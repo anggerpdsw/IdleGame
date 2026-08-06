@@ -21,15 +21,6 @@ namespace IdleDefenseSurvival.Core
         bool HasEnoughCurrency(CurrencyType type, long amount);
     }
 
-    public interface IUpgradeService
-    {
-        int GetSkillLevel(string skillId);
-        bool CanUpgrade(string skillId);
-        bool UpgradeSkill(string skillId, string reason = "");
-        bool UnlockSkill(string skillId);
-        bool IsSkillLocked(string skillId);
-    }
-
     public interface IAudioService
     {
         void PlayMusic(AudioClip clip, bool loop = true);
@@ -43,15 +34,6 @@ namespace IdleDefenseSurvival.Core
         void ShowRewardedAd(System.Action<bool> onComplete);
         void ShowBanner();
         void HideBanner();
-    }
-
-    public interface IAnalyticsService
-    {
-        void LogEvent(string name, System.Collections.Generic.IDictionary<string, object> parameters = null);
-        void RecordLevelComplete(float playtime, int wavesCleared, int finalWave);
-        void RecordUpgradePurchase(string skillId, int level, long cost);
-        void RecordEnemyKill(string enemyId, string damageSource, string role);
-        void SetUserProperty(string key, object value);
     }
 }
 

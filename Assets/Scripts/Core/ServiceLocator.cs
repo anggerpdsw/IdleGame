@@ -1,5 +1,6 @@
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Economy;
+using IdleDefenseSurvival.Core.Interfaces;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -11,7 +12,6 @@ namespace IdleDefenseSurvival.Core
     {
         public static ISaveService SaveService => SaveManager.Instance;
         public static IEconomyService EconomyService => EconomyManager.Instance;
-        public static IUpgradeService UpgradeService => UpgradeManager.Instance;
         public static IAudioService AudioService => AudioManager.Instance;
         public static IAdsService AdsService => AdvertisingManager.Instance;
         public static IAnalyticsService AnalyticsService => (IAnalyticsService)AnalyticsManager.Instance;

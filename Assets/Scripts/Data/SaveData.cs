@@ -16,7 +16,6 @@ namespace IdleDefenseSurvival.Data
         public CurrencyData currency;
         public SpendingData spending;
         public VipData vip;
-        public UpgradeData upgrades;
         public GameStateData gameState;
         public WaveProgressData waveProgress;
         public IdleRewardData idleReward;

@@ -1,3 +1,5 @@
+using IdleDefenseSurvival;
+
 namespace IdleDefenseSurvival.Data
 {
     /// <summary>
@@ -53,5 +55,12 @@ namespace IdleDefenseSurvival.Data
         {
             return Damage * DamageMultiplier * elementMultiplier;
         }
+
+        /// <summary>
+        /// True when the damage source is the player's basic auto-attack.
+        /// (Ultimates and tanks use UltimateDMG.* names — they are skills.)
+        /// </summary>
+        public static bool IsBasicAttack(string source)
+            => source == UltimateDMG.Player.ToString();
     }
 }

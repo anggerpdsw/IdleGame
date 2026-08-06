@@ -320,27 +320,6 @@ namespace IdleDefenseSurvival.Enemy
             EnemyStatisticsManager.Instance?.Register(this);
         }
 
-        /// <summary>
-        /// Legacy overload for backward compatibility.
-        /// Converts old parameters to DamageData and calls the new method.
-        /// </summary>
-        public float TakeDamage(float rawDamage, string damageSource = "Player", bool isCritical = false, Element element = Element.None)
-        {
-            float multiplier = Utilityku.ElementMultiplier(element, _element);
-
-            DamageData damageData = new(
-                rawDamage,
-                isCritical ? DamageType.Critical : DamageType.Normal,
-                isCritical ? CriticalType.Critical : CriticalType.None,
-                damageSource
-            )
-            {
-                DamageMultiplier = multiplier
-            };
-
-            return TakeDamage(damageData, false);
-        }
-
         public float TakeDamage(DamageData damageData, bool canEvade = true)
         {
             if (canEvade && Utilityku.Chance(_evasionChance))
@@ -352,8 +331,19 @@ namespace IdleDefenseSurvival.Enemy
             _lastDamageSource = damageData.Source;
 
             // Calculate final damage value
-            float elementMultiplier = Utilityku.ElementMultiplier(damageData.Element, _element);
-            float rawDamage = damageData.GetFinalDamage(elementMultiplier);
+            // Elemental attack: multiply by element matchup AND player's ElementDamage stat
+            // (boosted by Intelligence). Element.None on both sides = 1x, no element bonus.
+            float elementMultiplier = damageData.Element == Element.None || _element == Element.None
+                ? 1f
+                : PlayerStatsManager.Instance.GetStat(SkillType.ElementDamage) * Utilityku.ElementMultiplier(damageData.Element, _element);
+
+            // Skill vs basic attack: SkillDamage (Intelligence) boosts non-"Player"-source damage
+            // (ultimates, tanks, bombs, status effects). Basic player auto-attacks stay at 1x.
+            float skillMultiplier = DamageData.IsBasicAttack(damageData.Source)
+                ? 1f
+                : PlayerStatsManager.Instance.GetStat(SkillType.SkillDamage);
+
+            float rawDamage = damageData.GetFinalDamage(elementMultiplier) * skillMultiplier;
             float finalDamage = Utilityku.FinalDamage(rawDamage, _defenseAmount);
             finalDamage = Mathf.Min(_currentHealth, finalDamage);
             _currentHealth -= finalDamage;

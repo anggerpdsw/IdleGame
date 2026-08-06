@@ -50,9 +50,10 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<InventoryService>();
             EnsureSingleton<EquipmentService>();
             EnsureSingleton<CraftService>();
-            // SaveManager must be created AFTER UpgradeManager so it can access it
             EnsureSingleton<UpgradeManager>();
             EnsureSingleton<SaveManager>();
+            // Attribute stat modifiers need SaveManager (AccountData) to exist first.
+            EnsureSingleton<AttributeModifierManager>();
 
             // Load save data AFTER all managers exist (SaveManager.Start() will handle loading via coroutine)
             StartCoroutine(LoadMainMenu());

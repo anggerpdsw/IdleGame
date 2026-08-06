@@ -85,8 +85,9 @@ namespace IdleDefenseSurvival.Player
         }
 
         /// <summary>
-        /// Reload player stats based on current upgrade levels.
-        /// Called by UpgradeManager after a skill is upgraded.
+        /// Reload player base stats from dataPlayer.json.
+        /// Skills have no levels — modifiers (Constitution/Strength/etc.) are
+        /// applied by ModifierManager on top of these base values.
         /// </summary>
         public void ReloadStats()
         {
@@ -98,17 +99,7 @@ namespace IdleDefenseSurvival.Player
             }
 
             PlayerData baseData = JsonConvert.DeserializeObject<PlayerData>(jsonAsset.text);
-            var upgradeManager = ServiceLocator.UpgradeService;
-
-            if (upgradeManager == null)
-            {
-                Debug.LogWarning("[Player] UpgradeManager not found, using base stats.");
-                LoadPlayerData();
-                return;
-            }
-
-            // Load stats with current upgrade levels using the grouped structure
-            StatLoader.LoadWithUpgrades(baseData, (UpgradeManager)upgradeManager);
+            StatLoader.LoadBaseStats(baseData);
 
             // Update visuals
             DrawAttackRange();
@@ -122,22 +113,9 @@ namespace IdleDefenseSurvival.Player
             AttackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
         }
 
-        private void LoadPlayerData()
-        {
-            TextAsset playerJson = Resources.Load<TextAsset>("Data/dataPlayer");
-            if (playerJson == null)
-            {
-                Debug.LogWarning("Player data file not found at Resources/Data/dataPlayer.json. Using default values.");
-                return;
-            }
-
-            PlayerData pData = JsonConvert.DeserializeObject<PlayerData>(playerJson.text);
-            StatLoader.LoadFromPlayerData(pData);
-        }
-
         private void Start()
         {
-            // Wait for SaveManager to load before applying saved upgrade levels
+            // Re-apply base stats once save data (and any modifier sources) are loaded
             if (SaveManager.Instance != null && SaveManager.Instance.IsSaveLoaded)
             {
                 // Save already loaded (e.g., scene reload)

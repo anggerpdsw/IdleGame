@@ -29,5 +29,4 @@ public class UpgradeOpener : MonoBehaviour
         _isOpen = !_isOpen;
         _upgradePanel.SetActive(_isOpen);
     }
-
 }

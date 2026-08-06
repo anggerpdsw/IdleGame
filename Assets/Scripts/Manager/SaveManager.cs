@@ -69,8 +69,8 @@ namespace IdleDefenseSurvival.Manager
         {
             // Small initial delay to allow Awake methods to finish.
             yield return _waitForSeconds0_1;
-            // Wait until EconomyManager and UpgradeManager are available.
-            while (EconomyManager.Instance == null || UpgradeManager.Instance == null)
+            // Wait until EconomyManager is available.
+            while (EconomyManager.Instance == null)
                 yield return null;
             LoadAll();
         }
@@ -83,7 +83,7 @@ namespace IdleDefenseSurvival.Manager
             if (!_autoSaveEnabled) return;
 
             // Don't auto-save until load completes and all systems are initialized
-            if (UpgradeManager.Instance == null || !IsSaveLoaded) return;
+            if (!IsSaveLoaded) return;
 
             // Check if any system is dirty and auto-save immediately
             // (flags accumulate while load was blocked, so this flush also covers them)
@@ -238,8 +238,7 @@ namespace IdleDefenseSurvival.Manager
                     Debug.Log("[SaveManager] No save file found. Creating initial save with current game state.");
                     var initialData = new SaveData
                     {
-                        currency      = GatherCurrency(),
-                        upgrades      = UpgradeManager.Instance != null ? UpgradeManager.Instance.GatherUpgradeData() : new UpgradeData()
+                        currency = GatherCurrency()
                     };
                     SaveToFile(initialData);
                     Debug.Log("[SaveManager] Initial save created.");
@@ -298,7 +297,6 @@ namespace IdleDefenseSurvival.Manager
             data.currency ??= new CurrencyData();
             data.spending ??= new SpendingData();
             data.vip ??= new VipData();
-            data.upgrades ??= new UpgradeData();
             data.gameState ??= new GameStateData();
             data.waveProgress ??= new WaveProgressData();
             data.idleReward ??= new IdleRewardData();
@@ -324,9 +322,6 @@ namespace IdleDefenseSurvival.Manager
                     economyManager.SetCurrencyData(new CurrencyData());
                 _spending = new SpendingData();
                 _currentVip         = new VipData();
-                var upgradeManager  = UpgradeManager.Instance;
-                if (upgradeManager != null)
-                    upgradeManager.ResetProgress();
                 _currentGameState   = new GameStateData();
                 _currentWaveProgress = new WaveProgressData();
                 _currentIdleReward  = new IdleRewardData();
@@ -602,7 +597,6 @@ namespace IdleDefenseSurvival.Manager
             var currency = GatherCurrency();
             var spending = GatherSpendingData();
             var vip = GatherVipData();
-            var upgrades = UpgradeManager.Instance.GatherUpgradeData();
             var gameState = GatherGameState();
             var waveProgress = _currentWaveProgress;
             var idleReward = _currentIdleReward;
@@ -621,7 +615,6 @@ namespace IdleDefenseSurvival.Manager
                 currency = currency,
                 spending = spending,
                 vip = vip,
-                upgrades = upgrades,
                 gameState = gameState,
                 waveProgress = waveProgress,
                 idleReward = idleReward,
@@ -696,7 +689,6 @@ namespace IdleDefenseSurvival.Manager
             ApplyCurrency(data.currency);
             ApplySpendingData(data.spending);
             ApplyVipData(data.vip);
-            ApplyUpgradeData(data.upgrades);
             ApplyDailyRewardData(data.dailyReward);
             ApplyGameState(data.gameState);
             ApplyWaveProgress(data.waveProgress);
@@ -764,14 +756,6 @@ namespace IdleDefenseSurvival.Manager
 
         private void ApplyVipData(VipData data) => 
             _currentVip = data ?? _currentVip;
-
-        private void ApplyUpgradeData(UpgradeData data)
-        {
-            if (data == null) return;
-
-            var upgradeManager = UpgradeManager.Instance;
-            if (upgradeManager != null) upgradeManager.SetAllSkillLevels(data.skillLevels);
-        }
 
         private void ApplyGameState(GameStateData data)
         {

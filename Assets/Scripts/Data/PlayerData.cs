@@ -1,13 +1,44 @@
 using System;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace IdleDefenseSurvival.Data
 {
     [Serializable]
     public class PlayerData
     {
+        public MainAttributes mainAttributes;
         public PlayerSkills skills;
+    }
+
+    /// <summary>
+    /// Base (level-1) values of the four main attributes.
+    /// Player-allocated points are stored per-account in <see cref="AccountData"/>.
+    /// </summary>
+    [Serializable]
+    public class MainAttributes
+    {
+        public float constitution;
+        public float strength;
+        public float intelligence;
+        public float dexterity;
+    }
+
+    /// <summary>One stat bonus granted by an attribute. Parsed from dataAttribute.json.</summary>
+    [Serializable]
+    public class AttributeBonus
+    {
+        public string stat;          // SkillType name (AttackDamage, HealthPoint, ...)
+        public float flat;           // +X per point (flat)
+        public float percent;        // +X% per point (percent, 1 = +1%)
+    }
+
+    /// <summary>All bonuses one attribute grants. Parsed from dataAttribute.json.</summary>
+    [Serializable]
+    public class AttributeBonuses
+    {
+        public AttributeBonus[] constitution;
+        public AttributeBonus[] strength;
+        public AttributeBonus[] intelligence;
+        public AttributeBonus[] dexterity;
     }
 
     [Serializable]
@@ -39,6 +70,8 @@ namespace IdleDefenseSurvival.Data
         public SkillData superCriticalChance;
         public SkillData superCriticalFactor;
         public SkillData ultimateWeaponAttack;
+        public SkillData skillDamage;
+        public SkillData elementDamage;
         public SkillData ultraCriticalChance;
         public SkillData ultraCriticalFactor;
     }
@@ -61,82 +94,14 @@ namespace IdleDefenseSurvival.Data
     }
 
     /// <summary>
-    /// Defines the cost structure for upgrading a skill.
-    /// Supports multiple currencies with different scaling formulas.
-    /// Lives in Data namespace so SkillData can reference it directly.
+    /// A single player skill. Has a fixed base value (no levels).
+    /// Later influenced by Constitution/Strength/Intelligence/Dexterity stat modifiers.
     /// </summary>
-    [Serializable]
-    public class UpgradeCost
-    {
-        public CurrencyType currencyType = CurrencyType.Gold;
-        [Tooltip("Base cost at level 1")]
-        public long baseCost = 100;
-        [Tooltip("Exponential growth factor (1.15 = 15% increase per level)")]
-        public float growthFactor = 1.15f;
-        [Tooltip("If true, cost rounds to nearest 10/100/1000 for cleaner UI")]
-        public bool roundToNearest = true;
-
-        public long CalculateCost(int currentLevel)
-        {
-            if (currentLevel < 0) return 0;
-
-            float rawCost = baseCost * Mathf.Pow(growthFactor, currentLevel);
-
-            if (roundToNearest)
-            {
-                if (rawCost < 100)
-                    return Mathf.RoundToInt(rawCost / 10f) * 10;
-                if (rawCost < 1000)
-                    return Mathf.RoundToInt(rawCost / 50f) * 50;
-                if (rawCost < 10000)
-                    return Mathf.RoundToInt(rawCost / 100f) * 100;
-                return Mathf.RoundToInt(rawCost / 1000f) * 1000;
-            }
-
-            return Mathf.RoundToInt(rawCost);
-        }
-    }
-
     [Serializable]
     public class SkillData
     {
-        public int level;
-        public int maxLevel;
-        public float min;
-        public float max;
-        public bool isFloat = true;
-        public bool locked;
+        public float baseValue;
         public string description;
         public string displayName;
-
-        // ── Upgrade cost configuration (merged from dataUpgradeCosts.json) ──
-        [Tooltip("Currency costs for upgrading this skill")]
-        public List<UpgradeCost> costs = new();
-        [Tooltip("Gem cost to unlock this skill. 0 = already unlocked")]
-        public long unlockCost;
-        [Tooltip("Currency type for unlock cost")]
-        public CurrencyType unlockCurrency = CurrencyType.Gem;
-
-        // ── Computed helpers ──
-        public bool RequiresUnlock => unlockCost > 0;
-
-        public Dictionary<CurrencyType, long> GetUpgradeCost(int currentLevel)
-        {
-            var result = new Dictionary<CurrencyType, long>();
-            foreach (var cost in costs)
-            {
-                if (result.ContainsKey(cost.currencyType))
-                    result[cost.currencyType] += cost.CalculateCost(currentLevel);
-                else
-                    result[cost.currencyType] = cost.CalculateCost(currentLevel);
-            }
-            return result;
-        }
-
-        public Dictionary<CurrencyType, long> GetUnlockCost()
-        {
-            if (unlockCost <= 0) return null;
-            return new Dictionary<CurrencyType, long> { { unlockCurrency, unlockCost } };
-        }
     }
 }

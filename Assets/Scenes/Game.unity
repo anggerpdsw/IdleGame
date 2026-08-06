@@ -6585,7 +6585,7 @@ MonoBehaviour:
   debug: 0
   _menuPanel: {fileID: 1214397887}
   _buttonContainer: {fileID: 530835597}
-  _upgradeButtonPrefab: {fileID: 377513211602468825, guid: ad51b43334b2b9945b0f5322484d2750, type: 3}
+  _skillRowPrefab: {fileID: 377513211602468825, guid: ad51b43334b2b9945b0f5322484d2751, type: 3}
 --- !u!1 &1010404240
 GameObject:
   m_ObjectHideFlags: 0

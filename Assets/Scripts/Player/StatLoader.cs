@@ -1,56 +1,37 @@
 using System;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Core;
-using IdleDefenseSurvival.Manager; // for IUpgradeService
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Player
 {
+    /// <summary>
+    /// Loads player skill base values from dataPlayer.json into PlayerStatsManager.
+    /// No levels, no upgrades — skills are static values from JSON.
+    /// </summary>
     public static class StatLoader
     {
-        public static void LoadFromPlayerData(PlayerData playerData)
-        {
-            Load(playerData, null);
-        }
-
-        public static void LoadWithUpgrades(PlayerData playerData, UpgradeManager upgradeManager)
-        {
-            Load(playerData, upgradeManager);
-        }
-
-        private static void Load(PlayerData playerData, IUpgradeService upgradeService)
+        public static void LoadBaseStats(PlayerData playerData)
         {
             if (playerData?.skills == null) return;
 
             foreach (var group in playerData.skills.GetType().GetFields())
-            {
-                ProcessGroup(group.GetValue(playerData.skills), upgradeService);
-            }
-            
+                ProcessGroup(group.GetValue(playerData.skills));
+
             PlayerStatsManager.Instance.RefreshStats();
         }
 
-        private static void ProcessGroup(object group, IUpgradeService upgradeService)
+        private static void ProcessGroup(object group)
         {
             if (group == null) return;
 
             foreach (var field in group.GetType().GetFields())
             {
                 if (field.FieldType != typeof(SkillData)) continue;
-
                 if (!TryGetStatType(field.Name, out var statType)) continue;
 
-                SkillData skill = (SkillData)field.GetValue(group);
-
-                if (upgradeService != null)
-                {
-                    skill = CloneWithLevel(skill, upgradeService.GetSkillLevel(field.Name));
-                }
-
-                float value = skill.isFloat
-                    ? PlayerStatsCalculator.CalculateSkillFloatValue(skill)
-                    : PlayerStatsCalculator.CalculateSkillIntValue(skill);
-
-                PlayerStatsManager.Instance.SetBaseStat(statType, value);
+                var skill = (SkillData)field.GetValue(group);
+                PlayerStatsManager.Instance.SetBaseStat(statType, skill.baseValue);
             }
         }
 
@@ -61,21 +42,6 @@ namespace IdleDefenseSurvival.Player
 
             string enumName = char.ToUpperInvariant(skillName[0]) + skillName[1..];
             return Enum.TryParse(enumName, out statType);
-        }
-
-        private static SkillData CloneWithLevel(SkillData skill, int level)
-        {
-            return new SkillData
-            {
-                level = level,
-                maxLevel = skill.maxLevel,
-                min = skill.min,
-                max = skill.max,
-                isFloat = skill.isFloat,
-                locked = skill.locked,
-                description = skill.description,
-                displayName = skill.displayName
-            };
         }
     }
 }

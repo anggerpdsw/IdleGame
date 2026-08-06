@@ -19,6 +19,7 @@ namespace IdleDefenseSurvival
     public enum SpawnMode { Circle, FourSides }
     public enum UltimateDMG { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
     public enum WaveState { ActiveWave, Defeat, InterWave, Victory }
+    public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
     public enum ModifierMode { Flat, Percent }
     public enum ModifierSource { AccountLevel, Buff, Card, Equipment, Event, Pet, Quest, Skin, Upgrade, Ultimate }
 
@@ -39,6 +40,7 @@ namespace IdleDefenseSurvival
         KnockbackForce, LifeSteal, MultiShootChance, MultiShootCount, StuntChance,
         StuntDuration, SuperCriticalChance, SuperCriticalFactor, UltimateWeaponAttack,
         UltraCriticalChance, UltraCriticalFactor,
+        SkillDamage, ElementDamage,   // main-attribute derived stats (Intelligence)
 
         DeathDefy, DefenseAmount, EvasionChance, HealthPoint, HealthRegen,
 

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Modifier;
 
 namespace IdleDefenseSurvival.Manager

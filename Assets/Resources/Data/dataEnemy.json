@@ -1,6 +1,5 @@
 {
-  "enemies": [
-    {
+  "enemies": [{
       "id": "Infernal Lord",
       "role": "BOSS",
       "prefabName": "Basic",

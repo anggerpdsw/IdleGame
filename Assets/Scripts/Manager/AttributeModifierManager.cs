@@ -1,0 +1,126 @@
+using System.Collections.Generic;
+using UnityEngine;
+using IdleDefenseSurvival;
+using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Player;
+
+namespace IdleDefenseSurvival.Manager
+{
+    /// <summary>
+    /// Applies the four main attributes (Constitution/Strength/Intelligence/Dexterity)
+    /// as modifiers on top of the base player skills.
+    ///
+    /// Total attribute = base (dataPlayer.json "mainAttributes") + allocated points
+    /// (AccountData). Which skills each attribute boosts and by how much comes from
+    /// dataAttribute.json (parsed once by AttributeService — no re-parse on Apply).
+    ///
+    /// Auto-applies on: save load (OnSaveLoaded) and attribute change (AccountManager.OnAttributeChanged).
+    /// Modifiers registered under ModifierSource.AccountLevel.
+    /// </summary>
+    public class AttributeModifierManager : MonoBehaviour
+    {
+        private static AttributeModifierManager _instance;
+        public static AttributeModifierManager Instance => _instance;
+
+        private const string PREFIX = "attr";
+
+        // Always exactly four attributes; flat fields beat a Dictionary here.
+        private float _constitution, _strength, _intelligence, _dexterity;
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+
+        private void Start()
+        {
+            Apply();
+        }
+
+        private void OnEnable()
+        {
+            SaveManager.OnSaveLoaded += Apply;
+            // AccountManager is created before this manager in BootstrapController; if it is
+            // somehow null we subscribe anyway to attribute changes once it exists.
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.OnAttributeChanged += Apply;
+        }
+
+        private void OnDisable()
+        {
+            SaveManager.OnSaveLoaded -= Apply;
+            if (AccountManager.Instance != null)
+                AccountManager.Instance.OnAttributeChanged -= Apply;
+        }
+
+        private void OnDestroy()
+        {
+            if (ModifierManager.Instance != null)
+                ModifierManager.Instance.RemoveSource(ModifierSource.AccountLevel);
+        }
+
+        /// <summary>
+        /// (Re)apply attribute modifiers to skills. Called automatically on save load
+        /// and attribute change; no manual calls needed.
+        /// </summary>
+        public void Apply()
+        {
+            if (ModifierManager.Instance == null) return;
+
+            AttributeService.Initialize();
+            var account = SaveManager.Instance != null ? SaveManager.Instance.GetAccountData() : null;
+
+            _constitution = Total(MainAttribute.Constitution, account?.constitution ?? 0);
+            _strength = Total(MainAttribute.Strength, account?.strength ?? 0);
+            _intelligence = Total(MainAttribute.Intelligence, account?.intelligence ?? 0);
+            _dexterity = Total(MainAttribute.Dexterity, account?.dexterity ?? 0);
+            
+            var modifiers = new List<StatModifier>(32);
+            Collect(MainAttribute.Constitution, _constitution, modifiers);
+            Collect(MainAttribute.Strength, _strength, modifiers);
+            Collect(MainAttribute.Intelligence, _intelligence, modifiers);
+            Collect(MainAttribute.Dexterity, _dexterity, modifiers);
+
+            ModifierManager.Instance.SetSource(ModifierSource.AccountLevel, modifiers);
+        }
+
+        private void Collect(MainAttribute attr, float total, List<StatModifier> modifiers)
+        {
+            if (total <= 0) return;
+
+            var bonuses = AttributeService.GetBonuses(attr);
+            if (bonuses == null) return;
+
+            foreach (var bonus in bonuses)
+            {
+                float flat = bonus.Flat * total;
+                float percent = bonus.Percent * total;
+
+                // Flat and percent are separate modifiers so both can apply at once.
+                if (flat != 0f) modifiers.Add(Create(attr, bonus.Stat, ModifierMode.Flat, flat));
+                if (percent != 0f) modifiers.Add(Create(attr, bonus.Stat, ModifierMode.Percent, percent));
+            }
+        }
+
+        private StatModifier Create(MainAttribute attr, SkillType stat, ModifierMode mode, float value) => new()
+        {
+            // Mode in the id so flat + percent of the same stat don't collide.
+            Id = $"{PREFIX}_{attr}_{stat}_{mode}",
+            Source = ModifierSource.AccountLevel,
+            Stat = stat,
+            Mode = mode,
+            Value = value
+        };
+
+        private float Total(MainAttribute attr, int allocated) 
+            => AttributeService.GetBaseValue(attr) + allocated;
+
+    }
+}

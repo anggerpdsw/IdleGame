@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using IdleDefenseSurvival;
 using IdleDefenseSurvival.Data;
 
 namespace IdleDefenseSurvival.Manager
@@ -93,6 +94,9 @@ namespace IdleDefenseSurvival.Manager
                 Data.currentExp -= RequiredExp;
                 Data.level++;
 
+                // Each level-up grants 5 allocatable attribute points.
+                Data.unspentStatPoints += GameConstants.POINTS_PER_LEVEL;
+
                 // Notify listeners about the new level.
                 OnLevelUp?.Invoke(Data.level);
             }
@@ -119,6 +123,52 @@ namespace IdleDefenseSurvival.Manager
             double value = GameConstants.BASE_LEVEL * Math.Pow(level, 1.5);
             return (long)Math.Floor(value);
         }
+
+        #endregion
+
+        #region Attribute Allocation
+
+        /// <summary>Current unspent attribute points.</summary>
+        public int UnspentStatPoints => Data.unspentStatPoints;
+
+        /// <summary>
+        /// Current total value of an attribute = base + allocated points.
+        /// </summary>
+        public int GetAttributeValue(MainAttribute attribute) => attribute switch
+        {
+            MainAttribute.Constitution => Data.constitution,
+            MainAttribute.Strength => Data.strength,
+            MainAttribute.Intelligence => Data.intelligence,
+            MainAttribute.Dexterity => Data.dexterity,
+            _ => 0
+        };
+
+        /// <summary>
+        /// Spend one unspent point on an attribute.
+        /// Re-applies attribute modifiers immediately.
+        /// </summary>
+        public bool SpendPoint(MainAttribute attribute)
+        {
+            if (Data.unspentStatPoints <= 0) return false;
+
+            switch (attribute)
+            {
+                case MainAttribute.Constitution: Data.constitution++; break;
+                case MainAttribute.Strength: Data.strength++; break;
+                case MainAttribute.Intelligence: Data.intelligence++; break;
+                case MainAttribute.Dexterity: Data.dexterity++; break;
+                default: return false;
+            }
+
+            Data.unspentStatPoints--;
+            SaveManager.Instance.SaveAll();
+            // AttributeModifierManager re-applies automatically via OnAttributeChanged.
+            OnAttributeChanged?.Invoke();
+            return true;
+        }
+
+        /// <summary>Fired when any attribute changes (UI hook).</summary>
+        public event Action OnAttributeChanged;
 
         #endregion
 

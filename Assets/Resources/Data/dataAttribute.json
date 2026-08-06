@@ -1,0 +1,50 @@
+{
+  "constitution": [{
+      "stat": "HealthPoint",
+      "flat": 10,
+      "percent": 0
+    },
+    {
+      "stat": "DefenseAmount",
+      "flat": 0.5,
+      "percent": 0
+    },
+    {
+      "stat": "HealthRegen",
+      "flat": 0.1,
+      "percent": 0
+    }
+  ],
+  "strength": [{
+    "stat": "AttackDamage",
+    "flat": 1,
+    "percent": 0
+  }],
+  "intelligence": [{
+      "stat": "UltimateWeaponAttack",
+      "flat": 0.1,
+      "percent": 0
+    },
+    {
+      "stat": "SkillDamage",
+      "flat": 0,
+      "percent": 0.3
+    },
+    {
+      "stat": "ElementDamage",
+      "flat": 0,
+      "percent": 0.2
+    }
+  ],
+  "dexterity": [{
+      "stat": "AttackSpeed",
+      "flat": 0.03,
+      "percent": 0
+    },
+    {
+      "stat": "CriticalChance",
+      "flat": 0.3,
+      "percent": 0
+    }
+  ]
+}
