@@ -11,14 +11,14 @@ namespace IdleDefenseSurvival.Equipment
         public static readonly long[] SlotUnlockCosts = { 0, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000 };
 
         private readonly IEquipmentRepository _repo;
-        private readonly Dictionary<EquipmentSlot, EquipmentSlotData> _slotData = new();
+        private readonly Dictionary<EquipmentType, EquipmentSlotData> _slotData = new();
 
         public EquipmentSlotService(IEquipmentRepository repo)
         {
             _repo = repo;
-            foreach (EquipmentSlot slot in EquipmentSlotExtensions.GetAllSlots())
+            foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
             {
-                if (slot == EquipmentSlot.None) continue;
+                if (slot == EquipmentType.None) continue;
                 _slotData[slot] = new EquipmentSlotData
                 {
                     Slot = slot,
@@ -28,40 +28,40 @@ namespace IdleDefenseSurvival.Equipment
             }
         }
 
-        private static bool IsDefaultUnlocked(EquipmentSlot slot) =>
-            slot == EquipmentSlot.Hat || slot == EquipmentSlot.Armor || slot == EquipmentSlot.Pants;
+        private static bool IsDefaultUnlocked(EquipmentType slot) =>
+            slot == EquipmentType.Hat || slot == EquipmentType.Armor || slot == EquipmentType.Pants;
 
         public IReadOnlyList<EquipmentSlotData> GetAllSlotData()
         {
             var list = new List<EquipmentSlotData>(_slotData.Count);
-            foreach (EquipmentSlot slot in EquipmentSlotExtensions.GetAllSlots())
+            foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
             {
-                if (slot != EquipmentSlot.None && _slotData.TryGetValue(slot, out var data))
+                if (slot != EquipmentType.None && _slotData.TryGetValue(slot, out var data))
                     list.Add(data);
             }
             return list;
         }
 
-        public bool IsUnlocked(EquipmentSlot slot) => _repo.IsSlotUnlocked(slot);
+        public bool IsUnlocked(EquipmentType slot) => _repo.IsSlotUnlocked(slot);
         public int UnlockedCount => _repo.UnlockedSlots.Count;
 
-        public long GetUnlockCost(EquipmentSlot slot)
+        public long GetUnlockCost(EquipmentType slot)
         {
             int index = slot.GetIndex();
             return index >= 0 && index < SlotUnlockCosts.Length ? SlotUnlockCosts[index] : long.MaxValue;
         }
 
-        public EquipmentSlot? GetNextUnlockable()
+        public EquipmentType? GetNextUnlockable()
         {
-            foreach (EquipmentSlot slot in EquipmentSlotExtensions.GetAllSlots())
+            foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
             {
-                if (slot != EquipmentSlot.None && !_repo.IsSlotUnlocked(slot))
+                if (slot != EquipmentType.None && !_repo.IsSlotUnlocked(slot))
                     return slot;
             }
             return null;
         }
 
-        public bool Unlock(EquipmentSlot slot)
+        public bool Unlock(EquipmentType slot)
         {
             if (_repo.IsSlotUnlocked(slot)) return true;
 
@@ -77,34 +77,34 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>Resets to default free slots.</summary>
         public void ResetUnlocks()
         {
-            var unlocked = new List<EquipmentSlot>(_repo.UnlockedSlots);
+            var unlocked = new List<EquipmentType>(_repo.UnlockedSlots);
             foreach (var slot in unlocked) _repo.SetSlotUnlocked(slot, false);
 
-            foreach (EquipmentSlot slot in EquipmentSlotExtensions.GetAllSlots())
+            foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
             {
-                if (slot == EquipmentSlot.None) continue;
+                if (slot == EquipmentType.None) continue;
                 bool isDefault = IsDefaultUnlocked(slot);
                 _repo.SetSlotUnlocked(slot, isDefault);
                 if (_slotData.TryGetValue(slot, out var data)) data.IsUnlocked = isDefault;
             }
         }
 
-        public void RestoreUnlocks(IEnumerable<EquipmentSlot> slots)
+        public void RestoreUnlocks(IEnumerable<EquipmentType> slots)
         {
             foreach (var slot in slots)
             {
-                if (slot == EquipmentSlot.None) continue;
+                if (slot == EquipmentType.None) continue;
                 _repo.SetSlotUnlocked(slot, true);
                 if (_slotData.TryGetValue(slot, out var data)) data.IsUnlocked = true;
             }
         }
 
-        public void BindItem(EquipmentSlot slot, InventoryItem item)
+        public void BindItem(EquipmentType slot, InventoryItem item)
         {
             if (_slotData.TryGetValue(slot, out var data)) data.EquippedItem = item;
         }
 
-        public EquipmentSlotData GetSlotData(EquipmentSlot slot)
+        public EquipmentSlotData GetSlotData(EquipmentType slot)
         {
             _slotData.TryGetValue(slot, out var data);
             return data;

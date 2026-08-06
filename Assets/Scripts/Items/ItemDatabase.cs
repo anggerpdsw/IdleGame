@@ -132,9 +132,9 @@ namespace IdleDefenseSurvival.Items
             return _equipment.Values.Where(e => e.EquipmentType == type).ToList();
         }
 
-        public IReadOnlyList<EquipmentData> GetEquipmentBySlot(EquipmentSlot slot)
+        public IReadOnlyList<EquipmentData> GetEquipmentBySlot(EquipmentType slot)
         {
-            return _equipment.Values.Where(e => e.EquipmentType.ToSlot() == slot).ToList();
+            return _equipment.Values.Where(e => e.EquipmentType == slot).ToList();
         }
 
         public IReadOnlyList<EquipmentData> GetEquipmentBySet(string setId)

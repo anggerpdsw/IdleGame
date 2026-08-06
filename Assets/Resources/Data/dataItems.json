@@ -157,7 +157,7 @@
   "Equipment": [{
       "Id": "equip_hat_leather",
       "Name": "Leather Hat",
-      "Description": "A simple leather hat. +30 HP, +2 Defense",
+      "Description": "A simple leather hat. +6 CON, +2 Defense",
       "Category": 1,
       "ItemRarity": 2,
       "EquipmentType": 1,
@@ -169,27 +169,25 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 5,
       "MaxSockets": 1,
+      "AttributeStats": [{
+        "Attribute": "Constitution",
+        "BaseValue": 6,
+        "ValuePerLevel": 0.5,
+        "ValuePerEnhance": 0.8
+      }],
       "MainStats": [{
-          "Stat": 1,
-          "BaseValue": 30,
-          "ValuePerLevel": 3,
-          "ValuePerEnhance": 5,
-          "Mode": 1
-        },
-        {
-          "Stat": 3,
-          "BaseValue": 2,
-          "ValuePerLevel": 0.3,
-          "ValuePerEnhance": 0.5,
-          "Mode": 1
-        }
-      ],
+        "Stat": 3,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.5,
+        "Mode": 1
+      }],
       "IconKey": "UltimateStone"
     },
     {
       "Id": "equip_gloves_fighter",
       "Name": "Fighter Gloves",
-      "Description": "Reinforced knuckles. +4 Attack",
+      "Description": "Reinforced knuckles. +4 STR",
       "Category": 1,
       "ItemRarity": 3,
       "EquipmentType": 2,
@@ -201,19 +199,18 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 6,
       "MaxSockets": 1,
-      "MainStats": [{
-        "Stat": 2,
+      "AttributeStats": [{
+        "Attribute": "Strength",
         "BaseValue": 4,
         "ValuePerLevel": 0.4,
-        "ValuePerEnhance": 0.8,
-        "Mode": 1
+        "ValuePerEnhance": 0.8
       }],
       "IconKey": "UltimateStone"
     },
     {
       "Id": "equip_armor_iron",
       "Name": "Iron Armor",
-      "Description": "Solid iron plating. +60 HP, +8 Defense",
+      "Description": "Solid iron plating. +12 CON, +8 Defense",
       "Category": 1,
       "ItemRarity": 3,
       "EquipmentType": 4,
@@ -225,27 +222,25 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 7,
       "MaxSockets": 2,
+      "AttributeStats": [{
+        "Attribute": "Constitution",
+        "BaseValue": 12,
+        "ValuePerLevel": 1,
+        "ValuePerEnhance": 1.5
+      }],
       "MainStats": [{
-          "Stat": 1,
-          "BaseValue": 60,
-          "ValuePerLevel": 5,
-          "ValuePerEnhance": 8,
-          "Mode": 1
-        },
-        {
-          "Stat": 3,
-          "BaseValue": 8,
-          "ValuePerLevel": 0.6,
-          "ValuePerEnhance": 1,
-          "Mode": 1
-        }
-      ],
+        "Stat": 3,
+        "BaseValue": 8,
+        "ValuePerLevel": 0.6,
+        "ValuePerEnhance": 1,
+        "Mode": 1
+      }],
       "IconKey": "UltimateStone"
     },
     {
       "Id": "equip_belt_warrior",
       "Name": "Warrior Belt",
-      "Description": "Belt of a seasoned warrior. +5 Attack Speed",
+      "Description": "Belt of a seasoned warrior. +5 DEX",
       "Category": 1,
       "ItemRarity": 2,
       "EquipmentType": 5,
@@ -257,19 +252,18 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 5,
       "MaxSockets": 1,
-      "MainStats": [{
-        "Stat": 4,
+      "AttributeStats": [{
+        "Attribute": "Dexterity",
         "BaseValue": 5,
         "ValuePerLevel": 0.3,
-        "ValuePerEnhance": 0.5,
-        "Mode": 1
+        "ValuePerEnhance": 0.5
       }],
       "IconKey": "UltimateStone"
     },
     {
       "Id": "equip_ring_ruby",
       "Name": "Ruby Ring",
-      "Description": "A ring set with a crimson ruby. +3% Critical Rate",
+      "Description": "A ring set with a crimson ruby. +3 DEX",
       "Category": 1,
       "ItemRarity": 4,
       "EquipmentType": 8,
@@ -281,19 +275,18 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 8,
       "MaxSockets": 1,
-      "MainStats": [{
-        "Stat": 5,
+      "AttributeStats": [{
+        "Attribute": "Dexterity",
         "BaseValue": 3,
         "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0.5,
-        "Mode": 2
+        "ValuePerEnhance": 0.5
       }],
       "IconKey": "UltimateStone"
     },
     {
       "Id": "equip_bracelet_lifesteal",
       "Name": "Vampire Bracelet",
-      "Description": "Leeches life from foes. +2% Life Steal",
+      "Description": "Leeches life from foes. +2 INT",
       "Category": 1,
       "ItemRarity": 4,
       "EquipmentType": 10,
@@ -305,19 +298,18 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 8,
       "MaxSockets": 1,
-      "MainStats": [{
-        "Stat": 9,
+      "AttributeStats": [{
+        "Attribute": "Intelligence",
         "BaseValue": 2,
         "ValuePerLevel": 0.1,
-        "ValuePerEnhance": 0.3,
-        "Mode": 2
+        "ValuePerEnhance": 0.3
       }],
       "IconKey": "UltimateStone"
     },
     {
       "Id": "equip_hat_mystic",
       "Name": "Mystic Hat",
-      "Description": "Enchanted cloth woven with starlight. +10 Magic Power, +5% Cooldown Reduction",
+      "Description": "Enchanted cloth woven with starlight. +10 INT, +5% Cooldown Reduction",
       "Category": 1,
       "ItemRarity": 5,
       "EquipmentType": 1,
@@ -329,21 +321,19 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 10,
       "MaxSockets": 2,
+      "AttributeStats": [{
+        "Attribute": "Intelligence",
+        "BaseValue": 10,
+        "ValuePerLevel": 0.8,
+        "ValuePerEnhance": 1.5
+      }],
       "MainStats": [{
-          "Stat": 13,
-          "BaseValue": 10,
-          "ValuePerLevel": 0.8,
-          "ValuePerEnhance": 1.5,
-          "Mode": 1
-        },
-        {
-          "Stat": 15,
-          "BaseValue": 5,
-          "ValuePerLevel": 0.2,
-          "ValuePerEnhance": 0.4,
-          "Mode": 2
-        }
-      ],
+        "Stat": 15,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4,
+        "Mode": 2
+      }],
       "IconKey": "UltimateStone"
     }
   ],

@@ -64,7 +64,7 @@ namespace IdleDefenseSurvival.Equipment
         }
 
         public static Dictionary<MainStat, float> GetTotalStatBonuses(ItemDatabase db,
-            IReadOnlyDictionary<EquipmentSlot, InventoryItem> equippedItems,
+            IReadOnlyDictionary<EquipmentType, InventoryItem> equippedItems,
             IReadOnlyDictionary<string, int> setPieceCounts)
         {
             var totals = new Dictionary<MainStat, float>();
@@ -102,6 +102,58 @@ namespace IdleDefenseSurvival.Equipment
             return bonuses;
         }
 
+        public static Dictionary<MainAttribute, float> GetItemAttributeBonuses(InventoryItem item)
+        {
+            var bonuses = new Dictionary<MainAttribute, float>();
+            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
+
+            if (itemData.AttributeStats != null)
+                foreach (var attrEntry in itemData.AttributeStats)
+                    AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level, item.EnhanceLevel));
+
+            return bonuses;
+        }
+
+        public static Dictionary<MainAttribute, float> GetSetAttributeBonuses(ItemDatabase db,
+            IReadOnlyDictionary<string, int> setPieceCounts)
+        {
+            var totals = new Dictionary<MainAttribute, float>();
+
+            foreach (var (setId, count) in setPieceCounts)
+            {
+                var setData = db?.GetSet(setId);
+                if (setData?.Tiers == null) continue;
+
+                foreach (var tier in setData.Tiers.Where(t => t.IsActive(count)))
+                {
+                    if (tier.AttributeBonuses == null) continue;
+                    foreach (var attrEntry in tier.AttributeBonuses)
+                        AddAsAttribute(totals, attrEntry.Attribute, attrEntry.GetValue(1, 0));
+                }
+            }
+
+            return totals;
+        }
+
+        public static Dictionary<MainAttribute, float> GetTotalAttributeBonuses(ItemDatabase db,
+            IReadOnlyDictionary<EquipmentType, InventoryItem> equippedItems,
+            IReadOnlyDictionary<string, int> setPieceCounts)
+        {
+            var totals = new Dictionary<MainAttribute, float>();
+
+            foreach (var item in equippedItems.Values)
+            {
+                foreach (var (attr, value) in GetItemAttributeBonuses(item))
+                    AddAsAttribute(totals, attr, value);
+            }
+
+            var setBonuses = GetSetAttributeBonuses(db, setPieceCounts);
+            foreach (var (attr, value) in setBonuses)
+                AddAsAttribute(totals, attr, value);
+
+            return totals;
+        }
+
         /// <summary>Builds `Equip:{instanceId}_{stat}` modifiers. Single source for add/remove symmetry.</summary>
         public static IEnumerable<StatModifier> CreateStatModifiers(InventoryItem item)
         {
@@ -135,6 +187,13 @@ namespace IdleDefenseSurvival.Equipment
             if (stat == MainStat.None || value == 0f) return;
             dict.TryGetValue(stat, out float current);
             dict[stat] = current + value;
+        }
+
+        private static void AddAsAttribute(Dictionary<MainAttribute, float> dict, MainAttribute attr, float value)
+        {
+            if (value == 0f) return;
+            dict.TryGetValue(attr, out float current);
+            dict[attr] = current + value;
         }
 
         private sealed class ModifierBuilder

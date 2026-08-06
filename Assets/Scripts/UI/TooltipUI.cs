@@ -277,6 +277,21 @@ namespace IdleDefenseSurvival.UI
             var bonuses = EquipmentComparer.GetTotalStatBonuses(item);
             var comparisonBonuses = comparisonItem != null ? EquipmentComparer.GetTotalStatBonuses(comparisonItem) : null;
 
+            // Core attributes first (CON/STR/INT/DEX) — equipment identity.
+            var attrBonuses = EquipmentStatCalculator.GetItemAttributeBonuses(item);
+            var comparisonAttr = comparisonItem != null ? EquipmentStatCalculator.GetItemAttributeBonuses(comparisonItem) : null;
+
+            foreach (var kvp in attrBonuses.OrderByDescending(k => Math.Abs(k.Value)))
+            {
+                var entryObj = Instantiate(_statEntryPrefab, _mainStatsContainer);
+                var entryUI = entryObj.GetComponent<TooltipStatEntryUI>();
+                if (entryUI != null)
+                {
+                    float compareValue = comparisonAttr?.GetValueOrDefault(kvp.Key, 0) ?? 0;
+                    entryUI.Initialize(kvp.Key.GetDisplayName(), kvp.Value, compareValue);
+                }
+            }
+
             foreach (var kvp in bonuses.OrderByDescending(k => Math.Abs(k.Value)))
             {
                 var entryObj = Instantiate(_statEntryPrefab, _mainStatsContainer);
@@ -371,7 +386,7 @@ namespace IdleDefenseSurvival.UI
             foreach (Transform child in _comparisonStatsContainer)
                 Destroy(child.gameObject);
 
-            var comparison = EquipmentComparer.Compare(current, candidate, candidate.GetEquipmentType().ToSlot());
+            var comparison = EquipmentComparer.Compare(current, candidate, candidate.GetEquipmentType());
 
             foreach (var kvp in comparison.StatComparisons)
             {
@@ -419,9 +434,12 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private TextMeshProUGUI _comparisonText;
 
         public void Initialize(MainStat stat, float value, float comparisonValue = 0)
+            => Initialize(stat.GetDisplayName(), value, comparisonValue);
+
+        public void Initialize(string statName, float value, float comparisonValue = 0)
         {
             if (_statNameText != null)
-                _statNameText.text = stat.GetDisplayName();
+                _statNameText.text = statName;
 
             if (_statValueText != null)
             {

@@ -24,7 +24,7 @@ namespace IdleDefenseSurvival.UI.Inventory
 
         private void Refresh()
         {
-            var item = EquipmentService.Instance?.EquippedItems.GetValueOrDefault(_type.ToSlot());
+            var item = EquipmentService.Instance?.EquippedItems.GetValueOrDefault(_type);
             if (item == null)
             {
                 _icon.sprite = null;

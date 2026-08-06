@@ -25,7 +25,7 @@ namespace IdleDefenseSurvival.Equipment
         {
             if (item == null || !item.IsEquippable()) return null;
 
-            EquipmentSlot slot = item.GetEquipmentType().ToSlot();
+            EquipmentType slot = item.GetEquipmentType();
             _repo.TryGetEquipped(slot, out var currentItem);
 
             var comparison = new EquipmentComparison

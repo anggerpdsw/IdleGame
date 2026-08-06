@@ -122,11 +122,11 @@ namespace IdleDefenseSurvival.UI.Equipment
 
         #region Event Handlers
         private void OnEquipmentChanged(EquipmentChangedEventArgs args) => RefreshUI();
-        private void OnItemEquipped(EquipmentSlot slot, InventoryItem item) => RefreshSlot(slot);
-        private void OnItemUnequipped(EquipmentSlot slot, InventoryItem item) => RefreshSlot(slot);
+        private void OnItemEquipped(EquipmentType slot, InventoryItem item) => RefreshSlot(slot);
+        private void OnItemUnequipped(EquipmentType slot, InventoryItem item) => RefreshSlot(slot);
         private void OnSetBonusChanged() => RefreshSetBonuses();
-        private void OnDurabilityChanged(EquipmentSlot slot) => RefreshSlot(slot);
-        private void OnSlotUnlocked(EquipmentSlot slot) => RefreshSlot(slot);
+        private void OnDurabilityChanged(EquipmentType slot) => RefreshSlot(slot);
+        private void OnSlotUnlocked(EquipmentType slot) => RefreshSlot(slot);
         private void OnInventoryChanged(InventoryChangedEventArgs args) => RefreshUI();
         #endregion
 
@@ -151,7 +151,7 @@ namespace IdleDefenseSurvival.UI.Equipment
             }
         }
 
-        private void RefreshSlot(EquipmentSlot slot)
+        private void RefreshSlot(EquipmentType slot)
         {
             var slotUI = Array.Find(_slotUis, s => s.Slot == slot);
             slotUI?.Refresh();
@@ -241,7 +241,7 @@ namespace IdleDefenseSurvival.UI.Equipment
         {
             if (_comparePanel != null && newItem != null)
             {
-                var currentItem = EquipmentService.Instance?.EquippedItems.GetValueOrDefault(newItem.GetEquipmentType().ToSlot());
+                var currentItem = EquipmentService.Instance?.EquippedItems.GetValueOrDefault(newItem.GetEquipmentType());
                 _comparePanel.ShowComparison(currentItem, newItem);
             }
         }
@@ -281,13 +281,13 @@ namespace IdleDefenseSurvival.UI.Equipment
             }
         }
 
-        private void ShowCompatibleItems(EquipmentSlot slot)
+        private void ShowCompatibleItems(EquipmentType slot)
         {
             var inventory = InventoryService.Instance;
             var equipment = EquipmentService.Instance;
             if (inventory == null || equipment == null) return;
 
-            var candidates = inventory.GetEquipmentsByType(slot.ToType())
+            var candidates = inventory.GetEquipmentsByType(slot)
                 .Where(i => !i.IsEquipped && equipment.CanEquip(i, slot, out _))
                 .ToList();
 

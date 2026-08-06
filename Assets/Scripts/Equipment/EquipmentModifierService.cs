@@ -20,7 +20,7 @@ namespace IdleDefenseSurvival.Equipment
             _repo = repo;
         }
 
-        public void ApplyItemStatModifiers(InventoryItem item, EquipmentSlot slot, bool add)
+        public void ApplyItemStatModifiers(InventoryItem item, EquipmentType slot, bool add)
         {
             if (item == null) return;
 

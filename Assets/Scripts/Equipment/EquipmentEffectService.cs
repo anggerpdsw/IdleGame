@@ -19,7 +19,7 @@ namespace IdleDefenseSurvival.Equipment
             _repo = repo;
         }
 
-        public void ActivateItemEffects(InventoryItem item, EquipmentSlot slot)
+        public void ActivateItemEffects(InventoryItem item, EquipmentType slot)
         {
             var itemData = ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData;
             if (itemData?.SpecialEffects == null) return;
@@ -37,7 +37,7 @@ namespace IdleDefenseSurvival.Equipment
             }
         }
 
-        public void DeactivateItemEffects(InventoryItem item, EquipmentSlot slot)
+        public void DeactivateItemEffects(InventoryItem item, EquipmentType slot)
         {
             for (int i = _repo.ActiveEffects.Count - 1; i >= 0; i--)
             {
@@ -52,7 +52,7 @@ namespace IdleDefenseSurvival.Equipment
             }
         }
 
-        private static EquipmentContext BuildContext(InventoryItem item, EquipmentSlot slot) => new()
+        private static EquipmentContext BuildContext(InventoryItem item, EquipmentType slot) => new()
         {
             Item = item,
             Slot = slot,

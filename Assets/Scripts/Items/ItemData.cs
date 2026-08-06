@@ -100,8 +100,11 @@ namespace IdleDefenseSurvival.Items
     [Serializable]
     public class EquipmentData : ItemData
     {
+        // ============ Attribute Stats ============
+        public AttributeStatEntry[] AttributeStats; // Primary: 4 core attributes (CON/STR/INT/DEX)
+
         // ============ Main Stats ============
-        public MainStatEntry[] MainStats; // Primary stats this equipment provides
+        public MainStatEntry[] MainStats; // Secondary combat stats (Crit, LifeSteal, AttackSpeed, ...)
 
         // ============ Secondary Stats ============
         public SecondaryStatEntry[] SecondaryStats; // Additional stat modifiers
@@ -127,6 +130,7 @@ namespace IdleDefenseSurvival.Items
         public void InitializeDefaults()
         {
             Category = ItemCategory.Equipment;
+            if (AttributeStats == null) AttributeStats = Array.Empty<AttributeStatEntry>();
             if (MainStats == null) MainStats = Array.Empty<MainStatEntry>();
             if (SecondaryStats == null) SecondaryStats = Array.Empty<SecondaryStatEntry>();
             if (SpecialEffects == null) SpecialEffects = Array.Empty<SpecialEffectEntry>();
@@ -153,6 +157,24 @@ namespace IdleDefenseSurvival.Items
         {
             float value = BaseValue + ValuePerLevel * (level - 1) + ValuePerEnhance * enhanceLevel;
             return Mode == SecondaryStatMode.Percent ? value * 0.01f : value;
+        }
+    }
+
+    /// <summary>
+    /// Attribute stat entry - one of the four core attributes with scaling.
+    /// Feeds the attribute pool (AttributeModifierManager) instead of ModifierManager directly.
+    /// </summary>
+    [Serializable]
+    public class AttributeStatEntry
+    {
+        public MainAttribute Attribute = MainAttribute.Constitution;
+        public float BaseValue = 0f;
+        public float ValuePerLevel = 0f; // Scaling per level
+        public float ValuePerEnhance = 0f; // Scaling per enhance level
+
+        public float GetValue(int level, int enhanceLevel = 0)
+        {
+            return BaseValue + ValuePerLevel * (level - 1) + ValuePerEnhance * enhanceLevel;
         }
     }
 

@@ -23,12 +23,12 @@
         "displayName": "Attack Range"
       },
       "bounceChance": {
-        "baseValue": 0,
+        "baseValue": 5,
         "description": "Probability of projectile bouncing to another enemy after hitting one",
         "displayName": "Bounce Chance"
       },
       "bounceCount": {
-        "baseValue": 1,
+        "baseValue": 3,
         "description": "Number of times a projectile can bounce from enemy to enemy",
         "displayName": "Bounce Count"
       },
@@ -48,17 +48,17 @@
         "displayName": "Bounce Search Radius"
       },
       "damagePerRange": {
-        "baseValue": 0,
+        "baseValue": 10,
         "description": "Damage increased the further the enemy is from the player",
         "displayName": "Damage Per Range"
       },
       "knockbackChance": {
-        "baseValue": 0,
+        "baseValue": 5,
         "description": "Chance to knockback enemies",
         "displayName": "Knockback Chance"
       },
       "knockbackForce": {
-        "baseValue": 0.5,
+        "baseValue": 1.5,
         "description": "Force applied to knockbacked enemies",
         "displayName": "Knockback Force"
       },
@@ -73,12 +73,12 @@
         "displayName": "Multi-Shot Count"
       },
       "stuntChance": {
-        "baseValue": 0,
+        "baseValue": 1,
         "description": "Probability of triggering stunt effect when attacking",
         "displayName": "Stun Chance"
       },
       "stuntDuration": {
-        "baseValue": 0.5,
+        "baseValue": 1.5,
         "description": "Can stunt enemies for a period of time",
         "displayName": "Stun Duration"
       },
@@ -98,7 +98,7 @@
         "displayName": "Element Damage"
       },
       "superCriticalChance": {
-        "baseValue": 0,
+        "baseValue": 2.5,
         "description": "Chance for a super critical hit, if critical hit chance succeeds",
         "displayName": "Super Critical Chance"
       },
@@ -108,7 +108,7 @@
         "displayName": "Super Critical Factor"
       },
       "ultraCriticalChance": {
-        "baseValue": 0,
+        "baseValue": 1.25,
         "description": "Chance for a ultra critical hit, if super critical hit chance succeeds",
         "displayName": "Ultra Critical Chance"
       },

@@ -10,15 +10,15 @@ namespace IdleDefenseSurvival.Equipment
     /// </summary>
     public interface IEquipmentRepository
     {
-        IReadOnlyDictionary<EquipmentSlot, InventoryItem> EquippedItems { get; }
+        IReadOnlyDictionary<EquipmentType, InventoryItem> EquippedItems { get; }
 
-        bool TryGetEquipped(EquipmentSlot slot, out InventoryItem item);
-        void SetEquipped(EquipmentSlot slot, InventoryItem item);
-        bool RemoveEquipped(EquipmentSlot slot, out InventoryItem item);
+        bool TryGetEquipped(EquipmentType slot, out InventoryItem item);
+        void SetEquipped(EquipmentType slot, InventoryItem item);
+        bool RemoveEquipped(EquipmentType slot, out InventoryItem item);
 
-        bool IsSlotUnlocked(EquipmentSlot slot);
-        void SetSlotUnlocked(EquipmentSlot slot, bool unlocked);
-        IReadOnlyCollection<EquipmentSlot> UnlockedSlots { get; }
+        bool IsSlotUnlocked(EquipmentType slot);
+        void SetSlotUnlocked(EquipmentType slot, bool unlocked);
+        IReadOnlyCollection<EquipmentType> UnlockedSlots { get; }
 
         void UpdateSetPieceCount(string setId, int newCount);
         int GetSetPieceCount(string setId);

@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using IdleDefenseSurvival;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Manager
@@ -51,6 +52,10 @@ namespace IdleDefenseSurvival.Manager
             // somehow null we subscribe anyway to attribute changes once it exists.
             if (AccountManager.Instance != null)
                 AccountManager.Instance.OnAttributeChanged += Apply;
+            // EquipmentService is created after this manager in BootstrapController; subscribe
+            // when available so re-apply happens on equip/swap/unequip and set-bonus changes.
+            if (EquipmentService.Instance != null)
+                EquipmentService.Instance.OnEquipmentChanged += OnEquipmentChanged;
         }
 
         private void OnDisable()
@@ -58,6 +63,8 @@ namespace IdleDefenseSurvival.Manager
             SaveManager.OnSaveLoaded -= Apply;
             if (AccountManager.Instance != null)
                 AccountManager.Instance.OnAttributeChanged -= Apply;
+            if (EquipmentService.Instance != null)
+                EquipmentService.Instance.OnEquipmentChanged -= OnEquipmentChanged;
         }
 
         private void OnDestroy()
@@ -65,6 +72,9 @@ namespace IdleDefenseSurvival.Manager
             if (ModifierManager.Instance != null)
                 ModifierManager.Instance.RemoveSource(ModifierSource.AccountLevel);
         }
+
+        /// <summary>Equipment re-applies attribute pool on equip/swap/unequip/set-bonus changes.</summary>
+        private void OnEquipmentChanged(EquipmentChangedEventArgs _) => Apply();
 
         /// <summary>
         /// (Re)apply attribute modifiers to skills. Called automatically on save load
@@ -77,10 +87,22 @@ namespace IdleDefenseSurvival.Manager
             AttributeService.Initialize();
             var account = SaveManager.Instance != null ? SaveManager.Instance.GetAccountData() : null;
 
-            _constitution = Total(MainAttribute.Constitution, account?.constitution ?? 0);
-            _strength = Total(MainAttribute.Strength, account?.strength ?? 0);
-            _intelligence = Total(MainAttribute.Intelligence, account?.intelligence ?? 0);
-            _dexterity = Total(MainAttribute.Dexterity, account?.dexterity ?? 0);
+            // Equipment attribute bonuses (main stats + set bonuses) feed the same pool,
+            // so the equipment pipeline is: equipment -> attribute -> skill modifier.
+            var equipment = EquipmentService.Instance;
+            var equipBonuses = equipment != null
+                ? EquipmentStatCalculator.GetTotalAttributeBonuses(ItemDatabase.Instance,
+                    equipment.EquippedItems, equipment.EquippedSetCounts)
+                : null;
+
+            _constitution = Total(MainAttribute.Constitution, account?.constitution ?? 0) +
+                (equipBonuses?.GetValueOrDefault(MainAttribute.Constitution, 0) ?? 0);
+            _strength = Total(MainAttribute.Strength, account?.strength ?? 0) +
+                (equipBonuses?.GetValueOrDefault(MainAttribute.Strength, 0) ?? 0);
+            _intelligence = Total(MainAttribute.Intelligence, account?.intelligence ?? 0) +
+                (equipBonuses?.GetValueOrDefault(MainAttribute.Intelligence, 0) ?? 0);
+            _dexterity = Total(MainAttribute.Dexterity, account?.dexterity ?? 0) +
+                (equipBonuses?.GetValueOrDefault(MainAttribute.Dexterity, 0) ?? 0);
             
             var modifiers = new List<StatModifier>(32);
             Collect(MainAttribute.Constitution, _constitution, modifiers);

@@ -38,7 +38,7 @@ namespace IdleDefenseSurvival.Modifiers
         /// Initializes the effect with configuration data.
         /// Called when effect is first applied to an item.
         /// </summary>
-        void Initialize(SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot);
+        void Initialize(SpecialEffectEntry config, InventoryItem item, EquipmentType slot);
 
         /// <summary>
         /// Called when the effect is activated (item equipped).
@@ -99,7 +99,7 @@ namespace IdleDefenseSurvival.Modifiers
     public class EquipmentContext
     {
         public InventoryItem Item { get; set; }
-        public EquipmentSlot Slot { get; set; }
+        public EquipmentType Slot { get; set; }
         public IEquipmentService EquipmentService { get; set; }
         public IInventoryService InventoryService { get; set; }
         public Player.Player Player { get; set; }
@@ -199,7 +199,7 @@ namespace IdleDefenseSurvival.Modifiers
 
         // ============ Factory ============
         IEquipmentEffect CreateEffect(SpecialEffectType type);
-        IEquipmentEffect CreateEffect(SpecialEffectType type, SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot);
+        IEquipmentEffect CreateEffect(SpecialEffectType type, SpecialEffectEntry config, InventoryItem item, EquipmentType slot);
 
         // ============ Lookup ============
         IEquipmentEffect GetEffect(SpecialEffectType type);
@@ -217,7 +217,7 @@ namespace IdleDefenseSurvival.Modifiers
     {
         SpecialEffectType EffectType { get; }
         IEquipmentEffect Create();
-        IEquipmentEffect Create(SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot);
+        IEquipmentEffect Create(SpecialEffectEntry config, InventoryItem item, EquipmentType slot);
     }
 
     /// <summary>
@@ -234,10 +234,10 @@ namespace IdleDefenseSurvival.Modifiers
 
         protected SpecialEffectEntry _config;
         protected InventoryItem _item;
-        protected EquipmentSlot _slot;
+        protected EquipmentType _slot;
         protected EquipmentContext _context;
 
-        public virtual void Initialize(SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot)
+        public virtual void Initialize(SpecialEffectEntry config, InventoryItem item, EquipmentType slot)
         {
             _config = config;
             _item = item;

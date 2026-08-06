@@ -45,7 +45,7 @@ namespace IdleDefenseSurvival.Equipment
         public void Reset()
         {
             // Orchestrator calls UnequipAll before Reset; defensive reopen here.
-            foreach (var slot in new List<EquipmentSlot>(_repo.EquippedItems.Keys))
+            foreach (var slot in new List<EquipmentType>(_repo.EquippedItems.Keys))
                 _repo.RemoveEquipped(slot, out _);
 
             _repo.ClearSetCounts();

@@ -15,14 +15,14 @@ namespace IdleDefenseSurvival.Equipment
     {
         // ============ Events ============
         event Action<EquipmentChangedEventArgs> OnEquipmentChanged;
-        event Action<EquipmentSlot, InventoryItem> OnItemEquipped;
-        event Action<EquipmentSlot, InventoryItem> OnItemUnequipped;
-        event Action<EquipmentSlot> OnSlotUnlocked;
+        event Action<EquipmentType, InventoryItem> OnItemEquipped;
+        event Action<EquipmentType, InventoryItem> OnItemUnequipped;
+        event Action<EquipmentType> OnSlotUnlocked;
         event Action OnSetBonusChanged;
-        event Action<EquipmentSlot> OnDurabilityChanged;
+        event Action<EquipmentType> OnDurabilityChanged;
 
         // ============ Properties ============
-        IReadOnlyDictionary<EquipmentSlot, InventoryItem> EquippedItems { get; }
+        IReadOnlyDictionary<EquipmentType, InventoryItem> EquippedItems { get; }
         IReadOnlyList<EquipmentSlotData> SlotData { get; }
         int UnlockedSlotCount { get; }
         int TotalEquippedCount { get; }
@@ -30,19 +30,19 @@ namespace IdleDefenseSurvival.Equipment
 
         // ============ Core Operations ============
         /// <summary>Attempts to equip an item. Returns true on success.</summary>
-        bool Equip(InventoryItem item, EquipmentSlot slot = EquipmentSlot.None);
+        bool Equip(InventoryItem item, EquipmentType slot = EquipmentType.None);
 
         /// <summary>Attempts to equip an item by instance ID. Returns true on success.</summary>
-        bool EquipByInstanceId(string instanceId, EquipmentSlot slot = EquipmentSlot.None);
+        bool EquipByInstanceId(string instanceId, EquipmentType slot = EquipmentType.None);
 
         /// <summary>Unequips item from slot. Returns the unequipped item or null.</summary>
-        InventoryItem Unequip(EquipmentSlot slot);
+        InventoryItem Unequip(EquipmentType slot);
 
         /// <summary>Unequips item by instance ID. Returns the unequipped item or null.</summary>
         InventoryItem UnequipByInstanceId(string instanceId);
 
         /// <summary>Swaps equipment between two slots (if compatible).</summary>
-        bool SwapEquipment(EquipmentSlot slotA, EquipmentSlot slotB);
+        bool SwapEquipment(EquipmentType slotA, EquipmentType slotB);
 
         /// <summary>Auto-equips best items for all slots (based on simple stat comparison).</summary>
         int AutoEquipBest();
@@ -52,23 +52,23 @@ namespace IdleDefenseSurvival.Equipment
 
         // ============ Validation ============
         /// <summary>Checks if item can be equipped in slot.</summary>
-        bool CanEquip(InventoryItem item, EquipmentSlot slot, out string reason);
+        bool CanEquip(InventoryItem item, EquipmentType slot, out string reason);
 
         /// <summary>Checks if item meets requirements (level, tier, quests).</summary>
         bool MeetsRequirements(InventoryItem item, out string reason);
 
         /// <summary>Checks if slot is unlocked and available.</summary>
-        bool IsSlotAvailable(EquipmentSlot slot);
+        bool IsSlotAvailable(EquipmentType slot);
 
         // ============ Slot Management ============
         /// <summary>Unlocks an equipment slot (costs currency).</summary>
-        bool UnlockSlot(EquipmentSlot slot);
+        bool UnlockSlot(EquipmentType slot);
 
         /// <summary>Gets the cost to unlock a slot.</summary>
-        long GetSlotUnlockCost(EquipmentSlot slot);
+        long GetSlotUnlockCost(EquipmentType slot);
 
         /// <summary>Gets the next unlockable slot.</summary>
-        EquipmentSlot? GetNextUnlockableSlot();
+        EquipmentType? GetNextUnlockableSlot();
 
         // ============ Set Bonuses ============
         /// <summary>Gets active set bonuses for a set ID.</summary>
@@ -88,27 +88,27 @@ namespace IdleDefenseSurvival.Equipment
         Dictionary<MainStat, float> GetTotalStatBonuses();
 
         /// <summary>Gets stat bonuses from a specific slot.</summary>
-        Dictionary<MainStat, float> GetSlotStatBonuses(EquipmentSlot slot);
+        Dictionary<MainStat, float> GetSlotStatBonuses(EquipmentType slot);
 
         /// <summary>Gets all special effects from equipped items.</summary>
         IReadOnlyList<ActiveSpecialEffect> GetActiveSpecialEffects();
 
         // ============ Durability ============
         /// <summary>Damages durability on equipped items (called on hit, etc.).</summary>
-        void DamageDurability(EquipmentSlot slot, int amount);
+        void DamageDurability(EquipmentType slot, int amount);
 
         /// <summary>Repairs all equipped items.</summary>
         long RepairAll();
 
         /// <summary>Repairs a specific slot.</summary>
-        long RepairSlot(EquipmentSlot slot);
+        long RepairSlot(EquipmentType slot);
 
         /// <summary>Gets repair cost for all items.</summary>
         long GetTotalRepairCost();
 
         // ============ Visual ============
         /// <summary>Gets the equipped model prefab for a slot (for visual representation).</summary>
-        GameObject GetEquippedModel(EquipmentSlot slot);
+        GameObject GetEquippedModel(EquipmentType slot);
 
         // ============ Persistence ============
         EquipmentSaveData GetSaveData();
@@ -120,7 +120,7 @@ namespace IdleDefenseSurvival.Equipment
         EquipmentComparison CompareWithEquipped(InventoryItem item);
 
         /// <summary>Gets the best item in inventory for a specific slot.</summary>
-        InventoryItem GetBestItemForSlot(EquipmentSlot slot);
+        InventoryItem GetBestItemForSlot(EquipmentType slot);
     }
 
     /// <summary>
@@ -129,26 +129,26 @@ namespace IdleDefenseSurvival.Equipment
     public class EquipmentChangedEventArgs : EventArgs
     {
         public EquipmentChangeType ChangeType;
-        public EquipmentSlot Slot;
+        public EquipmentType Slot;
         public InventoryItem PreviousItem;
         public InventoryItem NewItem;
         public string SetId;
         public int PreviousSetCount;
         public int NewSetCount;
 
-        public static EquipmentChangedEventArgs CreateEquipped(EquipmentSlot slot, InventoryItem item, string setId = null, int setCount = 0) =>
+        public static EquipmentChangedEventArgs CreateEquipped(EquipmentType slot, InventoryItem item, string setId = null, int setCount = 0) =>
             new() { ChangeType = EquipmentChangeType.Equipped, Slot = slot, NewItem = item, SetId = setId, NewSetCount = setCount };
 
-        public static EquipmentChangedEventArgs CreateUnequipped(EquipmentSlot slot, InventoryItem item, string setId = null, int setCount = 0) =>
+        public static EquipmentChangedEventArgs CreateUnequipped(EquipmentType slot, InventoryItem item, string setId = null, int setCount = 0) =>
             new() { ChangeType = EquipmentChangeType.Unequipped, Slot = slot, PreviousItem = item, SetId = setId, NewSetCount = setCount };
 
-        public static EquipmentChangedEventArgs CreateSwapped(EquipmentSlot slotA, EquipmentSlot slotB, InventoryItem itemA, InventoryItem itemB) =>
+        public static EquipmentChangedEventArgs CreateSwapped(EquipmentType slotA, EquipmentType slotB, InventoryItem itemA, InventoryItem itemB) =>
             new() { ChangeType = EquipmentChangeType.Swapped, Slot = slotA, PreviousItem = itemA, NewItem = itemB };
 
         public static EquipmentChangedEventArgs CreateSetBonusChanged(string setId, int previousCount, int newCount) =>
             new() { ChangeType = EquipmentChangeType.SetBonusChanged, SetId = setId, PreviousSetCount = previousCount, NewSetCount = newCount };
 
-        public static EquipmentChangedEventArgs CreateSlotUnlocked(EquipmentSlot slot) =>
+        public static EquipmentChangedEventArgs CreateSlotUnlocked(EquipmentType slot) =>
             new() { ChangeType = EquipmentChangeType.SlotUnlocked, Slot = slot };
     }
 
@@ -173,7 +173,7 @@ namespace IdleDefenseSurvival.Equipment
         public float Value;
         public float Chance;
         public float Cooldown;
-        public EquipmentSlot SourceSlot;
+        public EquipmentType SourceSlot;
         public string SourceItemId;
         public string SourceInstanceId;
         public bool IsActive;
@@ -188,7 +188,7 @@ namespace IdleDefenseSurvival.Equipment
     [Serializable]
     public class EquipmentComparison
     {
-        public EquipmentSlot Slot;
+        public EquipmentType Slot;
         public InventoryItem CurrentItem;
         public InventoryItem NewItem;
         public Dictionary<MainStat, StatComparison> StatComparisons;
@@ -242,14 +242,14 @@ namespace IdleDefenseSurvival.Equipment
     [Serializable]
     public class EquippedItemData
     {
-        public EquipmentSlot Slot;
+        public EquipmentType Slot;
         public InventoryItem Item; // Full item data with instance ID
     }
 
     [Serializable]
     public class UnlockedSlotData
     {
-        public EquipmentSlot Slot;
+        public EquipmentType Slot;
         public bool IsUnlocked;
     }
 }

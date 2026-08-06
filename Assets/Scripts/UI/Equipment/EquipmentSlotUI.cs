@@ -17,7 +17,7 @@ namespace IdleDefenseSurvival.UI.Equipment
     public class EquipmentSlotUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IDropHandler
     {
         [Header("Slot Config")]
-        public EquipmentSlot Slot;
+        public EquipmentType Slot;
 
         [Header("Visuals")]
         [SerializeField] private Image _iconImage;
@@ -155,7 +155,7 @@ namespace IdleDefenseSurvival.UI.Equipment
             if (dragItem != null && dragItem.Item != null)
             {
                 var item = dragItem.Item;
-                if (item.GetEquipmentType() == Slot.ToType())
+                if (item.GetEquipmentType() == Slot)
                 {
                     EquipmentService.Instance?.Equip(item, Slot);
                 }

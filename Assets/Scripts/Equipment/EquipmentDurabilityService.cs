@@ -20,7 +20,7 @@ namespace IdleDefenseSurvival.Equipment
         }
 
         /// <summary>Returns true when the item broke and should be unequipped.</summary>
-        public bool DamageDurability(EquipmentSlot slot, int amount)
+        public bool DamageDurability(EquipmentType slot, int amount)
         {
             if (!_repo.TryGetEquipped(slot, out var item)) return false;
 
@@ -33,7 +33,7 @@ namespace IdleDefenseSurvival.Equipment
             return item.IsBroken;
         }
 
-        public long RepairSlot(EquipmentSlot slot)
+        public long RepairSlot(EquipmentType slot)
         {
             if (!_repo.TryGetEquipped(slot, out var item)) return 0;
 

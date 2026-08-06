@@ -1,7 +1,5 @@
-using System;
 using UnityEngine;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Manager;
@@ -60,10 +58,13 @@ namespace IdleDefenseSurvival.Items
                 float value = statEntry.GetValue(gemInstance.Level, 0);
                 if (value == 0) continue;
 
+                // Stat (SkillType) is the ModifierManager lookup key; missing it meant
+                // gem modifiers were never applied. MainStat kept for UI/display.
                 var modifier = new StatModifier
                 {
                     Id = $"{prefix}_{statEntry.Stat}",
                     Source = ModifierSource.Equipment,
+                    Stat = statEntry.Stat.ToSkillType(),
                     MainStat = statEntry.Stat,
                     Mode = (ModifierMode)statEntry.Mode,
                     Value = value,

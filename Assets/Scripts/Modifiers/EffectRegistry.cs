@@ -68,7 +68,7 @@ namespace IdleDefenseSurvival.Modifiers
             return factory.Create();
         }
 
-        public IEquipmentEffect CreateEffect(SpecialEffectType type, SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot)
+        public IEquipmentEffect CreateEffect(SpecialEffectType type, SpecialEffectEntry config, InventoryItem item, EquipmentType slot)
         {
             if (!_factories.TryGetValue(type, out var factory))
             {
@@ -123,7 +123,7 @@ namespace IdleDefenseSurvival.Modifiers
 
             public IEquipmentEffect Create() => new T();
 
-            public IEquipmentEffect Create(SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot)
+            public IEquipmentEffect Create(SpecialEffectEntry config, InventoryItem item, EquipmentType slot)
             {
                 var effect = new T();
                 effect.Initialize(config, item, slot);
@@ -140,7 +140,7 @@ namespace IdleDefenseSurvival.Modifiers
         /// <summary>
         /// Creates an effect from registry and initializes it.
         /// </summary>
-        public static IEquipmentEffect Create(SpecialEffectType type, SpecialEffectEntry config, InventoryItem item, EquipmentSlot slot)
+        public static IEquipmentEffect Create(SpecialEffectType type, SpecialEffectEntry config, InventoryItem item, EquipmentType slot)
         {
             return EffectRegistry.Instance.CreateEffect(type, config, item, slot);
         }
@@ -148,7 +148,7 @@ namespace IdleDefenseSurvival.Modifiers
         /// <summary>
         /// Creates multiple effects from a list of entries.
         /// </summary>
-        public static IEquipmentEffect[] CreateAll(SpecialEffectEntry[] entries, InventoryItem item, EquipmentSlot slot)
+        public static IEquipmentEffect[] CreateAll(SpecialEffectEntry[] entries, InventoryItem item, EquipmentType slot)
         {
             if (entries == null || entries.Length == 0) return Array.Empty<IEquipmentEffect>();
 

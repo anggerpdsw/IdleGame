@@ -15,7 +15,7 @@ namespace IdleDefenseSurvival.Equipment
             _repo = repo;
         }
 
-        public GameObject GetEquippedModel(EquipmentSlot slot)
+        public GameObject GetEquippedModel(EquipmentType slot)
         {
             if (!_repo.TryGetEquipped(slot, out var item)) return null;
             return (ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData)?.EquippedModelPrefab;

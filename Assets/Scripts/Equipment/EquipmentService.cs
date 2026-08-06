@@ -39,17 +39,17 @@ namespace IdleDefenseSurvival.Equipment
 
         #region Events (IEquipmentService re-raises dispatcher events)
         public event Action<EquipmentChangedEventArgs> OnEquipmentChanged;
-        public event Action<EquipmentSlot, InventoryItem> OnItemEquipped;
-        public event Action<EquipmentSlot, InventoryItem> OnItemUnequipped;
-        public event Action<EquipmentSlot> OnSlotUnlocked;
+        public event Action<EquipmentType, InventoryItem> OnItemEquipped;
+        public event Action<EquipmentType, InventoryItem> OnItemUnequipped;
+        public event Action<EquipmentType> OnSlotUnlocked;
         public event Action OnSetBonusChanged;
-        public event Action<EquipmentSlot> OnDurabilityChanged;
+        public event Action<EquipmentType> OnDurabilityChanged;
         #endregion
 
         #region Fields
-        private readonly Dictionary<EquipmentSlot, InventoryItem> _equippedItems = new();
+        private readonly Dictionary<EquipmentType, InventoryItem> _equippedItems = new();
         private readonly Dictionary<string, int> _setPieceCounts = new();
-        private readonly HashSet<EquipmentSlot> _unlockedSlots = new();
+        private readonly HashSet<EquipmentType> _unlockedSlots = new();
         private readonly List<IEquipmentEffect> _activeEffects = new();
 
         private EquipmentEventDispatcher _events;
@@ -65,19 +65,19 @@ namespace IdleDefenseSurvival.Equipment
         #endregion
 
         #region IEquipmentRepository
-        IReadOnlyDictionary<EquipmentSlot, InventoryItem> IEquipmentRepository.EquippedItems => _equippedItems;
-        IReadOnlyCollection<EquipmentSlot> IEquipmentRepository.UnlockedSlots => _unlockedSlots;
+        IReadOnlyDictionary<EquipmentType, InventoryItem> IEquipmentRepository.EquippedItems => _equippedItems;
+        IReadOnlyCollection<EquipmentType> IEquipmentRepository.UnlockedSlots => _unlockedSlots;
         IReadOnlyList<IEquipmentEffect> IEquipmentRepository.ActiveEffects => _activeEffects;
         IEnumerable<string> IEquipmentRepository.ActiveSetIds => _setPieceCounts.Keys;
 
-        bool IEquipmentRepository.TryGetEquipped(EquipmentSlot slot, out InventoryItem item) =>
+        bool IEquipmentRepository.TryGetEquipped(EquipmentType slot, out InventoryItem item) =>
             _equippedItems.TryGetValue(slot, out item);
 
-        void IEquipmentRepository.SetEquipped(EquipmentSlot slot, InventoryItem item) => _equippedItems[slot] = item;
-        bool IEquipmentRepository.RemoveEquipped(EquipmentSlot slot, out InventoryItem item) => _equippedItems.Remove(slot, out item);
+        void IEquipmentRepository.SetEquipped(EquipmentType slot, InventoryItem item) => _equippedItems[slot] = item;
+        bool IEquipmentRepository.RemoveEquipped(EquipmentType slot, out InventoryItem item) => _equippedItems.Remove(slot, out item);
 
-        bool IEquipmentRepository.IsSlotUnlocked(EquipmentSlot slot) => _unlockedSlots.Contains(slot);
-        void IEquipmentRepository.SetSlotUnlocked(EquipmentSlot slot, bool unlocked)
+        bool IEquipmentRepository.IsSlotUnlocked(EquipmentType slot) => _unlockedSlots.Contains(slot);
+        void IEquipmentRepository.SetSlotUnlocked(EquipmentType slot, bool unlocked)
         {
             if (unlocked) _unlockedSlots.Add(slot);
             else _unlockedSlots.Remove(slot);
@@ -118,9 +118,9 @@ namespace IdleDefenseSurvival.Equipment
             _visualService = new EquipmentVisualService(this);
 
             // Default free slots
-            foreach (EquipmentSlot slot in EquipmentSlotExtensions.GetAllSlots())
+            foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
             {
-                if (slot != EquipmentSlot.None && slot is EquipmentSlot.Hat or EquipmentSlot.Armor or EquipmentSlot.Pants)
+                if (slot != EquipmentType.None && slot is EquipmentType.Hat or EquipmentType.Armor or EquipmentType.Pants)
                     _unlockedSlots.Add(slot);
             }
 
@@ -135,13 +135,13 @@ namespace IdleDefenseSurvival.Equipment
         #endregion
 
         #region Core Operations
-        public bool Equip(InventoryItem item, EquipmentSlot slot = EquipmentSlot.None)
+        public bool Equip(InventoryItem item, EquipmentType slot = EquipmentType.None)
         {
             if (item == null || !item.IsEquippable()) return false;
 
             EquipmentType itemType = item.GetEquipmentType();
-            EquipmentSlot targetSlot = slot != EquipmentSlot.None ? slot : itemType.ToSlot();
-            if (targetSlot == EquipmentSlot.None) return false;
+            EquipmentType targetSlot = slot != EquipmentType.None ? slot : itemType;
+            if (targetSlot == EquipmentType.None) return false;
 
             if (!CanEquip(item, targetSlot, out string reason))
             {
@@ -155,13 +155,13 @@ namespace IdleDefenseSurvival.Equipment
             return EquipInternal(targetSlot, item);
         }
 
-        public bool EquipByInstanceId(string instanceId, EquipmentSlot slot = EquipmentSlot.None)
+        public bool EquipByInstanceId(string instanceId, EquipmentType slot = EquipmentType.None)
         {
             var item = InventoryService.Instance?.GetItem(instanceId);
             return item != null && Equip(item, slot);
         }
 
-        public InventoryItem Unequip(EquipmentSlot slot)
+        public InventoryItem Unequip(EquipmentType slot)
         {
             return _equippedItems.TryGetValue(slot, out var item) ? UnequipInternal(slot, item) : null;
         }
@@ -176,12 +176,12 @@ namespace IdleDefenseSurvival.Equipment
             return null;
         }
 
-        public bool SwapEquipment(EquipmentSlot slotA, EquipmentSlot slotB)
+        public bool SwapEquipment(EquipmentType slotA, EquipmentType slotB)
         {
             if (!_equippedItems.TryGetValue(slotA, out var itemA) || !_equippedItems.TryGetValue(slotB, out var itemB))
                 return false;
 
-            if (itemA.GetEquipmentType() != slotB.ToType() || itemB.GetEquipmentType() != slotA.ToType())
+            if (itemA.GetEquipmentType() != slotB || itemB.GetEquipmentType() != slotA)
                 return false;
 
             UnequipInternal(slotA, itemA);
@@ -206,7 +206,7 @@ namespace IdleDefenseSurvival.Equipment
         #endregion
 
         #region Internal Equip/Unequip
-        private bool EquipInternal(EquipmentSlot slot, InventoryItem item)
+        private bool EquipInternal(EquipmentType slot, InventoryItem item)
         {
             item.IsEquipped = true;
             item.EquippedSlot = slot;
@@ -236,7 +236,7 @@ namespace IdleDefenseSurvival.Equipment
             return true;
         }
 
-        private InventoryItem UnequipInternal(EquipmentSlot slot, InventoryItem item)
+        private InventoryItem UnequipInternal(EquipmentType slot, InventoryItem item)
         {
             _equippedItems.Remove(slot);
             _slots.BindItem(slot, null);
@@ -259,7 +259,7 @@ namespace IdleDefenseSurvival.Equipment
             _modifierService.ApplyItemStatModifiers(item, slot, false);
 
             item.IsEquipped = false;
-            item.EquippedSlot = EquipmentSlot.None;
+            item.EquippedSlot = EquipmentType.None;
 
             _events.Unequipped(slot, item, setId, newCount);
             Inventory.InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
@@ -269,14 +269,14 @@ namespace IdleDefenseSurvival.Equipment
         #endregion
 
         #region Validation
-        public bool CanEquip(InventoryItem item, EquipmentSlot slot, out string reason)
+        public bool CanEquip(InventoryItem item, EquipmentType slot, out string reason)
         {
             reason = string.Empty;
 
             if (item == null) { reason = "Item is null"; return false; }
             if (!item.IsEquippable()) { reason = "Item is not equippable"; return false; }
             if (!IsSlotAvailable(slot)) { reason = $"Slot {slot} is not available"; return false; }
-            if (item.GetEquipmentType() != slot.ToType())
+            if (item.GetEquipmentType() != slot)
             {
                 reason = $"Item type {item.GetEquipmentType()} does not match slot {slot}";
                 return false;
@@ -302,21 +302,21 @@ namespace IdleDefenseSurvival.Equipment
             return true;
         }
 
-        public bool IsSlotAvailable(EquipmentSlot slot) => _slots.IsUnlocked(slot);
+        public bool IsSlotAvailable(EquipmentType slot) => _slots.IsUnlocked(slot);
         #endregion
 
         #region Slot Management
-        public bool UnlockSlot(EquipmentSlot slot)
+        public bool UnlockSlot(EquipmentType slot)
         {
             if (!_slots.Unlock(slot)) return false;
             _events.NotifySlotUnlocked(slot);
             return true;
         }
 
-        public long GetSlotUnlockCost(EquipmentSlot slot) => _slots.GetUnlockCost(slot);
-        public EquipmentSlot? GetNextUnlockableSlot() => _slots.GetNextUnlockable();
+        public long GetSlotUnlockCost(EquipmentType slot) => _slots.GetUnlockCost(slot);
+        public EquipmentType? GetNextUnlockableSlot() => _slots.GetNextUnlockable();
 
-        public IReadOnlyDictionary<EquipmentSlot, InventoryItem> EquippedItems => _equippedItems;
+        public IReadOnlyDictionary<EquipmentType, InventoryItem> EquippedItems => _equippedItems;
         public IReadOnlyList<EquipmentSlotData> SlotData => _slots.GetAllSlotData();
         public int UnlockedSlotCount => _slots.UnlockedCount;
         public int TotalEquippedCount => _equippedItems.Count;
@@ -334,7 +334,7 @@ namespace IdleDefenseSurvival.Equipment
         public Dictionary<MainStat, float> GetTotalStatBonuses() =>
             EquipmentStatCalculator.GetTotalStatBonuses(ItemDatabase.Instance, _equippedItems, _setPieceCounts);
 
-        public Dictionary<MainStat, float> GetSlotStatBonuses(EquipmentSlot slot) =>
+        public Dictionary<MainStat, float> GetSlotStatBonuses(EquipmentType slot) =>
             _equippedItems.TryGetValue(slot, out var item)
                 ? EquipmentStatCalculator.GetItemStatBonuses(item)
                 : new Dictionary<MainStat, float>();
@@ -381,7 +381,7 @@ namespace IdleDefenseSurvival.Equipment
                             Value = effectEntry.Value,
                             Chance = effectEntry.Chance,
                             Cooldown = effectEntry.Cooldown,
-                            SourceSlot = EquipmentSlot.None,
+                            SourceSlot = EquipmentType.None,
                             SourceItemId = $"Set:{setId}",
                             SourceInstanceId = $"Set:{setId}",
                             IsActive = effectEntry.IsActive
@@ -393,12 +393,12 @@ namespace IdleDefenseSurvival.Equipment
             return effects;
         }
 
-        public void ApplyItemStatModifiers(InventoryItem item, EquipmentSlot slot, bool add) =>
+        public void ApplyItemStatModifiers(InventoryItem item, EquipmentType slot, bool add) =>
             _modifierService.ApplyItemStatModifiers(item, slot, add);
         #endregion
 
         #region Durability
-        public void DamageDurability(EquipmentSlot slot, int amount)
+        public void DamageDurability(EquipmentType slot, int amount)
         {
             bool broken = _durabilityService.DamageDurability(slot, amount);
             if (broken && _equippedItems.TryGetValue(slot, out var item))
@@ -406,12 +406,12 @@ namespace IdleDefenseSurvival.Equipment
         }
 
         public long RepairAll() => _durabilityService.RepairAll();
-        public long RepairSlot(EquipmentSlot slot) => _durabilityService.RepairSlot(slot);
+        public long RepairSlot(EquipmentType slot) => _durabilityService.RepairSlot(slot);
         public long GetTotalRepairCost() => _durabilityService.GetTotalRepairCost();
         #endregion
 
         #region Visual
-        public GameObject GetEquippedModel(EquipmentSlot slot) => _visualService.GetEquippedModel(slot);
+        public GameObject GetEquippedModel(EquipmentType slot) => _visualService.GetEquippedModel(slot);
         #endregion
 
         #region Persistence
@@ -446,7 +446,7 @@ namespace IdleDefenseSurvival.Equipment
         #region Comparison
         public EquipmentComparison CompareWithEquipped(InventoryItem item) => _comparisonService.CompareWithEquipped(item);
 
-        public InventoryItem GetBestItemForSlot(EquipmentSlot slot) =>
+        public InventoryItem GetBestItemForSlot(EquipmentType slot) =>
             _autoEquipService.GetBestItemForSlot(slot, (item, s) => CanEquip(item, s, out _));
         #endregion
     }

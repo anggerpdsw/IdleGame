@@ -60,4 +60,41 @@ namespace IdleDefenseSurvival
         Shield                // Grants shield up to % of max HP when at full HP
     }
 	
+    
+    /// <summary>
+    /// Item rarity tiers - each with associated visual properties and gameplay multipliers.
+    /// </summary>
+    public enum ItemRarity
+    {
+        None = 0,
+        Common = 1,
+        Uncommon = 2,
+        Rare = 3,
+        Epic = 4,
+        Legendary = 5,
+        Mythic = 6,
+        Ancient = 7,
+        Divine = 8,
+    }
+
+    /// <summary>
+    /// Equipment type - matches EquipmentType exactly.
+    /// Each equipment item has one EquipmentType that determines which slot it fits in.
+    /// </summary>
+    public enum EquipmentType
+    {
+        None = 0,
+        Hat = 1,
+        Gloves = 2,
+        Cape = 3,
+        Armor = 4,
+        Belt = 5,
+        Pants = 6,
+        Pendant = 7,
+        Ring = 8,
+        Earring = 9,
+        Bracelet = 10,
+        Shoes = 11,
+    }
+
 }

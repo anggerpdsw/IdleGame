@@ -42,7 +42,8 @@ namespace IdleDefenseSurvival.Items
         public int RequiredPieces = 2; // 2, 3, 4, 5, 6, 8, 11
         public string TierName; // "2-Piece Bonus", "Full Set Bonus"
         [TextArea] public string Description;
-        public MainStatEntry[] StatBonuses; // Stat bonuses at this tier
+        public AttributeStatEntry[] AttributeBonuses; // Core attribute bonuses at this tier (CON/STR/INT/DEX)
+        public MainStatEntry[] StatBonuses; // Combat stat bonuses at this tier
         public SpecialEffectEntry[] SpecialEffects; // Special effects at this tier
         public PassiveSkillEntry[] PassiveSkills; // Passive skills at this tier
         public GameObject VisualEffect; // Visual effect when this tier active

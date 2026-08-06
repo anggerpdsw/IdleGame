@@ -443,7 +443,7 @@ namespace IdleDefenseSurvival.UI.Equipment
 
             if (current == null && candidate == null) return;
 
-            var comparison = EquipmentComparer.Compare(current, candidate, candidate?.GetEquipmentType().ToSlot() ?? EquipmentSlot.None);
+            var comparison = EquipmentComparer.Compare(current, candidate, candidate?.GetEquipmentType() ?? EquipmentType.None);
             if (comparison == null) return;
 
             foreach (var kvp in comparison.StatComparisons.OrderByDescending(k => Math.Abs(k.Value.Difference)))

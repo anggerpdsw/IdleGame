@@ -39,7 +39,7 @@ namespace IdleDefenseSurvival.Items
         IReadOnlyList<ItemData> GetItemsByCategory(ItemCategory category);
         IReadOnlyList<ItemData> GetItemsByRarity(ItemRarity rarity);
         IReadOnlyList<EquipmentData> GetEquipmentByType(EquipmentType type);
-        IReadOnlyList<EquipmentData> GetEquipmentBySlot(EquipmentSlot slot);
+        IReadOnlyList<EquipmentData> GetEquipmentBySlot(EquipmentType slot);
         IReadOnlyList<EquipmentData> GetEquipmentBySet(string setId);
         IReadOnlyList<GemData> GetGemsByType(GemType type);
         IReadOnlyList<ItemData> SearchItems(string searchText);

@@ -4,22 +4,6 @@ using UnityEngine;
 namespace IdleDefenseSurvival.Items
 {
     /// <summary>
-    /// Item rarity tiers - each with associated visual properties and gameplay multipliers.
-    /// </summary>
-    public enum ItemRarity
-    {
-        None = 0,
-        Common = 1,
-        Uncommon = 2,
-        Rare = 3,
-        Epic = 4,
-        Legendary = 5,
-        Mythic = 6,
-        Ancient = 7,
-        Divine = 8,
-    }
-
-    /// <summary>
     /// Configuration data for a rarity tier.
     /// </summary>
     [Serializable]

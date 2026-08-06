@@ -5,7 +5,7 @@ namespace IdleDefenseSurvival.Equipment
     /// <summary>
     /// Equipment event delegate. Equip/unequip/durability dispatch with slot + item.
     /// </summary>
-    public delegate void EquipmentSlotItemChanged(EquipmentSlot slot, Inventory.InventoryItem item);
+    public delegate void EquipmentTypeItemChanged(EquipmentType slot, Inventory.InventoryItem item);
 
     /// <summary>
     /// Raises all equipment events. IEquipmentService re-raises these on its own
@@ -14,25 +14,25 @@ namespace IdleDefenseSurvival.Equipment
     public sealed class EquipmentEventDispatcher
     {
         public event Action<EquipmentChangedEventArgs> Changed;
-        public event EquipmentSlotItemChanged ItemEquipped;
-        public event EquipmentSlotItemChanged ItemUnequipped;
-        public event Action<EquipmentSlot> SlotUnlocked;
+        public event EquipmentTypeItemChanged ItemEquipped;
+        public event EquipmentTypeItemChanged ItemUnequipped;
+        public event Action<EquipmentType> SlotUnlocked;
         public event Action SetBonusChanged;
-        public event Action<EquipmentSlot> DurabilityChanged;
+        public event Action<EquipmentType> DurabilityChanged;
 
-        public void Equipped(EquipmentSlot slot, Inventory.InventoryItem item, string setId, int setCount)
+        public void Equipped(EquipmentType slot, Inventory.InventoryItem item, string setId, int setCount)
         {
             ItemEquipped?.Invoke(slot, item);
             Changed?.Invoke(EquipmentChangedEventArgs.CreateEquipped(slot, item, setId, setCount));
         }
 
-        public void Unequipped(EquipmentSlot slot, Inventory.InventoryItem item, string setId, int setCount)
+        public void Unequipped(EquipmentType slot, Inventory.InventoryItem item, string setId, int setCount)
         {
             ItemUnequipped?.Invoke(slot, item);
             Changed?.Invoke(EquipmentChangedEventArgs.CreateUnequipped(slot, item, setId, setCount));
         }
 
-        public void Swapped(EquipmentSlot slotA, EquipmentSlot slotB, Inventory.InventoryItem itemA, Inventory.InventoryItem itemB)
+        public void Swapped(EquipmentType slotA, EquipmentType slotB, Inventory.InventoryItem itemA, Inventory.InventoryItem itemB)
         {
             Changed?.Invoke(EquipmentChangedEventArgs.CreateSwapped(slotA, slotB, itemA, itemB));
         }
@@ -43,18 +43,18 @@ namespace IdleDefenseSurvival.Equipment
             Changed?.Invoke(EquipmentChangedEventArgs.CreateSetBonusChanged(setId, previousCount, newCount));
         }
 
-        public void NotifySlotUnlocked(EquipmentSlot slot)
+        public void NotifySlotUnlocked(EquipmentType slot)
         {
             SlotUnlocked?.Invoke(slot);
             Changed?.Invoke(EquipmentChangedEventArgs.CreateSlotUnlocked(slot));
         }
 
-        public void NotifyDurabilityChanged(EquipmentSlot slot)
+        public void NotifyDurabilityChanged(EquipmentType slot)
         {
             DurabilityChanged?.Invoke(slot);
         }
 
-        public void NotifyBroken(EquipmentSlot slot, Inventory.InventoryItem item, EquipmentChangeType type)
+        public void NotifyBroken(EquipmentType slot, Inventory.InventoryItem item, EquipmentChangeType type)
         {
             Changed?.Invoke(new EquipmentChangedEventArgs
             {

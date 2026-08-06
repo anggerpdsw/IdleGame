@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Inventory
         public bool IsFavorite = false; // Prevents accidental sell/destroy
         public bool IsLocked = false; // Prevents any modification
         public bool IsEquipped = false; // Currently equipped
-        public EquipmentSlot EquippedSlot = EquipmentSlot.None; // Which slot it's in
+        public EquipmentType EquippedSlot = EquipmentType.None; // Which slot it's in
         public bool IsNew = true; // Newly acquired (for UI highlight)
         public long AcquiredTimestamp = 0; // When item was obtained
 
@@ -264,7 +264,7 @@ namespace IdleDefenseSurvival.Inventory
     [Serializable]
     public class EquipmentSlotData
     {
-        public EquipmentSlot Slot;
+        public EquipmentType Slot;
         public InventoryItem EquippedItem;
         public bool IsUnlocked = true;
         public int RequiredLevel = 1;
@@ -275,7 +275,7 @@ namespace IdleDefenseSurvival.Inventory
             if (item == null || !IsUnlocked) return false;
             if (playerLevel < RequiredLevel) return false;
             if (!string.IsNullOrEmpty(RequiredQuest)) return false; // Quest check would go here
-            if (item.GetEquipmentType() != Slot.ToType()) return false;
+            if (item.GetEquipmentType() != Slot) return false;
             return true;
         }
     }

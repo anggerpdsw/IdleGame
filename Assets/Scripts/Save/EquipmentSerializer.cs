@@ -116,7 +116,7 @@ namespace IdleDefenseSurvival.Save
             }
 
             var seenInstanceIds = new HashSet<string>();
-            var seenSlots = new HashSet<EquipmentSlot>();
+            var seenSlots = new HashSet<EquipmentType>();
 
             foreach (var equipData in data.EquippedItems)
             {
@@ -149,7 +149,7 @@ namespace IdleDefenseSurvival.Save
                 }
 
                 // Validate item matches slot
-                if (equipData.Item.GetEquipmentType() != equipData.Slot.ToType())
+                if (equipData.Item.GetEquipmentType() != equipData.Slot)
                 {
                     error = $"Item {equipData.Item.ItemId} type {equipData.Item.GetEquipmentType()} doesn't match slot {equipData.Slot}";
                     return false;
@@ -175,7 +175,7 @@ namespace IdleDefenseSurvival.Save
 
             var validEquipped = new List<EquippedItemData>();
             var seenIds = new HashSet<string>();
-            var seenSlots = new HashSet<EquipmentSlot>();
+            var seenSlots = new HashSet<EquipmentType>();
 
             foreach (var equipData in repaired.EquippedItems)
             {
@@ -192,13 +192,13 @@ namespace IdleDefenseSurvival.Save
                 equipData.Item.Quantity = 1;
 
                 // Fix slot conflicts - move to first available compatible slot
-                EquipmentSlot targetSlot = equipData.Slot;
-                if (seenSlots.Contains(targetSlot) || equipData.Item.GetEquipmentType() != targetSlot.ToType())
+                EquipmentType targetSlot = equipData.Slot;
+                if (seenSlots.Contains(targetSlot) || equipData.Item.GetEquipmentType() != targetSlot)
                 {
                     // Find first available compatible slot
-                    foreach (EquipmentSlot slot in EquipmentSlotExtensions.GetAllSlots())
+                    foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
                     {
-                        if (!seenSlots.Contains(slot) && equipData.Item.GetEquipmentType() == slot.ToType())
+                        if (!seenSlots.Contains(slot) && equipData.Item.GetEquipmentType() == slot)
                         {
                             targetSlot = slot;
                             break;

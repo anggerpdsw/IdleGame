@@ -17,7 +17,7 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>
         /// Compares two equipment items and returns a detailed comparison.
         /// </summary>
-        public static EquipmentComparison Compare(InventoryItem current, InventoryItem candidate, EquipmentSlot slot)
+        public static EquipmentComparison Compare(InventoryItem current, InventoryItem candidate, EquipmentType slot)
         {
             var comparison = new EquipmentComparison
             {
@@ -132,10 +132,10 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>
         /// Gets the best equipment for a slot from a list of candidates.
         /// </summary>
-        public static InventoryItem GetBestForSlot(EquipmentSlot slot, IEnumerable<InventoryItem> candidates, InventoryItem current = null)
+        public static InventoryItem GetBestForSlot(EquipmentType slot, IEnumerable<InventoryItem> candidates, InventoryItem current = null)
         {
             var validCandidates = candidates
-                .Where(c => c != null && c.IsEquippable() && c.GetEquipmentType() == slot.ToType())
+                .Where(c => c != null && c.IsEquippable() && c.GetEquipmentType() == slot)
                 .ToList();
 
             if (validCandidates.Count == 0) return null;
@@ -153,10 +153,10 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>
         /// Ranks equipment items for a slot from best to worst.
         /// </summary>
-        public static List<EquipmentComparison> RankForSlot(EquipmentSlot slot, IEnumerable<InventoryItem> candidates, InventoryItem current = null)
+        public static List<EquipmentComparison> RankForSlot(EquipmentType slot, IEnumerable<InventoryItem> candidates, InventoryItem current = null)
         {
             var validCandidates = candidates
-                .Where(c => c != null && c.IsEquippable() && c.GetEquipmentType() == slot.ToType())
+                .Where(c => c != null && c.IsEquippable() && c.GetEquipmentType() == slot)
                 .ToList();
 
             var comparisons = new List<EquipmentComparison>();

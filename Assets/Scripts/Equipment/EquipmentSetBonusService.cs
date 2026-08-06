@@ -48,7 +48,11 @@ namespace IdleDefenseSurvival.Equipment
             }
 
             if (changed)
+            {
+                // Attribute set bonuses feed the attribute pool; re-apply once per change.
+                AttributeModifierManager.Instance?.Apply();
                 _events.NotifySetBonusChanged(setData.SetId, previousCount, newCount);
+            }
         }
 
         private void ActivateTier(SetBonusData setData, SetBonusTier tier)
@@ -61,7 +65,7 @@ namespace IdleDefenseSurvival.Equipment
                 foreach (var effectEntry in tier.SpecialEffects)
                 {
                     if (!effectEntry.IsActive) continue;
-                    var effect = EffectFactory.Create(effectEntry.EffectType, effectEntry, null, EquipmentSlot.None);
+                    var effect = EffectFactory.Create(effectEntry.EffectType, effectEntry, null, EquipmentType.None);
                     if (effect == null) continue;
                     effect.OnActivate(new EquipmentContext());
                     _repo.AddActiveEffect(effect);
