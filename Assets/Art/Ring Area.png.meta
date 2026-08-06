@@ -1,0 +1,1872 @@
+fileFormatVersion: 2
+guid: 6f05864222f31324f954c52015a28e18
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6870264365827065006
+    second: Ring Area_0
+  - first:
+      213: 4100637724696802834
+    second: Ring Area_1
+  - first:
+      213: -3492917822634759302
+    second: Ring Area_2
+  - first:
+      213: -9079551782291261744
+    second: Ring Area_3
+  - first:
+      213: 7779952179608975187
+    second: Ring Area_4
+  - first:
+      213: 7076060251424466067
+    second: Ring Area_5
+  - first:
+      213: 3519373104146553741
+    second: Ring Area_6
+  - first:
+      213: 3986934314605497876
+    second: Ring Area_7
+  - first:
+      213: 3177403463074648045
+    second: Ring Area_8
+  - first:
+      213: -7390406504846182925
+    second: Ring Area_9
+  - first:
+      213: 510608172185217628
+    second: Ring Area_10
+  - first:
+      213: -7002519135220338332
+    second: Ring Area_11
+  - first:
+      213: -6350540903647083799
+    second: Ring Area_12
+  - first:
+      213: 8489157199964717750
+    second: Ring Area_13
+  - first:
+      213: -2342444233777740634
+    second: Ring Area_14
+  - first:
+      213: -4985872174975834033
+    second: Ring Area_15
+  - first:
+      213: -2923833207736596706
+    second: Ring Area_16
+  - first:
+      213: -451836375529374876
+    second: Ring Area_17
+  - first:
+      213: 8511826367387473039
+    second: Ring Area_18
+  - first:
+      213: -7109535501641769283
+    second: Ring Area_19
+  - first:
+      213: -4307777032469897501
+    second: Ring Area_20
+  - first:
+      213: 6042316176197845418
+    second: Ring Area_21
+  - first:
+      213: -1391710389925685977
+    second: Ring Area_22
+  - first:
+      213: 5791393147120937356
+    second: Ring Area_23
+  - first:
+      213: 4022724475006959065
+    second: Ring Area_24
+  - first:
+      213: -743345837814845946
+    second: Ring Area_25
+  - first:
+      213: 3759004895240965625
+    second: Ring Area_26
+  - first:
+      213: 8506594229279949764
+    second: Ring Area_27
+  - first:
+      213: 8650910070272703944
+    second: Ring Area_28
+  - first:
+      213: 7496084056941581246
+    second: Ring Area_29
+  - first:
+      213: -4923531855042773975
+    second: Ring Area_30
+  - first:
+      213: 8111410739796244906
+    second: Ring Area_31
+  - first:
+      213: -8162020484430919953
+    second: Ring Area_32
+  - first:
+      213: 4377001519916185107
+    second: Ring Area_33
+  - first:
+      213: -6586720050995016528
+    second: Ring Area_34
+  - first:
+      213: -2449047076332759996
+    second: Ring Area_35
+  - first:
+      213: -3262197490359967906
+    second: Ring Area_36
+  - first:
+      213: -4723652389391975096
+    second: Ring Area_37
+  - first:
+      213: 5586947344443697548
+    second: Ring Area_38
+  - first:
+      213: -1063214047293630046
+    second: Ring Area_39
+  - first:
+      213: -248241431675619079
+    second: Ring Area_40
+  - first:
+      213: 4531765555739838593
+    second: Ring Area_41
+  - first:
+      213: 8468398363320454760
+    second: Ring Area_42
+  - first:
+      213: 6401720715213027837
+    second: Ring Area_43
+  - first:
+      213: -2423347590310111603
+    second: Ring Area_44
+  - first:
+      213: 7985916562546268755
+    second: Ring Area_45
+  - first:
+      213: 1486055038132902996
+    second: Ring Area_46
+  - first:
+      213: -2384853866314188626
+    second: Ring Area_47
+  - first:
+      213: -8539994757739809888
+    second: Ring Area_48
+  - first:
+      213: 649105284332297876
+    second: Ring Area_49
+  - first:
+      213: -4831411076305633496
+    second: Ring Area_50
+  - first:
+      213: 8577775971497861636
+    second: Ring Area_51
+  - first:
+      213: -7470086830129295544
+    second: Ring Area_52
+  - first:
+      213: -8441533377784381399
+    second: Ring Area_53
+  - first:
+      213: 439705513014880509
+    second: Ring Area_54
+  - first:
+      213: 4483042392179140197
+    second: Ring Area_55
+  - first:
+      213: -383671714245986281
+    second: Ring Area_56
+  - first:
+      213: -4198320753515905299
+    second: Ring Area_57
+  - first:
+      213: -6049335786425074784
+    second: Ring Area_58
+  - first:
+      213: 1639060523472515629
+    second: Ring Area_59
+  - first:
+      213: 5055202343965502718
+    second: Ring Area_60
+  - first:
+      213: 7876543257619043848
+    second: Ring Area_61
+  - first:
+      213: -6395494127955078750
+    second: Ring Area_62
+  - first:
+      213: -7487800544041790300
+    second: Ring Area_63
+  - first:
+      213: 1883876664520831829
+    second: Ring Area_64
+  - first:
+      213: -7275486169777388821
+    second: Ring Area_65
+  - first:
+      213: 1208601554617233253
+    second: Ring Area_66
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 455
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ring Area_0
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 470
+        width: 17
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25b7ad1a5fae7a0a0800000000000000
+      internalID: -6870264365827065006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_1
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 475
+        width: 17
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2167e15d84468e830800000000000000
+      internalID: 4100637724696802834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_2
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 478
+        width: 18
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7b69302fb9a68fc0800000000000000
+      internalID: -3492917822634759302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_3
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 478
+        width: 18
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d6b3c072c3fef180800000000000000
+      internalID: -9079551782291261744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_4
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 475
+        width: 18
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3577e139941f7fb60800000000000000
+      internalID: 7779952179608975187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_5
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 471
+        width: 17
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 394aa6fde47333260800000000000000
+      internalID: 7076060251424466067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_6
+      rect:
+        serializedVersion: 2
+        x: 148
+        y: 454
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8b18b8113357d030800000000000000
+      internalID: 3519373104146553741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_7
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 463
+        width: 16
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41e40eca2af645730800000000000000
+      internalID: 3986934314605497876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_8
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 464
+        width: 18
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: def09a47d97681c20800000000000000
+      internalID: 3177403463074648045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_9
+      rect:
+        serializedVersion: 2
+        x: 334
+        y: 455
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f538ec9070007990800000000000000
+      internalID: -7390406504846182925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_10
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 432
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5ae2826d6b061700800000000000000
+      internalID: 510608172185217628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_11
+      rect:
+        serializedVersion: 2
+        x: 129
+        y: 444
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 461f05c82fd02de90800000000000000
+      internalID: -7002519135220338332
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_12
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 445
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e2078ad1b85ed7a0800000000000000
+      internalID: -6350540903647083799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_13
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 433
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b2c852fe7b8fc570800000000000000
+      internalID: 8489157199964717750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_14
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 418
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a404835167fd7fd0800000000000000
+      internalID: -2342444233777740634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_15
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 420
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f48af035caf9ecab0800000000000000
+      internalID: -4985872174975834033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_16
+      rect:
+        serializedVersion: 2
+        x: 80
+        y: 403
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e178e5e40357c67d0800000000000000
+      internalID: -2923833207736596706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_17
+      rect:
+        serializedVersion: 2
+        x: 405
+        y: 404
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46bb8fbd531cab9f0800000000000000
+      internalID: -451836375529374876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_18
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 387
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f841fe9cbf4102670800000000000000
+      internalID: 8511826367387473039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_19
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 388
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbe1d92112bd55d90800000000000000
+      internalID: -7109535501641769283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_20
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 369
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ee9b00dc93b734c0800000000000000
+      internalID: -4307777032469897501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_21
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 370
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa18ed67c8e9ad350800000000000000
+      internalID: 6042316176197845418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_22
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 350
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 725524226c6aface0800000000000000
+      internalID: -1391710389925685977
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_23
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 351
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8966c812692f5050800000000000000
+      internalID: 5791393147120937356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_24
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 331
+        width: 11
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9dd3f02c89693d730800000000000000
+      internalID: 4022724475006959065
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_25
+      rect:
+        serializedVersion: 2
+        x: 454
+        y: 332
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60ee7cf16ea1fa5f0800000000000000
+      internalID: -743345837814845946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_26
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 310
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fdcac1490baa2430800000000000000
+      internalID: 3759004895240965625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_27
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 312
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c38e94b16e7d0670800000000000000
+      internalID: 8506594229279949764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_28
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 290
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8cd347adfd43e0870800000000000000
+      internalID: 8650910070272703944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_29
+      rect:
+        serializedVersion: 2
+        x: 467
+        y: 291
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb3d87cdbb0770860800000000000000
+      internalID: 7496084056941581246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_30
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 269
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92cfad32dd91cabb0800000000000000
+      internalID: -4923531855042773975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_31
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 270
+        width: 8
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa9f7dc7715819070800000000000000
+      internalID: 8111410739796244906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_32
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 248
+        width: 8
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fe688081d9daabe80800000000000000
+      internalID: -8162020484430919953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_33
+      rect:
+        serializedVersion: 2
+        x: 473
+        y: 249
+        width: 8
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 316f2f721bb3ebc30800000000000000
+      internalID: 4377001519916185107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_34
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 226
+        width: 8
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bccf75f2054794a0800000000000000
+      internalID: -6586720050995016528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_35
+      rect:
+        serializedVersion: 2
+        x: 473
+        y: 228
+        width: 7
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4441af0e8ac330ed0800000000000000
+      internalID: -2449047076332759996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_36
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 206
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5f5ce79aa85ab2d0800000000000000
+      internalID: -3262197490359967906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_37
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 207
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84dbdd7cd27327eb0800000000000000
+      internalID: -4723652389391975096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_38
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 185
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c89e0644203d88d40800000000000000
+      internalID: 5586947344443697548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_39
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 186
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a99bd60574be31f0800000000000000
+      internalID: -1063214047293630046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_40
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 165
+        width: 11
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f8b07eabb11e8cf0800000000000000
+      internalID: -248241431675619079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_41
+      rect:
+        serializedVersion: 2
+        x: 459
+        y: 165
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 188493b33c014ee30800000000000000
+      internalID: 4531765555739838593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_42
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 145
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86e0736a17bc58570800000000000000
+      internalID: 8468398363320454760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_43
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 146
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df9388d921b77d850800000000000000
+      internalID: 6401720715213027837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_44
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 127
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d865440c43a8e5ed0800000000000000
+      internalID: -2423347590310111603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_45
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 128
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35a9a7c6dcca3de60800000000000000
+      internalID: 7985916562546268755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_46
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 110
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45c57980f278f9410800000000000000
+      internalID: 1486055038132902996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_47
+      rect:
+        serializedVersion: 2
+        x: 428
+        y: 110
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea830294b0c47eed0800000000000000
+      internalID: -2384853866314188626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_48
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 94
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a37831c308db7980800000000000000
+      internalID: -8539994757739809888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_49
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 94
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49e947621d5120900800000000000000
+      internalID: 649105284332297876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_50
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 79
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82f3ae8593163fcb0800000000000000
+      internalID: -4831411076305633496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_51
+      rect:
+        serializedVersion: 2
+        x: 399
+        y: 79
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 402e2009cc16a0770800000000000000
+      internalID: 8577775971497861636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_52
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 65
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84fc1d03b9be45890800000000000000
+      internalID: -7470086830129295544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_53
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 53
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9200f893e16a9da80800000000000000
+      internalID: -8441533377784381399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_54
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 53
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df8680d95d52a1600800000000000000
+      internalID: 439705513014880509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_55
+      rect:
+        serializedVersion: 2
+        x: 382
+        y: 65
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 566ead2bd47f63e30800000000000000
+      internalID: 4483042392179140197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_56
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 43
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 718b002db9cecaaf0800000000000000
+      internalID: -383671714245986281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_57
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 35
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deeb881b4819cb5c0800000000000000
+      internalID: -4198320753515905299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_58
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 34
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ab331b27217c0ca0800000000000000
+      internalID: -6049335786425074784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_59
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 43
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d22f1faacdc1fb610800000000000000
+      internalID: 1639060523472515629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_60
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 28
+        width: 17
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efc29cb8fbfa72640800000000000000
+      internalID: 5055202343965502718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_61
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 23
+        width: 17
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80691607c5a1f4d60800000000000000
+      internalID: 7876543257619043848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_62
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 20
+        width: 18
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a11424b9f3ae37a0800000000000000
+      internalID: -6395494127955078750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_63
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 20
+        width: 18
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a49967c31df51890800000000000000
+      internalID: -7487800544041790300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_64
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 23
+        width: 18
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 553796d58dfd42a10800000000000000
+      internalID: 1883876664520831829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_65
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 27
+        width: 17
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be2c62230e7480b90800000000000000
+      internalID: -7275486169777388821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ring Area_66
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 19
+        width: 18
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56fe1f1e5b0d5c010800000000000000
+      internalID: 1208601554617233253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Ring Area_0: -6870264365827065006
+      Ring Area_1: 4100637724696802834
+      Ring Area_10: 510608172185217628
+      Ring Area_11: -7002519135220338332
+      Ring Area_12: -6350540903647083799
+      Ring Area_13: 8489157199964717750
+      Ring Area_14: -2342444233777740634
+      Ring Area_15: -4985872174975834033
+      Ring Area_16: -2923833207736596706
+      Ring Area_17: -451836375529374876
+      Ring Area_18: 8511826367387473039
+      Ring Area_19: -7109535501641769283
+      Ring Area_2: -3492917822634759302
+      Ring Area_20: -4307777032469897501
+      Ring Area_21: 6042316176197845418
+      Ring Area_22: -1391710389925685977
+      Ring Area_23: 5791393147120937356
+      Ring Area_24: 4022724475006959065
+      Ring Area_25: -743345837814845946
+      Ring Area_26: 3759004895240965625
+      Ring Area_27: 8506594229279949764
+      Ring Area_28: 8650910070272703944
+      Ring Area_29: 7496084056941581246
+      Ring Area_3: -9079551782291261744
+      Ring Area_30: -4923531855042773975
+      Ring Area_31: 8111410739796244906
+      Ring Area_32: -8162020484430919953
+      Ring Area_33: 4377001519916185107
+      Ring Area_34: -6586720050995016528
+      Ring Area_35: -2449047076332759996
+      Ring Area_36: -3262197490359967906
+      Ring Area_37: -4723652389391975096
+      Ring Area_38: 5586947344443697548
+      Ring Area_39: -1063214047293630046
+      Ring Area_4: 7779952179608975187
+      Ring Area_40: -248241431675619079
+      Ring Area_41: 4531765555739838593
+      Ring Area_42: 8468398363320454760
+      Ring Area_43: 6401720715213027837
+      Ring Area_44: -2423347590310111603
+      Ring Area_45: 7985916562546268755
+      Ring Area_46: 1486055038132902996
+      Ring Area_47: -2384853866314188626
+      Ring Area_48: -8539994757739809888
+      Ring Area_49: 649105284332297876
+      Ring Area_5: 7076060251424466067
+      Ring Area_50: -4831411076305633496
+      Ring Area_51: 8577775971497861636
+      Ring Area_52: -7470086830129295544
+      Ring Area_53: -8441533377784381399
+      Ring Area_54: 439705513014880509
+      Ring Area_55: 4483042392179140197
+      Ring Area_56: -383671714245986281
+      Ring Area_57: -4198320753515905299
+      Ring Area_58: -6049335786425074784
+      Ring Area_59: 1639060523472515629
+      Ring Area_6: 3519373104146553741
+      Ring Area_60: 5055202343965502718
+      Ring Area_61: 7876543257619043848
+      Ring Area_62: -6395494127955078750
+      Ring Area_63: -7487800544041790300
+      Ring Area_64: 1883876664520831829
+      Ring Area_65: -7275486169777388821
+      Ring Area_66: 1208601554617233253
+      Ring Area_7: 3986934314605497876
+      Ring Area_8: 3177403463074648045
+      Ring Area_9: -7390406504846182925
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

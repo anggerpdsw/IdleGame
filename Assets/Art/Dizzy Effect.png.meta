@@ -1,0 +1,385 @@
+fileFormatVersion: 2
+guid: cfef3cfc1445b88419816432a7e68a30
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 119503329722153783
+    second: Dizzy Effect_0
+  - first:
+      213: 7979704437161896224
+    second: Dizzy Effect_1
+  - first:
+      213: -10660796159961279
+    second: Dizzy Effect_2
+  - first:
+      213: -7263758137601112914
+    second: Dizzy Effect_3
+  - first:
+      213: 8566851809985134591
+    second: Dizzy Effect_4
+  - first:
+      213: 7165421553708669564
+    second: Dizzy Effect_5
+  - first:
+      213: 6970846812096104555
+    second: Dizzy Effect_6
+  - first:
+      213: 518609086099148226
+    second: Dizzy Effect_7
+  - first:
+      213: -8497815795461688754
+    second: Dizzy Effect_8
+  - first:
+      213: 6807999698254556660
+    second: Dizzy Effect_9
+  - first:
+      213: 2215665198652486522
+    second: Dizzy Effect_10
+  - first:
+      213: 3727052706318888465
+    second: Dizzy Effect_11
+  - first:
+      213: -6847162745714627172
+    second: Dizzy Effect_12
+  - first:
+      213: -1262009378530904755
+    second: Dizzy Effect_13
+  - first:
+      213: -5874174193079203197
+    second: Dizzy Effect_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 400
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Dizzy Effect_0
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 749
+        width: 389
+        height: 228
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73bb09d25af88a100800000000000000
+      internalID: 119503329722153783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_4
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 438
+        width: 413
+        height: 197
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 029a4a548ea9dbe60800000000000000
+      internalID: 7979704437161896224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_1
+      rect:
+        serializedVersion: 2
+        x: 563
+        y: 767
+        width: 412
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea4cee97572f13b90800000000000000
+      internalID: -7263758137601112914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_5
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 418
+        width: 387
+        height: 241
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fff7391055293e670800000000000000
+      internalID: 8566851809985134591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_2
+      rect:
+        serializedVersion: 2
+        x: 1052
+        y: 745
+        width: 382
+        height: 241
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7a9bb660f0b07360800000000000000
+      internalID: 7165421553708669564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_6
+      rect:
+        serializedVersion: 2
+        x: 1069
+        y: 427
+        width: 371
+        height: 218
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6807a21e3c6db060800000000000000
+      internalID: 6970846812096104555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_7
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 51
+        width: 311
+        height: 235
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e427dc0be81b11a80800000000000000
+      internalID: -8497815795461688754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_8
+      rect:
+        serializedVersion: 2
+        x: 563
+        y: 73
+        width: 388
+        height: 203
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fded6db7afda7e50800000000000000
+      internalID: 6807999698254556660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dizzy Effect_9
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 56
+        width: 349
+        height: 254
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7370e252cf9fbe10800000000000000
+      internalID: 2215665198652486522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 8146d91eb9440ec499c48089a97a7fbd
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Dizzy Effect_0: 119503329722153783
+      Dizzy Effect_1: -7263758137601112914
+      Dizzy Effect_12: -6847162745714627172
+      Dizzy Effect_13: -1262009378530904755
+      Dizzy Effect_14: -5874174193079203197
+      Dizzy Effect_2: 7165421553708669564
+      Dizzy Effect_4: 7979704437161896224
+      Dizzy Effect_5: 8566851809985134591
+      Dizzy Effect_6: 6970846812096104555
+      Dizzy Effect_7: -8497815795461688754
+      Dizzy Effect_8: 6807999698254556660
+      Dizzy Effect_9: 2215665198652486522
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

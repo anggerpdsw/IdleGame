@@ -1,0 +1,1 @@
+- [Ponytail Philosophy](ponytail-philosophy.md) — Lazy Senior Dev approach for efficient coding

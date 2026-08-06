@@ -1,0 +1,570 @@
+fileFormatVersion: 2
+guid: 79493cdc9da45454eb27b7a75b32184c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9094622450527073565
+    second: PanelHome1_0
+  - first:
+      213: 9188248060121772055
+    second: PanelHome1_1
+  - first:
+      213: 4123199896973501263
+    second: PanelHome1_2
+  - first:
+      213: -2337811776234953777
+    second: PanelHome1_3
+  - first:
+      213: -8487832227949379547
+    second: PanelHome1_4
+  - first:
+      213: -2310131145483450174
+    second: PanelHome1_5
+  - first:
+      213: 8200494333292083514
+    second: PanelHome1_6
+  - first:
+      213: -8001269294915555142
+    second: PanelHome1_7
+  - first:
+      213: 7543923633554426176
+    second: PanelHome1_8
+  - first:
+      213: 1053362515431834782
+    second: PanelHome1_9
+  - first:
+      213: 2818545725027197688
+    second: PanelHome1_10
+  - first:
+      213: 3214347473332657093
+    second: PanelHome1_11
+  - first:
+      213: 8555224017450577388
+    second: PanelHome1_12
+  - first:
+      213: -1739252632423081918
+    second: PanelHome1_13
+  - first:
+      213: 3306604425300165363
+    second: PanelHome1_14
+  - first:
+      213: 2652856024780070138
+    second: PanelHome1_15
+  - first:
+      213: 4243021240895260238
+    second: PanelHome1_16
+  - first:
+      213: 3297366055049440696
+    second: PanelHome1_17
+  - first:
+      213: -9147051323756107476
+    second: PanelHome1_18
+  - first:
+      213: 9171076823563502199
+    second: PanelHome1_19
+  - first:
+      213: -1041119784715265294
+    second: PanelHome1_20
+  - first:
+      213: -3195654482255580848
+    second: PanelHome1_21
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PanelHome1_0
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 829
+        width: 831
+        height: 157
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1575f1fee6963e70800000000000000
+      internalID: 9094622450527073565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_2
+      rect:
+        serializedVersion: 2
+        x: 920
+        y: 847
+        width: 175
+        height: 132
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f43680de57c883930800000000000000
+      internalID: 4123199896973501263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_3
+      rect:
+        serializedVersion: 2
+        x: 1103
+        y: 851
+        width: 122
+        height: 124
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc36ac5639c6e8fd0800000000000000
+      internalID: -2337811776234953777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_4
+      rect:
+        serializedVersion: 2
+        x: 1237
+        y: 858
+        width: 130
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52007f32f89253a80800000000000000
+      internalID: -8487832227949379547
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_5
+      rect:
+        serializedVersion: 2
+        x: 1373
+        y: 855
+        width: 132
+        height: 118
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c884e876f3c0ffd0800000000000000
+      internalID: -2310131145483450174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_11
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 180
+        width: 365
+        height: 617
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5cbdaa42ff7ab9c20800000000000000
+      internalID: 3214347473332657093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_12
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 374
+        width: 217
+        height: 198
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ced28069ae24ab670800000000000000
+      internalID: 8555224017450577388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_13
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 601
+        width: 224
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24852cd12feecd7e0800000000000000
+      internalID: -1739252632423081918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_14
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 601
+        width: 832
+        height: 192
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f240c6a43b63ed20800000000000000
+      internalID: 3306604425300165363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_15
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 389
+        width: 268
+        height: 186
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afc5545cf76d0d420800000000000000
+      internalID: 2652856024780070138
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_16
+      rect:
+        serializedVersion: 2
+        x: 980
+        y: 383
+        width: 533
+        height: 189
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e46cffd865d32ea30800000000000000
+      internalID: 4243021240895260238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_17
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 177
+        width: 669
+        height: 168
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bd27a5f4f892cd20800000000000000
+      internalID: 3297366055049440696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_18
+      rect:
+        serializedVersion: 2
+        x: 1124
+        y: 188
+        width: 407
+        height: 162
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c292041c8452f0180800000000000000
+      internalID: -9147051323756107476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_19
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 34
+        width: 457
+        height: 121
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7720254d7c5364f70800000000000000
+      internalID: 9171076823563502199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_20
+      rect:
+        serializedVersion: 2
+        x: 547
+        y: 35
+        width: 392
+        height: 118
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fa5a6762133d81f0800000000000000
+      internalID: -1041119784715265294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PanelHome1_21
+      rect:
+        serializedVersion: 2
+        x: 1015
+        y: 34
+        width: 429
+        height: 120
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05175400e21c6a3d0800000000000000
+      internalID: -3195654482255580848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: d9b43fdfb46bd8949aaa8892feb0e71b
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PanelHome1_0: 9094622450527073565
+      PanelHome1_1: 9188248060121772055
+      PanelHome1_10: 2818545725027197688
+      PanelHome1_11: 3214347473332657093
+      PanelHome1_12: 8555224017450577388
+      PanelHome1_13: -1739252632423081918
+      PanelHome1_14: 3306604425300165363
+      PanelHome1_15: 2652856024780070138
+      PanelHome1_16: 4243021240895260238
+      PanelHome1_17: 3297366055049440696
+      PanelHome1_18: -9147051323756107476
+      PanelHome1_19: 9171076823563502199
+      PanelHome1_2: 4123199896973501263
+      PanelHome1_20: -1041119784715265294
+      PanelHome1_21: -3195654482255580848
+      PanelHome1_3: -2337811776234953777
+      PanelHome1_4: -8487832227949379547
+      PanelHome1_5: -2310131145483450174
+      PanelHome1_6: 8200494333292083514
+      PanelHome1_7: -8001269294915555142
+      PanelHome1_8: 7543923633554426176
+      PanelHome1_9: 1053362515431834782
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

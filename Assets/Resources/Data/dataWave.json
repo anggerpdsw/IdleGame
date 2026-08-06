@@ -1,0 +1,19 @@
+{
+  "waves": {
+    "waveDuration": 30,
+    "interWaveDuration": 10,
+    "maxWave": 350
+  },
+  "difficulty": {
+    "tierMultiplier": 0.15,
+    "healthMultiplier": 1.008,
+    "speedMultiplier": 1.0015,
+    "damageMultiplier": 1.005
+  },
+  "spawning": {
+    "baseSpawnInterval": 1.51,
+    "minSpawnInterval": 0.117,
+    "minWaveSpawnDecay": 200,
+    "maxSpawnBuffer": 7.7
+  }
+}

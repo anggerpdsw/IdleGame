@@ -1,0 +1,343 @@
+fileFormatVersion: 2
+guid: 9f09a18be14ba9b459aa0d2cf7186f9f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7861754631831008184
+    second: Explotion Effect_0
+  - first:
+      213: -8349627268436145525
+    second: Explotion Effect_1
+  - first:
+      213: 7502477054975164259
+    second: Explotion Effect_2
+  - first:
+      213: 6696021068038317777
+    second: Explotion Effect_3
+  - first:
+      213: 6650401815800658944
+    second: Explotion Effect_4
+  - first:
+      213: -2061065685340978486
+    second: Explotion Effect_5
+  - first:
+      213: -6568830652264415514
+    second: Explotion Effect_6
+  - first:
+      213: -5908043478106447635
+    second: Explotion Effect_7
+  - first:
+      213: 3417011363179660675
+    second: Explotion Effect_8
+  - first:
+      213: 2831360389277660284
+    second: Explotion Effect_9
+  - first:
+      213: -8996437702242573
+    second: Explotion Effect_10
+  - first:
+      213: 7406947485205185815
+    second: Explotion Effect_11
+  - first:
+      213: -7521887112830481025
+    second: Explotion Effect_12
+  - first:
+      213: -1832600346573212851
+    second: Explotion Effect_13
+  - first:
+      213: -1818535502838456524
+    second: Explotion Effect_14
+  - first:
+      213: 7576576789001923258
+    second: Explotion Effect_15
+  - first:
+      213: -6530003618477781451
+    second: Explotion Effect_16
+  - first:
+      213: 5012072799691323862
+    second: Explotion Effect_17
+  - first:
+      213: -6679109695238696022
+    second: Explotion Effect_18
+  - first:
+      213: 4601851333636648866
+    second: Explotion Effect_19
+  - first:
+      213: -7162030598681183241
+    second: Explotion Effect_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 200
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Explotion Effect_0
+      rect:
+        serializedVersion: 2
+        x: 28
+        y: 600
+        width: 480
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84c4e62d0df65e290800000000000000
+      internalID: -7861754631831008184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explotion Effect_1
+      rect:
+        serializedVersion: 2
+        x: 496
+        y: 600
+        width: 480
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8ac2f1dc3a202c80800000000000000
+      internalID: -8349627268436145525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explotion Effect_2
+      rect:
+        serializedVersion: 2
+        x: 985
+        y: 600
+        width: 480
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d6a4f03fab0dec50800000000000000
+      internalID: 6696021068038317777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explotion Effect_3
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 100
+        width: 480
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 715c0ad7e73cac660800000000000000
+      internalID: 7406947485205185815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explotion Effect_4
+      rect:
+        serializedVersion: 2
+        x: 505
+        y: 100
+        width: 480
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d43fe3fb1bb4196e0800000000000000
+      internalID: -1832600346573212851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Explotion Effect_5
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 100
+        width: 450
+        height: 350
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43f90ed589343c6e0800000000000000
+      internalID: -1818535502838456524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e2f7af2a9f6cba84eb668d89435d6ae3
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Explotion Effect_0: -7861754631831008184
+      Explotion Effect_1: -8349627268436145525
+      Explotion Effect_10: -8996437702242573
+      Explotion Effect_12: -7521887112830481025
+      Explotion Effect_15: 7576576789001923258
+      Explotion Effect_16: -6530003618477781451
+      Explotion Effect_17: 5012072799691323862
+      Explotion Effect_18: -6679109695238696022
+      Explotion Effect_19: 4601851333636648866
+      Explotion Effect_2: 6696021068038317777
+      Explotion Effect_20: -7162030598681183241
+      Explotion Effect_3: 7406947485205185815
+      Explotion Effect_4: -1832600346573212851
+      Explotion Effect_5: -1818535502838456524
+      Explotion Effect_6: -6568830652264415514
+      Explotion Effect_7: -5908043478106447635
+      Explotion Effect_8: 3417011363179660675
+      Explotion Effect_9: 2831360389277660284
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

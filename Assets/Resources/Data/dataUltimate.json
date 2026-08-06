@@ -1,0 +1,76 @@
+{
+    "ultimate": [{
+            "id": "Void",
+            "active": true,
+            "cooldown": 61,
+            "duration": 8.3,
+            "slowPercent": 77,
+            "stuntMultiplier": 4.3,
+            "element": "None"
+        },
+        {
+            "id": "Tank",
+            "active": true,
+            "chance": 11,
+            "count": 4,
+            "duration": 15.7,
+            "damageMultiplier": 1.7,
+            "element": "Metal"
+        },
+        {
+            "id": "Root",
+            "active": true,
+            "cooldown": 17,
+            "duration": 8.5,
+            "element": "Wood"
+        },
+        {
+            "id": "Bomb",
+            "active": true,
+            "chance": 73,
+            "count": 5,
+            "duration": 13.5,
+            "damageMultiplier": 2.3,
+            "knockbackMultiplier": 1.2,
+            "element": "Fire"
+        },
+        {
+            "id": "Fountain",
+            "active": true,
+            "cooldown": 39.63,
+            "count": 7,
+            "duration": 8.1,
+            "damageMultiplier": 0.231,
+            "stuntMultiplier": 2.31,
+            "element": "Water"
+        },
+        {
+            "id": "Cloud",
+            "active": true,
+            "chance": 81,
+            "count": 5,
+            "duration": 6.3,
+            "damageMultiplier": 0.637,
+            "slowPercent": 69,
+            "element": "Earth"
+        },
+        {
+            "id": "Lightning",
+            "active": true,
+            "triggerKillCount": 5,
+            "count": 7,
+            "damageMultiplier": 2.3,
+            "stuntMultiplier": 2.1,
+            "defenseBreak": 0.22,
+            "element": "Lightning"
+        },
+        {
+            "id": "Shockwave",
+            "active": true,
+            "cooldown": 110,
+            "damageMultiplier": 3.3,
+            "knockbackMultiplier": 2.2,
+            "element": "Wind"
+        }
+    ]
+}

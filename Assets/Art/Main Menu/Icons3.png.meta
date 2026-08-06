@@ -1,0 +1,432 @@
+fileFormatVersion: 2
+guid: e55aced254d987a43b9313605dac7090
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -657391950960863211
+    second: Icons3_0
+  - first:
+      213: -2763512721592594591
+    second: Icons3_1
+  - first:
+      213: -3786794712790922400
+    second: Icons3_2
+  - first:
+      213: 7766700373882181502
+    second: Icons3_3
+  - first:
+      213: 7469182466393060455
+    second: Icons3_4
+  - first:
+      213: -6097977994118151761
+    second: Icons3_5
+  - first:
+      213: 72599069592842009
+    second: Icons3_6
+  - first:
+      213: -7311220686778395671
+    second: Icons3_7
+  - first:
+      213: 1116913933550384924
+    second: Icons3_8
+  - first:
+      213: -1136307083359506751
+    second: Icons3_9
+  - first:
+      213: -1800523950138975377
+    second: Icons3_10
+  - first:
+      213: 5292942504667020641
+    second: Icons3_11
+  - first:
+      213: 2461266669746265322
+    second: Icons3_12
+  - first:
+      213: -2738423591669610698
+    second: Icons3_13
+  - first:
+      213: 9134405741840652157
+    second: Icons3_14
+  - first:
+      213: -6714592348360487612
+    second: Icons3_15
+  - first:
+      213: 1890149610695879965
+    second: Icons3_16
+  - first:
+      213: -9109149999878033800
+    second: Icons3_17
+  - first:
+      213: -1823082791361466465
+    second: Icons3_18
+  - first:
+      213: -9103215501911883549
+    second: Icons3_19
+  - first:
+      213: 7061078078468511321
+    second: Icons3_20
+  - first:
+      213: 4886855174220444940
+    second: Icons3_21
+  - first:
+      213: -6084217859220511791
+    second: Icons3_22
+  - first:
+      213: 317434398003452982
+    second: Icons3_23
+  - first:
+      213: -4933518259340569716
+    second: Icons3_24
+  - first:
+      213: 1718406714474124630
+    second: Icons3_25
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 20
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Icons3_15
+      rect:
+        serializedVersion: 2
+        x: 602
+        y: 95
+        width: 22
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44dca68a5d9f0d2a0800000000000000
+      internalID: -6714592348360487612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_16
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 95
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1deed57e092b3a10800000000000000
+      internalID: 1890149610695879965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_17
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 11
+        width: 177
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87e2583665cc59180800000000000000
+      internalID: -9109149999878033800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_18
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 60
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9fa5c04cdb13b6e0800000000000000
+      internalID: -1823082791361466465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_19
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 60
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e086be5bb1eaa180800000000000000
+      internalID: -9103215501911883549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_20
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 60
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 956d966e91dfdf160800000000000000
+      internalID: 7061078078468511321
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_21
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 59
+        width: 30
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c057038a3e891d340800000000000000
+      internalID: 4886855174220444940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_22
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 59
+        width: 28
+        height: 31
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d3e215b714809ba0800000000000000
+      internalID: -6084217859220511791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icons3_23
+      rect:
+        serializedVersion: 2
+        x: 613
+        y: 60
+        width: 29
+        height: 28
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63c5c7437e0c76400800000000000000
+      internalID: 317434398003452982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: f9375db5990bca347b65819db989bf41
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Icons3_0: -657391950960863211
+      Icons3_1: -2763512721592594591
+      Icons3_10: -1800523950138975377
+      Icons3_11: 5292942504667020641
+      Icons3_12: 2461266669746265322
+      Icons3_13: -2738423591669610698
+      Icons3_14: 9134405741840652157
+      Icons3_15: -6714592348360487612
+      Icons3_16: 1890149610695879965
+      Icons3_17: -9109149999878033800
+      Icons3_18: -1823082791361466465
+      Icons3_19: -9103215501911883549
+      Icons3_2: -3786794712790922400
+      Icons3_20: 7061078078468511321
+      Icons3_21: 4886855174220444940
+      Icons3_22: -6084217859220511791
+      Icons3_23: 317434398003452982
+      Icons3_24: -4933518259340569716
+      Icons3_25: 1718406714474124630
+      Icons3_3: 7766700373882181502
+      Icons3_4: 7469182466393060455
+      Icons3_5: -6097977994118151761
+      Icons3_6: 72599069592842009
+      Icons3_7: -7311220686778395671
+      Icons3_8: 1116913933550384924
+      Icons3_9: -1136307083359506751
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

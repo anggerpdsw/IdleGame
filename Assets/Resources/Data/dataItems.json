@@ -1,0 +1,439 @@
+{
+  "Items": [{
+      "Id": "CardRoll",
+      "Name": "Card Roll Ticket",
+      "Description": "Used to roll a card.",
+      "Category": 2,
+      "ItemRarity": 2,
+      "IconKey": "CardRoll",
+      "SellPrice": 50,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "SkinShard",
+      "Name": "Skin Shard",
+      "Description": "Fragment of a rare skin.",
+      "Category": 12,
+      "ItemRarity": 3,
+      "IconKey": "SkinShard",
+      "SellPrice": 20,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_None",
+      "Name": "Neutral Ultimate Stone",
+      "Description": "Upgrades any ultimate.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_None",
+      "SellPrice": 25,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Metal",
+      "Name": "Metal Ultimate Stone",
+      "Description": "Upgrades Metal ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Metal",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Wood",
+      "Name": "Wood Ultimate Stone",
+      "Description": "Upgrades Wood ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Wood",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Fire",
+      "Name": "Fire Ultimate Stone",
+      "Description": "Upgrades Fire ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Fire",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Water",
+      "Name": "Water Ultimate Stone",
+      "Description": "Upgrades Water ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Water",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Earth",
+      "Name": "Earth Ultimate Stone",
+      "Description": "Upgrades Earth ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Earth",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Lightning",
+      "Name": "Lightning Ultimate Stone",
+      "Description": "Upgrades Lightning ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Lightning",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "UltimateStone_Wind",
+      "Name": "Wind Ultimate Stone",
+      "Description": "Upgrades Wind ultimates.",
+      "Category": 8,
+      "ItemRarity": 1,
+      "IconKey": "UltimateStone/UltimateStone_Wind",
+      "SellPrice": 30,
+      "StackSize": 999,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "potion_hp",
+      "Name": "HP Potion",
+      "Description": "Restores 500 HP when used.",
+      "Category": 2,
+      "ItemRarity": 1,
+      "IconKey": "Exp",
+      "SellPrice": 10,
+      "StackSize": 20,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "iron_ore",
+      "Name": "Iron Ore",
+      "Description": "Common ore used in crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Meat",
+      "SellPrice": 5,
+      "StackSize": 99,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "magic_crystal",
+      "Name": "Magic Crystal",
+      "Description": "Glowing crystal brimming with mana.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Gem",
+      "SellPrice": 25,
+      "StackSize": 99,
+      "MaxDurability": 0
+    },
+    {
+      "Id": "gold_pouch",
+      "Name": "Gold Pouch",
+      "Description": "A pouch of gold coins. Sell for a tidy sum.",
+      "Category": 5,
+      "ItemRarity": 2,
+      "IconKey": "Gold",
+      "SellPrice": 100,
+      "StackSize": 10,
+      "MaxDurability": 0
+    }
+  ],
+  "Equipment": [{
+      "Id": "equip_hat_leather",
+      "Name": "Leather Hat",
+      "Description": "A simple leather hat. +30 HP, +2 Defense",
+      "Category": 1,
+      "ItemRarity": 2,
+      "EquipmentType": 1,
+      "SellPrice": 35,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 50,
+      "MaxDurability": 100,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 5,
+      "MaxSockets": 1,
+      "MainStats": [{
+          "Stat": 1,
+          "BaseValue": 30,
+          "ValuePerLevel": 3,
+          "ValuePerEnhance": 5,
+          "Mode": 1
+        },
+        {
+          "Stat": 3,
+          "BaseValue": 2,
+          "ValuePerLevel": 0.3,
+          "ValuePerEnhance": 0.5,
+          "Mode": 1
+        }
+      ],
+      "IconKey": "UltimateStone"
+    },
+    {
+      "Id": "equip_gloves_fighter",
+      "Name": "Fighter Gloves",
+      "Description": "Reinforced knuckles. +4 Attack",
+      "Category": 1,
+      "ItemRarity": 3,
+      "EquipmentType": 2,
+      "SellPrice": 60,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 50,
+      "MaxDurability": 100,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 6,
+      "MaxSockets": 1,
+      "MainStats": [{
+        "Stat": 2,
+        "BaseValue": 4,
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8,
+        "Mode": 1
+      }],
+      "IconKey": "UltimateStone"
+    },
+    {
+      "Id": "equip_armor_iron",
+      "Name": "Iron Armor",
+      "Description": "Solid iron plating. +60 HP, +8 Defense",
+      "Category": 1,
+      "ItemRarity": 3,
+      "EquipmentType": 4,
+      "SellPrice": 80,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 50,
+      "MaxDurability": 120,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 7,
+      "MaxSockets": 2,
+      "MainStats": [{
+          "Stat": 1,
+          "BaseValue": 60,
+          "ValuePerLevel": 5,
+          "ValuePerEnhance": 8,
+          "Mode": 1
+        },
+        {
+          "Stat": 3,
+          "BaseValue": 8,
+          "ValuePerLevel": 0.6,
+          "ValuePerEnhance": 1,
+          "Mode": 1
+        }
+      ],
+      "IconKey": "UltimateStone"
+    },
+    {
+      "Id": "equip_belt_warrior",
+      "Name": "Warrior Belt",
+      "Description": "Belt of a seasoned warrior. +5 Attack Speed",
+      "Category": 1,
+      "ItemRarity": 2,
+      "EquipmentType": 5,
+      "SellPrice": 45,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 50,
+      "MaxDurability": 100,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 5,
+      "MaxSockets": 1,
+      "MainStats": [{
+        "Stat": 4,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.5,
+        "Mode": 1
+      }],
+      "IconKey": "UltimateStone"
+    },
+    {
+      "Id": "equip_ring_ruby",
+      "Name": "Ruby Ring",
+      "Description": "A ring set with a crimson ruby. +3% Critical Rate",
+      "Category": 1,
+      "ItemRarity": 4,
+      "EquipmentType": 8,
+      "SellPrice": 120,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 50,
+      "MaxDurability": 90,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 8,
+      "MaxSockets": 1,
+      "MainStats": [{
+        "Stat": 5,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.5,
+        "Mode": 2
+      }],
+      "IconKey": "UltimateStone"
+    },
+    {
+      "Id": "equip_bracelet_lifesteal",
+      "Name": "Vampire Bracelet",
+      "Description": "Leeches life from foes. +2% Life Steal",
+      "Category": 1,
+      "ItemRarity": 4,
+      "EquipmentType": 10,
+      "SellPrice": 130,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 50,
+      "MaxDurability": 90,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 8,
+      "MaxSockets": 1,
+      "MainStats": [{
+        "Stat": 9,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.3,
+        "Mode": 2
+      }],
+      "IconKey": "UltimateStone"
+    },
+    {
+      "Id": "equip_hat_mystic",
+      "Name": "Mystic Hat",
+      "Description": "Enchanted cloth woven with starlight. +10 Magic Power, +5% Cooldown Reduction",
+      "Category": 1,
+      "ItemRarity": 5,
+      "EquipmentType": 1,
+      "SellPrice": 200,
+      "StackSize": 1,
+      "BaseLevel": 1,
+      "MaxLevel": 60,
+      "MaxDurability": 110,
+      "DurabilityLossPerUse": 1,
+      "RepairCostPerDurability": 10,
+      "MaxSockets": 2,
+      "MainStats": [{
+          "Stat": 13,
+          "BaseValue": 10,
+          "ValuePerLevel": 0.8,
+          "ValuePerEnhance": 1.5,
+          "Mode": 1
+        },
+        {
+          "Stat": 15,
+          "BaseValue": 5,
+          "ValuePerLevel": 0.2,
+          "ValuePerEnhance": 0.4,
+          "Mode": 2
+        }
+      ],
+      "IconKey": "UltimateStone"
+    }
+  ],
+  "Gems": [{
+      "GemId": "gem_ruby",
+      "Name": "Ruby",
+      "Description": "Fiery gem. Boosts Attack.",
+      "GemType": 1,
+      "ItemRarity": 2,
+      "MaxLevel": 10,
+      "BaseExperience": 100,
+      "ExperienceGrowth": 1.5,
+      "RandomStatCount": 1,
+      "BaseStats": [{
+        "Stat": 2,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0,
+        "Mode": 1
+      }],
+      "RandomStats": [{
+        "Stat": 5,
+        "BaseValue": 1,
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0,
+        "Mode": 2
+      }],
+      "UpgradeData": {
+        "BaseGoldCost": 100,
+        "GoldCostGrowth": 1.3,
+        "MaxLevel": 10
+      },
+      "IconKey": "Gem"
+    },
+    {
+      "GemId": "gem_sapphire",
+      "Name": "Sapphire",
+      "Description": "Deep blue gem. Boosts Critical Rate.",
+      "GemType": 2,
+      "ItemRarity": 3,
+      "MaxLevel": 10,
+      "BaseExperience": 120,
+      "ExperienceGrowth": 1.5,
+      "RandomStatCount": 1,
+      "BaseStats": [{
+        "Stat": 5,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0,
+        "Mode": 2
+      }],
+      "RandomStats": [{
+        "Stat": 6,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0,
+        "Mode": 1
+      }],
+      "UpgradeData": {
+        "BaseGoldCost": 150,
+        "GoldCostGrowth": 1.3,
+        "MaxLevel": 10
+      },
+      "IconKey": "Gem"
+    },
+    {
+      "GemId": "gem_emerald",
+      "Name": "Emerald",
+      "Description": "Lively green gem. Boosts Dodge.",
+      "GemType": 3,
+      "ItemRarity": 3,
+      "MaxLevel": 10,
+      "BaseExperience": 120,
+      "ExperienceGrowth": 1.5,
+      "RandomStatCount": 1,
+      "BaseStats": [{
+        "Stat": 10,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0,
+        "Mode": 2
+      }],
+      "RandomStats": [],
+      "UpgradeData": {
+        "BaseGoldCost": 150,
+        "GoldCostGrowth": 1.3,
+        "MaxLevel": 10
+      },
+      "IconKey": "Gem"
+    }
+  ],
+  "Sets": []
+}

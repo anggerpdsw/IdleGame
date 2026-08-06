@@ -1,0 +1,59 @@
+{
+  "MaxSocketsPerItem": 4,
+  "CanAddSockets": true,
+  "AddSocketCost": {
+    "CurrencyType": "Gold",
+    "Amount": 10000
+  },
+  "MaxAdditionalSockets": 2,
+  "CanRemoveGems": true,
+  "CanDestroyGems": true,
+  "GemRemovalGoldCost": 100,
+  "GemDestructionReturnRate": 0.5,
+  "SocketRules": [
+    {
+      "SocketIndex": 0,
+      "UnlockEnhanceLevel": 0,
+      "UnlockPlayerLevel": 1,
+      "MinimumRarity": "Common",
+      "AllowAnyGem": true,
+      "AllowedGemTypes": [],
+      "IsLocked": false,
+      "SocketShape": "Circle",
+      "SocketColor": "FFFFFF"
+    },
+    {
+      "SocketIndex": 1,
+      "UnlockEnhanceLevel": 5,
+      "UnlockPlayerLevel": 1,
+      "MinimumRarity": "Common",
+      "AllowAnyGem": true,
+      "AllowedGemTypes": [],
+      "IsLocked": false,
+      "SocketShape": "Circle",
+      "SocketColor": "FFFFFF"
+    },
+    {
+      "SocketIndex": 2,
+      "UnlockEnhanceLevel": 10,
+      "UnlockPlayerLevel": 1,
+      "MinimumRarity": "Common",
+      "AllowAnyGem": true,
+      "AllowedGemTypes": [],
+      "IsLocked": false,
+      "SocketShape": "Circle",
+      "SocketColor": "FFFFFF"
+    },
+    {
+      "SocketIndex": 3,
+      "UnlockEnhanceLevel": 15,
+      "UnlockPlayerLevel": 1,
+      "MinimumRarity": "Common",
+      "AllowAnyGem": true,
+      "AllowedGemTypes": [],
+      "IsLocked": false,
+      "SocketShape": "Circle",
+      "SocketColor": "FFFFFF"
+    }
+  ]
+}

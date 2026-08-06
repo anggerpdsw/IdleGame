@@ -1,0 +1,496 @@
+{
+  "skills": {
+    "attack": {
+      "attackDamage": {
+        "level": 1,
+        "maxLevel": 7000,
+        "min": 7,
+        "max": 350,
+        "isFloat": true,
+        "locked": false,
+        "description": "The damage that character's attack power and ultimate weapons can cause to enemies.",
+        "displayName": "Attack Damage",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 100,
+          "growthFactor": 1.15,
+          "roundToNearest": true
+        }]
+      },
+      "attackSpeed": {
+        "level": 1,
+        "maxLevel": 99,
+        "min": 1.1,
+        "max": 5.95,
+        "isFloat": true,
+        "locked": false,
+        "description": "Speed projectiles are fired from player",
+        "displayName": "Attack Speed",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 150,
+          "growthFactor": 1.12,
+          "roundToNearest": true
+        }]
+      },
+      "attackRange": {
+        "level": 1,
+        "maxLevel": 79,
+        "min": 2.43,
+        "max": 5.5,
+        "isFloat": true,
+        "locked": false,
+        "description": "Maximum range of player",
+        "displayName": "Attack Range",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 120,
+          "growthFactor": 1.13,
+          "roundToNearest": true
+        }]
+      },
+      "bounceChance": {
+        "level": 0,
+        "maxLevel": 85,
+        "min": 2,
+        "max": 68,
+        "isFloat": true,
+        "locked": false,
+        "description": "Probability of projectile bouncing to another enemy after hitting one",
+        "displayName": "Bounce Chance",
+        "costs": [{
+            "currencyType": 0,
+            "baseCost": 80,
+            "growthFactor": 1.12,
+            "roundToNearest": true
+          },
+          {
+            "currencyType": 2,
+            "baseCost": 5,
+            "growthFactor": 1.12,
+            "roundToNearest": true
+          }
+        ]
+      },
+      "bounceCount": {
+        "level": 1,
+        "maxLevel": 8,
+        "min": 0,
+        "max": 8,
+        "isFloat": false,
+        "locked": false,
+        "description": "Number of times a projectile can bounce from enemy to enemy",
+        "displayName": "Bounce Count",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 150,
+          "growthFactor": 1.10,
+          "roundToNearest": true
+        }]
+      },
+      "criticalChance": {
+        "level": 0,
+        "maxLevel": 79,
+        "min": 1.2,
+        "max": 80,
+        "isFloat": true,
+        "locked": true,
+        "description": "Chance of each projectile to deal critical damage",
+        "displayName": "Critical Chance",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 120,
+          "growthFactor": 1.15,
+          "roundToNearest": true
+        }],
+        "unlockCost": 50,
+        "unlockCurrency": 1
+      },
+      "criticalFactor": {
+        "level": 0,
+        "maxLevel": 150,
+        "min": 1.3,
+        "max": 5.4,
+        "isFloat": true,
+        "locked": true,
+        "description": "Damage multiplier for critical hits",
+        "displayName": "Critical Factor",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 150,
+          "growthFactor": 1.14,
+          "roundToNearest": true
+        }],
+        "unlockCost": 80,
+        "unlockCurrency": 1
+      },
+      "bounceSearchRadius": {
+        "level": 0,
+        "maxLevel": 60,
+        "min": 2,
+        "max": 4,
+        "isFloat": true,
+        "locked": false,
+        "description": "Range that a projectile can bounce from enemy to enemy if activated",
+        "displayName": "Bounce Search Radius",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 90,
+          "growthFactor": 1.13,
+          "roundToNearest": true
+        }]
+      },
+      "damagePerRange": {
+        "level": 0,
+        "maxLevel": 200,
+        "min": 2,
+        "max": 59,
+        "isFloat": true,
+        "locked": true,
+        "description": "Damage increased the further the enemy is from the player",
+        "displayName": "Damage Per Range",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 200,
+          "growthFactor": 1.18,
+          "roundToNearest": true
+        }],
+        "unlockCost": 100,
+        "unlockCurrency": 1
+      },
+      "knockbackChance": {
+        "level": 0,
+        "maxLevel": 80,
+        "min": 5,
+        "max": 80,
+        "isFloat": true,
+        "locked": false,
+        "description": "Chance to knockback enemies",
+        "displayName": "Knockback Chance",
+        "costs": [{
+            "currencyType": 0,
+            "baseCost": 100,
+            "growthFactor": 1.13,
+            "roundToNearest": true
+          },
+          {
+            "currencyType": 2,
+            "baseCost": 10,
+            "growthFactor": 1.10,
+            "roundToNearest": true
+          }
+        ]
+      },
+      "knockbackForce": {
+        "level": 1,
+        "maxLevel": 40,
+        "min": 0.5,
+        "max": 6.43,
+        "isFloat": true,
+        "locked": false,
+        "description": "Force applied to knockbacked enemies",
+        "displayName": "Knockback Force",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 120,
+          "growthFactor": 1.15,
+          "roundToNearest": true
+        }]
+      },
+      "multiShootChance": {
+        "level": 0,
+        "maxLevel": 99,
+        "min": 1,
+        "max": 49.5,
+        "isFloat": true,
+        "locked": false,
+        "description": "Chance to shoot more than one projectile when firing",
+        "displayName": "Multi-Shot Chance",
+        "costs": [{
+            "currencyType": 0,
+            "baseCost": 90,
+            "growthFactor": 1.14,
+            "roundToNearest": true
+          },
+          {
+            "currencyType": 2,
+            "baseCost": 8,
+            "growthFactor": 1.11,
+            "roundToNearest": true
+          }
+        ]
+      },
+      "multiShootCount": {
+        "level": 1,
+        "maxLevel": 7,
+        "min": 1,
+        "max": 7,
+        "isFloat": false,
+        "locked": false,
+        "description": "Number of projetiles shot when multishot activates",
+        "displayName": "Multi-Shot Count",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 200,
+          "growthFactor": 1.08,
+          "roundToNearest": true
+        }]
+      },
+      "stuntChance": {
+        "level": 0,
+        "maxLevel": 200,
+        "min": 1,
+        "max": 11,
+        "isFloat": true,
+        "locked": false,
+        "description": "Probability of triggering stunt effect when attacking",
+        "displayName": "Stun Chance",
+        "costs": [{
+            "currencyType": 0,
+            "baseCost": 110,
+            "growthFactor": 1.13,
+            "roundToNearest": true
+          },
+          {
+            "currencyType": 2,
+            "baseCost": 12,
+            "growthFactor": 1.09,
+            "roundToNearest": true
+          }
+        ]
+      },
+      "stuntDuration": {
+        "level": 1,
+        "maxLevel": 150,
+        "min": 0.5,
+        "max": 3.3,
+        "isFloat": true,
+        "locked": false,
+        "description": "Can stunt enemies for a period of time",
+        "displayName": "Stun Duration",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 130,
+          "growthFactor": 1.11,
+          "roundToNearest": true
+        }]
+      },
+      "ultimateWeaponAttack": {
+        "level": 1,
+        "maxLevel": 6000,
+        "min": 1,
+        "max": 150,
+        "isFloat": true,
+        "locked": true,
+        "description": "Extra Attack Power from Ultimate Weapon",
+        "displayName": "Ultimate Weapon Attack",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 200,
+          "growthFactor": 1.16,
+          "roundToNearest": true
+        }],
+        "unlockCost": 150,
+        "unlockCurrency": 1
+      },
+      "superCriticalChance": {
+        "level": 0,
+        "maxLevel": 100,
+        "min": 1.5,
+        "max": 35,
+        "isFloat": true,
+        "locked": true,
+        "description": "Chance for a super critical hit, if critical hit chance succeeds",
+        "displayName": "Super Critical Chance",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 180,
+          "growthFactor": 1.16,
+          "roundToNearest": true
+        }],
+        "unlockCost": 120,
+        "unlockCurrency": 1
+      },
+      "superCriticalFactor": {
+        "level": 0,
+        "maxLevel": 120,
+        "min": 1.7,
+        "max": 4.4,
+        "isFloat": true,
+        "locked": true,
+        "description": "Super critical hit damage multiplier",
+        "displayName": "Super Critical Factor",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 180,
+          "growthFactor": 1.15,
+          "roundToNearest": true
+        }],
+        "unlockCost": 120,
+        "unlockCurrency": 1
+      },
+      "ultraCriticalChance": {
+        "level": 0,
+        "maxLevel": 100,
+        "min": 1.5,
+        "max": 15,
+        "isFloat": true,
+        "locked": true,
+        "description": "Chance for a ultra critical hit, if super critical hit chance succeeds",
+        "displayName": "Ultra Critical Chance",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 220,
+          "growthFactor": 1.18,
+          "roundToNearest": true
+        }],
+        "unlockCost": 200,
+        "unlockCurrency": 1
+      },
+      "ultraCriticalFactor": {
+        "level": 0,
+        "maxLevel": 120,
+        "min": 1.7,
+        "max": 7.2,
+        "isFloat": true,
+        "locked": true,
+        "description": "Ultra critical hit damage multiplier",
+        "displayName": "Ultra Critical Factor",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 220,
+          "growthFactor": 1.17,
+          "roundToNearest": true
+        }],
+        "unlockCost": 200,
+        "unlockCurrency": 1
+      }
+    },
+    "defense": {
+      "healthPoint": {
+        "level": 1,
+        "maxLevel": 9000,
+        "min": 444,
+        "max": 123456,
+        "isFloat": true,
+        "locked": false,
+        "description": "Maximum health of player",
+        "displayName": "Health Points",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 80,
+          "growthFactor": 1.18,
+          "roundToNearest": true
+        }]
+      },
+      "healthRegen": {
+        "level": 0,
+        "maxLevel": 8000,
+        "min": 50,
+        "max": 1000,
+        "isFloat": true,
+        "locked": false,
+        "description": "Amount of player health regenerated per second",
+        "displayName": "Health Regeneration",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 200,
+          "growthFactor": 1.14,
+          "roundToNearest": true
+        }]
+      },
+      "deathDefy": {
+        "level": 0,
+        "maxLevel": 75,
+        "min": 1,
+        "max": 30,
+        "isFloat": true,
+        "locked": true,
+        "description": "When suffering fatal damage, there's a chance to retain 5% max health",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 250,
+          "growthFactor": 1.20,
+          "roundToNearest": true
+        }],
+        "unlockCost": 150,
+        "unlockCurrency": 1
+      },
+      "defenseAmount": {
+        "level": 0,
+        "maxLevel": 7000,
+        "min": 0,
+        "max": 1500,
+        "isFloat": true,
+        "locked": false,
+        "description": "Reduced absolute damage when player attacked",
+        "displayName": "Defense",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 250,
+          "growthFactor": 1.20,
+          "roundToNearest": true
+        }]
+      },
+      "evasionChance": {
+        "level": 0,
+        "maxLevel": 120,
+        "min": 0,
+        "max": 80,
+        "isFloat": true,
+        "locked": false,
+        "description": "An opportunity to avoid direct enemy attacks",
+        "displayName": "Evasion Chance",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 180,
+          "growthFactor": 1.13,
+          "roundToNearest": true
+        }]
+      },
+      "lifeSteal": {
+        "level": 0,
+        "maxLevel": 80,
+        "min": 0,
+        "max": 4.47,
+        "isFloat": true,
+        "locked": false,
+        "description": "Can heal health player, percentage amount from attack damage player to enemies",
+        "displayName": "Life Steal",
+        "costs": [{
+            "currencyType": 0,
+            "baseCost": 160,
+            "growthFactor": 1.16,
+            "roundToNearest": true
+          },
+          {
+            "currencyType": 2,
+            "baseCost": 20,
+            "growthFactor": 1.13,
+            "roundToNearest": true
+          }
+        ]
+      }
+    },
+    "currency": {
+      "interestWave": {
+        "level": 0,
+        "maxLevel": 99,
+        "min": 0,
+        "max": 5.94,
+        "isFloat": true,
+        "locked": true,
+        "description": "Earn a percent of gold and meat kept on hand at the end of wave",
+        "displayName": "Interest Wave",
+        "costs": [{
+          "currencyType": 0,
+          "baseCost": 200,
+          "growthFactor": 1.15,
+          "roundToNearest": true
+        }],
+        "unlockCost": 80,
+        "unlockCurrency": 1
+      }
+    }
+  }
+}

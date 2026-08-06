@@ -1,0 +1,448 @@
+fileFormatVersion: 2
+guid: 0c982eeb890614c4880ec50e00b15cc0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7575246611231842029
+    second: Card Frame_0
+  - first:
+      213: -2352989872057925781
+    second: Card Frame_1
+  - first:
+      213: 364967917677281193
+    second: Card Frame_2
+  - first:
+      213: -365410053787016669
+    second: Card Frame_3
+  - first:
+      213: 7695781712624847805
+    second: Card Frame_4
+  - first:
+      213: 5067328532910648287
+    second: Card Frame_5
+  - first:
+      213: -8907082108423066908
+    second: Card Frame_6
+  - first:
+      213: -8602809374699313300
+    second: Card Frame_7
+  - first:
+      213: 2430567490766914817
+    second: Card Frame_8
+  - first:
+      213: 1563670322022784671
+    second: Card Frame_9
+  - first:
+      213: 4986624048903706417
+    second: Card Frame_10
+  - first:
+      213: -5169428291017234872
+    second: Card Frame_11
+  - first:
+      213: 5587169899074964723
+    second: Card Frame_12
+  - first:
+      213: 9045498844387941743
+    second: Card Frame_13
+  - first:
+      213: -2923490262041268491
+    second: Card Frame_14
+  - first:
+      213: 2688078677276505329
+    second: Card Frame_15
+  - first:
+      213: 4844606778183252599
+    second: Card Frame_16
+  - first:
+      213: -6314335799972288615
+    second: Card Frame_17
+  - first:
+      213: -8921654082635857943
+    second: Card Frame_18
+  - first:
+      213: 4878594775966864853
+    second: Card Frame_19
+  - first:
+      213: 3049828142394039935
+    second: Card Frame_20
+  - first:
+      213: 7261617829642712076
+    second: Card Frame_21
+  - first:
+      213: -6932337460299692129
+    second: Card Frame_22
+  - first:
+      213: -4779015593142305810
+    second: Card Frame_23
+  - first:
+      213: 2385028475264163343
+    second: Card Frame_24
+  - first:
+      213: -1273537616515473541
+    second: Card Frame_25
+  - first:
+      213: -2263152118161037330
+    second: Card Frame_26
+  - first:
+      213: 8140239137602033612
+    second: Card Frame_27
+  - first:
+      213: 1655941317513891482
+    second: Card Frame_28
+  - first:
+      213: -6815598454091098515
+    second: Card Frame_29
+  - first:
+      213: -3035078405375092440
+    second: Card Frame_30
+  - first:
+      213: -2151988990622107450
+    second: Card Frame_31
+  - first:
+      213: -7419607107850790603
+    second: Card Frame_32
+  - first:
+      213: 845485685709354731
+    second: Card Frame_33
+  - first:
+      213: 4175864654784601443
+    second: Card Frame_34
+  - first:
+      213: 5886915105963096558
+    second: Card Frame_35
+  - first:
+      213: 7983283940277172574
+    second: Card Frame_36
+  - first:
+      213: -8262668554307121986
+    second: Card Frame_37
+  - first:
+      213: 3583019760470095403
+    second: Card Frame_38
+  - first:
+      213: -2783793753242382881
+    second: Card Frame_39
+  - first:
+      213: 6458569580320075544
+    second: Card Frame_40
+  - first:
+      213: -3975644184890468157
+    second: Card Frame_41
+  - first:
+      213: 57505210299893972
+    second: Card Frame_42
+  - first:
+      213: -8680291029861613850
+    second: Card Frame_43
+  - first:
+      213: 488070035419963265
+    second: Card Frame_44
+  - first:
+      213: 785968543696775671
+    second: Card Frame_45
+  - first:
+      213: -3769007115918243342
+    second: Card Frame_46
+  - first:
+      213: -3840265358822973723
+    second: Card Frame_47
+  - first:
+      213: -9040059009770100944
+    second: Card Frame_48
+  - first:
+      213: 8086667744066309531
+    second: Card Frame_49
+  - first:
+      213: 2024157316739899341
+    second: Card Frame_50
+  - first:
+      213: -2844108870608452416
+    second: Card Frame_51
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Rare
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 300
+        width: 251
+        height: 418
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4eaa43e9300b36480800000000000000
+      internalID: -8907082108423066908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Legendary
+      rect:
+        serializedVersion: 2
+        x: 907
+        y: 300
+        width: 264
+        height: 418
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 846201eab508248b0800000000000000
+      internalID: -5169428291017234872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 300
+        width: 245
+        height: 418
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fc4e1ecb6d998d40800000000000000
+      internalID: 5587169899074964723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mythic
+      rect:
+        serializedVersion: 2
+        x: 604
+        y: 300
+        width: 263
+        height: 418
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f43e5f9059fd4520800000000000000
+      internalID: 2688078677276505329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Epic
+      rect:
+        serializedVersion: 2
+        x: 1213
+        y: 301
+        width: 261
+        height: 418
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18f18be7c19f5c600800000000000000
+      internalID: 488070035419963265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 935e34210d69b1d4c8afc20aaaf1ffb7
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Card Frame_0: -7575246611231842029
+      Card Frame_1: -2352989872057925781
+      Card Frame_10: 4986624048903706417
+      Card Frame_13: 9045498844387941743
+      Card Frame_14: -2923490262041268491
+      Card Frame_16: 4844606778183252599
+      Card Frame_17: -6314335799972288615
+      Card Frame_18: -8921654082635857943
+      Card Frame_19: 4878594775966864853
+      Card Frame_2: 364967917677281193
+      Card Frame_20: 3049828142394039935
+      Card Frame_21: 7261617829642712076
+      Card Frame_22: -6932337460299692129
+      Card Frame_23: -4779015593142305810
+      Card Frame_24: 2385028475264163343
+      Card Frame_25: -1273537616515473541
+      Card Frame_26: -2263152118161037330
+      Card Frame_27: 8140239137602033612
+      Card Frame_28: 1655941317513891482
+      Card Frame_29: -6815598454091098515
+      Card Frame_3: -365410053787016669
+      Card Frame_30: -3035078405375092440
+      Card Frame_31: -2151988990622107450
+      Card Frame_32: -7419607107850790603
+      Card Frame_33: 845485685709354731
+      Card Frame_34: 4175864654784601443
+      Card Frame_35: 5886915105963096558
+      Card Frame_36: 7983283940277172574
+      Card Frame_37: -8262668554307121986
+      Card Frame_38: 3583019760470095403
+      Card Frame_39: -2783793753242382881
+      Card Frame_4: 7695781712624847805
+      Card Frame_40: 6458569580320075544
+      Card Frame_41: -3975644184890468157
+      Card Frame_42: 57505210299893972
+      Card Frame_43: -8680291029861613850
+      Card Frame_45: 785968543696775671
+      Card Frame_46: -3769007115918243342
+      Card Frame_47: -3840265358822973723
+      Card Frame_48: -9040059009770100944
+      Card Frame_49: 8086667744066309531
+      Card Frame_5: 5067328532910648287
+      Card Frame_50: 2024157316739899341
+      Card Frame_51: -2844108870608452416
+      Card Frame_7: -8602809374699313300
+      Card Frame_8: 2430567490766914817
+      Card Frame_9: 1563670322022784671
+      Common: 5587169899074964723
+      Epic: 488070035419963265
+      Legendary: -5169428291017234872
+      Mythic: 2688078677276505329
+      Rare: -8907082108423066908
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

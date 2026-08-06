@@ -1,0 +1,2188 @@
+fileFormatVersion: 2
+guid: 8cd4fd58b9269d34f972de40bc822974
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4405207868525103694
+    second: Monsterpack_0
+  - first:
+      213: -7621972704573741629
+    second: Monsterpack_1
+  - first:
+      213: 1823075716159326576
+    second: Monsterpack_2
+  - first:
+      213: 8232174552577645496
+    second: Monsterpack_3
+  - first:
+      213: -5265624121208119427
+    second: Monsterpack_4
+  - first:
+      213: -351367896780865388
+    second: Monsterpack_5
+  - first:
+      213: -5251715025307628885
+    second: Monsterpack_6
+  - first:
+      213: -4286919029617203314
+    second: Monsterpack_7
+  - first:
+      213: 9165422006833557252
+    second: Monsterpack_8
+  - first:
+      213: 2740697362615869350
+    second: Monsterpack_9
+  - first:
+      213: 897377784418351259
+    second: Monsterpack_10
+  - first:
+      213: -6890776737804724237
+    second: Monsterpack_11
+  - first:
+      213: -2833941239069571693
+    second: Monsterpack_12
+  - first:
+      213: 6972136865211934957
+    second: Monsterpack_13
+  - first:
+      213: -694910796806672868
+    second: Monsterpack_14
+  - first:
+      213: -400777213697274593
+    second: Monsterpack_15
+  - first:
+      213: -101730575985123525
+    second: Monsterpack_16
+  - first:
+      213: -5122599147658226226
+    second: Monsterpack_17
+  - first:
+      213: 7068392615946569316
+    second: Monsterpack_18
+  - first:
+      213: 7787163152465877911
+    second: Monsterpack_19
+  - first:
+      213: -8379554263838823472
+    second: Monsterpack_20
+  - first:
+      213: 4423464648497372546
+    second: Monsterpack_21
+  - first:
+      213: -3381719019039859544
+    second: Monsterpack_22
+  - first:
+      213: 485581498716816337
+    second: Monsterpack_23
+  - first:
+      213: 7095854463676280533
+    second: Monsterpack_24
+  - first:
+      213: -1191407267469621283
+    second: Monsterpack_25
+  - first:
+      213: -759564696771722795
+    second: Monsterpack_26
+  - first:
+      213: 2110414220845559223
+    second: Monsterpack_27
+  - first:
+      213: -5588633513033390154
+    second: Monsterpack_28
+  - first:
+      213: -1985996731184623668
+    second: Monsterpack_29
+  - first:
+      213: -5363552556262158027
+    second: Monsterpack_30
+  - first:
+      213: -3579562667837279287
+    second: Monsterpack_31
+  - first:
+      213: -5443796206754158887
+    second: Monsterpack_32
+  - first:
+      213: 5555659854101939676
+    second: Monsterpack_33
+  - first:
+      213: 7986357675427625008
+    second: Monsterpack_34
+  - first:
+      213: -7800198643841633982
+    second: Monsterpack_35
+  - first:
+      213: 5549481705669529015
+    second: Monsterpack_36
+  - first:
+      213: -3665982957729041971
+    second: Monsterpack_37
+  - first:
+      213: 8262625327178192182
+    second: Monsterpack_38
+  - first:
+      213: 5516148357851871978
+    second: Monsterpack_39
+  - first:
+      213: -5899045967932319642
+    second: Monsterpack_40
+  - first:
+      213: 7413101634580453697
+    second: Monsterpack_41
+  - first:
+      213: -2277897886484649071
+    second: Monsterpack_42
+  - first:
+      213: 581006326139979649
+    second: Monsterpack_43
+  - first:
+      213: -7332048269143193268
+    second: Monsterpack_44
+  - first:
+      213: 2084587157862346972
+    second: Monsterpack_45
+  - first:
+      213: 6132397920383628844
+    second: Monsterpack_46
+  - first:
+      213: -7412107289674168521
+    second: Monsterpack_47
+  - first:
+      213: 9166877160489894553
+    second: Monsterpack_48
+  - first:
+      213: 9033547218357871554
+    second: Monsterpack_49
+  - first:
+      213: 1296684309034854483
+    second: Monsterpack_50
+  - first:
+      213: -1382548747660114646
+    second: Monsterpack_51
+  - first:
+      213: -742764859522959414
+    second: Monsterpack_52
+  - first:
+      213: -4839061805617126721
+    second: Monsterpack_53
+  - first:
+      213: -2543963527152258986
+    second: Monsterpack_54
+  - first:
+      213: 7761552636959277869
+    second: Monsterpack_55
+  - first:
+      213: -245656621162237410
+    second: Monsterpack_56
+  - first:
+      213: 5358909011706276628
+    second: Monsterpack_57
+  - first:
+      213: -8340575647811644549
+    second: Monsterpack_58
+  - first:
+      213: 1932255358710975469
+    second: Monsterpack_59
+  - first:
+      213: 5355125656289650446
+    second: Monsterpack_60
+  - first:
+      213: 6169890367403460666
+    second: Monsterpack_61
+  - first:
+      213: 4807272258057312506
+    second: Monsterpack_62
+  - first:
+      213: -1781141184506828433
+    second: Monsterpack_63
+  - first:
+      213: 2692917605844466161
+    second: Monsterpack_64
+  - first:
+      213: -4781759999389810849
+    second: Monsterpack_65
+  - first:
+      213: -1657109298920218206
+    second: Monsterpack_66
+  - first:
+      213: -3142491708467982675
+    second: Monsterpack_67
+  - first:
+      213: 2910508809110793440
+    second: Monsterpack_68
+  - first:
+      213: -2259298836182438114
+    second: Monsterpack_69
+  - first:
+      213: 9032840395564821291
+    second: Monsterpack_70
+  - first:
+      213: -1870317548452920990
+    second: Monsterpack_71
+  - first:
+      213: 5305495185087476763
+    second: Monsterpack_72
+  - first:
+      213: -2061887484689517358
+    second: Monsterpack_73
+  - first:
+      213: 6606183084739835240
+    second: Monsterpack_74
+  - first:
+      213: -7595444172243772646
+    second: Monsterpack_75
+  - first:
+      213: -6863617583691581690
+    second: Monsterpack_76
+  - first:
+      213: -5043855907138087363
+    second: Monsterpack_77
+  - first:
+      213: -7558727924211432021
+    second: Monsterpack_78
+  - first:
+      213: -4010367409726137778
+    second: Monsterpack_79
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 230
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Ice Wisp
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 979
+        width: 89
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4ac1357731722d30800000000000000
+      internalID: 4405207868525103694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fire Wisp
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 979
+        width: 90
+        height: 122
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c5a8284530593690800000000000000
+      internalID: -7621972704573741629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bat Fiend
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 978
+        width: 117
+        height: 116
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 079415c64bddc4910800000000000000
+      internalID: 1823075716159326576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Crimson Imp
+      rect:
+        serializedVersion: 2
+        x: 370
+        y: 978
+        width: 102
+        height: 121
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bb966fb32f8e3270800000000000000
+      internalID: 8232174552577645496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Void Puff
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 984
+        width: 103
+        height: 97
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7f59ae92cebce6b0800000000000000
+      internalID: -5265624121208119427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow Stalker
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 978
+        width: 97
+        height: 105
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49086ee62c0bf1bf0800000000000000
+      internalID: -351367896780865388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin Grunt
+      rect:
+        serializedVersion: 2
+        x: 740
+        y: 980
+        width: 104
+        height: 113
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: baa05fe52092e17b0800000000000000
+      internalID: -5251715025307628885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton Raider
+      rect:
+        serializedVersion: 2
+        x: 870
+        y: 980
+        width: 100
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e87edca0bddc184c0800000000000000
+      internalID: -4286919029617203314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton Guard
+      rect:
+        serializedVersion: 2
+        x: 997
+        y: 980
+        width: 120
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40facd531ce123f70800000000000000
+      internalID: 9165422006833557252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin Scout
+      rect:
+        serializedVersion: 2
+        x: 1132
+        y: 983
+        width: 108
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6af919ffab9e80620800000000000000
+      internalID: 2740697362615869350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Green Slime
+      rect:
+        serializedVersion: 2
+        x: 1268
+        y: 983
+        width: 102
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9835952750247c00800000000000000
+      internalID: 897377784418351259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Aqua Slime
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 850
+        width: 98
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f7df9cd01b0f50a0800000000000000
+      internalID: -6890776737804724237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Flame Core
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 853
+        width: 96
+        height: 98
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de8ec58f98102c060800000000000000
+      internalID: 6972136865211934957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dark Orb
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 852
+        width: 88
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1e21c5ef4e2b56f0800000000000000
+      internalID: -694910796806672868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Void Eye
+      rect:
+        serializedVersion: 2
+        x: 369
+        y: 852
+        width: 105
+        height: 98
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1dc08f5f37207af0800000000000000
+      internalID: -400777213697274593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Thorn Sprite
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 850
+        width: 100
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3f5c938494969ef0800000000000000
+      internalID: -101730575985123525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ice Sprite
+      rect:
+        serializedVersion: 2
+        x: 623
+        y: 853
+        width: 86
+        height: 92
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec5dc15473fd8e8b0800000000000000
+      internalID: -5122599147658226226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Watcher
+      rect:
+        serializedVersion: 2
+        x: 727
+        y: 855
+        width: 109
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4664d7e52a9f71260800000000000000
+      internalID: 7068392615946569316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Night Bat
+      rect:
+        serializedVersion: 2
+        x: 868
+        y: 855
+        width: 105
+        height: 87
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79b5db601af811c60800000000000000
+      internalID: 7787163152465877911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cave Bat
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 853
+        width: 109
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0dbe6c73bc7d5bb80800000000000000
+      internalID: -8379554263838823472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fire Beetle
+      rect:
+        serializedVersion: 2
+        x: 1136
+        y: 850
+        width: 105
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28d1f2a49ad436d30800000000000000
+      internalID: 4423464648497372546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hornet
+      rect:
+        serializedVersion: 2
+        x: 1261
+        y: 850
+        width: 121
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ac52f32878b111d0800000000000000
+      internalID: -3381719019039859544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Burrower
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 722
+        width: 113
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d38484ecc12db600800000000000000
+      internalID: 485581498716816337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Venom Lizard
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 722
+        width: 107
+        height: 89
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5de6b4d0a0a897260800000000000000
+      internalID: 7095854463676280533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stone Rhino
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 722
+        width: 106
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd787af0765477fe0800000000000000
+      internalID: -1191407267469621283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Swamp Brute
+      rect:
+        serializedVersion: 2
+        x: 379
+        y: 722
+        width: 110
+        height: 106
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d18ef0ceeb7575f0800000000000000
+      internalID: -759564696771722795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cannon Bug
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 721
+        width: 98
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bdae6a6d82b94d10800000000000000
+      internalID: 2110414220845559223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Magma Golem
+      rect:
+        serializedVersion: 2
+        x: 616
+        y: 721
+        width: 115
+        height: 106
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b72dc30e6f2172b0800000000000000
+      internalID: -5588633513033390154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ice Golem
+      rect:
+        serializedVersion: 2
+        x: 742
+        y: 722
+        width: 109
+        height: 105
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccf47a8ce725074e0800000000000000
+      internalID: -1985996731184623668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rock Golem
+      rect:
+        serializedVersion: 2
+        x: 867
+        y: 721
+        width: 117
+        height: 106
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5311bdd0e55d095b0800000000000000
+      internalID: -5363552556262158027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shield Kobold
+      rect:
+        serializedVersion: 2
+        x: 999
+        y: 722
+        width: 123
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c33f4c08b6d25ec0800000000000000
+      internalID: -3579562667837279287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orc Bruiser
+      rect:
+        serializedVersion: 2
+        x: 1132
+        y: 722
+        width: 117
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d6acc24130c374b0800000000000000
+      internalID: -5443796206754158887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Moss Slime
+      rect:
+        serializedVersion: 2
+        x: 1264
+        y: 722
+        width: 113
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd505a0c33ba91d40800000000000000
+      internalID: 5555659854101939676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Devourer
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 578
+        width: 180
+        height: 120
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 038f3150efd35de60800000000000000
+      internalID: 7986357675427625008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Crystal Cluster
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 578
+        width: 133
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 241f55029a020c390800000000000000
+      internalID: -7800198643841633982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Corrupted Drake
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 578
+        width: 161
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bd06f97538b30d40800000000000000
+      internalID: 5549481705669529015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wyvern
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 578
+        width: 168
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc1bce35cefcf1dc0800000000000000
+      internalID: -3665982957729041971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Infernal Lord
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 578
+        width: 130
+        height: 124
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6351a9235fdbaa270800000000000000
+      internalID: 8262625327178192182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cyclops
+      rect:
+        serializedVersion: 2
+        x: 849
+        y: 578
+        width: 108
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aea7d16a4bb4d8c40800000000000000
+      internalID: 5516148357851871978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Crystal Ogre
+      rect:
+        serializedVersion: 2
+        x: 974
+        y: 578
+        width: 112
+        height: 118
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66891b752f0622ea0800000000000000
+      internalID: -5899045967932319642
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Thorn Hulk
+      rect:
+        serializedVersion: 2
+        x: 1093
+        y: 578
+        width: 140
+        height: 112
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 149190d09a0a0e660800000000000000
+      internalID: 7413101634580453697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Club Orc
+      rect:
+        serializedVersion: 2
+        x: 1255
+        y: 576
+        width: 138
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19b2879e0f74360e0800000000000000
+      internalID: -2277897886484649071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Shadow Ninja
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 441
+        width: 74
+        height: 103
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18704d1ec26201800800000000000000
+      internalID: 581006326139979649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Forest Archer
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 441
+        width: 94
+        height: 109
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c49c3b132f45f3a90800000000000000
+      internalID: -7332048269143193268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arcane Warlock
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 440
+        width: 134
+        height: 111
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd0f9b7b9f0fdec10800000000000000
+      internalID: 2084587157862346972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ice Mage
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 441
+        width: 108
+        height: 104
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c267fc1fa67aa1550800000000000000
+      internalID: 6132397920383628844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Void Mage
+      rect:
+        serializedVersion: 2
+        x: 477
+        y: 441
+        width: 121
+        height: 110
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73743e9e0b7e22990800000000000000
+      internalID: -7412107289674168521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stone Titan
+      rect:
+        serializedVersion: 2
+        x: 612
+        y: 438
+        width: 135
+        height: 106
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99244a2953a473f70800000000000000
+      internalID: 9166877160489894553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mushroom Beast
+      rect:
+        serializedVersion: 2
+        x: 764
+        y: 439
+        width: 152
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c360f3555b9d5d70800000000000000
+      internalID: 9033547218357871554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Goblin Ranger
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 441
+        width: 126
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35868d9428fbef110800000000000000
+      internalID: 1296684309034854483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bone Archer
+      rect:
+        serializedVersion: 2
+        x: 1093
+        y: 441
+        width: 132
+        height: 108
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a25ce033d3330dce0800000000000000
+      internalID: -1382548747660114646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Skeleton Duelist
+      rect:
+        serializedVersion: 2
+        x: 1261
+        y: 441
+        width: 110
+        height: 103
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac7bd7cab4b21b5f0800000000000000
+      internalID: -742764859522959414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rogue Imp
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 309
+        width: 97
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb2e70e1de238dcb0800000000000000
+      internalID: -4839061805617126721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Night Rogue
+      rect:
+        serializedVersion: 2
+        x: 124
+        y: 309
+        width: 99
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6503a8a86a602bcd0800000000000000
+      internalID: -2543963527152258986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bombardier
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 308
+        width: 119
+        height: 106
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d234477300396bb60800000000000000
+      internalID: 7761552636959277869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dark Sage
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 308
+        width: 122
+        height: 105
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e12f6e6ca90479cf0800000000000000
+      internalID: -245656621162237410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Bramble Chief
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 307
+        width: 109
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41b646a7a5bae5a40800000000000000
+      internalID: 5358909011706276628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Water Spirit
+      rect:
+        serializedVersion: 2
+        x: 652
+        y: 309
+        width: 97
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b73d9e973a2504c80800000000000000
+      internalID: -8340575647811644549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Frost Adept
+      rect:
+        serializedVersion: 2
+        x: 772
+        y: 307
+        width: 129
+        height: 104
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deb005fd200c0da10800000000000000
+      internalID: 1932255358710975469
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lizard Hunter
+      rect:
+        serializedVersion: 2
+        x: 930
+        y: 307
+        width: 122
+        height: 110
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e07a9b6696a315a40800000000000000
+      internalID: 5355125656289650446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ash Assassin
+      rect:
+        serializedVersion: 2
+        x: 1068
+        y: 307
+        width: 138
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a380034899adf9550800000000000000
+      internalID: 6169890367403460666
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Fire Shaman
+      rect:
+        serializedVersion: 2
+        x: 1232
+        y: 308
+        width: 120
+        height: 110
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af8981016acd6b240800000000000000
+      internalID: 4807272258057312506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Steel Wolf
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 172
+        width: 146
+        height: 110
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f69e6a2978d1847e0800000000000000
+      internalID: -1781141184506828433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Ice Wolf
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 172
+        width: 123
+        height: 108
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f931c97b4a2f5520800000000000000
+      internalID: 2692917605844466161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rock Mimic
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 172
+        width: 138
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5fb23b8d96c3adb0800000000000000
+      internalID: -4781759999389810849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Log Mimic
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 171
+        width: 138
+        height: 117
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a12dd35fd3c009e0800000000000000
+      internalID: -1657109298920218206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Sand Worm
+      rect:
+        serializedVersion: 2
+        x: 647
+        y: 171
+        width: 120
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: daec727d070a364d0800000000000000
+      internalID: -3142491708467982675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Elder Ooze
+      rect:
+        serializedVersion: 2
+        x: 786
+        y: 171
+        width: 121
+        height: 106
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0eca1b26754346820800000000000000
+      internalID: 2910508809110793440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Purple Ooze
+      rect:
+        serializedVersion: 2
+        x: 929
+        y: 170
+        width: 110
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1f64e3cdab55a0e0800000000000000
+      internalID: -2259298836182438114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yeti
+      rect:
+        serializedVersion: 2
+        x: 1063
+        y: 172
+        width: 128
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2ba0725b781b5d70800000000000000
+      internalID: 9032840395564821291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lava Beast
+      rect:
+        serializedVersion: 2
+        x: 1218
+        y: 171
+        width: 155
+        height: 117
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 261c84b591c4b06e0800000000000000
+      internalID: -1870317548452920990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hydraling
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 43
+        width: 146
+        height: 107
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b143fa8d2c7e0a940800000000000000
+      internalID: 5305495185087476763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Demon Pup
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 44
+        width: 128
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d4f14cc144b263e0800000000000000
+      internalID: -2061887484689517358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Frost Beetle
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 44
+        width: 141
+        height: 103
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 865bc17b380edab50800000000000000
+      internalID: 6606183084739835240
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Jet Beetle
+      rect:
+        serializedVersion: 2
+        x: 534
+        y: 44
+        width: 136
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1b591a84cf879690800000000000000
+      internalID: -7595444172243772646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red-Eye Tank
+      rect:
+        serializedVersion: 2
+        x: 695
+        y: 43
+        width: 151
+        height: 93
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60730f13c288fb0a0800000000000000
+      internalID: -6863617583691581690
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mecha Crawler
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 43
+        width: 127
+        height: 97
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3657c4a6cf900ab0800000000000000
+      internalID: -5043855907138087363
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Boulderling
+      rect:
+        serializedVersion: 2
+        x: 1074
+        y: 43
+        width: 130
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba54d8330010a1790800000000000000
+      internalID: -7558727924211432021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Buzz Drone
+      rect:
+        serializedVersion: 2
+        x: 1233
+        y: 46
+        width: 135
+        height: 85
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4a5874b6105858c0800000000000000
+      internalID: -4010367409726137778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: d822c391f5f7aea4a89cb238c8ac9048
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Aqua Slime: -6890776737804724237
+      Arcane Warlock: 2084587157862346972
+      Ash Assassin: 6169890367403460666
+      Bat Fiend: 1823075716159326576
+      Bombardier: 7761552636959277869
+      Bone Archer: -1382548747660114646
+      Boulderling: -7558727924211432021
+      Bramble Chief: 5358909011706276628
+      Burrower: 485581498716816337
+      Buzz Drone: -4010367409726137778
+      Cannon Bug: 2110414220845559223
+      Cave Bat: -8379554263838823472
+      Club Orc: -2277897886484649071
+      Corrupted Drake: 5549481705669529015
+      Crimson Imp: 8232174552577645496
+      Crystal Cluster: -7800198643841633982
+      Crystal Ogre: -5899045967932319642
+      Cyclops: 5516148357851871978
+      Dark Orb: -694910796806672868
+      Dark Sage: -245656621162237410
+      Demon Pup: -2061887484689517358
+      Devourer: 7986357675427625008
+      Elder Ooze: 2910508809110793440
+      Fire Beetle: 4423464648497372546
+      Fire Shaman: 4807272258057312506
+      Fire Wisp: -7621972704573741629
+      Flame Core: 6972136865211934957
+      Forest Archer: -7332048269143193268
+      Frost Adept: 1932255358710975469
+      Frost Beetle: 6606183084739835240
+      Goblin Grunt: -5251715025307628885
+      Goblin Ranger: 1296684309034854483
+      Goblin Scout: 2740697362615869350
+      Green Slime: 897377784418351259
+      Hornet: -3381719019039859544
+      Hydraling: 5305495185087476763
+      Ice Golem: -1985996731184623668
+      Ice Mage: 6132397920383628844
+      Ice Sprite: -5122599147658226226
+      Ice Wisp: 4405207868525103694
+      Ice Wolf: 2692917605844466161
+      Infernal Lord: 8262625327178192182
+      Jet Beetle: -7595444172243772646
+      Lava Beast: -1870317548452920990
+      Lizard Hunter: 5355125656289650446
+      Log Mimic: -1657109298920218206
+      Magma Golem: -5588633513033390154
+      Mecha Crawler: -5043855907138087363
+      Monsterpack_12: -2833941239069571693
+      Moss Slime: 5555659854101939676
+      Mushroom Beast: 9033547218357871554
+      Night Bat: 7787163152465877911
+      Night Rogue: -2543963527152258986
+      Orc Bruiser: -5443796206754158887
+      Purple Ooze: -2259298836182438114
+      Red-Eye Tank: -6863617583691581690
+      Rock Golem: -5363552556262158027
+      Rock Mimic: -4781759999389810849
+      Rogue Imp: -4839061805617126721
+      Sand Worm: -3142491708467982675
+      Shadow Ninja: 581006326139979649
+      Shadow Stalker: -351367896780865388
+      Shield Kobold: -3579562667837279287
+      Skeleton Duelist: -742764859522959414
+      Skeleton Guard: 9165422006833557252
+      Skeleton Raider: -4286919029617203314
+      Steel Wolf: -1781141184506828433
+      Stone Rhino: -1191407267469621283
+      Stone Titan: 9166877160489894553
+      Swamp Brute: -759564696771722795
+      Thorn Hulk: 7413101634580453697
+      Thorn Sprite: -101730575985123525
+      Venom Lizard: 7095854463676280533
+      Void Eye: -400777213697274593
+      Void Mage: -7412107289674168521
+      Void Puff: -5265624121208119427
+      Watcher: 7068392615946569316
+      Water Spirit: -8340575647811644549
+      Wyvern: -3665982957729041971
+      Yeti: 9032840395564821291
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
