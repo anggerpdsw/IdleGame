@@ -42,11 +42,6 @@
         "description": "Damage multiplier for critical hits",
         "displayName": "Critical Factor"
       },
-      "bounceSearchRadius": {
-        "baseValue": 2,
-        "description": "Range that a projectile can bounce from enemy to enemy if activated",
-        "displayName": "Bounce Search Radius"
-      },
       "damagePerRange": {
         "baseValue": 10,
         "description": "Damage increased the further the enemy is from the player",
@@ -96,26 +91,6 @@
         "baseValue": 1,
         "description": "Elemental damage multiplier (1 = 100%). Boosted by Intelligence",
         "displayName": "Element Damage"
-      },
-      "superCriticalChance": {
-        "baseValue": 2.5,
-        "description": "Chance for a super critical hit, if critical hit chance succeeds",
-        "displayName": "Super Critical Chance"
-      },
-      "superCriticalFactor": {
-        "baseValue": 2,
-        "description": "Super critical hit damage multiplier",
-        "displayName": "Super Critical Factor"
-      },
-      "ultraCriticalChance": {
-        "baseValue": 1.25,
-        "description": "Chance for a ultra critical hit, if super critical hit chance succeeds",
-        "displayName": "Ultra Critical Chance"
-      },
-      "ultraCriticalFactor": {
-        "baseValue": 3,
-        "description": "Ultra critical hit damage multiplier",
-        "displayName": "Ultra Critical Factor"
       }
     },
     "defense": {

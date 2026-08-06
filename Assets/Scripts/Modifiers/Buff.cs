@@ -338,10 +338,6 @@ namespace IdleDefenseSurvival.Modifiers
                 SkillType.MultiShootCount => MainStat.None,
                 SkillType.StuntChance => MainStat.None,
                 SkillType.StuntDuration => MainStat.None,
-                SkillType.SuperCriticalChance => MainStat.CriticalRate,
-                SkillType.SuperCriticalFactor => MainStat.CriticalDamage,
-                SkillType.UltraCriticalChance => MainStat.CriticalRate,
-                SkillType.UltraCriticalFactor => MainStat.CriticalDamage,
                 SkillType.DamagePerRange => MainStat.None,
                 SkillType.InterestWave => MainStat.None,
                 _ => MainStat.None

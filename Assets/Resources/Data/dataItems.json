@@ -1,5 +1,6 @@
 {
-  "Items": [{
+  "Items": [
+    {
       "Id": "CardRoll",
       "Name": "Card Roll Ticket",
       "Description": "Used to roll a card.",
@@ -154,10 +155,11 @@
       "MaxDurability": 0
     }
   ],
-  "Equipment": [{
+  "Equipment": [
+    {
       "Id": "equip_hat_leather",
       "Name": "Leather Hat",
-      "Description": "A simple leather hat. +6 CON, +2 Defense",
+      "Description": "A simple leather hat. +8 INT",
       "Category": 1,
       "ItemRarity": 2,
       "EquipmentType": 1,
@@ -169,25 +171,21 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 5,
       "MaxSockets": 1,
-      "AttributeStats": [{
-        "Attribute": "Constitution",
-        "BaseValue": 6,
-        "ValuePerLevel": 0.5,
-        "ValuePerEnhance": 0.8
-      }],
-      "MainStats": [{
-        "Stat": 3,
-        "BaseValue": 2,
-        "ValuePerLevel": 0.3,
-        "ValuePerEnhance": 0.5,
-        "Mode": 1
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Intelligence",
+          "BaseValue": 8,
+          "ValuePerLevel": 0.6,
+          "ValuePerEnhance": 1.0
+        }
+      ],
+      "MainStats": []
     },
     {
       "Id": "equip_gloves_fighter",
       "Name": "Fighter Gloves",
-      "Description": "Reinforced knuckles. +4 STR",
+      "Description": "Reinforced knuckles. +10 STR, +5% Crit Damage",
       "Category": 1,
       "ItemRarity": 3,
       "EquipmentType": 2,
@@ -199,18 +197,29 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 6,
       "MaxSockets": 1,
-      "AttributeStats": [{
-        "Attribute": "Strength",
-        "BaseValue": 4,
-        "ValuePerLevel": 0.4,
-        "ValuePerEnhance": 0.8
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Strength",
+          "BaseValue": 10,
+          "ValuePerLevel": 0.8,
+          "ValuePerEnhance": 1.2
+        }
+      ],
+      "MainStats": [
+        {
+          "Stat": 6,
+          "BaseValue": 5,
+          "ValuePerLevel": 0.3,
+          "ValuePerEnhance": 0.5,
+          "Mode": 2
+        }
+      ]
     },
     {
       "Id": "equip_armor_iron",
       "Name": "Iron Armor",
-      "Description": "Solid iron plating. +12 CON, +8 Defense",
+      "Description": "Solid iron plating. +20 CON, +5 Defense",
       "Category": 1,
       "ItemRarity": 3,
       "EquipmentType": 4,
@@ -222,25 +231,29 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 7,
       "MaxSockets": 2,
-      "AttributeStats": [{
-        "Attribute": "Constitution",
-        "BaseValue": 12,
-        "ValuePerLevel": 1,
-        "ValuePerEnhance": 1.5
-      }],
-      "MainStats": [{
-        "Stat": 3,
-        "BaseValue": 8,
-        "ValuePerLevel": 0.6,
-        "ValuePerEnhance": 1,
-        "Mode": 1
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Constitution",
+          "BaseValue": 20,
+          "ValuePerLevel": 1.5,
+          "ValuePerEnhance": 2.5
+        }
+      ],
+      "MainStats": [
+        {
+          "Stat": 3,
+          "BaseValue": 5,
+          "ValuePerLevel": 0.4,
+          "ValuePerEnhance": 0.8,
+          "Mode": 1
+        }
+      ]
     },
     {
       "Id": "equip_belt_warrior",
       "Name": "Warrior Belt",
-      "Description": "Belt of a seasoned warrior. +5 DEX",
+      "Description": "Belt of a seasoned warrior. +10 CON, +6 STR",
       "Category": 1,
       "ItemRarity": 2,
       "EquipmentType": 5,
@@ -252,18 +265,27 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 5,
       "MaxSockets": 1,
-      "AttributeStats": [{
-        "Attribute": "Dexterity",
-        "BaseValue": 5,
-        "ValuePerLevel": 0.3,
-        "ValuePerEnhance": 0.5
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Constitution",
+          "BaseValue": 10,
+          "ValuePerLevel": 0.8,
+          "ValuePerEnhance": 1.3
+        },
+        {
+          "Attribute": "Strength",
+          "BaseValue": 6,
+          "ValuePerLevel": 0.4,
+          "ValuePerEnhance": 0.8
+        }
+      ],
+      "MainStats": []
     },
     {
       "Id": "equip_ring_ruby",
       "Name": "Ruby Ring",
-      "Description": "A ring set with a crimson ruby. +3 DEX",
+      "Description": "A ring set with a crimson ruby. +10 INT, +3% Crit Rate",
       "Category": 1,
       "ItemRarity": 4,
       "EquipmentType": 8,
@@ -275,18 +297,29 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 8,
       "MaxSockets": 1,
-      "AttributeStats": [{
-        "Attribute": "Dexterity",
-        "BaseValue": 3,
-        "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0.5
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Intelligence",
+          "BaseValue": 10,
+          "ValuePerLevel": 0.7,
+          "ValuePerEnhance": 1.3
+        }
+      ],
+      "MainStats": [
+        {
+          "Stat": 5,
+          "BaseValue": 3,
+          "ValuePerLevel": 0.15,
+          "ValuePerEnhance": 0.3,
+          "Mode": 2
+        }
+      ]
     },
     {
       "Id": "equip_bracelet_lifesteal",
       "Name": "Vampire Bracelet",
-      "Description": "Leeches life from foes. +2 INT",
+      "Description": "Leeches life from foes. +6 STR, +6 DEX, +2% Life Steal",
       "Category": 1,
       "ItemRarity": 4,
       "EquipmentType": 10,
@@ -298,13 +331,30 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 8,
       "MaxSockets": 1,
-      "AttributeStats": [{
-        "Attribute": "Intelligence",
-        "BaseValue": 2,
-        "ValuePerLevel": 0.1,
-        "ValuePerEnhance": 0.3
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Strength",
+          "BaseValue": 6,
+          "ValuePerLevel": 0.4,
+          "ValuePerEnhance": 0.8
+        },
+        {
+          "Attribute": "Dexterity",
+          "BaseValue": 6,
+          "ValuePerLevel": 0.4,
+          "ValuePerEnhance": 0.8
+        }
+      ],
+      "MainStats": [
+        {
+          "Stat": 9,
+          "BaseValue": 2,
+          "ValuePerLevel": 0.1,
+          "ValuePerEnhance": 0.2,
+          "Mode": 2
+        }
+      ]
     },
     {
       "Id": "equip_hat_mystic",
@@ -321,23 +371,28 @@
       "DurabilityLossPerUse": 1,
       "RepairCostPerDurability": 10,
       "MaxSockets": 2,
-      "AttributeStats": [{
-        "Attribute": "Intelligence",
-        "BaseValue": 10,
-        "ValuePerLevel": 0.8,
-        "ValuePerEnhance": 1.5
-      }],
-      "MainStats": [{
-        "Stat": 15,
-        "BaseValue": 5,
-        "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0.4,
-        "Mode": 2
-      }],
-      "IconKey": "UltimateStone"
+      "IconKey": "UltimateStone",
+      "AttributeStats": [
+        {
+          "Attribute": "Intelligence",
+          "BaseValue": 10,
+          "ValuePerLevel": 0.8,
+          "ValuePerEnhance": 1.5
+        }
+      ],
+      "MainStats": [
+        {
+          "Stat": 15,
+          "BaseValue": 5,
+          "ValuePerLevel": 0.2,
+          "ValuePerEnhance": 0.4,
+          "Mode": 2
+        }
+      ]
     }
   ],
-  "Gems": [{
+  "Gems": [
+    {
       "GemId": "gem_ruby",
       "Name": "Ruby",
       "Description": "Fiery gem. Boosts Attack.",
@@ -347,20 +402,24 @@
       "BaseExperience": 100,
       "ExperienceGrowth": 1.5,
       "RandomStatCount": 1,
-      "BaseStats": [{
-        "Stat": 2,
-        "BaseValue": 3,
-        "ValuePerLevel": 0.3,
-        "ValuePerEnhance": 0,
-        "Mode": 1
-      }],
-      "RandomStats": [{
-        "Stat": 5,
-        "BaseValue": 1,
-        "ValuePerLevel": 0.1,
-        "ValuePerEnhance": 0,
-        "Mode": 2
-      }],
+      "BaseStats": [
+        {
+          "Stat": 2,
+          "BaseValue": 3,
+          "ValuePerLevel": 0.3,
+          "ValuePerEnhance": 0,
+          "Mode": 1
+        }
+      ],
+      "RandomStats": [
+        {
+          "Stat": 5,
+          "BaseValue": 1,
+          "ValuePerLevel": 0.1,
+          "ValuePerEnhance": 0,
+          "Mode": 2
+        }
+      ],
       "UpgradeData": {
         "BaseGoldCost": 100,
         "GoldCostGrowth": 1.3,
@@ -378,20 +437,24 @@
       "BaseExperience": 120,
       "ExperienceGrowth": 1.5,
       "RandomStatCount": 1,
-      "BaseStats": [{
-        "Stat": 5,
-        "BaseValue": 2,
-        "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0,
-        "Mode": 2
-      }],
-      "RandomStats": [{
-        "Stat": 6,
-        "BaseValue": 5,
-        "ValuePerLevel": 0.4,
-        "ValuePerEnhance": 0,
-        "Mode": 1
-      }],
+      "BaseStats": [
+        {
+          "Stat": 5,
+          "BaseValue": 2,
+          "ValuePerLevel": 0.2,
+          "ValuePerEnhance": 0,
+          "Mode": 2
+        }
+      ],
+      "RandomStats": [
+        {
+          "Stat": 6,
+          "BaseValue": 5,
+          "ValuePerLevel": 0.4,
+          "ValuePerEnhance": 0,
+          "Mode": 1
+        }
+      ],
       "UpgradeData": {
         "BaseGoldCost": 150,
         "GoldCostGrowth": 1.3,
@@ -409,13 +472,15 @@
       "BaseExperience": 120,
       "ExperienceGrowth": 1.5,
       "RandomStatCount": 1,
-      "BaseStats": [{
-        "Stat": 10,
-        "BaseValue": 2,
-        "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0,
-        "Mode": 2
-      }],
+      "BaseStats": [
+        {
+          "Stat": 10,
+          "BaseValue": 2,
+          "ValuePerLevel": 0.2,
+          "ValuePerEnhance": 0,
+          "Mode": 2
+        }
+      ],
       "RandomStats": [],
       "UpgradeData": {
         "BaseGoldCost": 150,

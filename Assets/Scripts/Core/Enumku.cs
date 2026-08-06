@@ -30,24 +30,6 @@ namespace IdleDefenseSurvival
     public enum SlowType { Permanent, Temporary, Aura }
 
     /// <summary>
-    /// Basic skills Player
-    /// </summary>
-    public enum SkillType
-    {
-        None,
-        AttackRange, AttackSpeed, AttackDamage, BounceChance, BounceCount,
-        BounceSearchRadius, CriticalChance, CriticalFactor, DamagePerRange, KnockbackChance,
-        KnockbackForce, LifeSteal, MultiShootChance, MultiShootCount, StuntChance,
-        StuntDuration, SuperCriticalChance, SuperCriticalFactor, UltimateWeaponAttack,
-        UltraCriticalChance, UltraCriticalFactor,
-        SkillDamage, ElementDamage,   // main-attribute derived stats (Intelligence)
-
-        DeathDefy, DefenseAmount, EvasionChance, HealthPoint, HealthRegen,
-
-        InterestWave
-    }
-
-    /// <summary>
     /// Card effect types - separate from SkillType (player stats).
     /// Used for special card behaviors like auras, on-hit effects, etc.
     /// </summary>
@@ -60,9 +42,26 @@ namespace IdleDefenseSurvival
         Shield                // Grants shield up to % of max HP when at full HP
     }
 	
+    /// <summary>
+    /// Basic skills Player
+    /// </summary>
+    public enum SkillType
+    {
+        None,
+        AttackRange, AttackSpeed, AttackDamage, BounceChance, BounceCount,
+        BounceSearchRadius, CriticalChance, CriticalFactor, DamagePerRange, KnockbackChance,
+        KnockbackForce, LifeSteal, MultiShootChance, MultiShootCount, StuntChance,
+        StuntDuration, UltimateWeaponAttack,
+        SkillDamage, ElementDamage,   // main-attribute derived stats (Intelligence)
+
+        DeathDefy, DefenseAmount, EvasionChance, HealthPoint, HealthRegen,
+
+        InterestWave
+    }
+
     
     /// <summary>
-    /// Item rarity tiers - each with associated visual properties and gameplay multipliers.
+    /// Item rarity tiers - each with associated visual properties and gameplay stats.
     /// </summary>
     public enum ItemRarity
     {
@@ -78,7 +77,6 @@ namespace IdleDefenseSurvival
     }
 
     /// <summary>
-    /// Equipment type - matches EquipmentType exactly.
     /// Each equipment item has one EquipmentType that determines which slot it fits in.
     /// </summary>
     public enum EquipmentType

@@ -301,23 +301,25 @@ namespace IdleDefenseSurvival.Player
                     if (_player != null)  {
                         // --- Calculate critical tier (None, Critical, SuperCritical) ---
                         CriticalType critTier = CriticalType.None;
+                        float crit = PlayerStatsManager.Instance.GetStat(SkillType.CriticalChance);
+                        float critDMG = PlayerStatsManager.Instance.GetStat(SkillType.CriticalFactor);
                         // Normal critical chance roll
-                        if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.CriticalChance)))
+                        if (Utilityku.Chance(crit))
                         {
                             critTier = CriticalType.Critical;
-                            _damageMultiplier += PlayerStatsManager.Instance.GetStat(SkillType.CriticalFactor);
+                            _damageMultiplier += critDMG;
 
                             // SuperCritical roll - nested Chance as specified
-                            if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.SuperCriticalChance)))
+                            if (Utilityku.Chance(crit * 0.5f))
                             {
                                 critTier = CriticalType.SuperCritical;
-                                _damageMultiplier += PlayerStatsManager.Instance.GetStat(SkillType.SuperCriticalFactor);
+                                _damageMultiplier += critDMG * 1.1f;
 
                                 // UltraCritical roll - nested Chance as specified
-                                if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.UltraCriticalChance)))
+                                if (Utilityku.Chance(crit * 0.125f))
                                 {
                                     critTier = CriticalType.UltraCritical;
-                                    _damageMultiplier += PlayerStatsManager.Instance.GetStat(SkillType.UltraCriticalFactor);
+                                    _damageMultiplier += critDMG * 1.7f;
                                 }
                             }
                         }

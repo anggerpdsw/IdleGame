@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Items.Generation;
 using Gen = IdleDefenseSurvival.Items.Generation;

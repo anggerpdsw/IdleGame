@@ -82,16 +82,6 @@
             "ValuePerLevel": 2,
             "CardRarity": "Common"
         }, {
-            "Id": "wide_ricochet",
-            "Name": "Wide Ricochet",
-            "Description": "Increase Bounce Search Radius",
-            "EffectType": "",
-            "SkillType": "BounceSearchRadius",
-            "Mode": "Percent",
-            "BaseValue": 5,
-            "ValuePerLevel": 5,
-            "CardRarity": "Common"
-        }, {
             "Id": "keen_eye",
             "Name": "Keen Eye",
             "Description": "Increase Critical Chance",
@@ -182,26 +172,6 @@
             "ValuePerLevel": 5,
             "CardRarity": "Common"
         }, {
-            "Id": "execution",
-            "Name": "Execution",
-            "Description": "Increase Super Critical Chance",
-            "EffectType": "",
-            "SkillType": "SuperCriticalChance",
-            "Mode": "Flat",
-            "BaseValue": 1,
-            "ValuePerLevel": 1,
-            "CardRarity": "Common"
-        }, {
-            "Id": "execution_master",
-            "Name": "Execution Master",
-            "Description": "Increase Super Critical Damage",
-            "EffectType": "",
-            "SkillType": "SuperCriticalFactor",
-            "Mode": "Percent",
-            "BaseValue": 10,
-            "ValuePerLevel": 10,
-            "CardRarity": "Common"
-        }, {
             "Id": "arcane_power",
             "Name": "Arcane Power",
             "Description": "Increase Ultimate Weapon Attack Damage",
@@ -210,26 +180,6 @@
             "Mode": "Percent",
             "BaseValue": 4,
             "ValuePerLevel": 4,
-            "CardRarity": "Common"
-        }, {
-            "Id": "annihilation",
-            "Name": "Annihilation",
-            "Description": "Increase Ultra Critical Chance",
-            "EffectType": "",
-            "SkillType": "UltraCriticalChance",
-            "Mode": "Flat",
-            "BaseValue": 1,
-            "ValuePerLevel": 1,
-            "CardRarity": "Common"
-        }, {
-            "Id": "god_slayer",
-            "Name": "God Slayer",
-            "Description": "Increase Ultra Critical Damage",
-            "EffectType": "",
-            "SkillType": "UltraCriticalFactor",
-            "Mode": "Percent",
-            "BaseValue": 15,
-            "ValuePerLevel": 15,
             "CardRarity": "Common"
         }, {
             "Id": "last_stand",
