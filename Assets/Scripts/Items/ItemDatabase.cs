@@ -5,6 +5,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Items.Generation;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -44,6 +45,7 @@ namespace IdleDefenseSurvival.Items
         private readonly Dictionary<string, EquipmentData> _equipment = new();
         private readonly Dictionary<string, GemData> _gems = new();
         private readonly Dictionary<string, SetBonusData> _sets = new();
+        private readonly Dictionary<string, AffixData> _affixes = new();
         private bool _isLoaded = false;
         #endregion
 
@@ -54,6 +56,7 @@ namespace IdleDefenseSurvival.Items
         public IReadOnlyDictionary<string, EquipmentData> AllEquipment => _equipment;
         public IReadOnlyDictionary<string, GemData> AllGems => _gems;
         public IReadOnlyDictionary<string, SetBonusData> AllSets => _sets;
+        public IReadOnlyDictionary<string, AffixData> AllAffixes => _affixes;
         #endregion
 
         #region Initialization
@@ -92,6 +95,9 @@ namespace IdleDefenseSurvival.Items
 
                 if (container?.Sets != null)
                     foreach (var set in container.Sets) RegisterSet(set);
+
+                if (container?.Affixes != null)
+                    foreach (var affix in container.Affixes) RegisterAffix(affix);
             }
             catch (Exception e)
             {
@@ -100,7 +106,7 @@ namespace IdleDefenseSurvival.Items
 
             _isLoaded = true;
             OnDatabaseLoaded?.Invoke();
-            Debug.Log($"[ItemDatabase] Loaded {_items.Count} items, {_equipment.Count} equipment, {_gems.Count} gems, {_sets.Count} sets");
+            Debug.Log($"[ItemDatabase] Loaded {_items.Count} items, {_equipment.Count} equipment, {_gems.Count} gems, {_sets.Count} sets, {_affixes.Count} affixes");
         }
         #endregion
 
@@ -109,11 +115,14 @@ namespace IdleDefenseSurvival.Items
         public EquipmentData GetEquipment(string itemId) => _equipment.TryGetValue(itemId, out var equip) ? equip : null;
         public GemData GetGem(string gemId) => _gems.TryGetValue(gemId, out var gem) ? gem : null;
         public SetBonusData GetSet(string setId) => _sets.TryGetValue(setId, out var set) ? set : null;
+        public AffixData GetAffix(string affixId) => _affixes.TryGetValue(affixId, out var affix) ? affix : null;
 
         public bool TryGetItem(string itemId, out ItemData item) => _items.TryGetValue(itemId, out item);
         public bool TryGetEquipment(string itemId, out EquipmentData equipment) => _equipment.TryGetValue(itemId, out equipment);
         public bool TryGetGem(string gemId, out GemData gem) => _gems.TryGetValue(gemId, out gem);
         public bool TryGetSet(string setId, out SetBonusData set) => _sets.TryGetValue(setId, out set);
+        public bool TryGetAffix(string affixId, out AffixData affix) => _affixes.TryGetValue(affixId, out affix);
+        public IReadOnlyList<AffixData> GetAllAffixes() => _affixes.Values.ToList();
         #endregion
 
         #region Queries
@@ -168,8 +177,8 @@ namespace IdleDefenseSurvival.Items
         public GemType[] GetAllowedGemTypes(string itemId) => SocketService.Instance?.Config.SocketRules[0]?.AllowedGemTypes ?? Array.Empty<GemType>();
         public long GetSellPrice(string itemId) => GetItem(itemId)?.SellPrice ?? 0;
         public long GetBuyPrice(string itemId) => GetItem(itemId)?.BuyPrice ?? 0;
-        public int GetBaseDurability(string itemId) => GetItem(itemId)?.MaxDurability ?? 100;
-        public long GetRepairCostPerDurability(string itemId) => GetItem(itemId)?.RepairCostPerDurability ?? 10;
+        public int GetBaseDurability(string itemId) => GetEquipment(itemId)?.MaxDurability ?? 0;
+        public long GetRepairCostPerDurability(string itemId) => GetEquipment(itemId)?.RepairCostPerDurability ?? 0;
         public ItemLevelType[] GetSupportedLevelTypes(string itemId) => GetEquipment(itemId)?.SupportedLevelTypes ?? Array.Empty<ItemLevelType>();
         #endregion
 
@@ -261,6 +270,19 @@ namespace IdleDefenseSurvival.Items
             _sets[set.SetId] = set;
         }
 
+        public void RegisterAffix(AffixData affix)
+        {
+            if (affix == null || string.IsNullOrEmpty(affix.AffixId)) return;
+
+            if (_affixes.ContainsKey(affix.AffixId))
+            {
+                Debug.LogWarning($"[ItemDatabase] Affix already registered: {affix.AffixId}");
+                return;
+            }
+
+            _affixes[affix.AffixId] = affix;
+        }
+
         public void UnregisterItem(string itemId)
         {
             if (_items.Remove(itemId))
@@ -293,7 +315,7 @@ namespace IdleDefenseSurvival.Items
                 SellPrice = (long)(baseItem.SellPrice * rarity.GetDefaultSellMultiplier()),
                 BuyPrice = (long)(baseItem.BuyPrice * rarity.GetDefaultUpgradeMultiplier()),
                 RequiredLevel = level,
-                MainStats = GenerateScaledStats(baseItem.MainStats, rarity, level),
+                CombatStats = GenerateScaledStats(baseItem.CombatStats, rarity, level),
                 SecondaryStats = baseItem.SecondaryStats,
                 SpecialEffects = baseItem.SpecialEffects,
                 PassiveSkills = baseItem.PassiveSkills,
@@ -329,12 +351,12 @@ namespace IdleDefenseSurvival.Items
             return generated;
         }
 
-        private MainStatEntry[] GenerateScaledStats(MainStatEntry[] baseStats, ItemRarity rarity, int level)
+        private CombatStatEntry[] GenerateScaledStats(CombatStatEntry[] baseStats, ItemRarity rarity, int level)
         {
-            if (baseStats == null) return Array.Empty<MainStatEntry>();
+            if (baseStats == null) return Array.Empty<CombatStatEntry>();
 
             float multiplier = rarity.GetDefaultStatMultiplier();
-            return baseStats.Select(s => new MainStatEntry
+            return baseStats.Select(s => new CombatStatEntry
             {
                 Stat = s.Stat,
                 BaseValue = s.BaseValue * multiplier,
@@ -358,5 +380,6 @@ namespace IdleDefenseSurvival.Items
         public List<EquipmentData> Equipment;
         public List<GemData> Gems;
         public List<SetBonusData> Sets;
+        public List<AffixData> Affixes;
     }
 }

@@ -82,15 +82,15 @@
         "description": "Extra Attack Power from Ultimate Weapon",
         "displayName": "Ultimate Weapon Attack"
       },
-      "skillDamage": {
-        "baseValue": 1,
-        "description": "Overall skill damage multiplier (1 = 100%). Boosted by Intelligence",
-        "displayName": "Skill Damage"
+      "manaPoint": {
+        "baseValue": 100,
+        "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
+        "displayName": "Mana Points"
       },
-      "elementDamage": {
-        "baseValue": 1,
-        "description": "Elemental damage multiplier (1 = 100%). Boosted by Intelligence",
-        "displayName": "Element Damage"
+      "manaRegen": {
+        "baseValue": 2,
+        "description": "Mana regenerated per second",
+        "displayName": "Mana Regeneration"
       }
     },
     "defense": {

@@ -167,7 +167,7 @@ namespace IdleDefenseSurvival.Inventory
         public string GemId; // Reference to GemData
         public int Level = 1;
         public int Experience = 0;
-        public MainStatEntry[] Stats; // Generated stats
+        public CombatStatEntry[] Stats; // Generated stats
         public long AcquiredTimestamp;
 
         public GemInstanceData Clone()
@@ -176,7 +176,7 @@ namespace IdleDefenseSurvival.Inventory
             clone.InstanceId = Guid.NewGuid().ToString();
             if (Stats != null)
             {
-                clone.Stats = new MainStatEntry[Stats.Length];
+                clone.Stats = new CombatStatEntry[Stats.Length];
                 Array.Copy(Stats, clone.Stats, Stats.Length);
             }
             return clone;
@@ -192,7 +192,7 @@ namespace IdleDefenseSurvival.Inventory
         public string EnchantmentId;
         public int Level = 1;
         public int Experience = 0;
-        public MainStatEntry[] StatBonuses;
+        public CombatStatEntry[] StatBonuses;
         public SpecialEffectEntry[] Effects;
         public long AcquiredTimestamp;
 
@@ -201,7 +201,7 @@ namespace IdleDefenseSurvival.Inventory
             var clone = (EnchantmentInstanceData)MemberwiseClone();
             if (StatBonuses != null)
             {
-                clone.StatBonuses = new MainStatEntry[StatBonuses.Length];
+                clone.StatBonuses = new CombatStatEntry[StatBonuses.Length];
                 Array.Copy(StatBonuses, clone.StatBonuses, StatBonuses.Length);
             }
             if (Effects != null)

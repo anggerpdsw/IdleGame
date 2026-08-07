@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Items.Generation;
 
 namespace IdleDefenseSurvival.Equipment
 {
@@ -22,8 +23,8 @@ namespace IdleDefenseSurvival.Equipment
             var bonuses = new Dictionary<SecondaryStat, float>();
             if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
 
-            if (itemData.MainStats != null)
-                foreach (var statEntry in itemData.MainStats)
+            if (itemData.CombatStats != null)
+                foreach (var statEntry in itemData.CombatStats)
                     Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Level, item.EnhanceLevel));
 
             if (item.Enchantment?.StatBonuses != null)
@@ -115,6 +116,19 @@ namespace IdleDefenseSurvival.Equipment
                 foreach (var attrEntry in itemData.AttributeStats)
                     AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level, item.EnhanceLevel));
 
+            // Attribute affixes (prefix like "Wise +INT") — from item.CustomData["Affixes"]
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
+                affixObj is AffixInstanceData[] affixes)
+            {
+                foreach (var affix in affixes)
+                {
+                    if (affix?.AttributeValues == null) continue;
+                    foreach (var (attr, value) in affix.AttributeValues)
+                        AddAsAttribute(bonuses, attr, value);
+                }
+            }
+
             return bonuses;
         }
 
@@ -166,13 +180,42 @@ namespace IdleDefenseSurvival.Equipment
             string prefix = $"Equip:{item.InstanceId}";
             var builder = new ModifierBuilder();
 
-            if (itemData.MainStats != null)
-                foreach (var statEntry in itemData.MainStats)
+            if (itemData.CombatStats != null)
+                foreach (var statEntry in itemData.CombatStats)
                 {
                     float value = statEntry.GetValue(item.Level, item.EnhanceLevel);
                     if (value != 0)
                         builder.Add(prefix, statEntry.Stat, statEntry.Mode, value);
                 }
+
+            // Rolled secondaries (StatRollService -> item.CustomData["SecondaryStats"])
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("SecondaryStats", out var statsObj) &&
+                statsObj is CombatStatEntry[] rolledStats)
+            {
+                foreach (var entry in rolledStats)
+                {
+                    float value = entry.GetValue(item.Level, item.EnhanceLevel);
+                    if (value != 0)
+                        builder.Add(prefix + "_Roll", entry.Stat, entry.Mode, value);
+                }
+            }
+
+            // Affixes (AffixGenerator -> item.CustomData["Affixes"])
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
+                affixObj is AffixInstanceData[] affixes)
+            {
+                foreach (var affix in affixes)
+                {
+                    if (affix?.StatValues == null) continue;
+                    foreach (var (stat, value) in affix.StatValues)
+                    {
+                        if (stat == SecondaryStat.None || value == 0f) continue;
+                        builder.Add(prefix + "_Affix", stat, SecondaryStatMode.Flat, value);
+                    }
+                }
+            }
 
             if (item.Enchantment?.StatBonuses != null)
                 foreach (var statEntry in item.Enchantment.StatBonuses)

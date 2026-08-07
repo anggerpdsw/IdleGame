@@ -44,22 +44,23 @@ namespace IdleDefenseSurvival.Data
             {
                 return Critical switch
                 {
-                    CriticalType.SuperCritical => new Color32(255, 69, 0, 255),  // Orange-Red untuk Super
-                    CriticalType.UltraCritical => new Color32(255, 20, 147, 255), // Deep Pink untuk Ultra
-                    _ => new Color32(255, 215, 0, 255) // Gold untuk Critical biasa
+                    CriticalType.SuperCritical => GameColors.orangered,
+                    CriticalType.UltraCritical => GameColors.pink,
+                    _ => GameColors.gold
                 };
             }
 
             return Type switch
             {
-                DamageType.Normal     => new Color32(220, 38, 38, 255),   // Darker Red
-                DamageType.Heal       => new Color32(22, 163, 74, 255),   // Dark Green
-                DamageType.Poison     => new Color32(147, 51, 234, 255),  // Purple
-                DamageType.Burn       => new Color32(234, 88, 12, 255),   // Orange
-                DamageType.Ice        => new Color32(6, 182, 212, 255),   // Cyan
-                DamageType.TrueDamage => new Color32(30, 30, 30, 255),    // Dark Gray
-                DamageType.Miss       => new Color32(107, 114, 128, 255), // Gray
-                _                     => new Color32(255, 255, 255, 255)
+                DamageType.Normal     => GameColors.red,
+                DamageType.Heal       => GameColors.green,
+                DamageType.Mana       => GameColors.blue,
+                DamageType.Poison     => GameColors.purple,
+                DamageType.Burn       => GameColors.orange,
+                DamageType.Ice        => GameColors.cyan,
+                DamageType.TrueDamage => GameColors.darkgray,
+                DamageType.Miss       => GameColors.gray,
+                _                     => GameColors.white
             };
         }
 
@@ -82,6 +83,7 @@ namespace IdleDefenseSurvival.Data
             return Type switch
             {
                 DamageType.Heal => baseScale * 1.07f,
+                DamageType.Mana => baseScale * 1.07f,
                 _ => baseScale
             };
         }

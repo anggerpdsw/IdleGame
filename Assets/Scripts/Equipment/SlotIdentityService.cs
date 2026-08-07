@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival.Equipment
     /// RarityMechanicConfig, not here.
     ///
     /// Only specialization stats (SecondaryStat) appear here — derived stats like
-    /// AttackDamage (from STR), HealthRegen (from CON), SkillDamage (from INT),
+    /// AttackDamage (from STR), HealthRegen (from CON), ManaPoint/ManaRegen (from INT),
     /// CriticalDamage (from DEX), etc. are NOT listed — they come from Main Attributes.
     /// </summary>
     public static class SlotIdentityService
@@ -112,12 +112,16 @@ namespace IdleDefenseSurvival.Equipment
             },
 
             // Pendant: INT main → Specialization: CooldownReduction, BossDamage, DropRate
-            // (SkillDamage, ElementDamage, UltimateAttack come from INT — not secondary)
+            // (ElementMastery, UltimateAttack, ManaPoint, ManaRegen come from INT — not secondary)
             EquipmentType.Pendant => new[]
             {
                 SecondaryStat.CooldownReduction,
                 SecondaryStat.BossDamage,
-                SecondaryStat.DropRate
+                SecondaryStat.DropRate,
+                // Layer 3: element bonus rolls (elemental casters diversify elements)
+                SecondaryStat.FireDamageBonus,
+                SecondaryStat.WaterDamageBonus,
+                SecondaryStat.LightningDamageBonus
             },
 
             // Ring: STR main → Specialization: BossDamage, EliteDamage, BounceCount
@@ -130,7 +134,7 @@ namespace IdleDefenseSurvival.Equipment
             },
 
             // Earring: INT/DEX main → Specialization: CooldownReduction, DropRate, MultiShootCount
-            // (ElementDamage comes from INT)
+            // (ElementMastery comes from INT)
             EquipmentType.Earring => new[]
             {
                 SecondaryStat.CooldownReduction,

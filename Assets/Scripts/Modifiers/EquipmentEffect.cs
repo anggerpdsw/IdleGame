@@ -294,7 +294,11 @@ namespace IdleDefenseSurvival.Modifiers
             EffectType = EffectType,
             LastTriggerTime = GetLastTriggerTime(),
             CooldownRemaining = GetRemainingCooldown(_context),
-            IsActive = _config?.IsActive ?? false
+            IsActive = _config?.IsActive ?? false,
+            CustomState = _item == null ? null : new Dictionary<string, object>
+            {
+                ["ItemInstanceId"] = _item.InstanceId
+            }
         };
 
         public virtual void LoadRuntimeData(EffectRuntimeData data)

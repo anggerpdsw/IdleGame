@@ -338,19 +338,18 @@ namespace IdleDefenseSurvival.Enemy
             _lastDamageSource = damageData.Source;
 
             // Calculate final damage value
-            // Elemental attack: multiply by element matchup AND player's ElementDamage stat
-            // (boosted by Intelligence). Element.None on both sides = 1x, no element bonus.
+            // 3-layer element pipeline:
+            //   Layer 2: ElementMastery (universal, from Intelligence) → (1 + Mastery/1000)
+            //   Layer 3: per-element bonus (equipment) → (1 + Bonus/100)
+            //   Matchup: 1.5x counter / 0.75x same-or-unrelated / 0.5x weak
+            // Element.None on both sides = 1x, no element bonus.
             float elementMultiplier = damageData.Element == Element.None || _element == Element.None
                 ? 1f
-                : PlayerStatsManager.Instance.GetStat(SkillType.ElementDamage) * Utilityku.ElementMultiplier(damageData.Element, _element);
+                : (1f + PlayerStatsManager.Instance.GetStat(SkillType.ElementMastery) * 0.001f)
+                    * Utilityku.ElementBonus(damageData.Element)
+                    * Utilityku.ElementMultiplier(damageData.Element, _element);
 
-            // Skill vs basic attack: SkillDamage (Intelligence) boosts non-"Player"-source damage
-            // (ultimates, tanks, bombs, status effects). Basic player auto-attacks stay at 1x.
-            float skillMultiplier = DamageData.IsBasicAttack(damageData.Source)
-                ? 1f
-                : PlayerStatsManager.Instance.GetStat(SkillType.SkillDamage);
-
-            float rawDamage = damageData.GetFinalDamage(elementMultiplier) * skillMultiplier;
+            float rawDamage = damageData.GetFinalDamage(elementMultiplier);
             float finalDamage = Utilityku.FinalDamage(rawDamage, _defenseAmount);
             finalDamage = Mathf.Min(_currentHealth, finalDamage);
             _currentHealth -= finalDamage;

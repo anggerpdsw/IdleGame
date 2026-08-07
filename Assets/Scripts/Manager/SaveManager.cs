@@ -12,6 +12,7 @@ using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Save;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -568,7 +569,11 @@ namespace IdleDefenseSurvival.Manager
         {
             if (!Directory.Exists(SaveDir)) Directory.CreateDirectory(SaveDir);
             string json = JsonConvert.SerializeObject(data, Formatting.Indented,
-                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Converters = { new CustomDataConverter() }
+                });
             File.WriteAllText(SaveFile, json);
         }
 
@@ -579,7 +584,12 @@ namespace IdleDefenseSurvival.Manager
             if (string.IsNullOrEmpty(json)) return null;
             try
             {
-                return JsonConvert.DeserializeObject<SaveData>(json);
+                return JsonConvert.DeserializeObject<SaveData>(json,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        Converters = { new CustomDataConverter() }
+                    });
             }
             catch (Exception e)
             {

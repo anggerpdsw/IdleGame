@@ -102,10 +102,13 @@ namespace IdleDefenseSurvival.Equipment
             var attrBonuses = EquipmentStatCalculator.GetItemAttributeBonuses(item);
             var setCounts = _repo.SnapshotSetCounts();
 
-            // ~80% share via ×4 weight (Main Attribute -> derived SkillTypes; build decides).
+            // ~80% share via per-build attribute weights (Main Attribute -> derived
+            // SkillTypes). BuildProfile decides which attribute is worth most —
+            // BuildProfile.All keeps every attribute at ×1 (flat equivalence).
+            var attrWeights = AttributeWeightsConfig.ForBuild(_repo.BuildProfile);
             float score = 0f;
             foreach (var (attr, value) in attrBonuses)
-                score += value * 4f;
+                score += value * attrWeights.WeightFor(attr);
 
             // ~20% share: combat stats via per-build weights.
             var bonuses = EquipmentStatCalculator.GetItemBonusesWithSet(item, db, setCounts);

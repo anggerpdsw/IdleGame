@@ -232,7 +232,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Gets stat bonuses from a specific socketed gem.
         /// </summary>
-        public MainStatEntry[] GetGemStats(string gemId, int level)
+        public CombatStatEntry[] GetGemStats(string gemId, int level)
         {
             return GemStatService.Instance.GetGemStats(gemId, level);
         }
@@ -240,7 +240,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Generates gem stats for a given gem data and level.
         /// </summary>
-        public MainStatEntry[] GenerateGemStats(GemData gemData, int level)
+        public CombatStatEntry[] GenerateGemStats(GemData gemData, int level)
         {
             return GemStatService.Instance.GenerateGemStats(gemData, level);
         }

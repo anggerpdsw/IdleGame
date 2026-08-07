@@ -813,8 +813,8 @@ namespace IdleDefenseSurvival.Inventory
                 ItemId = itemId,
                 Quantity = quantity,
                 Level = equipmentData?.BaseLevel ?? 1,
-                MaxDurability = itemData?.MaxDurability ?? 100,
-                CurrentDurability = itemData?.MaxDurability ?? 100,
+                MaxDurability = equipmentData?.MaxDurability ?? 0,
+                CurrentDurability = equipmentData?.MaxDurability ?? 0,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 CustomData = customData
             };

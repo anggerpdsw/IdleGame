@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using IdleDefenseSurvival;
 using IdleDefenseSurvival.Controller;
+using IdleDefenseSurvival.Manager;
 using UnityEngine;
 
 public static class Utilityku
@@ -149,6 +150,33 @@ public static class Utilityku
         {(Element.Lightning,  Element.Wind),      0.5f},
         {(Element.Wind,       Element.Metal),     0.5f},
     };
+    /// <summary>
+    /// Layer 3: per-element damage bonus (percent stat from equipment/card/buff).
+    /// Maps an Element to its percent SkillType. Returns 1x when no element.
+    /// </summary>
+    public static float ElementBonus(Element element)
+    {
+        if (element == Element.None) return 1f;
+        if (PlayerStatsManager.Instance == null) return 1f;
+
+        SkillType stat = element switch
+        {
+            Element.Metal     => SkillType.MetalDamageBonus,
+            Element.Wood      => SkillType.WoodDamageBonus,
+            Element.Fire      => SkillType.FireDamageBonus,
+            Element.Water     => SkillType.WaterDamageBonus,
+            Element.Earth     => SkillType.EarthDamageBonus,
+            Element.Lightning => SkillType.LightningDamageBonus,
+            Element.Wind      => SkillType.WindDamageBonus,
+            _ => SkillType.None
+        };
+        if (stat == SkillType.None) return 1f;
+
+        float bonus = PlayerStatsManager.Instance.GetStat(stat);
+        // Percent stat: +18 Fire Damage → 1.18x
+        return (100f + bonus) * 0.01f;
+    }
+
     public static float ElementMultiplier(Element attacker, Element defender)
     {
         // Non-elemental attack

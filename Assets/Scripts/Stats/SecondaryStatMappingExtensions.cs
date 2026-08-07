@@ -41,6 +41,15 @@ namespace IdleDefenseSurvival.Stats
         // Accuracy (specialization-only, counters enemy Evasion)
         SecondaryStat.HitRate => SkillType.HitRate,
 
+        // Element damage bonus — per-element percent from equipment rolls
+        SecondaryStat.MetalDamageBonus    => SkillType.MetalDamageBonus,
+        SecondaryStat.WoodDamageBonus     => SkillType.WoodDamageBonus,
+        SecondaryStat.FireDamageBonus     => SkillType.FireDamageBonus,
+        SecondaryStat.WaterDamageBonus    => SkillType.WaterDamageBonus,
+        SecondaryStat.EarthDamageBonus    => SkillType.EarthDamageBonus,
+        SecondaryStat.LightningDamageBonus => SkillType.LightningDamageBonus,
+        SecondaryStat.WindDamageBonus     => SkillType.WindDamageBonus,
+
         _ => SkillType.None
     };
     }

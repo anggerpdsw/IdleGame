@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Modifiers;
+using IdleDefenseSurvival;
 
 namespace IdleDefenseSurvival.Equipment
 {
@@ -11,6 +12,9 @@ namespace IdleDefenseSurvival.Equipment
     public interface IEquipmentRepository
     {
         IReadOnlyDictionary<EquipmentType, InventoryItem> EquippedItems { get; }
+
+        /// <summary>Build profile (All/Tank/Warrior/Mage/Assassin) steering auto-equip attribute weights.</summary>
+        BuildProfile BuildProfile { get; }
 
         bool TryGetEquipped(EquipmentType slot, out InventoryItem item);
         void SetEquipped(EquipmentType slot, InventoryItem item);

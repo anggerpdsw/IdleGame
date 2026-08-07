@@ -3,6 +3,7 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Items.Generation;
 using IdleDefenseSurvival.Stats;
 using TMPro;
 using UnityEngine;
@@ -139,13 +140,55 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (item.EnhanceLevel > 0) lines.Add($"+{item.EnhanceLevel}");
             lines.Add($"Durability: {item.CurrentDurability}/{item.MaxDurability}");
 
-            if (itemData?.MainStats != null)
+            if (itemData?.CombatStats != null)
             {
-                foreach (var stat in itemData.MainStats)
+                foreach (var stat in itemData.CombatStats)
                 {
                     float value = stat.GetValue(item.Level, item.EnhanceLevel);
                     string sign = value >= 0 ? "+" : "";
                     lines.Add($"{stat.Stat.GetDisplayName()}: {sign}{value:F1}");
+                }
+            }
+
+            // Rolled secondaries (generation output)
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("SecondaryStats", out var statsObj) &&
+                statsObj is CombatStatEntry[] rolledStats)
+            {
+                foreach (var stat in rolledStats)
+                {
+                    float value = stat.GetValue(item.Level, item.EnhanceLevel);
+                    string sign = value >= 0 ? "+" : "";
+                    lines.Add($"{stat.Stat.GetDisplayName()}: {sign}{value:F1}");
+                }
+            }
+
+            // Affixes (secondary stats + attributes + passive)
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
+                affixObj is AffixInstanceData[] affixes)
+            {
+                foreach (var affix in affixes)
+                {
+                    if (affix?.StatValues != null)
+                    {
+                        foreach (var (stat, value) in affix.StatValues)
+                        {
+                            if (stat == SecondaryStat.None) continue;
+                            string sign = value >= 0 ? "+" : "";
+                            lines.Add($"{stat.GetDisplayName()}: {sign}{value:F1}");
+                        }
+                    }
+
+                    if (affix?.AttributeValues != null)
+                    {
+                        foreach (var (attr, value) in affix.AttributeValues)
+                        {
+                            if (value == 0f) continue;
+                            string sign = value >= 0 ? "+" : "";
+                            lines.Add($"{attr.GetDisplayName()}: {sign}{value:F1}");
+                        }
+                    }
                 }
             }
 

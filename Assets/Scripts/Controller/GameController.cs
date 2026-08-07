@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Controller
         [Header("Player")]
         [SerializeField] private TextMeshProUGUI _coinMultiplier;
         [SerializeField] private TextMeshProUGUI _healthPlayer;
+        [SerializeField] private TextMeshProUGUI _manaPlayer;
         [SerializeField] private TextMeshProUGUI _attackPlayer;
         [SerializeField] private TextMeshProUGUI _defensePlayer;
         [SerializeField] private TextMeshProUGUI _regenPlayer;
@@ -42,6 +43,7 @@ namespace IdleDefenseSurvival.Controller
 
             _coinMultiplier.text = "x1";
             _healthPlayer.text = "HP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentHealth) + " / " + Utilityku.FormatNumber((long)stats.GetStat(SkillType.HealthPoint));
+            _manaPlayer.text = "MP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentMana) + " / " + Utilityku.FormatNumber((long)stats.GetStat(SkillType.ManaPoint));
             _attackPlayer.text = FormatValue(stats.GetStat(SkillType.AttackDamage));
             _defensePlayer.text = FormatValue(stats.GetStat(SkillType.DefenseAmount));
             _regenPlayer.text = FormatValue(stats.GetStat(SkillType.HealthRegen)) + "/s";

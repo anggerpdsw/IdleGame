@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Items
         public string TierName; // "2-Piece Bonus", "Full Set Bonus"
         [TextArea] public string Description;
         public AttributeStatEntry[] AttributeBonuses; // Core attribute bonuses at this tier (CON/STR/INT/DEX)
-        public MainStatEntry[] StatBonuses; // Combat stat bonuses at this tier
+        public CombatStatEntry[] StatBonuses; // Combat stat bonuses at this tier
         public SpecialEffectEntry[] SpecialEffects; // Special effects at this tier
         public PassiveSkillEntry[] PassiveSkills; // Passive skills at this tier
         public GameObject VisualEffect; // Visual effect when this tier active
@@ -69,8 +69,8 @@ namespace IdleDefenseSurvival.Items
         public float ExperienceGrowth = 1.5f;
 
         // Stat generation
-        public MainStatEntry[] BaseStats; // Guaranteed stats
-        public MainStatEntry[] RandomStats; // Random stats (rolled on creation)
+        public CombatStatEntry[] BaseStats; // Guaranteed stats
+        public CombatStatEntry[] RandomStats; // Random stats (rolled on creation)
         public int RandomStatCount = 1; // How many random stats to roll
 
         // Upgrade

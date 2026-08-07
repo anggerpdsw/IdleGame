@@ -58,10 +58,10 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Gets stat bonuses from a specific socketed gem.
         /// </summary>
-        public MainStatEntry[] GetGemStats(string gemId, int level)
+        public CombatStatEntry[] GetGemStats(string gemId, int level)
         {
             var gemData = ItemDatabase.Instance?.GetGem(gemId);
-            if (gemData == null) return Array.Empty<MainStatEntry>();
+            if (gemData == null) return Array.Empty<CombatStatEntry>();
 
             return GenerateGemStats(gemData, level);
         }
@@ -69,16 +69,16 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Generates gem stats for a given gem data and level.
         /// </summary>
-        public MainStatEntry[] GenerateGemStats(GemData gemData, int level)
+        public CombatStatEntry[] GenerateGemStats(GemData gemData, int level)
         {
-            var stats = new List<MainStatEntry>();
+            var stats = new List<CombatStatEntry>();
 
             // Base stats (guaranteed)
             if (gemData.BaseStats != null)
             {
                 foreach (var stat in gemData.BaseStats)
                 {
-                    stats.Add(new MainStatEntry
+                    stats.Add(new CombatStatEntry
                     {
                         Stat = stat.Stat,
                         BaseValue = stat.BaseValue,

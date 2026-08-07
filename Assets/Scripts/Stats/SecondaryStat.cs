@@ -31,6 +31,13 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.DropRate => "Drop Rate",
             SecondaryStat.InterestWave => "Interest Wave",
             SecondaryStat.HitRate => "Hit Rate",
+            SecondaryStat.MetalDamageBonus => "Metal Damage",
+            SecondaryStat.WoodDamageBonus => "Wood Damage",
+            SecondaryStat.FireDamageBonus => "Fire Damage",
+            SecondaryStat.WaterDamageBonus => "Water Damage",
+            SecondaryStat.EarthDamageBonus => "Earth Damage",
+            SecondaryStat.LightningDamageBonus => "Lightning Damage",
+            SecondaryStat.WindDamageBonus => "Wind Damage",
             _ => "Unknown"
         };
 
@@ -57,6 +64,13 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.DropRate => "DR",
             SecondaryStat.InterestWave => "INTW",
             SecondaryStat.HitRate => "HIT",
+            SecondaryStat.MetalDamageBonus => "MET",
+            SecondaryStat.WoodDamageBonus => "WOD",
+            SecondaryStat.FireDamageBonus => "FIR",
+            SecondaryStat.WaterDamageBonus => "WAT",
+            SecondaryStat.EarthDamageBonus => "ERT",
+            SecondaryStat.LightningDamageBonus => "LTN",
+            SecondaryStat.WindDamageBonus => "WND",
             _ => "??"
         };
 
@@ -81,6 +95,15 @@ namespace IdleDefenseSurvival.Stats
 
             // Accuracy - Cyan/Blue white
             SecondaryStat.HitRate => new Color(0.4f, 0.9f, 1f),
+
+            // Element damage bonus - Arcane purple/teal family, one hue per element
+            SecondaryStat.MetalDamageBonus => new Color(0.7f, 0.75f, 0.8f),
+            SecondaryStat.WoodDamageBonus => new Color(0.4f, 0.85f, 0.45f),
+            SecondaryStat.FireDamageBonus => new Color(1f, 0.45f, 0.2f),
+            SecondaryStat.WaterDamageBonus => new Color(0.3f, 0.6f, 1f),
+            SecondaryStat.EarthDamageBonus => new Color(0.72f, 0.5f, 0.3f),
+            SecondaryStat.LightningDamageBonus => new Color(1f, 0.9f, 0.2f),
+            SecondaryStat.WindDamageBonus => new Color(0.4f, 0.95f, 0.95f),
 
             // Projectile/Crowd Control - Purple/Teal
             SecondaryStat.AttackRange => new Color(0.6f, 0.3f, 1f),
@@ -112,6 +135,13 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.StuntChance => true,
             SecondaryStat.InterestWave => true,
             SecondaryStat.HitRate => true,
+            SecondaryStat.MetalDamageBonus => true,
+            SecondaryStat.WoodDamageBonus => true,
+            SecondaryStat.FireDamageBonus => true,
+            SecondaryStat.WaterDamageBonus => true,
+            SecondaryStat.EarthDamageBonus => true,
+            SecondaryStat.LightningDamageBonus => true,
+            SecondaryStat.WindDamageBonus => true,
             _ => false
         };
 
@@ -138,6 +168,9 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.AttackRange or SecondaryStat.BounceChance or SecondaryStat.BounceCount or
             SecondaryStat.MultiShootChance or SecondaryStat.MultiShootCount or
             SecondaryStat.KnockbackChance or SecondaryStat.StuntChance or SecondaryStat.StuntDuration => StatCategory.Special,
+            SecondaryStat.MetalDamageBonus or SecondaryStat.WoodDamageBonus or SecondaryStat.FireDamageBonus or
+            SecondaryStat.WaterDamageBonus or SecondaryStat.EarthDamageBonus or
+            SecondaryStat.LightningDamageBonus or SecondaryStat.WindDamageBonus => StatCategory.Magic,
             _ => StatCategory.Other
         };
     }

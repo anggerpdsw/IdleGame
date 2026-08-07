@@ -24,18 +24,18 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls secondary stats for an equipment item.
         /// </summary>
-        public MainStatEntry[] RollSecondaryStats(EquipmentData baseEquipment, ItemRarity rarity, ItemGenerationContext context)
+        public CombatStatEntry[] RollSecondaryStats(EquipmentData baseEquipment, ItemRarity rarity, ItemGenerationContext context)
         {
             if (baseEquipment.SecondaryStats == null || baseEquipment.SecondaryStats.Length == 0)
-                return Array.Empty<MainStatEntry>();
+                return Array.Empty<CombatStatEntry>();
 
             int statCount = GetStatCount(rarity, context);
-            if (statCount <= 0) return Array.Empty<MainStatEntry>();
+            if (statCount <= 0) return Array.Empty<CombatStatEntry>();
 
             var availableStats = GetAvailableStats(baseEquipment);
-            if (availableStats.Length == 0) return Array.Empty<MainStatEntry>();
+            if (availableStats.Length == 0) return Array.Empty<CombatStatEntry>();
 
-            var results = new List<MainStatEntry>();
+            var results = new List<CombatStatEntry>();
             var usedStats = new HashSet<SecondaryStat>();
 
             for (int i = 0; i < statCount && availableStats.Length > 0; i++)
@@ -93,7 +93,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return _rng.Choice(candidates);
         }
 
-        private MainStatEntry CreateStatEntry(SecondaryStat stat, ItemRarity rarity, ItemGenerationContext context)
+        private CombatStatEntry CreateStatEntry(SecondaryStat stat, ItemRarity rarity, ItemGenerationContext context)
         {
             float rarityMult = rarity.GetDefaultStatMultiplier();
             float tierMult = 1f + context.Tier * 0.02f;
@@ -110,7 +110,7 @@ namespace IdleDefenseSurvival.Items.Generation
             // Determine mode (flat vs percent)
             var mode = _config.PercentStats.Contains(stat) ? SecondaryStatMode.Percent : SecondaryStatMode.Flat;
 
-            return new MainStatEntry
+            return new CombatStatEntry
             {
                 Stat = stat,
                 BaseValue = finalValue,
@@ -131,7 +131,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Secondary count per rarity moved to RarityMechanicConfig (single tuning point).
         /// Only specialization stats (SecondaryStat) are rolled here — derived stats like
-        /// AttackDamage (STR), Health (CON), SkillDamage (INT), CriticalDamage (DEX) come
+        /// AttackDamage (STR), Health (CON), ManaPoint/ManaRegen (INT), CriticalDamage (DEX) come
         /// from Main Attributes, not equipment secondaries.
         /// </summary>
         public Dictionary<SecondaryStat, float> BaseValues = new()
@@ -153,7 +153,14 @@ namespace IdleDefenseSurvival.Items.Generation
             { SecondaryStat.GoldGain, 1f },
             { SecondaryStat.DropRate, 1f },
             { SecondaryStat.InterestWave, 1f },
-            { SecondaryStat.HitRate, 1f }
+            { SecondaryStat.HitRate, 1f },
+            { SecondaryStat.MetalDamageBonus, 1f },
+            { SecondaryStat.WoodDamageBonus, 1f },
+            { SecondaryStat.FireDamageBonus, 1f },
+            { SecondaryStat.WaterDamageBonus, 1f },
+            { SecondaryStat.EarthDamageBonus, 1f },
+            { SecondaryStat.LightningDamageBonus, 1f },
+            { SecondaryStat.WindDamageBonus, 1f }
         };
 
         public float PerLevelMultiplier = 0.1f;

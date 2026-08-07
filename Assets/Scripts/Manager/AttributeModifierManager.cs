@@ -95,13 +95,13 @@ namespace IdleDefenseSurvival.Manager
                     equipment.EquippedItems, equipment.EquippedSetCounts)
                 : null;
 
-            _constitution = Total(MainAttribute.Constitution, account?.constitution ?? 0) +
+            _constitution = Allocated(account?.constitution ?? 0) +
                 (equipBonuses?.GetValueOrDefault(MainAttribute.Constitution, 0) ?? 0);
-            _strength = Total(MainAttribute.Strength, account?.strength ?? 0) +
+            _strength = Allocated(account?.strength ?? 0) +
                 (equipBonuses?.GetValueOrDefault(MainAttribute.Strength, 0) ?? 0);
-            _intelligence = Total(MainAttribute.Intelligence, account?.intelligence ?? 0) +
+            _intelligence = Allocated(account?.intelligence ?? 0) +
                 (equipBonuses?.GetValueOrDefault(MainAttribute.Intelligence, 0) ?? 0);
-            _dexterity = Total(MainAttribute.Dexterity, account?.dexterity ?? 0) +
+            _dexterity = Allocated(account?.dexterity ?? 0) +
                 (equipBonuses?.GetValueOrDefault(MainAttribute.Dexterity, 0) ?? 0);
             
             var modifiers = new List<StatModifier>(32);
@@ -141,8 +141,13 @@ namespace IdleDefenseSurvival.Manager
             Value = value
         };
 
-        private float Total(MainAttribute attr, int allocated) 
-            => AttributeService.GetBaseValue(attr) + allocated;
+        /// <summary>
+        /// Allocated attribute points (skip base). Account attribute starts at
+        /// STARTING_STAT_POINTS from dataPlayer.json; per-point bonuses apply above that.
+        /// Total attribute = allocated + equip, base contributes no bonus.
+        /// </summary>
+        private static float Allocated(int allocated) =>
+            Mathf.Max(0, allocated - GameConstants.STARTING_STAT_POINTS);
 
     }
 }

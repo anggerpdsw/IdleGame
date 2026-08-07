@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
-using IdleDefenseSurvival;
 using IdleDefenseSurvival.Data;
 
 namespace IdleDefenseSurvival.Player
@@ -23,19 +23,12 @@ namespace IdleDefenseSurvival.Player
     }
 
     /// <summary>
-    /// Static config for the four main attributes.
-    /// Base values from dataPlayer.json ("mainAttributes"); per-point bonuses from
-    /// dataAttribute.json. Both are loaded and parsed ONCE (cached) — Apply() calls
+    /// Static config for the four main attributes' per-point bonuses.
+    /// Loaded and parsed ONCE from dataAttribute.json (cached) — Apply() calls
     /// never re-read JSON or re-parse stat strings.
     /// </summary>
     public static class AttributeService
     {
-        private const float DefaultAttribute = 5f;
-        private static float _constitution = DefaultAttribute;
-        private static float _strength = DefaultAttribute;
-        private static float _intelligence = DefaultAttribute;
-        private static float _dexterity = DefaultAttribute;
-
         private static AttributeBonusData[] _constitutionBonuses = Array.Empty<AttributeBonusData>();
         private static AttributeBonusData[] _strengthBonuses = Array.Empty<AttributeBonusData>();
         private static AttributeBonusData[] _intelligenceBonuses = Array.Empty<AttributeBonusData>();
@@ -48,73 +41,48 @@ namespace IdleDefenseSurvival.Player
         {
             if (_loaded && !force) return;
 
-            LoadBaseValues();
             LoadBonuses();
             _loaded = true;
         }
 
-        private static void LoadBaseValues()
+        private static void LoadBonuses()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/dataPlayer");
-            if (jsonAsset == null) return;
+            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/dataAttribute");
+            if (jsonAsset == null)
+            {
+                Debug.LogWarning("[AttributeService] dataAttribute.json not found.");
+                return;
+            }
 
             try
             {
-                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<PlayerData>(jsonAsset.text);
-                if (data?.mainAttributes == null) return;
+                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<AttributeConfig>(jsonAsset.text);
+                if (data == null) return;
 
-                _constitution = data.mainAttributes.constitution;
-                _strength = data.mainAttributes.strength;
-                _intelligence = data.mainAttributes.intelligence;
-                _dexterity = data.mainAttributes.dexterity;
+                _constitutionBonuses = Parse(data.constitution);
+                _strengthBonuses = Parse(data.strength);
+                _intelligenceBonuses = Parse(data.intelligence);
+                _dexterityBonuses = Parse(data.dexterity);
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AttributeService] Failed to load mainAttributes: {e.Message}");
+                Debug.LogError($"[AttributeService] Failed to parse dataAttribute.json: {e.Message}");
             }
         }
 
-        private static void LoadBonuses()
+        private static AttributeBonusData[] Parse(AttributeBonusEntry[] entries)
         {
-            // Hardcoded per-point bonuses per MainAttribute as per redesign.
-            // Scaling values correspond to flat additions for each SkillType.
-            _constitutionBonuses = new AttributeBonusData[]
-            {
-                new(SkillType.HealthPoint, 40f, 0f),
-                new(SkillType.DefenseAmount, 1f, 0f),
-                new(SkillType.HealthRegen, 0.1f, 0f),
-                new(SkillType.DeathDefy, 0.0025f, 0f)
-            };
-            _strengthBonuses = new AttributeBonusData[]
-            {
-                new(SkillType.AttackDamage, 5f, 0f),
-                new(SkillType.KnockbackForce, 0.2f, 0f),
-                new(SkillType.UltimateAttack, 2f, 0f)
-            };
-            _intelligenceBonuses = new AttributeBonusData[]
-            {
-                new(SkillType.SkillDamage, 3f, 0f),
-                new(SkillType.ElementDamage, 3f, 0f),
-                new(SkillType.UltimateAttack, 2f, 0f)
-            };
-            _dexterityBonuses = new AttributeBonusData[]
-            {
-                new(SkillType.AttackSpeed, 0.4f, 0f),
-                new(SkillType.CriticalChance, 0.15f, 0f),
-                new(SkillType.CriticalDamage, 0.3f, 0f),
-                new(SkillType.Evasion, 0.15f, 0f)
-            };
-        }
+            if (entries == null) return Array.Empty<AttributeBonusData>();
 
-        /// <summary>Base (level-1) value of the attribute.</summary>
-        public static float GetBaseValue(MainAttribute attribute) => attribute switch
-        {
-            MainAttribute.Constitution => _constitution,
-            MainAttribute.Strength => _strength,
-            MainAttribute.Intelligence => _intelligence,
-            MainAttribute.Dexterity => _dexterity,
-            _ => 5f
-        };
+            var list = new List<AttributeBonusData>(entries.Length);
+            foreach (var entry in entries)
+            {
+                if (entry == null) continue;
+                if (!Enum.TryParse(entry.stat, out SkillType stat)) continue; // Unknown stat — skip.
+                list.Add(new AttributeBonusData(stat, entry.flat, entry.percent));
+            }
+            return list.ToArray();
+        }
 
         /// <summary>Cached per-point bonuses for the attribute (already parsed).</summary>
         public static AttributeBonusData[] GetBonuses(MainAttribute attribute) => attribute switch

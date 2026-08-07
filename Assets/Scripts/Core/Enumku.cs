@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival
     }
     public enum CurrencyType { Gold, Gem, Meat }
     public enum DailyRewardState { Locked, Waiting, Claimable, Claimed, CompletedToday }
-    public enum DamageType { Normal, Critical, Heal, Poison, Burn, Ice, TrueDamage, Miss }
+    public enum DamageType { Normal, Critical, Heal, Mana, Poison, Burn, Ice, TrueDamage, Miss }
     public enum ProjectileOwner { Player, Tank, Enemy }
     public enum RewardType { Gold, Gem, Meat, Exp, Card, Ticket, Energy, Item, Equipment, Hero }
     public enum Role { Fighter, Tank, Golem, Caster, Ranger, Agile, Beast, BOSS }
@@ -19,6 +19,11 @@ namespace IdleDefenseSurvival
     public enum UltimateDMG { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
     public enum WaveState { ActiveWave, Defeat, InterWave, Victory }
     public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
+    /// <summary>
+    /// Player build profiles. Steering auto-equip attribute weights (EquipmentAutoEquipService)
+    /// and future per-build tuning. Compile-time-safe alternatives to a string.
+    /// </summary>
+    public enum BuildProfile { All, Tank, Warrior, Mage, Assassin }
     public enum ModifierMode { Flat, Percent }
     public enum ModifierSource { AccountLevel, Buff, Card, Equipment, Event, Pet, Quest, Skin, Upgrade, Ultimate }
 
@@ -75,9 +80,22 @@ namespace IdleDefenseSurvival
         Evasion = 21,
 
         // Magic
-        SkillDamage = 22,
-        ElementDamage = 23,
+        /// <summary>Universal elemental power (final = 1 + ElementMastery/1000), boosted by Intelligence.</summary>
+        ElementMastery = 23,
         UltimateAttack = 24,
+        /// <summary>Maximum mana pool. Ultimates and mana-cost skills draw from this.</summary>
+        ManaPoint = 47,
+        /// <summary>Mana regenerated per second.</summary>
+        ManaRegen = 48,
+
+        // Element damage (Layer 3) — per-element bonus (percent, from equipment/card/buff)
+        MetalDamageBonus = 40,
+        WoodDamageBonus = 41,
+        FireDamageBonus = 42,
+        WaterDamageBonus = 43,
+        EarthDamageBonus = 44,
+        LightningDamageBonus = 45,
+        WindDamageBonus = 46,
 
         // Economy
         InterestWave = 25,
@@ -175,6 +193,15 @@ namespace IdleDefenseSurvival
 
         // Accuracy — counters enemy Evasion. Specialization-only (equipment/passive/buff/card).
         HitRate = 20,
+
+        // Element damage bonus (Layer 3) — per-element percent from equipment (Roll → ModifierSource.Equipment → SkillType).
+        MetalDamageBonus = 21,
+        WoodDamageBonus = 22,
+        FireDamageBonus = 23,
+        WaterDamageBonus = 24,
+        EarthDamageBonus = 25,
+        LightningDamageBonus = 26,
+        WindDamageBonus = 27,
     }
 
 }

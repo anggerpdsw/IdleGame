@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Items.Generation;
 
 namespace IdleDefenseSurvival.Equipment
 {
@@ -282,16 +283,50 @@ namespace IdleDefenseSurvival.Equipment
 
             if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
 
-            // Main stats
-            if (itemData.MainStats != null)
+            // Combat stats (crit, lifesteal, element, ...)
+            if (itemData.CombatStats != null)
             {
-                foreach (var statEntry in itemData.MainStats)
+                foreach (var statEntry in itemData.CombatStats)
                 {
                     float value = statEntry.GetValue(item.Level, item.EnhanceLevel);
                     if (bonuses.ContainsKey(statEntry.Stat))
                         bonuses[statEntry.Stat] += value;
                     else
                         bonuses[statEntry.Stat] = value;
+                }
+            }
+
+            // Rolled secondaries (generation output for non-statically-defined items)
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("SecondaryStats", out var statsObj) &&
+                statsObj is CombatStatEntry[] rolledStats)
+            {
+                foreach (var statEntry in rolledStats)
+                {
+                    float value = statEntry.GetValue(item.Level, item.EnhanceLevel);
+                    if (bonuses.ContainsKey(statEntry.Stat))
+                        bonuses[statEntry.Stat] += value;
+                    else
+                        bonuses[statEntry.Stat] = value;
+                }
+            }
+
+            // Affixes (rolled at generation; feed the same combat pool)
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
+                affixObj is AffixInstanceData[] affixes)
+            {
+                foreach (var affix in affixes)
+                {
+                    if (affix?.StatValues == null) continue;
+                    foreach (var (stat, value) in affix.StatValues)
+                    {
+                        if (stat == SecondaryStat.None) continue;
+                        if (bonuses.ContainsKey(stat))
+                            bonuses[stat] += value;
+                        else
+                            bonuses[stat] = value;
+                    }
                 }
             }
 

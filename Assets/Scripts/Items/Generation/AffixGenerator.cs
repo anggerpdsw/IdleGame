@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Items.Random;
 using System.Linq;
+using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -20,7 +21,17 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             _rng = rng ?? new UnityRandomProvider();
             _config = config ?? AffixGeneratorConfig.Default;
-            _affixDatabase = affixDatabase ?? new Dictionary<string, AffixData>();
+            _affixDatabase = affixDatabase;
+        }
+
+        /// <summary>
+        /// Affix pool from dataItems.json via ItemDatabase. Empty dict when database
+        /// not loaded yet or no affixes defined — generator then yields none.
+        /// </summary>
+        private IReadOnlyDictionary<string, AffixData> GetDatabase()
+        {
+            if (_affixDatabase != null) return _affixDatabase;
+            return ItemDatabase.Instance?.AllAffixes ?? new Dictionary<string, AffixData>();
         }
 
         /// <summary>
@@ -34,16 +45,48 @@ namespace IdleDefenseSurvival.Items.Generation
             var results = new List<AffixInstanceData>();
             var availableAffixes = GetAvailableAffixes(baseEquipment, rarity);
 
+            // Prefix + suffix alternate each roll (prefix (Type 0) first, then suffix (Type 1)),
+            // so a 2-affix item gets one of each instead of two prefixes. Same-type affixes
+            // are removed after each pick — no duplicate prefix/suffix on one item.
+            AffixType? lastType = null;
             for (int i = 0; i < affixCount && availableAffixes.Count > 0; i++)
             {
-                var affix = _rng.Choice(availableAffixes);
-                availableAffixes.Remove(affix);
+                var affix = PickWeighted(availableAffixes, lastType);
+                if (affix == null) break;
+                lastType = affix.Type;
+                availableAffixes.RemoveAll(a => a.AffixId == affix.AffixId);
 
                 var instance = CreateAffixInstance(affix, rarity, context);
                 results.Add(instance);
             }
 
             return results.ToArray();
+        }
+
+        /// <summary>
+        /// Weighted pick among pool slots. Prefers the opposite AffixType to the one just
+        /// rolled (prefix after suffix, suffix after prefix); falls back to any type.
+        /// </summary>
+        private AffixData PickWeighted(List<AffixData> pool, AffixType? preferType)
+        {
+            var candidates = pool;
+            if (preferType.HasValue)
+            {
+                var oppositeType = preferType.Value == AffixType.Prefix ? AffixType.Suffix : AffixType.Prefix;
+                var opposite = pool.FindAll(a => a.Type == oppositeType);
+                if (opposite.Count > 0) candidates = opposite;
+            }
+
+            float totalWeight = 0f;
+            for (int i = 0; i < candidates.Count; i++) totalWeight += Math.Max(0f, candidates[i].Weight);
+
+            float roll = _rng.Range(0f, totalWeight);
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                roll -= Math.Max(0f, candidates[i].Weight);
+                if (roll <= 0f) return candidates[i];
+            }
+            return candidates[candidates.Count - 1];
         }
 
         private int GetAffixCount(ItemRarity rarity, ItemGenerationContext context)
@@ -72,7 +115,8 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             var result = new List<AffixData>();
 
-            foreach (var kvp in _affixDatabase)
+            var db = GetDatabase();
+            foreach (var kvp in db)
             {
                 var affix = kvp.Value;
                 if (affix.MinRarity <= rarity && affix.MaxRarity >= rarity)
@@ -98,6 +142,8 @@ namespace IdleDefenseSurvival.Items.Generation
                 Level = 1,
                 Experience = 0,
                 StatValues = GenerateStatValues(affix, rarity, context),
+                AttributeValues = GenerateAttributeValues(affix, rarity, context),
+                PassiveEffect = affix?.PassiveEffect,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
         }
@@ -123,6 +169,26 @@ namespace IdleDefenseSurvival.Items.Generation
 
                     float value = statEntry.BaseValue * rarityMult * tierMult * variance;
                     values[statEntry.Stat] = value;
+                }
+            }
+
+            return values;
+        }
+
+        private Dictionary<MainAttribute, float> GenerateAttributeValues(AffixData affix, ItemRarity rarity, ItemGenerationContext context)
+        {
+            var values = new Dictionary<MainAttribute, float>();
+
+            if (affix?.AttributeStats != null)
+            {
+                foreach (var attrEntry in affix.AttributeStats)
+                {
+                    float rarityMult = rarity.GetDefaultStatMultiplier();
+                    float tierMult = 1f + context.Tier * 0.02f;
+                    float variance = _rng.Range(0.9f, 1.1f);
+
+                    float value = attrEntry.BaseValue * rarityMult * tierMult * variance;
+                    values[attrEntry.Attribute] = value;
                 }
             }
 
@@ -175,7 +241,9 @@ namespace IdleDefenseSurvival.Items.Generation
         public ItemRarity MinRarity;
         public ItemRarity MaxRarity;
         public EquipmentType[] ApplicableTypes;
-        public MainStatEntry[] Stats;
+        public CombatStatEntry[] Stats;            // SecondaryStat bonuses (combat stats)
+        public AttributeStatEntry[] AttributeStats; // MainAttribute bonuses (CON/STR/INT/DEX)
+        public SpecialEffectEntry PassiveEffect; // Optional on-hit passive (e.g. FreezeEnemy)
         public float Weight = 1f;
     }
 
@@ -190,7 +258,12 @@ namespace IdleDefenseSurvival.Items.Generation
         public int Level;
         public int Experience;
         public Dictionary<SecondaryStat, float> StatValues;
+        public Dictionary<MainAttribute, float> AttributeValues; // from AffixData.AttributeStats
+        public SpecialEffectEntry PassiveEffect; // from AffixData.PassiveEffect (same affix, enabled)
         public long AcquiredTimestamp;
+        /// <summary>Owning item instance. Stamped on generation so runtime can key
+        /// passive-effect activation/deactivation to a concrete equipped item.</summary>
+        public string ItemInstanceId;
     }
 
     public enum AffixType

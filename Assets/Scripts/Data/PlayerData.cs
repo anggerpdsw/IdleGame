@@ -22,6 +22,29 @@ namespace IdleDefenseSurvival.Data
         public float dexterity;
     }
 
+    /// <summary>
+    /// Root of dataAttribute.json — per-point bonus of each main attribute.
+    /// </summary>
+    [Serializable]
+    public class AttributeConfig
+    {
+        public AttributeBonusEntry[] constitution;
+        public AttributeBonusEntry[] strength;
+        public AttributeBonusEntry[] intelligence;
+        public AttributeBonusEntry[] dexterity;
+    }
+
+    /// <summary>
+    /// One per-point bonus entry: stat name (parsed to <see cref="SkillType"/>), flat and percent value.
+    /// </summary>
+    [Serializable]
+    public class AttributeBonusEntry
+    {
+        public string stat;
+        public float flat;
+        public float percent;
+    }
+
     [Serializable]
     public class PlayerSkills
     {
@@ -50,8 +73,8 @@ namespace IdleDefenseSurvival.Data
         public SkillData superCriticalChance;
         public SkillData superCriticalFactor;
         public SkillData ultimateAttack;
-        public SkillData skillDamage;
-        public SkillData elementDamage;
+        public SkillData manaPoint;
+        public SkillData manaRegen;
         public SkillData ultraCriticalChance;
         public SkillData ultraCriticalFactor;
     }

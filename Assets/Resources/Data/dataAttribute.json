@@ -1,6 +1,5 @@
 {
-  "constitution": [
-    {
+  "constitution": [{
       "stat": "HealthPoint",
       "flat": 40,
       "percent": 0
@@ -17,18 +16,17 @@
     },
     {
       "stat": "DeathDefy",
-      "flat": 0.0025,
+      "flat": 0.0005,
       "percent": 0
     }
   ],
-  "strength": [
-    {
+  "strength": [{
       "stat": "AttackDamage",
       "flat": 5,
       "percent": 0
     },
     {
-      "stat": "KnockbackForce",
+      "stat": "KnockbackChance",
       "flat": 0.2,
       "percent": 0
     },
@@ -38,15 +36,19 @@
       "percent": 0
     }
   ],
-  "intelligence": [
-    {
-      "stat": "SkillDamage",
-      "flat": 3,
+  "intelligence": [{
+      "stat": "ManaPoint",
+      "flat": 20,
       "percent": 0
     },
     {
-      "stat": "ElementDamage",
-      "flat": 3,
+      "stat": "ManaRegen",
+      "flat": 0.5,
+      "percent": 0
+    },
+    {
+      "stat": "ElementMastery",
+      "flat": 0.8,
       "percent": 0
     },
     {
@@ -55,20 +57,14 @@
       "percent": 0
     }
   ],
-  "dexterity": [
-    {
+  "dexterity": [{
       "stat": "AttackSpeed",
-      "flat": 0.4,
+      "flat": 0.04,
       "percent": 0
     },
     {
       "stat": "CriticalChance",
       "flat": 0.15,
-      "percent": 0
-    },
-    {
-      "stat": "CriticalDamage",
-      "flat": 0.3,
       "percent": 0
     },
     {

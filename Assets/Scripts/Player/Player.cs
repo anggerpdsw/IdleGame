@@ -29,7 +29,9 @@ namespace IdleDefenseSurvival.Player
         [Header("Visualization")]
         [SerializeField] private Transform _visual;
         [SerializeField] private Slider healthBar;
-        [SerializeField] private Image fillImage;
+        [SerializeField] private Image fillHealth;
+        [SerializeField] private Slider manaBar;
+        [SerializeField] private Image fillMana;
         [SerializeField] private SpriteRenderer _attackRangeRenderer;
         // Barrier visual – child GameObject with SpriteRenderer
         [SerializeField] private SpriteRenderer _barrierRenderer;
@@ -45,11 +47,19 @@ namespace IdleDefenseSurvival.Player
         private float _attackTimer;
         private float _regenTimer;
         private float _currentHealth;
+        private float _currentMana;
         private int _enemyLayerMask;
         private Transform _currentTarget;
         private UltimateManager _ultimateManager;
 
         public float CurrentHealth => _currentHealth;
+        public float MaxHealth => PlayerStatsManager.Instance != null
+            ? PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint)
+            : 0f;
+        public float CurrentMana => _currentMana;
+        public float MaxMana => PlayerStatsManager.Instance != null
+            ? PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint)
+            : 0f;
 
         // Shield system
         [SerializeField] private float _currentShield = 0f;
@@ -104,11 +114,14 @@ namespace IdleDefenseSurvival.Player
             // Update visuals
             DrawAttackRange();
 
-            // Always start at full health on game start
+            // Always start at full health and mana on game start
             float health = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
             _currentHealth = health;
-            
+            float mana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
+            _currentMana = mana;
+
             UpdateHealthUI();
+            UpdateManaUI();
             UpdateShieldVisual();
             AttackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
         }
@@ -242,13 +255,29 @@ namespace IdleDefenseSurvival.Player
 
             float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
             float regen = PlayerStatsManager.Instance.GetStat(SkillType.HealthRegen);
+            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
+            float manaRegen = PlayerStatsManager.Instance.GetStat(SkillType.ManaRegen);
 
             while (_regenTimer >= 1f)
             {
                 _regenTimer -= 1f;
-                if (_currentHealth >= maxHealth) break;
-                Heal(Mathf.Min(regen, maxHealth - _currentHealth));
+                if (_currentHealth < maxHealth)
+                    Heal(Mathf.Min(regen, maxHealth - _currentHealth));
+                if (_currentMana < maxMana)
+                    GainMana(Mathf.Min(manaRegen, maxMana - _currentMana));
             }
+        }
+
+        /// <summary>Checks bump; le than cost, false. Mana system gate.</summary>
+        public bool CanAfford(float manaCost) => _currentMana >= manaCost;
+
+        /// <summary>Consumes mana for an ultimate or mana-cost skill. Returns true when spent.</summary>
+        public bool SpendMana(float manaCost)
+        {
+            if (!CanAfford(manaCost)) return false;
+            _currentMana -= manaCost;
+            UpdateManaUI();
+            return true;
         }
 
         /// <summary>
@@ -470,6 +499,36 @@ namespace IdleDefenseSurvival.Player
             return finalDamage;
         }
 
+        public void GainMana(float gainmana)
+        {
+            float mana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
+            if (_currentMana >= mana) return;
+
+            float oldMana = _currentMana;
+            _currentMana = Mathf.Min(_currentMana + gainmana, mana);
+
+            // Calculate actual gainmana received (clamped by max mana)
+            float actualGainMana = _currentMana - oldMana;
+
+            if (!Mathf.Approximately(oldMana, _currentMana))
+            {
+                UpdateManaUI();
+                // Show gainmana popup
+                if (actualGainMana >= 1f) ShowDamagePopup(actualGainMana, DamageType.Mana, CriticalType.None, "+");
+            }
+        }
+
+        private void UpdateManaUI()
+        {
+            if (manaBar == null) return;
+            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
+            manaBar.maxValue = maxMana;
+            manaBar.value = _currentMana;
+            
+            float percent = Mathf.Clamp01(_currentMana / maxMana);
+            fillMana.color = Color.Lerp(GameColors.empty, GameColors.blue, percent);
+        }
+
         public void Heal(float heal)
         {
             float health = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
@@ -488,26 +547,6 @@ namespace IdleDefenseSurvival.Player
                 // Show heal popup
                 if (actualHeal >= 1f) ShowDamagePopup(actualHeal, DamageType.Heal, CriticalType.None, "+");
             }
-        }
-
-        /// <summary>
-        /// Show damage popup at player position.
-        /// </summary>
-        private void ShowDamagePopup(float damage, DamageType type, CriticalType criticalType, string prefix = "")
-        {
-            if (DamagePopupManager.Instance == null) return;
-
-            // Position popup slightly above player center
-            Vector3 popupPosition = transform.position + Vector3.up * 0.5f;
-
-            DamagePopupData popupData = new(
-                damage,
-                type,
-                criticalType, // Langsung kirim CriticalType, bukan bool
-                prefix // Prefix with + for heal
-            );
-
-            DamagePopupManager.Instance.ShowDamage(popupPosition, popupData, transform);
         }
 
         private void UpdateHealthUI()
@@ -530,7 +569,27 @@ namespace IdleDefenseSurvival.Player
                 color = Color.Lerp(GameColors.red, GameColors.yellow, t);
             }
 
-            fillImage.color = color;
+            fillHealth.color = color;
+        }
+
+        /// <summary>
+        /// Show damage popup at player position.
+        /// </summary>
+        private void ShowDamagePopup(float damage, DamageType type, CriticalType criticalType, string prefix = "")
+        {
+            if (DamagePopupManager.Instance == null) return;
+
+            // Position popup slightly above player center
+            Vector3 popupPosition = transform.position + Vector3.up * 0.5f;
+
+            DamagePopupData popupData = new(
+                damage,
+                type,
+                criticalType, // Langsung kirim CriticalType, bukan bool
+                prefix // Prefix with + for heal
+            );
+
+            DamagePopupManager.Instance.ShowDamage(popupPosition, popupData, transform);
         }
 
         private void Die()

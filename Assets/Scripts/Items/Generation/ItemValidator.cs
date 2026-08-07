@@ -74,12 +74,12 @@ namespace IdleDefenseSurvival.Items.Generation
                 }
             }
 
-            // Validate Durability
-            if (baseData != null && baseData.MaxDurability > 0)
+            // Validate Durability (equipment only)
+            if (baseData is EquipmentData durData && durData.MaxDurability > 0)
             {
-                if (item.MaxDurability != baseData.MaxDurability)
+                if (item.MaxDurability != durData.MaxDurability)
                 {
-                    errors.Add($"MaxDurability {item.MaxDurability} doesn't match base {baseData.MaxDurability}");
+                    errors.Add($"MaxDurability {item.MaxDurability} doesn't match base {durData.MaxDurability}");
                 }
                 if (item.CurrentDurability > item.MaxDurability)
                 {

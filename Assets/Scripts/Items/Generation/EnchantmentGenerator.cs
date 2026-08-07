@@ -49,13 +49,13 @@ namespace IdleDefenseSurvival.Items.Generation
                 .Where(s => s != SecondaryStat.None)
                 .ToArray();
 
-            enchantment.StatBonuses = new MainStatEntry[statCount];
+            enchantment.StatBonuses = new CombatStatEntry[statCount];
             for (int i = 0; i < statCount; i++)
             {
                 var stat = allStats[_rng.NextInt(allStats.Length)];
                 float baseValue = GetRandomStatValue(stat, rarity, enchantLevel);
 
-                enchantment.StatBonuses[i] = new MainStatEntry
+                enchantment.StatBonuses[i] = new CombatStatEntry
                 {
                     Stat = stat,
                     BaseValue = baseValue,

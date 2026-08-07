@@ -133,7 +133,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Clamp(level, 1, baseEquipment.MaxLevel);
         }
 
-        private void ApplySecondaryStats(InventoryItem item, MainStatEntry[] stats)
+        private void ApplySecondaryStats(InventoryItem item, CombatStatEntry[] stats)
         {
             // Store in CustomData for now - actual stat application happens at runtime
             item.CustomData ??= new Dictionary<string, object>();
@@ -143,6 +143,8 @@ namespace IdleDefenseSurvival.Items.Generation
         private void ApplyAffixes(InventoryItem item, AffixInstanceData[] affixes)
         {
             item.CustomData ??= new Dictionary<string, object>();
+            foreach (var affix in affixes)
+                if (affix != null) affix.ItemInstanceId = item.InstanceId;
             item.CustomData["Affixes"] = affixes;
         }
 

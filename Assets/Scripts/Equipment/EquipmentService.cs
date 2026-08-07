@@ -61,11 +61,18 @@ namespace IdleDefenseSurvival.Equipment
         private EquipmentComparisonService _comparisonService;
         private EquipmentPersistenceService _persistenceService;
         private EquipmentAutoEquipService _autoEquipService;
+        private BuildProfile _buildProfile = BuildProfile.All;
         private EquipmentVisualService _visualService;
+        #endregion
+
+        #region Effects
+        /// <summary>Public bridge so combat code (Projectile) can pump effect triggers.</summary>
+        public EquipmentEffectService Effects => _effectService;
         #endregion
 
         #region IEquipmentRepository
         IReadOnlyDictionary<EquipmentType, InventoryItem> IEquipmentRepository.EquippedItems => _equippedItems;
+        BuildProfile IEquipmentRepository.BuildProfile => _buildProfile;
         IReadOnlyCollection<EquipmentType> IEquipmentRepository.UnlockedSlots => _unlockedSlots;
         IReadOnlyList<IEquipmentEffect> IEquipmentRepository.ActiveEffects => _activeEffects;
         IEnumerable<string> IEquipmentRepository.ActiveSetIds => _setPieceCounts.Keys;

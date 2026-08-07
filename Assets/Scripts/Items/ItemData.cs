@@ -50,11 +50,6 @@ namespace IdleDefenseSurvival.Items
         public int RequiredTier = 1;
         public string[] RequiredQuests; // Quest IDs that must be completed
 
-        // ============ Durability ============
-        public int MaxDurability = 100;
-        public int DurabilityLossPerUse = 1;
-        public long RepairCostPerDurability = 10;
-
         // ============ Level/Progression ============
         public int BaseLevel = 1;
         public int MaxLevel = 100;
@@ -101,10 +96,14 @@ namespace IdleDefenseSurvival.Items
         // ============ Attribute Stats ============
         public AttributeStatEntry[] AttributeStats; // Primary: 4 core attributes (CON/STR/INT/DEX)
 
-        // ============ Main Stats ============
-        public MainStatEntry[] MainStats; // Secondary combat stats (Crit, LifeSteal, AttackSpeed, ...)
+        // ============ Combat Stats ============
+        // The 4 base attributes (CON/STR/INT/DEX) live in AttributeStats above.
+        // This is the item's flat combat/specialization stats (Crit, LifeSteal,
+        // CooldownReduction, element damage, ...) — not "main attributes".
+        public CombatStatEntry[] CombatStats; // Secondary combat stats (Crit, LifeSteal, AttackSpeed, ...)
 
-        // ============ Secondary Stats ============
+        // ============ Secondary Stats (roll pool) ============
+        // Candidate SecondaryStats rolled at generation into item.CustomData["SecondaryStats"].
         public SecondaryStatRow[] SecondaryStats; // Additional stat modifiers
 
         // ============ Special Effects ============
@@ -112,6 +111,12 @@ namespace IdleDefenseSurvival.Items
 
         // ============ Passive Skills ============
         public PassiveSkillEntry[] PassiveSkills; // Passive skill bonuses
+
+        // ============ Durability ============
+        // Equipment-only: non-equipment items (consumables, materials) have no durability.
+        public int MaxDurability = 100;
+        public int DurabilityLossPerUse = 1;
+        public long RepairCostPerDurability = 10;
 
         // ============ Enchantment ============
         public EnchantmentData BaseEnchantment; // Fixed enchantment on this equipment
@@ -129,7 +134,7 @@ namespace IdleDefenseSurvival.Items
         {
             Category = ItemCategory.Equipment;
             if (AttributeStats == null) AttributeStats = Array.Empty<AttributeStatEntry>();
-            if (MainStats == null) MainStats = Array.Empty<MainStatEntry>();
+            if (CombatStats == null) CombatStats = Array.Empty<CombatStatEntry>();
             if (SecondaryStats == null) SecondaryStats = Array.Empty<SecondaryStatRow>();
             if (SpecialEffects == null) SpecialEffects = Array.Empty<SpecialEffectEntry>();
             if (PassiveSkills == null) PassiveSkills = Array.Empty<PassiveSkillEntry>();
@@ -142,7 +147,7 @@ namespace IdleDefenseSurvival.Items
     /// Main stat entry - defines a single main stat with value and scaling.
     /// </summary>
     [Serializable]
-    public class MainStatEntry
+    public class CombatStatEntry
     {
         public SecondaryStat Stat = SecondaryStat.None;
         public float BaseValue = 0f;
@@ -235,7 +240,7 @@ namespace IdleDefenseSurvival.Items
     public class EnchantmentData
     {
         public string EnchantmentId;
-        public MainStatEntry[] StatBonuses;
+        public CombatStatEntry[] StatBonuses;
         public SpecialEffectEntry[] Effects;
         public int Level = 1;
         public int MaxLevel = 5;

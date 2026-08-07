@@ -161,8 +161,8 @@ namespace IdleDefenseSurvival.UI
             // Equipment specific
             SetEquipmentInfo(item, itemData);
 
-            // Main stats
-            SetMainStats(item, itemData, comparisonItem);
+            // Combat stats
+            SetCombatStats(item, itemData, comparisonItem);
 
             // Special effects
             SetSpecialEffects(itemData);
@@ -266,7 +266,7 @@ namespace IdleDefenseSurvival.UI
             }
         }
 
-        private void SetMainStats(InventoryItem item, EquipmentData itemData, InventoryItem comparisonItem)
+        private void SetCombatStats(InventoryItem item, EquipmentData itemData, InventoryItem comparisonItem)
         {
             if (_mainStatsContainer == null || _statEntryPrefab == null) return;
 

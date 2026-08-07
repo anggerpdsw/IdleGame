@@ -4,6 +4,8 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Modifiers;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -263,6 +265,15 @@ namespace IdleDefenseSurvival.Player
             ReturnToPool();
         }
 
+        private void TriggerEquipmentHitEffects(EnemyAi enemy)
+        {
+            var effectService = EquipmentService.Instance?.Effects;
+            if (effectService == null) return;
+
+            var data = new TriggerData { Enemy = enemy };
+            effectService.TriggerEffects(EffectTriggerType.OnHit, data);
+        }
+
         private void HitTarget()
         {
             if (_hasHit) return;
@@ -348,6 +359,10 @@ namespace IdleDefenseSurvival.Player
                             ReturnToPool();
                             return;
                         }
+
+                        // Pump equipped-item + affix passives (e.g. FreezeEnemy):
+                        // every hit an armed passive gets its chance to fire.
+                        TriggerEquipmentHitEffects(enemy);
 
                         float heal = actualDamage * _lifeSteal / 100f;
                         _player.Heal(heal);

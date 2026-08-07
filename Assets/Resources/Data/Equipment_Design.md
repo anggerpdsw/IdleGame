@@ -23,13 +23,13 @@ Four laws:
 
 | Slot | Identity | Core Attribute(s) | Secondary Stats (complement identity) |
 |---|---|---|---|
-| Hat | Magic Caster | INT (+CON) | SkillDamage, ElementDamage, UltimateAttack |
+| Hat | Magic Caster | INT (+CON) | ElementMastery, UltimateAttack, ManaPoint, ManaRegen |
 | Gloves | Physical DPS | STR | CriticalDamage, KnockbackForce |
 | Cape | Versatile Ranger | DEX (+INT) | AttackSpeed, Evasion |
 | Armor | Tank | CON | DefenseAmount, HealthRegen |
 | Belt | Hybrid Tank/Bruiser | CON + STR | HealthRegen, LifeSteal |
 | Pants | Guardian | CON + DEX | HealthRegen, Evasion |
-| Pendant | Spell Power | STR + INT | UltimateAttack, ElementDamage |
+| Pendant | Spell Power | STR + INT | UltimateAttack, ElementMastery |
 | Ring | Crit Specialist | INT | CriticalChance, CriticalDamage |
 | Earring | Swift Assassin | DEX | AttackSpeed, MultiShootChance |
 | Bracelet | Life Stealer | STR + DEX | LifeSteal, AttackSpeed |
@@ -72,7 +72,7 @@ Secondaries are chosen from the SkillType list only. Everything maps into the ex
 **Damage:** AttackDamage, CriticalDamage, CriticalChance, DamagePerRange, KnockbackForce, KnockbackChance, MultiShootCount, MultiShootChance, BounceCount, BounceChance
 **Survival:** HealthPoint, DefenseAmount, HealthRegen, Evasion, DeathDefy, LifeSteal
 **Speed/Utility:** AttackSpeed, AttackRange, StuntChance, StuntDuration
-**Economy:** InterestWave, UltimateAttack, SkillDamage, ElementDamage (INT-linked)
+**Economy:** InterestWave, UltimateAttack, ElementMastery, ManaPoint, ManaRegen (INT-linked)
 
 Budget per rarity (flat base values, scale with level/enhance):
 
@@ -88,6 +88,26 @@ Budget per rarity (flat base values, scale with level/enhance):
 | Divine | 75 |
 
 Secondaries = **at most 20%** of total item value; attributes are always ≥80%.
+
+---
+
+## 4b. Affix System (random prefixes/suffixes)
+
+**Critique 7 answer:** the design previously had no random modifiers — every item of a kind was identical, so drops were interchangeable. Affixes make each drop roll an identity.
+
+- Every generated equipment item rolls **prefix + suffix** from `dataItems.json → Affixes` (AffixType: Prefix=0, Suffix=1). Prefix then suffix alternate per roll — a 2-affix item always gets one of each, never two prefixes.
+- Affix count scales with rarity (Common 0, Uncommon/Rare 1, Epic 2, Legendary 2, Mythic 3, Ancient 3, Divine 4 — see `AffixGeneratorConfig`).
+- **Slot + rarity restriction (the pool is filtered, not flat):** each affix declares `MinRarity/MaxRarity` (gates the pool) + `ApplicableTypes` (which equipment slots it can land on — slot identity preserved: Ring rolls Crit/CritDmg/INT but never LifeRegen/Knockback/Defense), + `Weight` (drop weight, cumulative-sum roll). Generator removes same-affix-id after each pick so no duplicate on one item.
+- **Three affix classes** (an affix grants one or more):
+  1. **Stat affix** (original): `Stats` = `CombatStatEntry` curve → combat-secondary pool, `ModifierSource.Equipment`.
+  2. **Attribute affix** (new): `AttributeStats` = `AttributeStatEntry` curve → feeds the **attribute pool** (`AttributeModifierManager`) via `GetItemAttributeBonuses`. Prefix like *"of Wisdom"* grants +INT. The 80/20 rule holds because affix-attributes are kept rare/low (see §4b note below).
+  3. **Passive affix** (new): `PassiveEffect` = a `SpecialEffectEntry` (EffectType/Value/Chance/Cooldown). On equip `EquipmentEffectService.ActivateItemEffects` activates them like item specials (`EffectFactory.Create`); `Projectile.HitTarget` pumps `TriggerEffects(OnHit, TriggerData{Enemy})` so "of Glacier: 12% chance to FreezeEnemy" actually fires. Lifecycle keyed to the owning item (`GetRuntimeData` stamps `ItemInstanceId`) so unequip wipes them symmetrically.
+- Rolled values = `BaseValue × rarity multiplier × tier multiplier × variance(0.9–1.1)` — same item name, different rolls. This is the "hunt a good roll" chase.
+- Secondary affixes feed the combat-stat pool (`ModifierSource.Equipment`). Attribute affixes are the deliberate rarity in the pool (see weighting below).
+
+**Attribute-affix budget:** secondary affixes currently outnumber attribute affixes in the pool (14 secondary vs 1 attribute), so attribute grants stay rare. Adjust by weighting (a lower `Weight` for attribute affixes) — no code change needed. Naming: prefix goes before, suffix after: *"Strong Leather Hat of the Hunter"*. Rendering affix names in tooltips is a follow-up (data + generator land first).
+
+**Build profile steering:** `BuildProfile` is an enum (`All/Tank/Warrior/Mage/Assassin`), on `IEquipmentRepository`, feeding `AttributeWeightsConfig.ForBuild(profile)` → auto-equip scores. No string `"all"/"strength"` remnants — typos are compile errors.
 
 ---
 
@@ -155,15 +175,14 @@ Drop chance scales with **item level + rarity weight**, but the REAL currency is
 Auto-equip must reproduce a human's "is this better?" — attributes weighted at ~80%:
 
 ```
-score(item) = Σ (attrValue × attrWeight × 4)   // attributes, ×4 for 80% share
-            + Σ (secondaryValue × statWeight)  // 20% share, per-build weights
-            + socketBonus(0.5 × rarity-tier)   // more sockets = more value
-            + passiveBonus (rare passive > none; build-specific)
-            + setSynergy (per equipped set piece: +10% of set bonus value)
+score(item) = Σ (attrValue × attrWeight)       // ~80% share, per-build weights
+            + Σ (secondaryValue × statWeight)  // ~20% share, per-build weights
+            + socketBonus(0.5 × sockets)       // more sockets = more value
+            + passiveBonus (mechanic bonus, small — never raw power)
 ```
 
-- **attrWeight:** CON 1.0, STR 1.0, INT 1.0, DEX 1.0 (flat — attributes are interchangeable in value, the build decides).
-- **statWeight:** per-build config (e.g., crit build weighs CriticalChance ×3, others ×1). Default profile = even weights.
+- **attrWeight:** per-build `AttributeWeightsConfig` (`EquipmentAutoEquipService`). Default profile `"all"` = CON/STR/INT/DEX all ×1 (flat equivalence). Focus profiles (`"strength"`, `"constitution"`, `"intelligence"`, `"dexterity"`) weight the build's primary attribute ×3 and the others ×0.5 — so a DEX build auto-equips DEX gear, CON gear still scores but no longer ties.
+- **statWeight:** per-build config (e.g., crit build weighs CriticalChance ×3, others ×1). Default profile = even weights, tuned to ~20% share.
 - Normalize by item level: `score / sqrt(itemLevel)` so a level-5 Ancient doesn't auto-beat a level-50 Common in a slot the player is under-leveled for.
 - Anti-power-creep: score displayed to player as 4 bars (Attribute / Combat / Sockets / Passive). Auto-equip defaults to the best *attribute* score; secondaries only break ties. **Player sees the tradeoff, never a blind "best"**.
 
@@ -176,12 +195,12 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 ### Hat (Magic Caster — INT)
 
 **Common — Leather Hat** — INT 4 / 0.3 / 0.5
-**Rare — Apprentice Hat** — INT 8 / 0.6 / 1.0, +SkillDamage 3%, 1 socket
-**Epic — Sorcerer Hat** — INT 12 / 0.9 / 1.5, +SkillDamage 5%, +ElementDamage 2%, 1 socket
-**Legendary — Archmage Crown** — INT 15 / 1.1 / 2.0, +SkillDamage 7%, +ElementDamage 3%, +UltimateAttack 4%, 2 sockets, passive: "On ultimate cast: +10% SkillDamage for 5s"
-**Mythic — Star Caller Crown** — INT 18 / 1.3 / 2.5, +ElementDamage 4%, +SkillDamage 8%, +UltimateAttack 6%, +CriticalChance 2%, 2 sockets, passive: "On kill: -0.5s ultimate cooldown"
-**Ancient — Void Sovereign Crown** — INT 22 / 1.5 / 3.0, +ElementDamage 6%, +SkillDamage 10%, +UltimateAttack 8%, +CriticalChance 3%, +BounceChance 5%, 3 sockets, strong passive: "While above 50% HP: +25% SkillDamage; on death: revive once with 30% HP per wave"
-**Divine — Crown of the First Flame** — INT 28 / 1.8 / 3.5, +ElementDamage 8%, +SkillDamage 12%, +UltimateAttack 10%, +CriticalChance 4%, +BounceChance 8%, +AttackSpeed 3%, 3 sockets, unique passive: "Arcane Storm — every kill grants 1 stack of +2% ElementDamage, max 10; resets on taking damage", FX: flame aura
+**Rare — Apprentice Hat** — INT 8 / 0.6 / 1.0, 1 socket
+**Epic — Sorcerer Hat** — INT 12 / 0.9 / 1.5, +Fire Damage 2%, 1 socket
+**Legendary — Archmage Crown** — INT 15 / 1.1 / 2.0, +Water Damage 3%, +UltimateAttack 4%, 2 sockets, passive: "On ultimate cast: +10% UltimateAttack for 5s"
+**Mythic — Star Caller Crown** — INT 18 / 1.3 / 2.5, +Lightning Damage 4%, +UltimateAttack 6%, +CriticalChance 2%, 2 sockets, passive: "On kill: -0.5s ultimate cooldown"
+**Ancient — Void Sovereign Crown** — INT 22 / 1.5 / 3.0, +Fire Damage 6%, +UltimateAttack 8%, +CriticalChance 3%, +BounceChance 5%, 3 sockets, strong passive: "While above 50% HP: +25% UltimateAttack; on death: revive once with 30% HP per wave"
+**Divine — Crown of the First Flame** — INT 28 / 1.8 / 3.5, +Fire Damage 8%, +UltimateAttack 10%, +CriticalChance 4%, +BounceChance 8%, +AttackSpeed 3%, 3 sockets, unique passive: "Arcane Storm — every kill grants 1 stack of +2% Fire Damage, max 10; resets on taking damage", FX: flame aura
 
 ### Gloves (Physical DPS — STR)
 
@@ -228,7 +247,7 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 Follow the same ladder with their identities:
 - **Cape** (DEX+INT): AttackSpeed, Evasion, UltimateAttack
 - **Pants** (CON+DEX): HealthRegen, Evasion, AttackSpeed
-- **Pendant** (STR+INT): UltimateAttack, ElementDamage, SkillDamage
+- **Pendant** (STR+INT): UltimateAttack, ElementMastery, ManaPoint, ManaRegen
 - **Earring** (DEX): AttackSpeed, MultiShootChance, MultiShootCount
 - **Bracelet** (STR+DEX): LifeSteal, AttackSpeed, CriticalDamage
 - **Shoes** (DEX): AttackSpeed, Evasion, StuntChance
@@ -263,7 +282,8 @@ The rule: **every expansion converts to attributes or consumes them — never by
 ## 14. Implementation Notes (this repo)
 
 - Attribute pipeline already exists: `EquipmentData.AttributeStats` → `EquipmentStatCalculator.GetTotalAttributeBonuses` → `AttributeModifierManager.Apply()` → `ModifierSource.AccountLevel`.
-- Secondary pipeline: `EquipmentData.MainStats` → `MainStatMappingExtensions.ToSkillType()` → `ModifierSource.Equipment`.
+- Secondary pipeline: `EquipmentData.CombatStats` (the list stat curve on the item) → `MainStatMappingExtensions.ToSkillType()` → `ModifierSource.Equipment`. `MainStats` was renamed because the 4 basic attributes are the true "main" stats — combat stats are secondaries.
+- Affix pipeline: `dataItems.json → Affixes` → `ItemDatabase.AllAffixes` → `AffixGenerator.GenerateAffixes` (CustomData `["Affixes"]`) → `CreateStatModifiers` (`ModifierSource.Equipment`). Same for `["SecondaryStats"]` (the generation-rolled secondaries from `StatRollService`). Both survive save/load via `CustomDataConverter`.
 - `MaxSockets` on `ItemData` + `SocketConfigData` gates rarity socket counts — enforce in `ItemGenerator` (rarity → socket count), not per-item hand-authoring.
 - Passive tiers map to existing `SpecialEffectEntry` / `PassiveSkillEntry` / `EffectFactory`.
 - Auto-equip scoring (#10) replaces the current simple sum in `EquipmentAutoEquipService` — attributes ×4 weight, secondaries ×1, plus socket/passive/set terms.
