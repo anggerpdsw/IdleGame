@@ -427,7 +427,7 @@ namespace IdleDefenseSurvival.Player
         public float TakeDamage(DamageData damageData, bool canEvade = true)
         {
             // Immunity & Evasion check – if player is currently immune, ignore damage.
-            if (_isImmune || (canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.EvasionChance))))
+            if (_isImmune || (canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.Evasion))))
             {
                 ShowDamagePopup(1f, DamageType.Miss, CriticalType.None);
                 return 1f;

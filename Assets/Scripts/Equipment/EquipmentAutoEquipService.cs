@@ -1,15 +1,40 @@
+using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Equipment
 {
     /// <summary>
-    /// Auto-equip: chooses best candidate per empty slot by composite stat score.
+    /// Auto-equip: chooses best candidate per empty slot by attribute-weighted score.
+    /// Attributes drive ~80% of item value; combat stats ~20%. Rarity/sockets/passives
+    /// factor in so a higher-rarity item (with a mechanic) outweighs raw numbers.
+    /// Anti-power-creep: score is level-relative so a low-level legendary never
+    /// auto-beats a high-level common in the same slot.
     /// </summary>
     public sealed class EquipmentAutoEquipService
     {
         private readonly IEquipmentRepository _repo;
+
+        // Build weights for specialization stats (tuned to ~20% share).
+        // Derived combat stats (AttackDamage, HealthPoint, CriticalDamage, ...) come
+        // from Main Attribute (×80 weight below), so only SecondaryStat routes here.
+        private static readonly Dictionary<SecondaryStat, float> StatWeights = new()
+        {
+            { SecondaryStat.LifeSteal, 1.3f },
+            { SecondaryStat.MoveSpeed, 0.5f },
+            { SecondaryStat.CooldownReduction, 0.8f },
+            { SecondaryStat.BossDamage, 1.5f },
+            { SecondaryStat.EliteDamage, 1.2f },
+            { SecondaryStat.BounceChance, 1.0f },
+            { SecondaryStat.BounceCount, 1.0f },
+            { SecondaryStat.AttackRange, 0.8f },
+            { SecondaryStat.MultiShootChance, 1.2f },
+            { SecondaryStat.KnockbackChance, 0.8f },
+            { SecondaryStat.GoldGain, 1.0f },
+            { SecondaryStat.DropRate, 1.0f },
+        };
 
         public EquipmentAutoEquipService(IEquipmentRepository repo)
         {
@@ -56,10 +81,7 @@ namespace IdleDefenseSurvival.Equipment
 
             foreach (var candidate in candidates)
             {
-                var bonuses = EquipmentStatCalculator.GetItemBonusesWithSet(candidate, ItemDatabase.Instance, _repo.SnapshotSetCounts());
-                // Attributes are the core power source — weight them higher than raw combat stats.
-                var attrBonuses = EquipmentStatCalculator.GetItemAttributeBonuses(candidate);
-                float score = bonuses.Values.Sum() + attrBonuses.Values.Sum() * 2f;
+                float score = Evaluate(candidate, slot);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -68,6 +90,39 @@ namespace IdleDefenseSurvival.Equipment
             }
 
             return best;
+        }
+
+        /// <summary>Attribute-weighted score. Attr ×4 = 80/20 split; normalize by level.</summary>
+        public float Evaluate(InventoryItem item, EquipmentType slot)
+        {
+            if (item == null) return float.MinValue;
+
+            var db = ItemDatabase.Instance;
+            bool hasPassive = db?.GetItem(item.ItemId) is EquipmentData itemData && RarityMechanicConfig.HasPassive(itemData.ItemRarity);
+            var attrBonuses = EquipmentStatCalculator.GetItemAttributeBonuses(item);
+            var setCounts = _repo.SnapshotSetCounts();
+
+            // ~80% share via ×4 weight (Main Attribute -> derived SkillTypes; build decides).
+            float score = 0f;
+            foreach (var (attr, value) in attrBonuses)
+                score += value * 4f;
+
+            // ~20% share: combat stats via per-build weights.
+            var bonuses = EquipmentStatCalculator.GetItemBonusesWithSet(item, db, setCounts);
+            foreach (var (stat, value) in bonuses)
+                score += value * StatWeights.GetValueOrDefault(stat, 0.3f);
+
+            // Small terms so rarity won't dominate but mechanics still count.
+            if (hasPassive)
+                score += 1.0f;    // passive = mechanic bonus, not raw power
+            int sockets = item.Sockets?.Length ?? 0;
+            score += sockets * 0.5f; // sockets = gem opportunity; value lives in comparison UI
+
+            // Level normalization: higher level = higher raw, don't blind-select highest rarity.
+            int level = System.Math.Max(item.Level, 1);
+            score /= (float)System.Math.Sqrt(level);
+
+            return score;
         }
     }
 }

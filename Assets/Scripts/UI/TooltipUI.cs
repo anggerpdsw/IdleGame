@@ -433,7 +433,7 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private TextMeshProUGUI _statValueText;
         [SerializeField] private TextMeshProUGUI _comparisonText;
 
-        public void Initialize(MainStat stat, float value, float comparisonValue = 0)
+        public void Initialize(SecondaryStat stat, float value, float comparisonValue = 0)
             => Initialize(stat.GetDisplayName(), value, comparisonValue);
 
         public void Initialize(string statName, float value, float comparisonValue = 0)

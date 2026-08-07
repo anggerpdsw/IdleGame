@@ -85,10 +85,10 @@ namespace IdleDefenseSurvival.Equipment
 
         // ============ Stat Calculation ============
         /// <summary>Gets total stat bonuses from all equipped items (including set bonuses).</summary>
-        Dictionary<MainStat, float> GetTotalStatBonuses();
+        Dictionary<SecondaryStat, float> GetTotalStatBonuses();
 
         /// <summary>Gets stat bonuses from a specific slot.</summary>
-        Dictionary<MainStat, float> GetSlotStatBonuses(EquipmentType slot);
+        Dictionary<SecondaryStat, float> GetSlotStatBonuses(EquipmentType slot);
 
         /// <summary>Gets all special effects from equipped items.</summary>
         IReadOnlyList<ActiveSpecialEffect> GetActiveSpecialEffects();
@@ -191,7 +191,7 @@ namespace IdleDefenseSurvival.Equipment
         public EquipmentType Slot;
         public InventoryItem CurrentItem;
         public InventoryItem NewItem;
-        public Dictionary<MainStat, StatComparison> StatComparisons;
+        public Dictionary<SecondaryStat, StatComparison> StatComparisons;
         public int TotalStatImprovement; // Sum of all stat differences
         public bool IsUpgrade;
         public string[] GainedEffects;
@@ -204,7 +204,7 @@ namespace IdleDefenseSurvival.Equipment
         public int UpgradeStatCount;
         public int DowngradeStatCount;
 
-        public float GetStatDifference(MainStat stat)
+        public float GetStatDifference(SecondaryStat stat)
         {
             return StatComparisons.TryGetValue(stat, out var comp) ? comp.Difference : 0f;
         }
@@ -213,7 +213,7 @@ namespace IdleDefenseSurvival.Equipment
     [Serializable]
     public class StatComparison
     {
-        public MainStat Stat;
+        public SecondaryStat Stat;
         public float CurrentValue;
         public float NewValue;
         public float Difference;

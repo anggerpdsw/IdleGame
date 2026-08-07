@@ -134,7 +134,7 @@ namespace IdleDefenseSurvival.Items.Generation
                 {
                     foreach (var stat in item.Enchantment.StatBonuses)
                     {
-                        if (stat.Stat == MainStat.None)
+                        if (stat.Stat == SecondaryStat.None)
                         {
                             errors.Add("Enchantment has None stat");
                         }

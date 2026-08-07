@@ -94,8 +94,8 @@ namespace IdleDefenseSurvival.Ultimate
             _chainDelay = 0.05f;
             _chainWait = new WaitForSeconds(_chainDelay);
 
-            float ultimateWeaponAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateWeaponAttack);
-            float baseDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * lightningData.GetDamageMultiplier() * ultimateWeaponAttack;
+            float ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
+            float baseDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * lightningData.GetDamageMultiplier() * ultimateAttack;
             float stunMultiplier = lightningData.GetStuntMultiplier();
             float defenseBreak = lightningData.GetDefenseBreak();
 

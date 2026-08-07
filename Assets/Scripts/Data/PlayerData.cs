@@ -22,25 +22,6 @@ namespace IdleDefenseSurvival.Data
         public float dexterity;
     }
 
-    /// <summary>One stat bonus granted by an attribute. Parsed from dataAttribute.json.</summary>
-    [Serializable]
-    public class AttributeBonus
-    {
-        public string stat;          // SkillType name (AttackDamage, HealthPoint, ...)
-        public float flat;           // +X per point (flat)
-        public float percent;        // +X% per point (percent, 1 = +1%)
-    }
-
-    /// <summary>All bonuses one attribute grants. Parsed from dataAttribute.json.</summary>
-    [Serializable]
-    public class AttributeBonuses
-    {
-        public AttributeBonus[] constitution;
-        public AttributeBonus[] strength;
-        public AttributeBonus[] intelligence;
-        public AttributeBonus[] dexterity;
-    }
-
     [Serializable]
     public class PlayerSkills
     {
@@ -58,8 +39,7 @@ namespace IdleDefenseSurvival.Data
         public SkillData bounceChance;
         public SkillData bounceCount;
         public SkillData criticalChance;
-        public SkillData criticalFactor;
-        public SkillData bounceSearchRadius;
+        public SkillData criticalDamage;
         public SkillData damagePerRange;
         public SkillData knockbackChance;
         public SkillData knockbackForce;
@@ -69,7 +49,7 @@ namespace IdleDefenseSurvival.Data
         public SkillData stuntDuration;
         public SkillData superCriticalChance;
         public SkillData superCriticalFactor;
-        public SkillData ultimateWeaponAttack;
+        public SkillData ultimateAttack;
         public SkillData skillDamage;
         public SkillData elementDamage;
         public SkillData ultraCriticalChance;
@@ -81,7 +61,8 @@ namespace IdleDefenseSurvival.Data
     {
         public SkillData deathDefy;
         public SkillData defenseAmount;
-        public SkillData evasionChance;
+        public SkillData evasion;
+        public SkillData hitRate;
         public SkillData healthPoint;
         public SkillData healthRegen;
         public SkillData lifeSteal;

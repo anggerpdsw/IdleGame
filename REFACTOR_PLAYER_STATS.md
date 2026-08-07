@@ -53,7 +53,7 @@ private void LoadPlayerData()
 
 ## 🚀 Adding New Stats (Step-by-Step Guide)
 
-### Example: Adding `CriticalChance` and `CriticalFactor`
+### Example: Adding `CriticalChance` and `CriticalDamage`
 
 #### Step 1: Add to Enum
 **File:** [Assets/Scripts/Player/PlayerStatType.cs](Assets/Scripts/Player/PlayerStatType.cs)
@@ -69,7 +69,7 @@ public enum PlayerStatType
     
     // NEW: Add here
     CriticalChance,
-    CriticalFactor
+    CriticalDamage
 }
 ```
 
@@ -86,7 +86,7 @@ public class PlayerSkills
     
     // NEW: Add here
     public SkillData criticalChance;
-    public SkillData criticalFactor;
+    public SkillData criticalDamage;
 }
 ```
 
@@ -99,7 +99,7 @@ public class PlayerSkills
     "attackRange": { "level": 1, "maxLevel": 100, "min": 2, "max": 10, "locked": false, "description": "Maximum range of player" },
     ...
     "criticalChance": { "level": 0, "maxLevel": 100, "min": 0, "max": 50, "locked": true, "description": "Chance of each projectile to deal critical damage" },
-    "criticalFactor": { "level": 0, "maxLevel": 100, "min": 100, "max": 300, "locked": true, "description": "Damage multiplier for critical hits" }
+    "criticalDamage": { "level": 0, "maxLevel": 100, "min": 100, "max": 300, "locked": true, "description": "Damage multiplier for critical hits" }
   }
 }
 ```
@@ -113,7 +113,7 @@ stats.SetStat(PlayerStatType.StuntDuration, PlayerStatsCalculator.CalculateSkill
 
 // NEW: Add here
 stats.SetStat(PlayerStatType.CriticalChance, PlayerStatsCalculator.CalculateSkillFloatValue(s.criticalChance));
-stats.SetStat(PlayerStatType.CriticalFactor, PlayerStatsCalculator.CalculateSkillFloatValue(s.criticalFactor));
+stats.SetStat(PlayerStatType.CriticalDamage, PlayerStatsCalculator.CalculateSkillFloatValue(s.criticalDamage));
 ```
 
 In `LoadWithUpgrades()`:
@@ -122,7 +122,7 @@ stats.SetStat(PlayerStatType.StuntDuration, CalcFloat("stuntDuration", s.stuntDu
 
 // NEW: Add here
 stats.SetStat(PlayerStatType.CriticalChance, CalcFloat("criticalChance", s.criticalChance));
-stats.SetStat(PlayerStatType.CriticalFactor, CalcFloat("criticalFactor", s.criticalFactor));
+stats.SetStat(PlayerStatType.CriticalDamage, CalcFloat("criticalDamage", s.criticalDamage));
 ```
 
 #### Step 5: Use in Gameplay Code
@@ -130,7 +130,7 @@ stats.SetStat(PlayerStatType.CriticalFactor, CalcFloat("criticalFactor", s.criti
 // Anywhere in your code
 if (Utilityku.Chance(_player.Stats.GetFloat(PlayerStatType.CriticalChance)))
 {
-    float critDamage = baseDamage * _player.Stats.GetFloat(PlayerStatType.CriticalFactor);
+    float critDamage = baseDamage * _player.Stats.GetFloat(PlayerStatType.CriticalDamage);
     enemy.TakeDamage(critDamage);
 }
 ```

@@ -45,7 +45,7 @@ namespace IdleDefenseSurvival.Ultimate
         private DamageData damageData;
         private float _shockwaveDamage;
         private float _knockbackForce;
-        private float _ultimateWeaponAttack;
+        private float _ultimateAttack;
 
         // Track enemies already hit to prevent multiple hits
         private readonly HashSet<EnemyAi> _hitEnemies = new();
@@ -68,8 +68,8 @@ namespace IdleDefenseSurvival.Ultimate
             _currentRadius = 0f;
 
             // from shockwaveData → damageData
-            _ultimateWeaponAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateWeaponAttack);
-            _shockwaveDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * shockwaveData.GetDamageMultiplier() * _ultimateWeaponAttack;
+            _ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
+            _shockwaveDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * shockwaveData.GetDamageMultiplier() * _ultimateAttack;
             _knockbackForce = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackForce) * shockwaveData.GetKnockbackMultiplier();
 
             damageData = new(_shockwaveDamage, DamageType.Normal, CriticalType.None, UltimateID)

@@ -1,49 +1,79 @@
 {
-  "constitution": [{
+  "constitution": [
+    {
       "stat": "HealthPoint",
-      "flat": 10,
+      "flat": 40,
       "percent": 0
     },
     {
       "stat": "DefenseAmount",
-      "flat": 0.5,
+      "flat": 1,
       "percent": 0
     },
     {
       "stat": "HealthRegen",
       "flat": 0.1,
       "percent": 0
+    },
+    {
+      "stat": "DeathDefy",
+      "flat": 0.0025,
+      "percent": 0
     }
   ],
-  "strength": [{
-    "stat": "AttackDamage",
-    "flat": 1,
-    "percent": 0
-  }],
-  "intelligence": [{
-      "stat": "UltimateWeaponAttack",
-      "flat": 0.1,
+  "strength": [
+    {
+      "stat": "AttackDamage",
+      "flat": 5,
       "percent": 0
     },
     {
+      "stat": "KnockbackForce",
+      "flat": 0.2,
+      "percent": 0
+    },
+    {
+      "stat": "UltimateAttack",
+      "flat": 2,
+      "percent": 0
+    }
+  ],
+  "intelligence": [
+    {
       "stat": "SkillDamage",
-      "flat": 0,
-      "percent": 0.3
+      "flat": 3,
+      "percent": 0
     },
     {
       "stat": "ElementDamage",
-      "flat": 0,
-      "percent": 0.2
+      "flat": 3,
+      "percent": 0
+    },
+    {
+      "stat": "UltimateAttack",
+      "flat": 2,
+      "percent": 0
     }
   ],
-  "dexterity": [{
+  "dexterity": [
+    {
       "stat": "AttackSpeed",
-      "flat": 0.03,
+      "flat": 0.4,
       "percent": 0
     },
     {
       "stat": "CriticalChance",
+      "flat": 0.15,
+      "percent": 0
+    },
+    {
+      "stat": "CriticalDamage",
       "flat": 0.3,
+      "percent": 0
+    },
+    {
+      "stat": "Evasion",
+      "flat": 0.15,
       "percent": 0
     }
   ]

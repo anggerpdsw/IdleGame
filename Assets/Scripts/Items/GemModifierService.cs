@@ -59,13 +59,13 @@ namespace IdleDefenseSurvival.Items
                 if (value == 0) continue;
 
                 // Stat (SkillType) is the ModifierManager lookup key; missing it meant
-                // gem modifiers were never applied. MainStat kept for UI/display.
+                // gem modifiers were never applied. SecondaryStat kept for UI/display.
                 var modifier = new StatModifier
                 {
                     Id = $"{prefix}_{statEntry.Stat}",
                     Source = ModifierSource.Equipment,
                     Stat = statEntry.Stat.ToSkillType(),
-                    MainStat = statEntry.Stat,
+                    SecondaryStat = statEntry.Stat,
                     Mode = (ModifierMode)statEntry.Mode,
                     Value = value,
                     Permanent = true

@@ -1,5 +1,3 @@
-using IdleDefenseSurvival;
-
 namespace IdleDefenseSurvival.Stats
 {
     /// <summary>
@@ -25,4 +23,5 @@ namespace IdleDefenseSurvival.Stats
             _ => "?"
         };
     }
-}
+
+    }

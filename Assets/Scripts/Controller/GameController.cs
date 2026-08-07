@@ -15,10 +15,11 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private TextMeshProUGUI _regenPlayer;
 
         [Header("Enemy")]
+        [SerializeField] private TextMeshProUGUI _countEnemy;
         [SerializeField] private TextMeshProUGUI _avgHealthEnemy;
         [SerializeField] private TextMeshProUGUI _avgAttackEnemy;
         [SerializeField] private TextMeshProUGUI _avgDefenseEnemy;
-        [SerializeField] private TextMeshProUGUI _avgSpeedEnemy;
+        [SerializeField] private TextMeshProUGUI _avgEvasionEnemy;
 
         private void Start()
         {
@@ -52,17 +53,19 @@ namespace IdleDefenseSurvival.Controller
             var stats = EnemyStatisticsManager.Instance;
             if (stats != null)
             {
-                _avgHealthEnemy.text = FormatValue(stats.GetAverageHealth());
-                _avgAttackEnemy.text = FormatValue(stats.GetAverageAttack());
+                _countEnemy.text      = stats.GetAliveCount().ToString();
+                _avgHealthEnemy.text  = FormatValue(stats.GetAverageHealth());
+                _avgAttackEnemy.text  = FormatValue(stats.GetAverageAttack());
                 _avgDefenseEnemy.text = FormatValue(stats.GetAverageDefense());
-                _avgSpeedEnemy.text = FormatValue(stats.GetAverageSpeed());
+                _avgEvasionEnemy.text = FormatValue(stats.GetAverageEvasion());
             }
             else
             {
-                _avgHealthEnemy.text = "";
-                _avgAttackEnemy.text = "";
+                _countEnemy.text      = "";
+                _avgHealthEnemy.text  = "";
+                _avgAttackEnemy.text  = "";
                 _avgDefenseEnemy.text = "";
-                _avgSpeedEnemy.text = "";
+                _avgEvasionEnemy.text = "";
             }
         }
 

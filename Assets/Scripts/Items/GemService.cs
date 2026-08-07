@@ -224,7 +224,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Gets stat bonuses from all socketed gems on an item.
         /// </summary>
-        public Dictionary<MainStat, float> GetItemGemBonuses(InventoryItem item)
+        public Dictionary<SecondaryStat, float> GetItemGemBonuses(InventoryItem item)
         {
             return GemStatService.Instance.GetItemGemBonuses(item);
         }
@@ -248,7 +248,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Gets the total stat value for a specific stat from all socketed gems.
         /// </summary>
-        public float GetTotalStatValue(InventoryItem item, MainStat stat)
+        public float GetTotalStatValue(InventoryItem item, SecondaryStat stat)
         {
             return GemStatService.Instance.GetTotalStatValue(item, stat);
         }

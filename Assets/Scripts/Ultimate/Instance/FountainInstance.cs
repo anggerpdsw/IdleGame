@@ -29,7 +29,7 @@ namespace IdleDefenseSurvival.Ultimate
         private bool _isActive = true;
 
         private DamageData damageData;
-        private float _ultimateWeaponAttack;
+        private float _ultimateAttack;
         private float _fountainDamage;
         private float _fountainDuration;
         private float _stuntMultiplier;
@@ -52,8 +52,8 @@ namespace IdleDefenseSurvival.Ultimate
             _nextDamageTime = Time.time;
             
             // from fountainData → damageData
-            _ultimateWeaponAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateWeaponAttack);
-            _fountainDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * fountainData.GetDamageMultiplier() * _ultimateWeaponAttack;
+            _ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
+            _fountainDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * fountainData.GetDamageMultiplier() * _ultimateAttack;
             _fountainDuration = fountainData.GetDuration();
             _stuntMultiplier = fountainData.GetStuntMultiplier();
             _stuntDuration = PlayerStatsManager.Instance.GetStat(SkillType.StuntDuration) * _stuntMultiplier;

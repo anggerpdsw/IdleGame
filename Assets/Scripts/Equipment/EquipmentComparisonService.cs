@@ -33,13 +33,13 @@ namespace IdleDefenseSurvival.Equipment
                 Slot = slot,
                 CurrentItem = currentItem,
                 NewItem = item,
-                StatComparisons = new Dictionary<MainStat, StatComparison>()
+                StatComparisons = new Dictionary<SecondaryStat, StatComparison>()
             };
 
-            var currentBonuses = currentItem != null ? EquipmentStatCalculator.GetItemStatBonuses(currentItem) : new Dictionary<MainStat, float>();
+            var currentBonuses = currentItem != null ? EquipmentStatCalculator.GetItemStatBonuses(currentItem) : new Dictionary<SecondaryStat, float>();
             var newBonuses = EquipmentStatCalculator.GetItemStatBonuses(item);
 
-            var allStats = new HashSet<MainStat>(currentBonuses.Keys);
+            var allStats = new HashSet<SecondaryStat>(currentBonuses.Keys);
             allStats.UnionWith(newBonuses.Keys);
 
             int totalImprovement = 0;

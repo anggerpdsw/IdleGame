@@ -24,14 +24,14 @@ namespace IdleDefenseSurvival.Equipment
                 Slot = slot,
                 CurrentItem = current,
                 NewItem = candidate,
-                StatComparisons = new Dictionary<MainStat, StatComparison>()
+                StatComparisons = new Dictionary<SecondaryStat, StatComparison>()
             };
 
-            var currentBonuses = current != null ? GetTotalStatBonuses(current) : new Dictionary<MainStat, float>();
-            var candidateBonuses = candidate != null ? GetTotalStatBonuses(candidate) : new Dictionary<MainStat, float>();
+            var currentBonuses = current != null ? GetTotalStatBonuses(current) : new Dictionary<SecondaryStat, float>();
+            var candidateBonuses = candidate != null ? GetTotalStatBonuses(candidate) : new Dictionary<SecondaryStat, float>();
 
             // Compare all stats
-            var allStats = new HashSet<MainStat>(currentBonuses.Keys);
+            var allStats = new HashSet<SecondaryStat>(currentBonuses.Keys);
             allStats.UnionWith(candidateBonuses.Keys);
 
             float totalImprovement = 0f;
@@ -230,31 +230,26 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>
         /// Calculates a composite score for an equipment item.
         /// </summary>
-        public static float CalculateScore(Dictionary<MainStat, float> statBonuses, IEnumerable<string> effects)
+        public static float CalculateScore(Dictionary<SecondaryStat, float> statBonuses, IEnumerable<string> effects)
         {
             float score = 0f;
 
-            // Stat weights (adjustable based on game balance)
-            var statWeights = new Dictionary<MainStat, float>
+            // Stat weights for specialization (SecondaryStat) — derived combat stats
+            // (AttackDamage, HealthPoint, CriticalDamage, ...) come from Main Attribute.
+            var statWeights = new Dictionary<SecondaryStat, float>
             {
-                { MainStat.Attack, 1.0f },
-                { MainStat.HP, 0.8f },
-                { MainStat.Defense, 0.7f },
-                { MainStat.CriticalRate, 1.5f },
-                { MainStat.CriticalDamage, 1.2f },
-                { MainStat.AttackSpeed, 1.0f },
-                { MainStat.LifeSteal, 1.3f },
-                { MainStat.DamageReduction, 1.0f },
-                { MainStat.MoveSpeed, 0.5f },
-                { MainStat.Range, 0.6f },
-                { MainStat.CooldownReduction, 0.8f },
-                { MainStat.FinalDamage, 2.0f },
-                { MainStat.FinalDefense, 1.5f },
-                { MainStat.FinalHP, 1.5f },
-                { MainStat.BossDamage, 1.5f },
-                { MainStat.EliteDamage, 1.2f },
-                { MainStat.Dodge, 0.8f },
-                { MainStat.BlockChance, 0.7f },
+                { SecondaryStat.LifeSteal, 1.3f },
+                { SecondaryStat.MoveSpeed, 0.5f },
+                { SecondaryStat.CooldownReduction, 0.8f },
+                { SecondaryStat.BossDamage, 1.5f },
+                { SecondaryStat.EliteDamage, 1.2f },
+                { SecondaryStat.BounceChance, 1.0f },
+                { SecondaryStat.BounceCount, 1.0f },
+                { SecondaryStat.AttackRange, 0.8f },
+                { SecondaryStat.MultiShootChance, 1.2f },
+                { SecondaryStat.KnockbackChance, 0.8f },
+                { SecondaryStat.GoldGain, 1.0f },
+                { SecondaryStat.DropRate, 1.0f },
             };
 
             foreach (var kvp in statBonuses)
@@ -279,9 +274,9 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>
         /// Gets total stat bonuses for an item (including gems, enchantments, etc.)
         /// </summary>
-        public static Dictionary<MainStat, float> GetTotalStatBonuses(InventoryItem item)
+        public static Dictionary<SecondaryStat, float> GetTotalStatBonuses(InventoryItem item)
         {
-            var bonuses = new Dictionary<MainStat, float>();
+            var bonuses = new Dictionary<SecondaryStat, float>();
 
             if (item == null) return bonuses;
 

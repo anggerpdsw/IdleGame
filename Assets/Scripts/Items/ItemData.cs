@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Items.Generation;
 using UnityEngine;
 
@@ -107,7 +105,7 @@ namespace IdleDefenseSurvival.Items
         public MainStatEntry[] MainStats; // Secondary combat stats (Crit, LifeSteal, AttackSpeed, ...)
 
         // ============ Secondary Stats ============
-        public SecondaryStatEntry[] SecondaryStats; // Additional stat modifiers
+        public SecondaryStatRow[] SecondaryStats; // Additional stat modifiers
 
         // ============ Special Effects ============
         public SpecialEffectEntry[] SpecialEffects; // Passive/triggered effects
@@ -132,7 +130,7 @@ namespace IdleDefenseSurvival.Items
             Category = ItemCategory.Equipment;
             if (AttributeStats == null) AttributeStats = Array.Empty<AttributeStatEntry>();
             if (MainStats == null) MainStats = Array.Empty<MainStatEntry>();
-            if (SecondaryStats == null) SecondaryStats = Array.Empty<SecondaryStatEntry>();
+            if (SecondaryStats == null) SecondaryStats = Array.Empty<SecondaryStatRow>();
             if (SpecialEffects == null) SpecialEffects = Array.Empty<SpecialEffectEntry>();
             if (PassiveSkills == null) PassiveSkills = Array.Empty<PassiveSkillEntry>();
             // AllowedGemTypes moved to SocketConfigData.SocketRules
@@ -146,7 +144,7 @@ namespace IdleDefenseSurvival.Items
     [Serializable]
     public class MainStatEntry
     {
-        public MainStat Stat = MainStat.None;
+        public SecondaryStat Stat = SecondaryStat.None;
         public float BaseValue = 0f;
         public float ValuePerLevel = 0f; // Scaling per level
         public float ValuePerEnhance = 0f; // Scaling per enhance level
@@ -157,6 +155,24 @@ namespace IdleDefenseSurvival.Items
         {
             float value = BaseValue + ValuePerLevel * (level - 1) + ValuePerEnhance * enhanceLevel;
             return Mode == SecondaryStatMode.Percent ? value * 0.01f : value;
+        }
+    }
+
+    /// <summary>
+    /// Secondary stat row - defines a stat modifier with complex application mode.
+    /// Renamed from SecondaryStatEntry to avoid collision with the SecondaryStat enum.
+    /// </summary>
+    [Serializable]
+    public class SecondaryStatRow
+    {
+        public SecondaryStat Stat = SecondaryStat.None;
+        public float Value = 0f;
+        public SecondaryStatMode Mode = SecondaryStatMode.Flat;
+        public string Condition; // For Conditional mode - JSON condition string
+
+        public float Apply(float baseValue)
+        {
+            return Mode.Calculate(baseValue, Value);
         }
     }
 
@@ -175,23 +191,6 @@ namespace IdleDefenseSurvival.Items
         public float GetValue(int level, int enhanceLevel = 0)
         {
             return BaseValue + ValuePerLevel * (level - 1) + ValuePerEnhance * enhanceLevel;
-        }
-    }
-
-    /// <summary>
-    /// Secondary stat entry - defines a stat modifier with complex application mode.
-    /// </summary>
-    [Serializable]
-    public class SecondaryStatEntry
-    {
-        public MainStat Stat = MainStat.None;
-        public float Value = 0f;
-        public SecondaryStatMode Mode = SecondaryStatMode.Flat;
-        public string Condition; // For Conditional mode - JSON condition string
-
-        public float Apply(float baseValue)
-        {
-            return Mode.Calculate(baseValue, Value);
         }
     }
 
@@ -226,7 +225,7 @@ namespace IdleDefenseSurvival.Items
         public int MaxLevel = 10;
         public float ValuePerLevel = 1f;
         public SecondaryStatMode Mode = SecondaryStatMode.Flat;
-        public MainStat[] AffectedStats; // Which stats this passive affects
+        public SecondaryStat[] AffectedStats; // Which stats this passive affects
     }
 
     /// <summary>

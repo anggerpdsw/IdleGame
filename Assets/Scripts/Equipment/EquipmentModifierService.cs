@@ -52,7 +52,7 @@ namespace IdleDefenseSurvival.Equipment
 
             foreach (var statEntry in tier.StatBonuses)
             {
-                if (statEntry.Stat == MainStat.None) continue;
+                if (statEntry.Stat == SecondaryStat.None) continue;
                 var skillType = statEntry.Stat.ToSkillType();
                 if (skillType == SkillType.None) continue;
 
@@ -61,7 +61,7 @@ namespace IdleDefenseSurvival.Equipment
                     Id = $"Set:{setData.SetId}:{tier.RequiredPieces}:{statEntry.Stat}",
                     Source = ModifierSource.Equipment,
                     Stat = skillType,
-                    MainStat = statEntry.Stat,
+                    SecondaryStat = statEntry.Stat,
                     Mode = (ModifierMode)statEntry.Mode,
                     Value = statEntry.GetValue(1, 0),
                     Permanent = true
@@ -76,7 +76,7 @@ namespace IdleDefenseSurvival.Equipment
 
             foreach (var statEntry in tier.StatBonuses)
             {
-                if (statEntry.Stat == MainStat.None) continue;
+                if (statEntry.Stat == SecondaryStat.None) continue;
                 ModifierManager.Instance?.RemoveModifier($"Set:{setData.SetId}:{tier.RequiredPieces}:{statEntry.Stat}");
             }
         }

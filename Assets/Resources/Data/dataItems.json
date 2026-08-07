@@ -159,7 +159,7 @@
     {
       "Id": "equip_hat_leather",
       "Name": "Leather Hat",
-      "Description": "A simple leather hat. +8 INT",
+      "Description": "A simple leather hat. +8 INT, +3% Cooldown Reduction",
       "Category": 1,
       "ItemRarity": 2,
       "EquipmentType": 1,
@@ -180,12 +180,20 @@
           "ValuePerEnhance": 1.0
         }
       ],
-      "MainStats": []
+      "MainStats": [
+        {
+          "Stat": 12,
+          "BaseValue": 3,
+          "ValuePerLevel": 0.2,
+          "ValuePerEnhance": 0.4,
+          "Mode": 2
+        }
+      ]
     },
     {
       "Id": "equip_gloves_fighter",
       "Name": "Fighter Gloves",
-      "Description": "Reinforced knuckles. +10 STR, +5% Crit Damage",
+      "Description": "Reinforced knuckles. +10 STR, +5% Knockback",
       "Category": 1,
       "ItemRarity": 3,
       "EquipmentType": 2,
@@ -219,7 +227,7 @@
     {
       "Id": "equip_armor_iron",
       "Name": "Iron Armor",
-      "Description": "Solid iron plating. +20 CON, +5 Defense",
+      "Description": "Solid iron plating. +20 CON, +5% Life Steal",
       "Category": 1,
       "ItemRarity": 3,
       "EquipmentType": 4,
@@ -242,18 +250,18 @@
       ],
       "MainStats": [
         {
-          "Stat": 3,
+          "Stat": 10,
           "BaseValue": 5,
           "ValuePerLevel": 0.4,
           "ValuePerEnhance": 0.8,
-          "Mode": 1
+          "Mode": 2
         }
       ]
     },
     {
       "Id": "equip_belt_warrior",
       "Name": "Warrior Belt",
-      "Description": "Belt of a seasoned warrior. +10 CON, +6 STR",
+      "Description": "Belt of a seasoned warrior. +10 CON, +6 STR, +1% Gold Gain",
       "Category": 1,
       "ItemRarity": 2,
       "EquipmentType": 5,
@@ -280,12 +288,20 @@
           "ValuePerEnhance": 0.8
         }
       ],
-      "MainStats": []
+      "MainStats": [
+        {
+          "Stat": 17,
+          "BaseValue": 1,
+          "ValuePerLevel": 0.05,
+          "ValuePerEnhance": 0.1,
+          "Mode": 2
+        }
+      ]
     },
     {
       "Id": "equip_ring_ruby",
       "Name": "Ruby Ring",
-      "Description": "A ring set with a crimson ruby. +10 INT, +3% Crit Rate",
+      "Description": "A ring set with a crimson ruby. +10 INT, +3% Elite Damage",
       "Category": 1,
       "ItemRarity": 4,
       "EquipmentType": 8,
@@ -308,7 +324,7 @@
       ],
       "MainStats": [
         {
-          "Stat": 5,
+          "Stat": 16,
           "BaseValue": 3,
           "ValuePerLevel": 0.15,
           "ValuePerEnhance": 0.3,
@@ -348,7 +364,7 @@
       ],
       "MainStats": [
         {
-          "Stat": 9,
+          "Stat": 10,
           "BaseValue": 2,
           "ValuePerLevel": 0.1,
           "ValuePerEnhance": 0.2,
@@ -382,7 +398,7 @@
       ],
       "MainStats": [
         {
-          "Stat": 15,
+          "Stat": 12,
           "BaseValue": 5,
           "ValuePerLevel": 0.2,
           "ValuePerEnhance": 0.4,
@@ -395,7 +411,7 @@
     {
       "GemId": "gem_ruby",
       "Name": "Ruby",
-      "Description": "Fiery gem. Boosts Attack.",
+      "Description": "Fiery gem. Boosts Attack Range.",
       "GemType": 1,
       "ItemRarity": 2,
       "MaxLevel": 10,
@@ -404,7 +420,7 @@
       "RandomStatCount": 1,
       "BaseStats": [
         {
-          "Stat": 2,
+          "Stat": 1,
           "BaseValue": 3,
           "ValuePerLevel": 0.3,
           "ValuePerEnhance": 0,
@@ -413,7 +429,7 @@
       ],
       "RandomStats": [
         {
-          "Stat": 5,
+          "Stat": 2,
           "BaseValue": 1,
           "ValuePerLevel": 0.1,
           "ValuePerEnhance": 0,
@@ -430,7 +446,7 @@
     {
       "GemId": "gem_sapphire",
       "Name": "Sapphire",
-      "Description": "Deep blue gem. Boosts Critical Rate.",
+      "Description": "Deep blue gem. Boosts Multi-Shot.",
       "GemType": 2,
       "ItemRarity": 3,
       "MaxLevel": 10,
@@ -439,7 +455,7 @@
       "RandomStatCount": 1,
       "BaseStats": [
         {
-          "Stat": 5,
+          "Stat": 4,
           "BaseValue": 2,
           "ValuePerLevel": 0.2,
           "ValuePerEnhance": 0,
@@ -448,7 +464,7 @@
       ],
       "RandomStats": [
         {
-          "Stat": 6,
+          "Stat": 5,
           "BaseValue": 5,
           "ValuePerLevel": 0.4,
           "ValuePerEnhance": 0,
@@ -465,7 +481,7 @@
     {
       "GemId": "gem_emerald",
       "Name": "Emerald",
-      "Description": "Lively green gem. Boosts Dodge.",
+      "Description": "Lively green gem. Boosts Move Speed.",
       "GemType": 3,
       "ItemRarity": 3,
       "MaxLevel": 10,
@@ -474,7 +490,7 @@
       "RandomStatCount": 1,
       "BaseStats": [
         {
-          "Stat": 10,
+          "Stat": 13,
           "BaseValue": 2,
           "ValuePerLevel": 0.2,
           "ValuePerEnhance": 0,

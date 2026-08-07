@@ -109,9 +109,9 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Min(baseTier + context.Tier / 10, maxTier);
         }
 
-        private Dictionary<MainStat, float> GenerateStatValues(AffixData affix, ItemRarity rarity, ItemGenerationContext context)
+        private Dictionary<SecondaryStat, float> GenerateStatValues(AffixData affix, ItemRarity rarity, ItemGenerationContext context)
         {
-            var values = new Dictionary<MainStat, float>();
+            var values = new Dictionary<SecondaryStat, float>();
 
             if (affix.Stats != null)
             {
@@ -189,7 +189,7 @@ namespace IdleDefenseSurvival.Items.Generation
         public int Tier;
         public int Level;
         public int Experience;
-        public Dictionary<MainStat, float> StatValues;
+        public Dictionary<SecondaryStat, float> StatValues;
         public long AcquiredTimestamp;
     }
 

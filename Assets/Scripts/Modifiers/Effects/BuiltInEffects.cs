@@ -60,7 +60,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
         {
             if (context.Player == null) return true;
 
-            float maxHealth = context.GetStat(MainStat.HP);
+            float maxHealth = context.GetStat(SkillType.HealthPoint);
             float currentHealth = context.Player.CurrentHealth;
             float threshold = maxHealth * 0.3f;
 
@@ -245,7 +245,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
 
         private void CreateExplosion(EquipmentContext context, Vector3 position, float damagePercent, float radius)
         {
-            float playerDamage = context.GetStat(MainStat.Attack);
+            float playerDamage = context.GetStat(SkillType.AttackDamage);
             float explosionDamage = playerDamage * damagePercent;
 
             // Find enemies in radius
@@ -305,7 +305,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
         {
             if (remainingChains <= 0) return;
 
-            float playerDamage = context.GetStat(MainStat.Attack);
+            float playerDamage = context.GetStat(SkillType.AttackDamage);
             float chainDamage = playerDamage * damagePercent;
 
             // Find nearest enemy not yet hit
@@ -479,7 +479,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
             if (_timer >= 10f)
             {
                 _timer = 0f;
-                float maxHealth = context.GetStat(MainStat.HP);
+                float maxHealth = context.GetStat(SkillType.HealthPoint);
                 float shieldAmount = maxHealth * (GetCurrentValue(context) * 0.01f);
 
                 if (context.Player != null && shieldAmount > 0f)

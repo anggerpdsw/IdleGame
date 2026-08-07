@@ -72,7 +72,7 @@ namespace IdleDefenseSurvival.Enemy
         private float _stuntEndTime;
         private float _knockbackEndTime;
         private float _knockbackDuration;
-        private float _evasionChance;
+        private float _evasion;
         private bool _isStunt = false;
         private float _attackTimer = 0f;
         private string _lastDamageSource = UltimateDMG.Player.ToString();
@@ -89,6 +89,7 @@ namespace IdleDefenseSurvival.Enemy
         private ContactFilter2D _enemyContactFilter;
 
         public float EnemyAttackDamage => _damage;
+        public float Evasion => _evasion;
         public Vector3 HealthBarWorldPosition
         {
             get
@@ -305,7 +306,7 @@ namespace IdleDefenseSurvival.Enemy
             _moveSpeed      = data.moveSpeed;
             _originalMoveSpeed = _moveSpeed;
             _knockbackDuration = data.knockback;
-            _evasionChance  = data.evasion;
+            _evasion  = data.evasion;
             _element        = data.element;
 
             _goldReward = goldReward;
@@ -322,7 +323,13 @@ namespace IdleDefenseSurvival.Enemy
 
         public float TakeDamage(DamageData damageData, bool canEvade = true)
         {
-            if (canEvade && Utilityku.Chance(_evasionChance))
+            float hitRate = PlayerStatsManager.Instance != null
+                ? PlayerStatsManager.Instance.GetStat(SkillType.HitRate)
+                : 100f;
+            float hitChance = Mathf.Clamp(hitRate - _evasion, 5f, 100f);
+
+            // Miss when HitRate (player, from equipment/passive/buff/card) fails to beat enemy evasion.
+            if (canEvade && !Utilityku.Chance(hitChance))
             {
                 ShowDamagePopup(1f, DamageType.Miss, CriticalType.None);
                 return 1f;

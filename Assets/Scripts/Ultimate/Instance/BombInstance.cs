@@ -38,7 +38,7 @@ namespace IdleDefenseSurvival.Ultimate
         private DamageData damageData;
         private float _explosionDamage;
         private float _knockbackForce;
-        private float _ultimateWeaponAttack;
+        private float _ultimateAttack;
 
         private void Awake()
         {
@@ -64,8 +64,8 @@ namespace IdleDefenseSurvival.Ultimate
             _lifetime = bombData.GetDuration();
 
             // from bombData → damageData
-            _ultimateWeaponAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateWeaponAttack);
-            _explosionDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * bombData.GetDamageMultiplier() * _ultimateWeaponAttack;
+            _ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
+            _explosionDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * bombData.GetDamageMultiplier() * _ultimateAttack;
             _knockbackForce = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackForce) * bombData.GetKnockbackMultiplier();
 
             damageData = new(_explosionDamage, DamageType.Normal, CriticalType.None, UltimateID)

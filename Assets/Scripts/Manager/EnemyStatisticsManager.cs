@@ -41,6 +41,7 @@ namespace IdleDefenseSurvival.Manager
         private float _cachedAvgAttack;
         private float _cachedAvgDefense;
         private float _cachedAvgSpeed;
+        private float _cachedAvgEvasion;
         private EnemyAi _cachedStrongest;
         private EnemyAi _cachedWeakest;
         private int _cachedAliveCount;
@@ -70,6 +71,7 @@ namespace IdleDefenseSurvival.Manager
         public float GetAverageAttack() { EnsureCalculated(); return _cachedAvgAttack; }
         public float GetAverageDefense() { EnsureCalculated(); return _cachedAvgDefense; }
         public float GetAverageSpeed() { EnsureCalculated(); return _cachedAvgSpeed; }
+        public float GetAverageEvasion() { EnsureCalculated(); return _cachedAvgEvasion; }
         public EnemyAi GetStrongestEnemy() { EnsureCalculated(); return _cachedStrongest; }
         public EnemyAi GetWeakestEnemy() { EnsureCalculated(); return _cachedWeakest; }
         public int GetAliveCount() { EnsureCalculated(); return _cachedAliveCount; }
@@ -97,7 +99,7 @@ namespace IdleDefenseSurvival.Manager
                 return;
             }
 
-            float sumHealth = 0f, sumAttack = 0f, sumDefense = 0f, sumSpeed = 0f;
+            float sumHealth = 0f, sumAttack = 0f, sumDefense = 0f, sumSpeed = 0f, sumEvasion = 0f;
             EnemyAi strongest = null;
             EnemyAi weakest = null;
             float maxHealth = float.MinValue;
@@ -113,11 +115,13 @@ namespace IdleDefenseSurvival.Manager
                 float attack = enemy.EnemyAttackDamage;
                 float defense = enemy.DefenseAmount;
                 float speed = enemy.MoveSpeed;
+                float evasion = enemy.Evasion;
 
                 sumHealth += health;
                 sumAttack += attack;
                 sumDefense += defense;
                 sumSpeed += speed;
+                sumEvasion += evasion;
 
                 if (health > maxHealth) { maxHealth = health; strongest = enemy; }
                 if (health < minHealth) { minHealth = health; weakest = enemy; }
@@ -129,6 +133,7 @@ namespace IdleDefenseSurvival.Manager
             _cachedAvgAttack = sumAttack / count;
             _cachedAvgDefense = sumDefense / count;
             _cachedAvgSpeed = sumSpeed / count;
+            _cachedAvgEvasion = sumEvasion / count;
             _cachedStrongest = strongest;
             _cachedWeakest = weakest;
             _cachedAliveCount = count;
@@ -139,29 +144,10 @@ namespace IdleDefenseSurvival.Manager
 
         private void ResetCache()
         {
-            _cachedAvgHealth = _cachedAvgAttack = _cachedAvgDefense = _cachedAvgSpeed = 0f;
+            _cachedAvgHealth = _cachedAvgAttack = _cachedAvgDefense = _cachedAvgSpeed = _cachedAvgEvasion = 0f;
             _cachedStrongest = _cachedWeakest = null;
             _cachedAliveCount = _cachedBossCount = 0;
         }
 
-        // -------------------------------------------------------------------
-        // Editor debug
-        // -------------------------------------------------------------------
-#if UNITY_EDITOR
-        private void OnGUI()
-        {
-            if (!Application.isPlaying) return;
-            GUILayout.BeginArea(new Rect(10, 10, 300, 200));
-            GUILayout.Label($"Enemy Statistics (Active: {GetAliveCount()})");
-            GUILayout.Label($"Avg Health: {GetAverageHealth():F1}");
-            GUILayout.Label($"Avg Attack: {GetAverageAttack():F1}");
-            GUILayout.Label($"Avg Defense: {GetAverageDefense():F1}");
-            GUILayout.Label($"Avg Speed: {GetAverageSpeed():F3}");
-            GUILayout.Label($"Boss Count: {GetBossCount()}");
-            GUILayout.Label($"Strongest: {(_cachedStrongest ? _cachedStrongest.name : "none")}");
-            GUILayout.Label($"Weakest: {(_cachedWeakest ? _cachedWeakest.name : "none")}");
-            GUILayout.EndArea();
-        }
-#endif
     }
 }

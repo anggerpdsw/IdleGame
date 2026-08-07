@@ -24,7 +24,7 @@ namespace IdleDefenseSurvival.Player
 
         [Header("Bounce Settings")]
         [Tooltip("Radius untuk mencari enemy terdekat saat bounce")]
-        [SerializeField] private float _bounceSearchRadius = 2f;
+        [SerializeField] private float _bounceRadius = 2f;
                 
         [Header("Visual")]
         [SerializeField] private SpriteRenderer _spriteRenderer;
@@ -135,7 +135,7 @@ namespace IdleDefenseSurvival.Player
             _baseStuntDuration = PlayerStatsManager.Instance.GetStat(SkillType.StuntDuration);
             _bounceChance = PlayerStatsManager.Instance.GetStat(SkillType.BounceChance);
             _bounceCount = PlayerStatsManager.Instance.GetStatInt(SkillType.BounceCount);
-            _bounceSearchRadius = PlayerStatsManager.Instance.GetStat(SkillType.BounceSearchRadius);
+            _bounceRadius = 8f;
             _knockbackChance = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackChance);
             _lifeSteal = PlayerStatsManager.Instance.GetStat(SkillType.LifeSteal);
             _stuntChance = PlayerStatsManager.Instance.GetStat(SkillType.StuntChance);
@@ -302,7 +302,7 @@ namespace IdleDefenseSurvival.Player
                         // --- Calculate critical tier (None, Critical, SuperCritical) ---
                         CriticalType critTier = CriticalType.None;
                         float crit = PlayerStatsManager.Instance.GetStat(SkillType.CriticalChance);
-                        float critDMG = PlayerStatsManager.Instance.GetStat(SkillType.CriticalFactor);
+                        float critDMG = PlayerStatsManager.Instance.GetStat(SkillType.CriticalDamage);
                         // Normal critical chance roll
                         if (Utilityku.Chance(crit))
                         {
@@ -405,7 +405,7 @@ namespace IdleDefenseSurvival.Player
         private Transform FindNearestUnhitEnemy(Vector2 fromPosition)
         {
             // Gunakan Physics2D untuk cari semua enemy dalam radius
-            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceSearchRadius, LayerMask.GetMask("Enemy"));
+            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceRadius, LayerMask.GetMask("Enemy"));
 
             Transform nearest = null;
             float minDistance = float.MaxValue;
@@ -434,7 +434,7 @@ namespace IdleDefenseSurvival.Player
         {
             // Draw explosion radius in editor
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.3f); // Orange with transparency
-            Gizmos.DrawWireSphere(transform.position, _bounceSearchRadius);
+            Gizmos.DrawWireSphere(transform.position, _bounceRadius);
         }
 #endif
 

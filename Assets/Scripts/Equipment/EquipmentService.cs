@@ -331,13 +331,13 @@ namespace IdleDefenseSurvival.Equipment
         #endregion
 
         #region Stat Calculation
-        public Dictionary<MainStat, float> GetTotalStatBonuses() =>
+        public Dictionary<SecondaryStat, float> GetTotalStatBonuses() =>
             EquipmentStatCalculator.GetTotalStatBonuses(ItemDatabase.Instance, _equippedItems, _setPieceCounts);
 
-        public Dictionary<MainStat, float> GetSlotStatBonuses(EquipmentType slot) =>
+        public Dictionary<SecondaryStat, float> GetSlotStatBonuses(EquipmentType slot) =>
             _equippedItems.TryGetValue(slot, out var item)
                 ? EquipmentStatCalculator.GetItemStatBonuses(item)
-                : new Dictionary<MainStat, float>();
+                : new Dictionary<SecondaryStat, float>();
 
         public IReadOnlyList<ActiveSpecialEffect> GetActiveSpecialEffects()
         {

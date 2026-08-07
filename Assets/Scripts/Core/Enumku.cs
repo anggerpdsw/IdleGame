@@ -11,7 +11,6 @@ namespace IdleDefenseSurvival
     public enum CurrencyType { Gold, Gem, Meat }
     public enum DailyRewardState { Locked, Waiting, Claimable, Claimed, CompletedToday }
     public enum DamageType { Normal, Critical, Heal, Poison, Burn, Ice, TrueDamage, Miss }
-    public enum Element { None, Metal, Wood, Fire, Water, Earth, Lightning, Wind }
     public enum ProjectileOwner { Player, Tank, Enemy }
     public enum RewardType { Gold, Gem, Meat, Exp, Card, Ticket, Energy, Item, Equipment, Hero }
     public enum Role { Fighter, Tank, Golem, Caster, Ranger, Agile, Beast, BOSS }
@@ -42,21 +41,57 @@ namespace IdleDefenseSurvival
         Shield                // Grants shield up to % of max HP when at full HP
     }
 	
+    public enum Element { None, Metal, Wood, Fire, Water, Earth, Lightning, Wind }
     /// <summary>
-    /// Basic skills Player
+    /// Basic skills Player - all combat runtime stats.
+    /// Derived from MainAttribute (80%) + SecondaryStat specialization (20%).
     /// </summary>
     public enum SkillType
     {
         None,
-        AttackRange, AttackSpeed, AttackDamage, BounceChance, BounceCount,
-        BounceSearchRadius, CriticalChance, CriticalFactor, DamagePerRange, KnockbackChance,
-        KnockbackForce, LifeSteal, MultiShootChance, MultiShootCount, StuntChance,
-        StuntDuration, UltimateWeaponAttack,
-        SkillDamage, ElementDamage,   // main-attribute derived stats (Intelligence)
 
-        DeathDefy, DefenseAmount, EvasionChance, HealthPoint, HealthRegen,
+        // Physical
+        AttackDamage = 1,
+        AttackSpeed = 2,
+        AttackRange = 3,
+        CriticalChance = 4,
+        CriticalDamage = 5,
+        DamagePerRange = 6,
+        BounceChance = 7,
+        BounceCount = 8,
+        MultiShootChance = 10,
+        MultiShootCount = 11,
+        KnockbackChance = 12,
+        KnockbackForce = 13,
+        StuntChance = 14,
+        StuntDuration = 15,
 
-        InterestWave
+        // Survival
+        HealthPoint = 16,
+        HealthRegen = 17,
+        DefenseAmount = 18,
+        LifeSteal = 19,
+        DeathDefy = 20,
+        Evasion = 21,
+
+        // Magic
+        SkillDamage = 22,
+        ElementDamage = 23,
+        UltimateAttack = 24,
+
+        // Economy
+        InterestWave = 25,
+        GoldGain = 26,
+        DropRate = 27,
+
+        // Utility
+        MoveSpeed = 28,
+        CooldownReduction = 29,
+        BossDamage = 30,
+        EliteDamage = 31,
+
+        // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
+        HitRate = 32,
     }
 
     
@@ -93,6 +128,53 @@ namespace IdleDefenseSurvival
         Earring = 9,
         Bracelet = 10,
         Shoes = 11,
+    }
+
+    /// <summary>
+    /// Secondary stats - specialization layer from equipment (the ~20% build identity).
+    /// Core power comes from MainAttribute (CON/STR/INT/DEX) via derived SkillTypes,
+    /// and SkillType feeds combat. SecondaryStat is pure specialization (build identity).
+    /// No stat here is derivable from attributes — that avoids double-dipping.
+    /// </summary>
+    public enum SecondaryStat
+    {
+        None = 0,
+
+        // Projectile
+        AttackRange = 1,
+        BounceChance = 2,
+        BounceCount = 3,
+
+        // Multi Shot
+        MultiShootChance = 4,
+        MultiShootCount = 5,
+
+        // Crowd Control
+        KnockbackChance = 6,
+        StuntChance = 7,
+        StuntDuration = 8,
+
+        // Sustain
+        Evasion = 9,
+        LifeSteal = 10,
+
+        // Utility
+        DamagePerRange = 11,
+        CooldownReduction = 12,
+        MoveSpeed = 13,
+        UltimateAttack = 14,
+
+        // PvE
+        BossDamage = 15,
+        EliteDamage = 16,
+
+        // Economy
+        GoldGain = 17,
+        DropRate = 18,
+        InterestWave = 19,
+
+        // Accuracy — counters enemy Evasion. Specialization-only (equipment/passive/buff/card).
+        HitRate = 20,
     }
 
 }

@@ -33,7 +33,7 @@ namespace IdleDefenseSurvival.Ultimate
         private DamageData damageData;
         private float _cloudDamage;
         private float _cloudDuration;
-        private float _ultimateWeaponAttack;
+        private float _ultimateAttack;
 
         // Track enemies currently slowed by this cloud
         private readonly HashSet<EnemyAi> _slowedEnemies = new();
@@ -51,8 +51,8 @@ namespace IdleDefenseSurvival.Ultimate
             _nextDamageTime = Time.time;
             
             // from cloudData → damageData
-            _ultimateWeaponAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateWeaponAttack);
-            _cloudDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * cloudData.GetDamageMultiplier() * _ultimateWeaponAttack;
+            _ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
+            _cloudDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * cloudData.GetDamageMultiplier() * _ultimateAttack;
             _cloudDuration = cloudData.GetDuration();
             
             damageData = new(_cloudDamage, DamageType.Normal, CriticalType.None, UltimateID)

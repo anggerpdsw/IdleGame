@@ -288,9 +288,9 @@ namespace IdleDefenseSurvival.Modifiers
         /// <summary>
         /// Gets combined stat modifiers from all active buffs.
         /// </summary>
-        public Dictionary<MainStat, float> GetCombinedStatModifiers()
+        public Dictionary<SecondaryStat, float> GetCombinedStatModifiers()
         {
-            var modifiers = new Dictionary<MainStat, float>();
+            var modifiers = new Dictionary<SecondaryStat, float>();
 
             foreach (var buff in _activeBuffs.Values)
             {
@@ -299,8 +299,8 @@ namespace IdleDefenseSurvival.Modifiers
                     foreach (var mod in buff.StatModifiers)
                     {
                         float value = mod.Value * buff.StackCount;
-                        MainStat mainStat = mod.UsesMainStat ? mod.MainStat : SkillTypeToMainStat(mod.Stat);
-                        if (mainStat != MainStat.None)
+                        SecondaryStat mainStat = mod.UsesSecondaryStat ? mod.SecondaryStat : SkillTypeToSecondaryStat(mod.Stat);
+                        if (mainStat != SecondaryStat.None)
                         {
                             if (modifiers.ContainsKey(mainStat))
                                 modifiers[mainStat] += value;
@@ -314,33 +314,36 @@ namespace IdleDefenseSurvival.Modifiers
             return modifiers;
         }
 
-        private MainStat SkillTypeToMainStat(SkillType skillType)
+        private SecondaryStat SkillTypeToSecondaryStat(SkillType skillType)
         {
+            // Only specialization stats have a SecondaryStat counterpart. Derived
+            // stats (AttackDamage, HealthPoint, CriticalDamage, ...) come from Main
+            // Attribute and are not buffed via the SecondaryStat path.
             return skillType switch
             {
-                SkillType.AttackDamage => MainStat.Attack,
-                SkillType.AttackSpeed => MainStat.AttackSpeed,
-                SkillType.AttackRange => MainStat.Range,
-                SkillType.CriticalChance => MainStat.CriticalRate,
-                SkillType.CriticalFactor => MainStat.CriticalDamage,
-                SkillType.HealthPoint => MainStat.HP,
-                SkillType.HealthRegen => MainStat.HealthRegen,
-                SkillType.DefenseAmount => MainStat.Defense,
-                SkillType.EvasionChance => MainStat.Dodge,
-                SkillType.LifeSteal => MainStat.LifeSteal,
-                SkillType.DeathDefy => MainStat.None,
-                SkillType.BounceChance => MainStat.None,
-                SkillType.BounceCount => MainStat.None,
-                SkillType.BounceSearchRadius => MainStat.None,
-                SkillType.KnockbackChance => MainStat.None,
-                SkillType.KnockbackForce => MainStat.None,
-                SkillType.MultiShootChance => MainStat.None,
-                SkillType.MultiShootCount => MainStat.None,
-                SkillType.StuntChance => MainStat.None,
-                SkillType.StuntDuration => MainStat.None,
-                SkillType.DamagePerRange => MainStat.None,
-                SkillType.InterestWave => MainStat.None,
-                _ => MainStat.None
+                // Projectile / Multi / Crowd Control
+                SkillType.AttackRange => SecondaryStat.AttackRange,
+                SkillType.BounceChance => SecondaryStat.BounceChance,
+                SkillType.BounceCount => SecondaryStat.BounceCount,
+                SkillType.MultiShootChance => SecondaryStat.MultiShootChance,
+                SkillType.MultiShootCount => SecondaryStat.MultiShootCount,
+                SkillType.KnockbackChance => SecondaryStat.KnockbackChance,
+                SkillType.StuntChance => SecondaryStat.StuntChance,
+                SkillType.StuntDuration => SecondaryStat.StuntDuration,
+
+                // Sustain / Utility / PvE / Economy
+                SkillType.LifeSteal => SecondaryStat.LifeSteal,
+                SkillType.DamagePerRange => SecondaryStat.DamagePerRange,
+                SkillType.CooldownReduction => SecondaryStat.CooldownReduction,
+                SkillType.MoveSpeed => SecondaryStat.MoveSpeed,
+                SkillType.BossDamage => SecondaryStat.BossDamage,
+                SkillType.EliteDamage => SecondaryStat.EliteDamage,
+                SkillType.GoldGain => SecondaryStat.GoldGain,
+                SkillType.DropRate => SecondaryStat.DropRate,
+                SkillType.InterestWave => SecondaryStat.InterestWave,
+
+                // Derived from Main Attribute / no secondary equivalent
+                _ => SecondaryStat.None
             };
         }
         #endregion

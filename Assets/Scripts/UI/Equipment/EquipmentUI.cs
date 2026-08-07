@@ -344,7 +344,7 @@ namespace IdleDefenseSurvival.UI.Equipment
         [SerializeField] private TextMeshProUGUI _statValueText;
         [SerializeField] private Image _statIcon;
 
-        public void Initialize(MainStat stat, float value)
+        public void Initialize(SecondaryStat stat, float value)
         {
             if (_statNameText != null)
                 _statNameText.text = stat.GetDisplayName();

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Items.Random;
+using IdleDefenseSurvival.Equipment;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -36,13 +36,13 @@ namespace IdleDefenseSurvival.Items.Generation
             if (availableStats.Length == 0) return Array.Empty<MainStatEntry>();
 
             var results = new List<MainStatEntry>();
-            var usedStats = new HashSet<MainStat>();
+            var usedStats = new HashSet<SecondaryStat>();
 
             for (int i = 0; i < statCount && availableStats.Length > 0; i++)
             {
                 // Pick a stat (avoid duplicates if configured)
                 var stat = PickStat(availableStats, usedStats, rarity);
-                if (stat == MainStat.None) break;
+                if (stat == SecondaryStat.None) break;
 
                 usedStats.Add(stat);
                 var entry = CreateStatEntry(stat, rarity, context);
@@ -54,7 +54,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
         private int GetStatCount(ItemRarity rarity, ItemGenerationContext context)
         {
-            int baseCount = _config.BaseCountPerRarity.TryGetValue(rarity, out var count) ? count : 0;
+            int baseCount = RarityMechanicConfig.GetSecondaryCount(rarity);
 
             // Tier bonus
             int tierBonus = context.Tier / 10;
@@ -75,25 +75,25 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Max(0, baseCount + tierBonus + eventBonus);
         }
 
-        private MainStat[] GetAvailableStats(EquipmentData baseEquipment)
+        private SecondaryStat[] GetAvailableStats(EquipmentData baseEquipment)
         {
             return baseEquipment.SecondaryStats
-                .Where(s => s.Stat != MainStat.None && s.Value > 0)
+                .Where(s => s.Stat != SecondaryStat.None && s.Value > 0)
                 .Select(s => s.Stat)
                 .Distinct()
                 .ToArray();
         }
 
-        private MainStat PickStat(MainStat[] available, HashSet<MainStat> used, ItemRarity rarity)
+        private SecondaryStat PickStat(SecondaryStat[] available, HashSet<SecondaryStat> used, ItemRarity rarity)
         {
             var candidates = available.Where(s => !used.Contains(s)).ToArray();
-            if (candidates.Length == 0) return MainStat.None;
+            if (candidates.Length == 0) return SecondaryStat.None;
 
             // Weight by rarity importance
             return _rng.Choice(candidates);
         }
 
-        private MainStatEntry CreateStatEntry(MainStat stat, ItemRarity rarity, ItemGenerationContext context)
+        private MainStatEntry CreateStatEntry(SecondaryStat stat, ItemRarity rarity, ItemGenerationContext context)
         {
             float rarityMult = rarity.GetDefaultStatMultiplier();
             float tierMult = 1f + context.Tier * 0.02f;
@@ -128,48 +128,52 @@ namespace IdleDefenseSurvival.Items.Generation
     [Serializable]
     public class StatRollConfig
     {
-        public Dictionary<ItemRarity, int> BaseCountPerRarity = new()
+        /// <summary>
+        /// Secondary count per rarity moved to RarityMechanicConfig (single tuning point).
+        /// Only specialization stats (SecondaryStat) are rolled here — derived stats like
+        /// AttackDamage (STR), Health (CON), SkillDamage (INT), CriticalDamage (DEX) come
+        /// from Main Attributes, not equipment secondaries.
+        /// </summary>
+        public Dictionary<SecondaryStat, float> BaseValues = new()
         {
-            { ItemRarity.Common, 0 },
-            { ItemRarity.Uncommon, 1 },
-            { ItemRarity.Rare, 2 },
-            { ItemRarity.Epic, 3 },
-            { ItemRarity.Legendary, 4 },
-            { ItemRarity.Mythic, 5 },
-            { ItemRarity.Ancient, 6 },
-            { ItemRarity.Divine, 7 }
-        };
-
-        public Dictionary<MainStat, float> BaseValues = new()
-        {
-            { MainStat.Attack, 5f },
-            { MainStat.HP, 50f },
-            { MainStat.Defense, 3f },
-            { MainStat.CriticalRate, 1f },
-            { MainStat.CriticalDamage, 10f },
-            { MainStat.AttackSpeed, 0.05f },
-            { MainStat.LifeSteal, 1f },
-            { MainStat.MoveSpeed, 0.5f },
-            { MainStat.Range, 0.5f },
-            { MainStat.DamageReduction, 1f },
-            { MainStat.ArmorPenetration, 1f },
-            { MainStat.MagicResistance, 1f }
+            { SecondaryStat.AttackRange, 5f },
+            { SecondaryStat.BounceChance, 5f },
+            { SecondaryStat.BounceCount, 1f },
+            { SecondaryStat.MultiShootChance, 5f },
+            { SecondaryStat.MultiShootCount, 1f },
+            { SecondaryStat.KnockbackChance, 5f },
+            { SecondaryStat.StuntChance, 3f },
+            { SecondaryStat.StuntDuration, 0.5f },
+            { SecondaryStat.LifeSteal, 1f },
+            { SecondaryStat.DamagePerRange, 1f },
+            { SecondaryStat.CooldownReduction, 1f },
+            { SecondaryStat.MoveSpeed, 0.5f },
+            { SecondaryStat.BossDamage, 1f },
+            { SecondaryStat.EliteDamage, 1f },
+            { SecondaryStat.GoldGain, 1f },
+            { SecondaryStat.DropRate, 1f },
+            { SecondaryStat.InterestWave, 1f },
+            { SecondaryStat.HitRate, 1f }
         };
 
         public float PerLevelMultiplier = 0.1f;
         public float PerEnhanceMultiplier = 0.2f;
 
-        public HashSet<MainStat> PercentStats = new()
+        public HashSet<SecondaryStat> PercentStats = new()
         {
-            MainStat.CriticalRate,
-            MainStat.CriticalDamage,
-            MainStat.AttackSpeed,
-            MainStat.LifeSteal,
-            MainStat.MoveSpeed,
-            MainStat.DamageReduction,
-            MainStat.CooldownReduction,
-            MainStat.ArmorPenetration,
-            MainStat.MagicResistance
+            SecondaryStat.BounceChance,
+            SecondaryStat.MultiShootChance,
+            SecondaryStat.KnockbackChance,
+            SecondaryStat.StuntChance,
+            SecondaryStat.LifeSteal,
+            SecondaryStat.MoveSpeed,
+            SecondaryStat.CooldownReduction,
+            SecondaryStat.BossDamage,
+            SecondaryStat.EliteDamage,
+            SecondaryStat.GoldGain,
+            SecondaryStat.DropRate,
+            SecondaryStat.InterestWave,
+            SecondaryStat.HitRate
         };
 
         public static StatRollConfig Default => new();

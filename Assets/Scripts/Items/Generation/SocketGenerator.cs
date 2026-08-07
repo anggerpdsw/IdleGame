@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Random;
@@ -28,7 +29,10 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             if (baseEquipment.MaxSockets <= 0) return Array.Empty<SocketData>();
 
-            int socketCount = baseEquipment.MaxSockets;
+            // Rarity ladder caps socket count (design: 0/0/1/1/2/2/3/3).
+            int socketCount = Math.Min(baseEquipment.MaxSockets, RarityMechanicConfig.GetSocketCount(rarity));
+            if (socketCount <= 0) return Array.Empty<SocketData>();
+
             var sockets = new SocketData[socketCount];
 
             for (int i = 0; i < socketCount; i++)

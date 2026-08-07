@@ -10,12 +10,16 @@ namespace IdleDefenseSurvival.Equipment
     /// <summary>
     /// Pure stat aggregation: main stats, enchant, socket gems, set bonuses.
     /// No ModifierManager or PlayerStatsManager dependencies.
+    ///
+    /// Hierarchy:
+    /// Main Attribute (STR/CON/INT/DEX) -> SkillType (combat runtime stats) <- 80% power
+    /// SecondaryStat (equipment specialization) -> SkillType mapping <- 20% power
     /// </summary>
     public static class EquipmentStatCalculator
     {
-        public static Dictionary<MainStat, float> GetItemStatBonuses(InventoryItem item)
+        public static Dictionary<SecondaryStat, float> GetItemStatBonuses(InventoryItem item)
         {
-            var bonuses = new Dictionary<MainStat, float>();
+            var bonuses = new Dictionary<SecondaryStat, float>();
             if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
 
             if (itemData.MainStats != null)
@@ -26,7 +30,7 @@ namespace IdleDefenseSurvival.Equipment
                 foreach (var statEntry in item.Enchantment.StatBonuses)
                     Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Enchantment.Level, 0));
 
-            // Gem stats (via GemService like EquipmentComparer.GetTotalStatBonuses)
+            // Gem stats
             if (item.Sockets != null)
             {
                 foreach (var socket in item.Sockets)
@@ -42,10 +46,10 @@ namespace IdleDefenseSurvival.Equipment
             return bonuses;
         }
 
-        public static Dictionary<MainStat, float> GetSetStatBonuses(ItemDatabase db,
+        public static Dictionary<SecondaryStat, float> GetSetStatBonuses(ItemDatabase db,
             IReadOnlyDictionary<string, int> setPieceCounts)
         {
-            var totals = new Dictionary<MainStat, float>();
+            var totals = new Dictionary<SecondaryStat, float>();
 
             foreach (var (setId, count) in setPieceCounts)
             {
@@ -63,11 +67,11 @@ namespace IdleDefenseSurvival.Equipment
             return totals;
         }
 
-        public static Dictionary<MainStat, float> GetTotalStatBonuses(ItemDatabase db,
+        public static Dictionary<SecondaryStat, float> GetTotalStatBonuses(ItemDatabase db,
             IReadOnlyDictionary<EquipmentType, InventoryItem> equippedItems,
             IReadOnlyDictionary<string, int> setPieceCounts)
         {
-            var totals = new Dictionary<MainStat, float>();
+            var totals = new Dictionary<SecondaryStat, float>();
 
             foreach (var item in equippedItems.Values)
             {
@@ -83,7 +87,7 @@ namespace IdleDefenseSurvival.Equipment
         }
 
         /// <summary>Aggregate a single item's bonuses incl. its would-be set tier (for auto-equip scoring).</summary>
-        public static Dictionary<MainStat, float> GetItemBonusesWithSet(InventoryItem item,
+        public static Dictionary<SecondaryStat, float> GetItemBonusesWithSet(InventoryItem item,
             ItemDatabase db, IReadOnlyDictionary<string, int> setPieceCounts)
         {
             var bonuses = GetItemStatBonuses(item);
@@ -182,9 +186,9 @@ namespace IdleDefenseSurvival.Equipment
                 yield return modifier;
         }
 
-        private static void Add(Dictionary<MainStat, float> dict, MainStat stat, float value)
+        private static void Add(Dictionary<SecondaryStat, float> dict, SecondaryStat stat, float value)
         {
-            if (stat == MainStat.None || value == 0f) return;
+            if (stat == SecondaryStat.None || value == 0f) return;
             dict.TryGetValue(stat, out float current);
             dict[stat] = current + value;
         }
@@ -200,13 +204,13 @@ namespace IdleDefenseSurvival.Equipment
         {
             public readonly List<StatModifier> Modifiers = new();
 
-            public void Add(string idPrefix, MainStat stat, SecondaryStatMode mode, float value) =>
+            public void Add(string idPrefix, SecondaryStat stat, SecondaryStatMode mode, float value) =>
                 Modifiers.Add(new StatModifier
                 {
                     Id = $"{idPrefix}_{stat}",
                     Source = ModifierSource.Equipment,
                     Stat = stat.ToSkillType(),
-                    MainStat = stat,
+                    SecondaryStat = stat,
                     Mode = (ModifierMode)mode,
                     Value = value,
                     Permanent = true

@@ -40,10 +40,10 @@ namespace IdleDefenseSurvival.Ultimate
         private float _attackTimer;
         private Transform _currentTarget;
         private float _duration;
-        private float _ultimateWeaponAttack;
+        private float _ultimateAttack;
 
         public float TankAttackRange => PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * 0.47f;
-        public float TankAttackDamage => PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * 2.3f * _ultimateWeaponAttack;
+        public float TankAttackDamage => PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * 2.3f * _ultimateAttack;
         public float TankAttackSpeed => PlayerStatsManager.Instance.GetStat(SkillType.AttackSpeed) * 0.51f;
         public float TankDamagePerRange => PlayerStatsManager.Instance.GetStat(SkillType.DamagePerRange) * 1.5f;
 
@@ -69,7 +69,7 @@ namespace IdleDefenseSurvival.Ultimate
             _duration = duration;
             _elapsed = 0f;
             _hasArrived = false;
-            _ultimateWeaponAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateWeaponAttack);
+            _ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
 
             // Initialize combat stats from player
             if (player != null)

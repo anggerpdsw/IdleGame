@@ -37,10 +37,10 @@
         "description": "Chance of each projectile to deal critical damage",
         "displayName": "Critical Chance"
       },
-      "criticalFactor": {
+      "criticalDamage": {
         "baseValue": 1.5,
         "description": "Damage multiplier for critical hits",
-        "displayName": "Critical Factor"
+        "displayName": "Critical Damage"
       },
       "damagePerRange": {
         "baseValue": 10,
@@ -77,7 +77,7 @@
         "description": "Can stunt enemies for a period of time",
         "displayName": "Stun Duration"
       },
-      "ultimateWeaponAttack": {
+      "ultimateAttack": {
         "baseValue": 1,
         "description": "Extra Attack Power from Ultimate Weapon",
         "displayName": "Ultimate Weapon Attack"
@@ -114,10 +114,15 @@
         "description": "Reduced absolute damage when player attacked",
         "displayName": "Defense"
       },
-      "evasionChance": {
+      "evasion": {
         "baseValue": 0,
         "description": "An opportunity to avoid direct enemy attacks",
-        "displayName": "Evasion Chance"
+        "displayName": "Evasion"
+      },
+      "hitRate": {
+        "baseValue": 95,
+        "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
+        "displayName": "Hit Rate"
       },
       "lifeSteal": {
         "baseValue": 0,

@@ -47,7 +47,7 @@ namespace IdleDefenseSurvival.Ultimate
 
             ModifierManager.Instance.AddStatModifiers(ModifierSource.Ultimate, UltimateID,
                 (SkillType.DefenseAmount, ModifierMode.Percent, 100f),
-                (SkillType.EvasionChance, ModifierMode.Flat, 10f)
+                (SkillType.Evasion, ModifierMode.Flat, 10f)
             );
 
             // Spawn visual effects
@@ -97,7 +97,7 @@ namespace IdleDefenseSurvival.Ultimate
         {
             ModifierManager.Instance.RemoveStatModifiers(UltimateID,
                 SkillType.DefenseAmount,
-                SkillType.EvasionChance
+                SkillType.Evasion
             );
         }
 

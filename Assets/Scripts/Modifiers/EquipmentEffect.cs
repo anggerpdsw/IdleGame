@@ -112,9 +112,10 @@ namespace IdleDefenseSurvival.Modifiers
         public Enemy.EnemyAi LastEnemyHit { get; set; }
         public Enemy.EnemyAi LastEnemyKilled { get; set; }
 
-        // Stat access
-        public float GetStat(MainStat stat) => PlayerStatsManager.Instance?.GetStat((SkillType)stat) ?? 0f;
-        public float GetBaseStat(MainStat stat) => PlayerStatsManager.Instance?.GetBaseStat((SkillType)stat) ?? 0f;
+        // Stat access — SkillType is the single combat stat source (derived from
+        // Main Attribute + equipment SecondaryStat). Effects read SkillType directly.
+        public float GetStat(SkillType stat) => PlayerStatsManager.Instance?.GetStat(stat) ?? 0f;
+        public float GetBaseStat(SkillType stat) => PlayerStatsManager.Instance?.GetBaseStat(stat) ?? 0f;
 
         // Helper methods
         public bool HasSetBonus(string setId) => EquipmentService?.GetSetPieceCount(setId) > 0;

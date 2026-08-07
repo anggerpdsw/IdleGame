@@ -45,8 +45,8 @@ namespace IdleDefenseSurvival.Items.Generation
 
             // Generate stat bonuses
             int statCount = GetEnchantmentStatCount(rarity, context);
-            var allStats = Enum.GetValues(typeof(MainStat)).Cast<MainStat>()
-                .Where(s => s != MainStat.None)
+            var allStats = Enum.GetValues(typeof(SecondaryStat)).Cast<SecondaryStat>()
+                .Where(s => s != SecondaryStat.None)
                 .ToArray();
 
             enchantment.StatBonuses = new MainStatEntry[statCount];
@@ -135,7 +135,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return $"Enchant_{rarity}_{Guid.NewGuid().ToString("N")[..8]}";
         }
 
-        private float GetRandomStatValue(MainStat stat, ItemRarity rarity, int enchantLevel)
+        private float GetRandomStatValue(SecondaryStat stat, ItemRarity rarity, int enchantLevel)
         {
             float rarityMult = rarity.GetDefaultStatMultiplier();
             float levelMult = 1f + enchantLevel * 0.1f;
@@ -196,30 +196,33 @@ namespace IdleDefenseSurvival.Items.Generation
             { ItemRarity.Divine, 4 }
         };
 
-        public Dictionary<MainStat, float> BaseValues = new()
+        public Dictionary<SecondaryStat, float> BaseValues = new()
         {
-            { MainStat.Attack, 5f },
-            { MainStat.HP, 50f },
-            { MainStat.Defense, 3f },
-            { MainStat.CriticalRate, 1f },
-            { MainStat.CriticalDamage, 10f },
-            { MainStat.AttackSpeed, 0.05f },
-            { MainStat.LifeSteal, 1f },
-            { MainStat.MoveSpeed, 0.5f },
-            { MainStat.Range, 0.5f },
-            { MainStat.DamageReduction, 1f },
-            { MainStat.CooldownReduction, 1f }
+            { SecondaryStat.AttackRange, 5f },
+            { SecondaryStat.BounceChance, 5f },
+            { SecondaryStat.BounceCount, 1f },
+            { SecondaryStat.MultiShootChance, 5f },
+            { SecondaryStat.KnockbackChance, 5f },
+            { SecondaryStat.LifeSteal, 1f },
+            { SecondaryStat.MoveSpeed, 0.5f },
+            { SecondaryStat.CooldownReduction, 1f },
+            { SecondaryStat.BossDamage, 1f },
+            { SecondaryStat.EliteDamage, 1f },
+            { SecondaryStat.HitRate, 1f }
         };
 
-        public HashSet<MainStat> PercentStats = new()
+        // Derived combat stats (CriticalChance, AttackSpeed, ...) come from Main Attribute.
+        public HashSet<SecondaryStat> PercentStats = new()
         {
-            MainStat.CriticalRate,
-            MainStat.CriticalDamage,
-            MainStat.AttackSpeed,
-            MainStat.LifeSteal,
-            MainStat.MoveSpeed,
-            MainStat.DamageReduction,
-            MainStat.CooldownReduction
+            SecondaryStat.BounceChance,
+            SecondaryStat.MultiShootChance,
+            SecondaryStat.KnockbackChance,
+            SecondaryStat.LifeSteal,
+            SecondaryStat.MoveSpeed,
+            SecondaryStat.CooldownReduction,
+            SecondaryStat.BossDamage,
+            SecondaryStat.EliteDamage,
+            SecondaryStat.HitRate
         };
 
         public float SpecialEffectChance = 0.1f;
