@@ -80,6 +80,9 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>Checks if a set bonus tier is active.</summary>
         bool IsSetBonusActive(string setId, int tierIndex);
 
+        /// <summary>True if any set bonus tier for this set is currently active.</summary>
+        bool IsSetBonusActive(string setId);
+
         /// <summary>Gets the piece count for a set.</summary>
         int GetSetPieceCount(string setId);
 
@@ -223,27 +226,39 @@ namespace IdleDefenseSurvival.Equipment
 
     /// <summary>
     /// Save data for equipment.
+    /// Single source of truth: EquipmentService owns equip state via (Slot, InstanceId).
+    /// Item data itself lives in the inventory save; equipment references by InstanceId.
     /// </summary>
     [Serializable]
     public class EquipmentSaveData
     {
-        public EquippedItemData[] EquippedItems;
+        // Slot -> InstanceId mapping (single source of truth)
+        public EquipmentInstanceIdData[] EquippedItems;
         public UnlockedSlotData[] UnlockedSlots;
         public long LastModifiedTimestamp;
 
         public static EquipmentSaveData CreateEmpty() => new()
         {
-            EquippedItems = Array.Empty<EquippedItemData>(),
+            EquippedItems = Array.Empty<EquipmentInstanceIdData>(),
             UnlockedSlots = Array.Empty<UnlockedSlotData>(),
             LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
     }
 
     [Serializable]
-    public class EquippedItemData
+    public class EquipmentInstanceIdData
     {
         public EquipmentType Slot;
-        public InventoryItem Item; // Full item data with instance ID
+        public string InstanceId; // Reference to InventoryItem.InstanceId
+
+        // Migration helper: captures old "Item" field from v3 saves during deserialization.
+        // Not written back on save (ShouldSerialize pattern).
+        [Newtonsoft.Json.JsonProperty("Item")]
+        public InventoryItem LegacyItem { get; set; }
+
+        public bool HasLegacyItem => LegacyItem != null && !string.IsNullOrEmpty(LegacyItem.InstanceId);
+
+        public bool ShouldSerializeLegacyItem() => false;
     }
 
     [Serializable]

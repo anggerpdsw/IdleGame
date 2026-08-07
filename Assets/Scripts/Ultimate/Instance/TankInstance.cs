@@ -191,7 +191,7 @@ namespace IdleDefenseSurvival.Ultimate
             float diameter = _tankAttackRange * 2f;
 
             _attackRangeRenderer.transform.localScale = new Vector3(diameter, diameter, 1f);
-            _attackRangeRenderer.color = new Color(0.10f, 0.95f, 1.00f, 0.09f);
+            _attackRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
         }
         
 #if UNITY_EDITOR
@@ -200,7 +200,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (_tankAttackRange <= 0f) return;
 
             // Draw attack range as green circle in Scene view
-            Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Green with transparency
+            Gizmos.color = GameColors.green.WithAlpha(0.5f); // Green with transparency
             DrawCircleGizmo(transform.position, _tankAttackRange, 32);
         }
 

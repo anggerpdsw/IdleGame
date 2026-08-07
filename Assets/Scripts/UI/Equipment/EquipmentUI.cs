@@ -121,13 +121,17 @@ namespace IdleDefenseSurvival.UI.Equipment
         #endregion
 
         #region Event Handlers
-        private void OnEquipmentChanged(EquipmentChangedEventArgs args) => RefreshUI();
+        private void OnEquipmentChanged(EquipmentChangedEventArgs args)
+        {
+            if (args?.Slot != EquipmentType.None) RefreshSlot(args.Slot);
+            else RefreshUI();
+        }
         private void OnItemEquipped(EquipmentType slot, InventoryItem item) => RefreshSlot(slot);
         private void OnItemUnequipped(EquipmentType slot, InventoryItem item) => RefreshSlot(slot);
-        private void OnSetBonusChanged() => RefreshSetBonuses();
+        private void OnSetBonusChanged() => RefreshAllSlots();
         private void OnDurabilityChanged(EquipmentType slot) => RefreshSlot(slot);
         private void OnSlotUnlocked(EquipmentType slot) => RefreshSlot(slot);
-        private void OnInventoryChanged(InventoryChangedEventArgs args) => RefreshUI();
+        private void OnInventoryChanged(InventoryChangedEventArgs args) => RefreshAllSlots();
         #endregion
 
         #region Public API
@@ -142,19 +146,60 @@ namespace IdleDefenseSurvival.UI.Equipment
 
         private void RefreshAllSlots()
         {
-            var equipment = EquipmentService.Instance;
-            if (equipment == null) return;
-
+            if (_slotUis == null) return;
             foreach (var slotUI in _slotUis)
             {
-                slotUI.Refresh();
+                RefreshSlot(slotUI.Slot);
             }
         }
 
         private void RefreshSlot(EquipmentType slot)
         {
             var slotUI = Array.Find(_slotUis, s => s.Slot == slot);
-            slotUI?.Refresh();
+            if (slotUI == null) return;
+
+            slotUI.ApplyViewData(BuildSlotViewData(slot));
+        }
+
+        /// <summary>Builds presenter view-data for one slot (all service lookups happen here).</summary>
+        public bool IsSlotLocked(EquipmentType slot)
+        {
+            var equipment = EquipmentService.Instance;
+            if (equipment == null) return false;
+            foreach (var sd in equipment.SlotData)
+            {
+                if (sd.Slot == slot) return !sd.IsUnlocked;
+            }
+            return false;
+        }
+
+        private EquipmentSlotViewData BuildSlotViewData(EquipmentType slot)
+        {
+            var equipment = EquipmentService.Instance;
+            if (equipment == null) return new EquipmentSlotViewData();
+
+            equipment.EquippedItems.TryGetValue(slot, out var item);
+
+            EquipmentSlotData slotData = null;
+            foreach (var sd in equipment.SlotData)
+            {
+                if (sd.Slot == slot) { slotData = sd; break; }
+            }
+
+            string setId = item?.GetSetId();
+            bool setBonusActive = !string.IsNullOrEmpty(setId) && equipment.IsSetBonusActive(setId);
+
+            bool isLocked = slotData != null && !slotData.IsUnlocked;
+
+            return EquipmentPresentationService.BuildSlot(new EquipmentSlotViewSource
+            {
+                IsLocked = isLocked,
+                Item = item,
+                SetBonusActive = setBonusActive,
+                UnlockState = slotData?.UnlockState ?? EquipmentSlotUnlockState.Unlocked,
+                UnlockCost = isLocked ? equipment.GetSlotUnlockCost(slot) : 0,
+                RequiredLevel = slotData?.RequiredLevel ?? 1
+            });
         }
 
         private void RefreshSetBonuses()
@@ -241,7 +286,8 @@ namespace IdleDefenseSurvival.UI.Equipment
         {
             if (_comparePanel != null && newItem != null)
             {
-                var currentItem = EquipmentService.Instance?.EquippedItems.GetValueOrDefault(newItem.GetEquipmentType());
+                InventoryItem currentItem = null;
+                EquipmentService.Instance?.EquippedItems.TryGetValue(newItem.GetEquipmentType(), out currentItem);
                 _comparePanel.ShowComparison(currentItem, newItem);
             }
         }

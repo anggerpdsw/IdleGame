@@ -241,7 +241,7 @@ namespace IdleDefenseSurvival.Ultimate
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(0.5f, 0f, 1f, 0.3f); // Purple for void
+            Gizmos.color = GameColors.debugLightningPurple.WithAlpha(0.3f); // Purple for void
             Gizmos.DrawWireSphere(transform.position, _voidRadius);
         }
 #endif

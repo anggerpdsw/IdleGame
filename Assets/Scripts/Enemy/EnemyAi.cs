@@ -759,7 +759,7 @@ namespace IdleDefenseSurvival.Enemy
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, _attackRange);
 
-            Gizmos.color = new Color(0, 0.5f, 1f, 0.5f); // Blue dengan transparansi
+            Gizmos.color = GameColors.debugBlueGizmo.WithAlpha(0.5f); // Blue dengan transparansi
             Gizmos.DrawWireSphere(transform.position, _separationRadius);
         }
 #endif

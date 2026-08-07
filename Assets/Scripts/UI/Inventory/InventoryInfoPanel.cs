@@ -236,8 +236,7 @@ namespace IdleDefenseSurvival.UI.Inventory
 
         private void OnDestroy()
         {
-            if (_currentItem != null)
-                InventoryService.Instance?.DestroyItem(_currentItem.InstanceId, _currentItem.Quantity);
+            // Do not destroy item - panel only displays it, doesn't own it.
         }
 
         private void OnFavoriteChanged(bool isFavorite)

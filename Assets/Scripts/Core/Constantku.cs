@@ -2,7 +2,7 @@ namespace IdleDefenseSurvival
 {
     public static class GameConstants
     {
-        public const int CURRENT_SAVE_VERSION = 1;
+        public const int CURRENT_SAVE_VERSION = 4;
         public const int MAX_WAVE_PER_TIER = 350;
         public const int BASE_LEVEL = 9753;
         public const int STARTING_STAT_POINTS = 5;  // Level 1 start

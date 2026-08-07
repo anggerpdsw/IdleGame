@@ -321,7 +321,7 @@ namespace IdleDefenseSurvival.Items
         public int GetTotalSocketedGems(InventoryItem item)
         {
             if (item?.Sockets == null) return 0;
-            return item.Sockets.Count(s => s.IsFilled);
+            return item.Sockets.Count(s => !s.IsEmpty);
         }
 
         /// <summary>
@@ -348,7 +348,7 @@ namespace IdleDefenseSurvival.Items
             int count = 0;
             foreach (var socket in item.Sockets)
             {
-                if (socket.IsFilled)
+                if (!socket.IsEmpty)
                 {
                     var gemData = ItemDatabase.Instance?.GetGem(socket.GemId);
                     if (gemData?.GemType == gemType)
@@ -367,7 +367,7 @@ namespace IdleDefenseSurvival.Items
 
             foreach (var socket in item.Sockets)
             {
-                if (socket.IsFilled && socket.GemId == gemId)
+                if (!socket.IsEmpty && socket.GemId == gemId)
                 {
                     return GetSocketedGemInstance(item, socket.SocketIndex);
                 }
@@ -385,7 +385,7 @@ namespace IdleDefenseSurvival.Items
             int maxLevel = 0;
             foreach (var socket in item.Sockets)
             {
-                if (socket.IsFilled && socket.GemLevel > maxLevel)
+                if (!socket.IsEmpty && socket.GemLevel > maxLevel)
                     maxLevel = socket.GemLevel;
             }
             return maxLevel;
@@ -401,7 +401,7 @@ namespace IdleDefenseSurvival.Items
             int total = 0;
             foreach (var socket in item.Sockets)
             {
-                if (socket.IsFilled)
+                if (!socket.IsEmpty)
                     total += socket.GemLevel;
             }
             return total;
@@ -416,7 +416,7 @@ namespace IdleDefenseSurvival.Items
         {
             if (item?.Sockets == null || socketIndex < 0 || socketIndex >= item.Sockets.Length) return;
             var socket = item.Sockets[socketIndex];
-            if (socket.IsFilled && GetSocketedGemInstance(item, socketIndex) is GemInstanceData gem)
+            if (!socket.IsEmpty && GetSocketedGemInstance(item, socketIndex) is GemInstanceData gem)
                 GemModifierService.Instance.Apply(item, socketIndex, gem);
         }
 

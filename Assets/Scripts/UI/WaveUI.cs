@@ -113,9 +113,9 @@ namespace IdleDefenseSurvival.UI
         {
             // Set default colors if not set
             if (_activeColor == Color.black)
-                _activeColor = new Color(0.2f, 0.8f, 0.2f, 1f);
+                _activeColor = GameColors.green;
             if (_interWaveColor == Color.black)
-                _interWaveColor = new Color(1f, 0.8f, 0.2f, 1f);
+                _interWaveColor = GameColors.waveInterYellow;
         }
 #endif
     }

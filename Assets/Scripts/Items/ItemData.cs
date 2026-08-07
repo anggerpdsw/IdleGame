@@ -446,16 +446,16 @@ namespace IdleDefenseSurvival.Items
 
         public static Color GetColor(this GemType type) => type switch
         {
-            GemType.Ruby => new Color(0.9f, 0.1f, 0.1f),
-            GemType.Sapphire => new Color(0.1f, 0.3f, 0.9f),
-            GemType.Emerald => new Color(0.1f, 0.8f, 0.3f),
-            GemType.Topaz => new Color(0.9f, 0.7f, 0.1f),
-            GemType.Amethyst => new Color(0.7f, 0.1f, 0.9f),
-            GemType.Diamond => new Color(0.9f, 0.9f, 1f),
-            GemType.Onyx => new Color(0.2f, 0.1f, 0.3f),
-            GemType.Pearl => new Color(1f, 0.9f, 0.9f),
-            GemType.Opal => new Color(0.8f, 0.4f, 0.8f),
-            GemType.Prismatic => new Color(1f, 0.5f, 1f),
+            GemType.Ruby => GameColors.gemRuby,
+            GemType.Sapphire => GameColors.gemSapphire,
+            GemType.Emerald => GameColors.gemEmerald,
+            GemType.Topaz => GameColors.gemTopaz,
+            GemType.Amethyst => GameColors.gemAmethyst,
+            GemType.Diamond => GameColors.gemDiamond,
+            GemType.Onyx => GameColors.gemOnyx,
+            GemType.Pearl => GameColors.gemPearl,
+            GemType.Opal => GameColors.gemOpal,
+            GemType.Prismatic => GameColors.gemPrismatic,
             _ => Color.white
         };
     }

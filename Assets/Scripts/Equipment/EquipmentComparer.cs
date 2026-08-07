@@ -335,7 +335,7 @@ namespace IdleDefenseSurvival.Equipment
             {
                 foreach (var socket in item.Sockets)
                 {
-                    if (socket.IsFilled)
+                    if (!socket.IsEmpty)
                     {
                         var gemStats = GemService.Instance?.GetGemStats(socket.GemId, socket.GemLevel);
                         if (gemStats != null)

@@ -311,8 +311,8 @@ namespace IdleDefenseSurvival.Ultimate
                 lr.startWidth = isClimax ? 0.3f : 0.15f;
                 lr.endWidth = isClimax ? 0.15f : 0.05f;
                 lr.material = new Material(Shader.Find("Sprites/Default"));
-                lr.startColor = isClimax ? new Color(1f, 0.8f, 0f, 1f) : new Color(0.5f, 0f, 1f, 0.8f); // Gold for climax, purple for normal
-                lr.endColor = isClimax ? new Color(1f, 0.5f, 0f, 0f) : new Color(0.2f, 0f, 0.5f, 0f);
+                lr.startColor = isClimax ? GameColors.debugLightningGold : GameColors.debugLightningPurple.WithAlpha(0.8f); // Gold for climax, purple for normal
+                lr.endColor = isClimax ? GameColors.debugOrangeGizmo.WithAlpha(0f) : GameColors.debugDarkPurple.WithAlpha(0f);
                 lr.sortingOrder = 10;
 
                 // Add some jaggedness for lightning look
@@ -372,7 +372,7 @@ namespace IdleDefenseSurvival.Ultimate
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(0.5f, 0f, 1f, 0.3f);
+            Gizmos.color = GameColors.debugLightningPurple.WithAlpha(0.3f);
             Gizmos.DrawWireSphere(transform.position, _lightningRadius);
 
             if (_lastTarget != null)

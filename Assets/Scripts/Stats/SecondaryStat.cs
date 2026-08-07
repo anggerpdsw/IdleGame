@@ -79,41 +79,41 @@ namespace IdleDefenseSurvival.Stats
         /// </summary>
         public static Color GetStatColor(this SecondaryStat stat) => stat switch
         {
-            SecondaryStat.LifeSteal => new Color(0.8f, 0.2f, 0.4f),
+            SecondaryStat.LifeSteal => GameColors.statLifeSteal,
 
             // PvE / utility damage - Red/Orange
-            SecondaryStat.BossDamage => new Color(1f, 0.1f, 0.1f),
-            SecondaryStat.EliteDamage => new Color(1f, 0.3f, 0.2f),
-            SecondaryStat.DamagePerRange => new Color(1f, 0.4f, 0.2f),
+            SecondaryStat.BossDamage => GameColors.statBossDamage,
+            SecondaryStat.EliteDamage => GameColors.statEliteDamage,
+            SecondaryStat.DamagePerRange => GameColors.statDamagePerRange,
 
             // Utility stats - Yellow/Gold
-            SecondaryStat.MoveSpeed => new Color(1f, 0.9f, 0.2f),
-            SecondaryStat.CooldownReduction => new Color(0.9f, 0.7f, 0.2f),
-            SecondaryStat.GoldGain => new Color(1f, 0.85f, 0f),
-            SecondaryStat.DropRate => new Color(0.9f, 0.6f, 0.1f),
-            SecondaryStat.InterestWave => new Color(0.5f, 0.8f, 0.5f),
+            SecondaryStat.MoveSpeed => GameColors.statMoveSpeed,
+            SecondaryStat.CooldownReduction => GameColors.statCooldownReduction,
+            SecondaryStat.GoldGain => GameColors.statGoldGain,
+            SecondaryStat.DropRate => GameColors.statDropRate,
+            SecondaryStat.InterestWave => GameColors.statInterestWave,
 
             // Accuracy - Cyan/Blue white
-            SecondaryStat.HitRate => new Color(0.4f, 0.9f, 1f),
+            SecondaryStat.HitRate => GameColors.statHitRate,
 
             // Element damage bonus - Arcane purple/teal family, one hue per element
-            SecondaryStat.MetalDamageBonus => new Color(0.7f, 0.75f, 0.8f),
-            SecondaryStat.WoodDamageBonus => new Color(0.4f, 0.85f, 0.45f),
-            SecondaryStat.FireDamageBonus => new Color(1f, 0.45f, 0.2f),
-            SecondaryStat.WaterDamageBonus => new Color(0.3f, 0.6f, 1f),
-            SecondaryStat.EarthDamageBonus => new Color(0.72f, 0.5f, 0.3f),
-            SecondaryStat.LightningDamageBonus => new Color(1f, 0.9f, 0.2f),
-            SecondaryStat.WindDamageBonus => new Color(0.4f, 0.95f, 0.95f),
+            SecondaryStat.MetalDamageBonus => GameColors.statMetal,
+            SecondaryStat.WoodDamageBonus => GameColors.statWood,
+            SecondaryStat.FireDamageBonus => GameColors.statFire,
+            SecondaryStat.WaterDamageBonus => GameColors.statWater,
+            SecondaryStat.EarthDamageBonus => GameColors.statEarth,
+            SecondaryStat.LightningDamageBonus => GameColors.statMoveSpeed,
+            SecondaryStat.WindDamageBonus => GameColors.statWind,
 
             // Projectile/Crowd Control - Purple/Teal
-            SecondaryStat.AttackRange => new Color(0.6f, 0.3f, 1f),
-            SecondaryStat.BounceChance => new Color(0.5f, 0.8f, 1f),
-            SecondaryStat.BounceCount => new Color(0.4f, 0.7f, 1f),
-            SecondaryStat.MultiShootChance => new Color(0.8f, 0.3f, 1f),
-            SecondaryStat.MultiShootCount => new Color(0.7f, 0.2f, 1f),
-            SecondaryStat.KnockbackChance => new Color(0.9f, 0.4f, 0.6f),
-            SecondaryStat.StuntChance => new Color(0.8f, 0.3f, 0.5f),
-            SecondaryStat.StuntDuration => new Color(0.7f, 0.2f, 0.4f),
+            SecondaryStat.AttackRange => GameColors.statRange,
+            SecondaryStat.BounceChance => GameColors.statBounceChance,
+            SecondaryStat.BounceCount => GameColors.statBounceCount,
+            SecondaryStat.MultiShootChance => GameColors.statMultiShootChance,
+            SecondaryStat.MultiShootCount => GameColors.statMultiShootCount,
+            SecondaryStat.KnockbackChance => GameColors.statKnockbackChance,
+            SecondaryStat.StuntChance => GameColors.statStunChance,
+            SecondaryStat.StuntDuration => GameColors.statStunDuration,
 
             _ => Color.white
         };

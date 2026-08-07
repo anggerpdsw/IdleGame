@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using IdleDefenseSurvival;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Equipment
 {
@@ -33,11 +35,15 @@ namespace IdleDefenseSurvival.Equipment
 
         public IReadOnlyList<EquipmentSlotData> GetAllSlotData()
         {
+            int playerLevel = PlayerStatsManager.Instance?.GetStatInt(SkillType.HealthPoint) ?? 1;
             var list = new List<EquipmentSlotData>(_slotData.Count);
             foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
             {
                 if (slot != EquipmentType.None && _slotData.TryGetValue(slot, out var data))
+                {
+                    data.UnlockState = ComputeUnlockState(data, playerLevel);
                     list.Add(data);
+                }
             }
             return list;
         }
@@ -70,7 +76,11 @@ namespace IdleDefenseSurvival.Equipment
                 return false;
 
             _repo.SetSlotUnlocked(slot, true);
-            if (_slotData.TryGetValue(slot, out var data)) data.IsUnlocked = true;
+            if (_slotData.TryGetValue(slot, out var data))
+            {
+                data.IsUnlocked = true;
+                data.UnlockState = EquipmentSlotUnlockState.Unlocked;
+            }
             return true;
         }
 
@@ -108,6 +118,19 @@ namespace IdleDefenseSurvival.Equipment
         {
             _slotData.TryGetValue(slot, out var data);
             return data;
+        }
+
+        /// <summary>
+        /// Computes the current unlock gate for a slot.
+        /// Priority: quest &gt; level &gt; gold. Called on unlock/reload; UI just reads it.
+        /// </summary>
+        public static EquipmentSlotUnlockState ComputeUnlockState(EquipmentSlotData data, int playerLevel)
+        {
+            if (data.IsUnlocked) return EquipmentSlotUnlockState.Unlocked;
+
+            if (!string.IsNullOrEmpty(data.RequiredQuest)) return EquipmentSlotUnlockState.LockedByQuest;
+            if (data.RequiredLevel > 1 && playerLevel < data.RequiredLevel) return EquipmentSlotUnlockState.LockedByLevel;
+            return EquipmentSlotUnlockState.LockedByGold;
         }
     }
 }

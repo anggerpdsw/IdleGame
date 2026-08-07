@@ -26,7 +26,8 @@ namespace IdleDefenseSurvival.Equipment
         public EquipmentSaveData GetSaveData()
         {
             var equippedData = _repo.EquippedItems
-                .Select(kvp => new EquippedItemData { Slot = kvp.Key, Item = kvp.Value })
+                .Select(kvp => new EquipmentInstanceIdData { Slot = kvp.Key, InstanceId = kvp.Value?.InstanceId })
+                .Where(d => !string.IsNullOrEmpty(d.InstanceId))
                 .ToArray();
 
             var unlockedData = _repo.UnlockedSlots

@@ -18,11 +18,16 @@ namespace IdleDefenseSurvival.UI.Inventory
 
         public InventoryItem Item { get; private set; }
 
+        /// <summary>Currently dragged item (set on drag start, cleared on destroy).</summary>
+        public static InventoryItem DraggedItem { get; internal set; }
+
         public void Initialize(InventoryItem item)
         {
             Item = item;
+            DraggedItem = item;
             var itemData = ItemDatabase.Instance?.GetItem(item.ItemId);
             if (itemData == null) return;
+
 
             if (_iconImage != null && itemData.Icon != null)
             {
@@ -43,6 +48,12 @@ namespace IdleDefenseSurvival.UI.Inventory
             {
                 _canvasGroup.blocksRaycasts = false;
             }
+        }
+
+        private void OnDestroy()
+        {
+            if (ReferenceEquals(DraggedItem, Item))
+                DraggedItem = null;
         }
     }
 }

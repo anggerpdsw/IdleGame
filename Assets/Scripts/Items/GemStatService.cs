@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Items
 
             foreach (var socket in item.Sockets)
             {
-                if (!socket.IsFilled) continue;
+                if (socket.IsEmpty) continue;
                 var stats = GetGemStats(socket.GemId, socket.GemLevel);
                 foreach (var statEntry in stats)
                 {

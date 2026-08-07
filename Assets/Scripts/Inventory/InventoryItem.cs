@@ -10,6 +10,8 @@ namespace IdleDefenseSurvival.Inventory
     /// <summary>
     /// Represents a single item instance in the inventory.
     /// Contains runtime state that varies per instance (level, durability, sockets, etc.)
+    /// Derived fields (IsStackable, IsBroken, HasSockets, ...) are computed properties
+    /// marked [JsonIgnore] so they are never serialized - they are derived from item data.
     /// </summary>
     [Serializable]
     public class InventoryItem
@@ -42,23 +44,27 @@ namespace IdleDefenseSurvival.Inventory
         // ============ Flags ============
         public bool IsFavorite = false; // Prevents accidental sell/destroy
         public bool IsLocked = false; // Prevents any modification
-        public bool IsEquipped = false; // Currently equipped
-        public EquipmentType EquippedSlot = EquipmentType.None; // Which slot it's in
         public bool IsNew = true; // Newly acquired (for UI highlight)
-        public long AcquiredTimestamp = 0; // When item was obtained
+        public long AcquiredTimestamp = 0; // When item was obtained (for Sort by Newest)
+
+        // Runtime mirror of EquipmentService state - NOT saved (EquipmentService owns equip state)
+        [Newtonsoft.Json.JsonIgnore]
+        public bool IsEquipped = false;
+        [Newtonsoft.Json.JsonIgnore]
+        public EquipmentType EquippedSlot = EquipmentType.None;
 
         // ============ Custom Data ============
         public Dictionary<string, object> CustomData; // For modding/extensibility
 
-        // ============ Computed Properties ============
-        public bool IsStackable => Quantity > 1;
-        public bool IsMaxStack => Quantity >= GetMaxStackSize();
-        public bool IsBroken => CurrentDurability <= 0;
-        public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
-        public bool CanLimitBreak => LimitBreakCount < GetMaxLimitBreak();
-        public bool HasSockets => Sockets != null && Sockets.Length > 0;
-        public int FilledSocketCount => Sockets?.Count(s => s?.GemId != null) ?? 0;
-        public int EmptySocketCount => Sockets?.Count(s => s?.GemId == null) ?? 0;
+        // ============ Computed Properties (NOT serialized - [JsonIgnore]) ============
+        [Newtonsoft.Json.JsonIgnore] public bool IsStackable => Quantity > 1;
+        [Newtonsoft.Json.JsonIgnore] public bool IsMaxStack => Quantity >= GetMaxStackSize();
+        [Newtonsoft.Json.JsonIgnore] public bool IsBroken => CurrentDurability <= 0;
+        [Newtonsoft.Json.JsonIgnore] public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
+        [Newtonsoft.Json.JsonIgnore] public bool CanLimitBreak => LimitBreakCount < GetMaxLimitBreak();
+        [Newtonsoft.Json.JsonIgnore] public bool HasSockets => Sockets != null && Sockets.Length > 0;
+        [Newtonsoft.Json.JsonIgnore] public int FilledSocketCount => Sockets?.Count(s => s?.GemId != null) ?? 0;
+        [Newtonsoft.Json.JsonIgnore] public int EmptySocketCount => Sockets?.Count(s => s?.GemId == null) ?? 0;
 
         // ============ Methods ============
         public InventoryItem Clone()
@@ -67,6 +73,8 @@ namespace IdleDefenseSurvival.Inventory
             clone.InstanceId = Guid.NewGuid().ToString();
             clone.Quantity = 1; // Cloned items start as single
             clone.IsNew = true;
+            clone.IsEquipped = false;
+            clone.EquippedSlot = EquipmentType.None;
             clone.AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             if (Sockets != null)
             {
@@ -148,8 +156,8 @@ namespace IdleDefenseSurvival.Inventory
         public bool IsUnlocked = true; // Socket unlocked (some sockets unlock at higher enhance)
         public string GemInstanceId; // InstanceId of the GemInstanceData for this socket
 
+        [Newtonsoft.Json.JsonIgnore] // computed, not saved
         public bool IsEmpty => string.IsNullOrEmpty(GemId);
-        public bool IsFilled => !IsEmpty;
 
         public SocketData Clone()
         {
@@ -270,6 +278,9 @@ namespace IdleDefenseSurvival.Inventory
         public int RequiredLevel = 1;
         public string RequiredQuest;
 
+        /// <summary>Computed unlock gate for the UI (poin 10).</summary>
+        public EquipmentSlotUnlockState UnlockState = EquipmentSlotUnlockState.Unlocked;
+
         public bool CanEquip(InventoryItem item, int playerLevel)
         {
             if (item == null || !IsUnlocked) return false;
@@ -278,5 +289,16 @@ namespace IdleDefenseSurvival.Inventory
             if (item.GetEquipmentType() != Slot) return false;
             return true;
         }
+    }
+
+    /// <summary>
+    /// Unlock gate for an equipment slot. UI reads this instead of branching.
+    /// </summary>
+    public enum EquipmentSlotUnlockState
+    {
+        Unlocked = 0,
+        LockedByGold = 1,   // pay Gem/Gold to unlock (SlotUnlockCosts)
+        LockedByLevel = 2,  // reach RequiredLevel
+        LockedByQuest = 3   // complete RequiredQuest
     }
 }

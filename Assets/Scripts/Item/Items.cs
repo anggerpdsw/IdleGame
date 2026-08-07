@@ -330,10 +330,10 @@ namespace IdleDefenseSurvival.Item
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+            Gizmos.color = GameColors.debugYellowGizmo.WithAlpha(0.3f);
             Gizmos.DrawWireSphere(transform.position, _spreadRadius);
 
-            Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
+            Gizmos.color = GameColors.debugCyanGizmo.WithAlpha(0.5f);
             Gizmos.DrawWireSphere(transform.position, _clickRadius);
         }
 #endif

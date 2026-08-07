@@ -110,9 +110,9 @@ namespace IdleDefenseSurvival.Reward
         {
             return state switch
             {
-                DailyRewardState.Claimable => new Color(0.22f, 0.49f, 0.22f, 0.95f),
-                DailyRewardState.Claimed => new Color(0.26f, 0.38f, 0.24f, 0.95f),
-                _ => new Color(0.16f, 0.16f, 0.20f, 0.95f)
+                DailyRewardState.Claimable => GameColors.dailyClaimableGreen.WithAlpha(0.95f),
+                DailyRewardState.Claimed => GameColors.dailyClaimedGreen.WithAlpha(0.95f),
+                _ => GameColors.dailyDefault.WithAlpha(0.95f)
             };
         }
     }

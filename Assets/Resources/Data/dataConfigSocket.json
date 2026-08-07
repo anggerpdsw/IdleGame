@@ -10,8 +10,7 @@
   "CanDestroyGems": true,
   "GemRemovalGoldCost": 100,
   "GemDestructionReturnRate": 0.5,
-  "SocketRules": [
-    {
+  "SocketRules": [{
       "SocketIndex": 0,
       "UnlockEnhanceLevel": 0,
       "UnlockPlayerLevel": 1,

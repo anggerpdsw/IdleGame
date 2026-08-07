@@ -100,7 +100,7 @@ namespace IdleDefenseSurvival.Items
             for (int i = 0; i < item.Sockets.Length; i++)
             {
                 var socket = item.Sockets[i];
-                if (socket.IsFilled && !string.IsNullOrEmpty(socket.GemInstanceId))
+                if (!socket.IsEmpty && !string.IsNullOrEmpty(socket.GemInstanceId))
                 {
                     string prefix = $"Gem:{socket.GemInstanceId}";
                     var gemData = ItemDatabase.Instance?.GetGem(socket.GemId);

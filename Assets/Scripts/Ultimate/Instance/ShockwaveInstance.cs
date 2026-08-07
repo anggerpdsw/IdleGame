@@ -147,11 +147,11 @@ namespace IdleDefenseSurvival.Ultimate
         private void OnDrawGizmosSelected()
         {
             // Draw current radius in editor
-            Gizmos.color = new Color(0f, 1f, 1f, 0.3f); // Cyan with transparency
+            Gizmos.color = GameColors.debugCyanGizmo.WithAlpha(0.3f); // Cyan with transparency
             Gizmos.DrawWireSphere(transform.position, _currentRadius);
 
             // Draw max radius as dashed reference
-            Gizmos.color = new Color(0f, 0.7f, 0.7f, 0.2f); // Darker cyan
+            Gizmos.color = GameColors.debugDarkCyan.WithAlpha(0.2f); // Darker cyan
             Gizmos.DrawWireSphere(transform.position, _maxRadius);
         }
 #endif

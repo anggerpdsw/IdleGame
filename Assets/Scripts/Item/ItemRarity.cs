@@ -47,14 +47,14 @@ namespace IdleDefenseSurvival.Items
         /// </summary>
         public static Color GetDefaultColor(this ItemRarity rarity) => rarity switch
         {
-            ItemRarity.Common => new Color(0.7f, 0.7f, 0.7f),      // Gray
-            ItemRarity.Uncommon => new Color(0.2f, 0.8f, 0.2f),    // Green
-            ItemRarity.Rare => new Color(0.2f, 0.4f, 1f),          // Blue
-            ItemRarity.Epic => new Color(0.7f, 0.2f, 1f),          // Purple
-            ItemRarity.Legendary => new Color(1f, 0.6f, 0.1f),     // Orange
-            ItemRarity.Mythic => new Color(1f, 0.2f, 0.6f),        // Pink/Magenta
-            ItemRarity.Ancient => new Color(0.5f, 0.2f, 1f),       // Deep Purple
-            ItemRarity.Divine => new Color(1f, 0.9f, 0.2f),        // Gold
+            ItemRarity.Common => GameColors.commonGray,      // Gray
+            ItemRarity.Uncommon => GameColors.uncommonGreen,    // Green
+            ItemRarity.Rare => GameColors.rareBlue,          // Blue
+            ItemRarity.Epic => GameColors.epicPurple,          // Purple
+            ItemRarity.Legendary => GameColors.legendaryOrange,     // Orange
+            ItemRarity.Mythic => GameColors.mythicPink,        // Pink/Magenta
+            ItemRarity.Ancient => GameColors.ancientPurple,       // Deep Purple
+            ItemRarity.Divine => GameColors.divineGold,        // Gold
             _ => Color.white
         };
 

@@ -1,9 +1,6 @@
 using TMPro;
-using System.Collections.Generic;
-using System.Linq;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.UI.Inventory;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -12,7 +9,8 @@ using UnityEngine.UI;
 namespace IdleDefenseSurvival.UI.Equipment
 {
     /// <summary>
-    /// Individual equipment slot UI.
+    /// Pure view for one equipment slot (paper-doll).
+    /// Only ApplyViewData from the parent UI; never queries any service or database.
     /// </summary>
     public class EquipmentSlotUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IDropHandler
     {
@@ -20,101 +18,109 @@ namespace IdleDefenseSurvival.UI.Equipment
         public EquipmentType Slot;
 
         [Header("Visuals")]
+        [Tooltip("Icon of the equipped item.")]
         [SerializeField] private Image _iconImage;
+        [Tooltip("Border colored by the equipped item's rarity.")]
         [SerializeField] private Image _rarityBorder;
+        [Tooltip("Shown when this slot is not unlocked yet.")]
         [SerializeField] private GameObject _lockedOverlay;
+        [Tooltip("Shown when no item is equipped in this slot.")]
         [SerializeField] private GameObject _emptyIndicator;
+        [Tooltip("Durability bar of the equipped item.")]
         [SerializeField] private Slider _durabilityBar;
+        [Tooltip("Shown when the equipped item has enhancement level > 0.")]
         [SerializeField] private GameObject _enhanceIndicator;
         [SerializeField] private TextMeshProUGUI _enhanceText;
+        [Tooltip("Highlight when the equipped item's set bonus is active.")]
         [SerializeField] private GameObject _setBonusGlow;
+        [Tooltip("Unlock button shown when the slot is locked and unlockable.")]
+        [SerializeField] private Button _unlockButton;
+        [Tooltip("Text on the unlock button (cost / requirement).")]
+        [SerializeField] private TextMeshProUGUI _unlockButtonText;
 
         // State
         private EquipmentUI _parentUI;
         private InventoryItem _currentItem;
+        private bool _isInitialized;
 
         public InventoryItem CurrentItem => _currentItem;
+        public EquipmentType SlotType => Slot;
 
         public void Initialize(EquipmentUI parentUI)
         {
             _parentUI = parentUI;
-            Refresh();
+            _isInitialized = true;
+
+            if (_unlockButton != null)
+                _unlockButton.onClick.AddListener(OnUnlockClicked);
         }
 
-        public void Refresh()
+        private void OnUnlockClicked()
         {
-            var equipment = EquipmentService.Instance;
-            if (equipment == null) return;
+            EquipmentService.Instance?.UnlockSlot(Slot);
+        }
 
-            _currentItem = equipment.EquippedItems.GetValueOrDefault(Slot);
+        /// <summary>Applies presenter-built view data. Pure view step — no lookups.</summary>
+        public void ApplyViewData(EquipmentSlotViewData data)
+        {
+            if (!_isInitialized || data == null) return;
+            if (this == null || gameObject == null || !gameObject.activeInHierarchy) return;
 
-            var slotData = equipment.SlotData.FirstOrDefault(s => s.Slot == Slot);
+            _currentItem = data.ReferenceItem;
 
-            // Locked overlay
-            bool isLocked = slotData != null && !slotData.IsUnlocked;
-            if (_lockedOverlay != null) _lockedOverlay.SetActive(isLocked);
+            var state = data.State;
+            var occupied = state == EquipmentSlotState.Occupied;
 
-            if (_currentItem == null)
+            if (_lockedOverlay != null) _lockedOverlay.SetActive(state == EquipmentSlotState.Locked);
+            if (_emptyIndicator != null) _emptyIndicator.SetActive(state == EquipmentSlotState.Empty);
+            if (_setBonusGlow != null) _setBonusGlow.SetActive(occupied && data.ShowSetBonusGlow);
+
+            // Unlock button (poin 10)
+            if (_unlockButton != null)
             {
-                // Empty slot
-                if (_iconImage != null) { _iconImage.sprite = null; _iconImage.enabled = false; }
-                if (_rarityBorder != null) _rarityBorder.enabled = false;
-                if (_emptyIndicator != null) _emptyIndicator.SetActive(true);
-                if (_durabilityBar != null) _durabilityBar.gameObject.SetActive(false);
-                if (_enhanceIndicator != null) _enhanceIndicator.SetActive(false);
-                if (_setBonusGlow != null) _setBonusGlow.SetActive(false);
-                return;
+                bool show = state == EquipmentSlotState.Locked && data.ShowUnlockButton;
+                _unlockButton.gameObject.SetActive(show);
+                if (_unlockButtonText != null && show) _unlockButtonText.text = data.UnlockLabel;
             }
-
-            // Has item
-            if (_emptyIndicator != null) _emptyIndicator.SetActive(false);
-
-            var itemData = ItemDatabase.Instance?.GetItem(_currentItem.ItemId);
 
             // Icon
-            if (_iconImage != null && itemData?.Icon != null)
+            if (_iconImage != null)
             {
-                _iconImage.sprite = itemData.Icon;
-                _iconImage.enabled = true;
+                _iconImage.sprite = data.Icon;
+                _iconImage.enabled = occupied && data.ShowIcon;
             }
 
-            // ItemRarity border
-            if (_rarityBorder != null && itemData?.ItemRarity != ItemRarity.None)
+            // Rarity border
+            if (_rarityBorder != null)
             {
-                _rarityBorder.color = itemData.ItemRarity.GetDefaultColor();
-                _rarityBorder.enabled = true;
+                bool rarity = occupied && data.ShowBorder;
+                _rarityBorder.color = rarity ? data.BorderColor : GameColors.white;
             }
 
             // Durability
             if (_durabilityBar != null)
             {
-                _durabilityBar.gameObject.SetActive(true);
-                float p = _currentItem.GetDurabilityPercent();
-                _durabilityBar.value = p;
-                var fill = _durabilityBar.fillRect != null ? _durabilityBar.fillRect.GetComponent<Image>() : null;
-                if (fill != null) fill.color = _currentItem.GetDurabilityColor();
+                bool show = occupied && data.ShowDurability;
+                _durabilityBar.gameObject.SetActive(show);
+                if (show)
+                {
+                    _durabilityBar.value = data.Durability;
+                    var fill = _durabilityBar.fillRect != null ? _durabilityBar.fillRect.GetComponent<Image>() : null;
+                    if (fill != null) fill.color = data.DurabilityColor;
+                }
             }
 
-            // Enhance level
-            if (_enhanceIndicator != null && _currentItem.EnhanceLevel > 0)
+            // Enhance badge
+            if (_enhanceIndicator != null)
             {
-                _enhanceIndicator.SetActive(true);
-                if (_enhanceText != null) _enhanceText.text = $"+{_currentItem.EnhanceLevel}";
-            }
-            else if (_enhanceIndicator != null)
-            {
-                _enhanceIndicator.SetActive(false);
+                bool show = occupied && data.ShowEnhance;
+                _enhanceIndicator.SetActive(show);
+                if (_enhanceText != null && show) _enhanceText.text = data.EnhanceText;
             }
 
-            // Set bonus glow
-            if (_setBonusGlow != null)
-            {
-                string setId = _currentItem.GetSetId();
-                bool hasActiveSetBonus = !string.IsNullOrEmpty(setId) && EquipmentService.Instance?.IsSetBonusActive(setId, 0) == true;
-                _setBonusGlow.SetActive(hasActiveSetBonus);
-            }
-
-            gameObject.name = $"EquipSlot_{Slot}_{_currentItem.ItemId}";
+            gameObject.name = occupied
+                ? $"Slot_{Slot}_{_currentItem?.ItemId}"
+                : $"Slot_{Slot}_{state}";
         }
 
         #region Event Handlers
@@ -123,42 +129,43 @@ namespace IdleDefenseSurvival.UI.Equipment
             if (eventData.button == PointerEventData.InputButton.Right)
             {
                 _parentUI?.OnSlotRightClick(this);
+                return;
             }
-            else
+
+            // Locked slot: clicking unlocks (uses gold/level/quest gate via service).
+            if (!_parentUI.IsSlotLocked(Slot))
             {
-                _parentUI?.OnSlotClick(this);
+                EquipmentService.Instance?.UnlockSlot(Slot);
+                return;
             }
+
+            _parentUI?.OnSlotClick(this);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (_parentUI == null)
-            {
-                _parentUI._hoveredSlot = this;
-            }
+            if (_parentUI != null) _parentUI._hoveredSlot = this;
             ShowTooltip();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (_parentUI == null)
-            {
-                _parentUI._hoveredSlot = null;
-            }
+            if (_parentUI != null) _parentUI._hoveredSlot = null;
             HideTooltip();
         }
 
         public void OnDrop(PointerEventData eventData)
         {
-            // Handle drag-drop from inventory
-            var dragItem = eventData.pointerDrag?.GetComponent<InventoryDragItem>();
-            if (dragItem != null && dragItem.Item != null)
+            // Fallback: eventData.pointerDrag is the grid slot, not the visual drag
+            // component. Resolve from the drag's static current-drag instead.
+            var item = eventData.pointerDrag?.GetComponent<InventoryDragItem>()?.Item
+                       ?? InventoryDragItem.DraggedItem;
+
+            if (item == null || item.GetEquipmentType() != Slot) return;
+
+            if (EquipmentService.Instance?.CanEquip(item, Slot, out _) == true)
             {
-                var item = dragItem.Item;
-                if (item.GetEquipmentType() == Slot)
-                {
-                    EquipmentService.Instance?.Equip(item, Slot);
-                }
+                EquipmentService.Instance.Equip(item, Slot);
             }
         }
         #endregion
@@ -176,5 +183,4 @@ namespace IdleDefenseSurvival.UI.Equipment
         }
         #endregion
     }
-
 }

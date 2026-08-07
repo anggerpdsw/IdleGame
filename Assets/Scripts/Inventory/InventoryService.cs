@@ -713,12 +713,12 @@ namespace IdleDefenseSurvival.Inventory
         {
             var slotData = _slots
                 .Where(s => !s.IsEmpty)
-                .Select(s => new InventorySlotData { SlotIndex = s.SlotIndex, Item = s.Item })
+                .Select(s => new InventorySlotData { Item = s.Item })
                 .ToArray();
 
             return new InventorySaveData
             {
-                Config = _config,
+                CurrentCapacity = Capacity, // Current expanded capacity
                 Slots = slotData,
                 LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
@@ -728,16 +728,42 @@ namespace IdleDefenseSurvival.Inventory
         {
             if (data == null) return;
 
-            _config = data.Config ?? new InventoryConfig();
-            CreateSlots(_config.BaseCapacity);
+            // Config is loaded from dataInventory.json - we only restore CurrentCapacity
+            // Handle legacy Config field from v3 saves (Width * Height preserves expansions)
+            int capacity = data.CurrentCapacity;
+            if (capacity == 0 && data.LegacyConfig != null)
+            {
+                capacity = data.LegacyConfig.Width * data.LegacyConfig.Height;
+            }
+            if (capacity == 0)
+            {
+                capacity = 48; // Default BaseCapacity
+            }
+
+            // Sync Height so Capacity (Width * Height) matches restored slot count
+            _config.Height = (capacity + _config.Width - 1) / _config.Width;
+            CreateSlots(capacity);
 
             if (data.Slots != null)
             {
                 foreach (var slotData in data.Slots)
                 {
-                    if (slotData.SlotIndex >= 0 && slotData.SlotIndex < _slots.Count)
+                    int targetSlot = -1;
+
+                    // Use legacy SlotIndex if available (migrated from v3)
+                    if (slotData.LegacySlotIndex >= 0 && slotData.LegacySlotIndex < _slots.Count)
                     {
-                        _slots[slotData.SlotIndex].Item = slotData.Item;
+                        targetSlot = slotData.LegacySlotIndex;
+                    }
+                    else
+                    {
+                        // Fallback: find first empty slot
+                        targetSlot = FindEmptySlot();
+                    }
+
+                    if (targetSlot >= 0 && slotData.Item != null)
+                    {
+                        _slots[targetSlot].Item = slotData.Item;
                     }
                 }
             }

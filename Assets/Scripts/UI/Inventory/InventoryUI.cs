@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
-using System.Linq;
 using TMPro;
 
 namespace IdleDefenseSurvival.UI.Inventory
@@ -18,13 +18,9 @@ namespace IdleDefenseSurvival.UI.Inventory
         [SerializeField] private TextMeshProUGUI _capacityText;
         [SerializeField] private RectTransform _gridContainer;
         [SerializeField] private GameObject _slotPrefab;
-        [SerializeField] private GameObject _itemPrefab;
-        [SerializeField] private ScrollRect _scrollRect;
 
         [Header("Filter/Sort")]
-        [SerializeField] private InventoryFilterUI _filterUI;
         [SerializeField] private InventorySortUI _sortUI;
-        [SerializeField] private InputField _searchField;
 
         [Header("Tabs")]
         [SerializeField] private InventoryTabButton[] _tabs;
@@ -70,7 +66,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             // Handle drag visual
             if (_activeDragItem != null)
             {
-                _activeDragItem.transform.position = Input.mousePosition;
+                _activeDragItem.transform.position = Mouse.current.position.ReadValue();
             }
         }
         #endregion
@@ -99,17 +95,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             }
             SetTab(_currentTab);
 
-            // Setup search
-            if (_searchField != null)
-            {
-                _searchField.onValueChanged.AddListener(OnSearchChanged);
-            }
-
-            // Setup filter & sort
-            if (_filterUI != null)
-            {
-                _filterUI.OnFilterChanged += OnFilterChanged;
-            }
+            // Setup sort
             if (_sortUI != null)
             {
                 _sortUI.OnSortChanged += OnSortChanged;
@@ -185,16 +171,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             RefreshUI();
         }
 
-        private void OnSearchChanged(string text)
-        {
-            if (InventoryService.Instance != null)
-            {
-                var filter = InventoryService.Instance.GetCurrentFilter();
-                filter.SearchText = text;
-                InventoryService.Instance.SetFilter(filter);
-            }
-        }
-        #endregion
+                #endregion
 
         #region Public API
         public void RefreshUI()
@@ -231,37 +208,32 @@ namespace IdleDefenseSurvival.UI.Inventory
             var inventory = InventoryService.Instance;
             if (inventory == null) return new List<InventoryItem>();
 
-            // Clone filter so tab override never mutates the service's stored filter.
-            var filter = inventory.GetCurrentFilter().Clone();
-            if (_currentTab == TabType.All)
-            {
-                filter.Categories = null;
-            }
-            else
-            {
-                filter.Categories = TabToCategories(_currentTab);
-            }
+            var items = new List<InventoryItem>(inventory.AllItems);
 
-            return filter.IsEmpty
-                ? inventory.AllItems.ToList()
-                : inventory.AllItems.Where(filter.Matches).ToList();
+            // Equipment currently worn is shown in the paper-doll slots, never in the list.
+            items.RemoveAll(item => item.IsEquipped);
+
+            if (_currentTab != TabType.All)
+                items.RemoveAll(item => !TabMatches(item));
+
+            return items;
         }
+
+        private bool TabMatches(InventoryItem item) => _currentTab switch
+        {
+            TabType.Equipment => item.GetItemCategory() == ItemCategory.Equipment,
+            TabType.Consumables => item.GetItemCategory() == ItemCategory.Consumable,
+            TabType.Materials => item.GetItemCategory() == ItemCategory.Material,
+            TabType.Gems => item.GetItemCategory() == ItemCategory.Gem,
+            TabType.Other => OtherCategories.Contains(item.GetItemCategory()),
+            _ => true
+        };
 
         private static readonly ItemCategory[] OtherCategories =
         {
             ItemCategory.Quest, ItemCategory.Currency, ItemCategory.Key, ItemCategory.Chest,
             ItemCategory.UpgradeStone, ItemCategory.SkillBook, ItemCategory.Rune,
             ItemCategory.Skin, ItemCategory.Pet, ItemCategory.Artifact
-        };
-
-        private ItemCategory[] TabToCategories(TabType tab) => tab switch
-        {
-            TabType.Equipment => new[] { ItemCategory.Equipment },
-            TabType.Consumables => new[] { ItemCategory.Consumable },
-            TabType.Materials => new[] { ItemCategory.Material },
-            TabType.Gems => new[] { ItemCategory.Gem },
-            TabType.Other => OtherCategories,
-            _ => Array.Empty<ItemCategory>()
         };
 
         public void SetTab(TabType tab)
@@ -288,12 +260,6 @@ namespace IdleDefenseSurvival.UI.Inventory
             InventoryService.Instance?.Sort(sortType, ascending);
         }
 
-        public void OnFilterChanged(InventoryFilter filter)
-        {
-            InventoryService.Instance?.SetFilter(filter);
-            RefreshUI();
-        }
-
         private void UpdateCapacityDisplay()
         {
             var inventory = InventoryService.Instance;
@@ -312,9 +278,17 @@ namespace IdleDefenseSurvival.UI.Inventory
             _draggedItem = item;
             _draggedFromSlot = slotIndex;
 
-            _activeDragItem = Instantiate(_dragItemPrefab, _dragCanvas.transform);
-            _activeDragItem.Initialize(item);
-            _activeDragItem.transform.position = screenPosition;
+            if (_dragItemPrefab != null && _dragCanvas != null)
+            {
+                _activeDragItem = Instantiate(_dragItemPrefab, _dragCanvas.transform);
+                _activeDragItem.Initialize(item);
+                _activeDragItem.transform.position = screenPosition;
+            }
+            else
+            {
+                // No drag prefab wired yet; still allow drop via static DraggedItem.
+                InventoryDragItem.DraggedItem = item;
+            }
         }
 
         public void EndDrag(int targetSlotIndex)
@@ -359,6 +333,10 @@ namespace IdleDefenseSurvival.UI.Inventory
             {
                 Destroy(_activeDragItem.gameObject);
                 _activeDragItem = null;
+            }
+            else
+            {
+                InventoryDragItem.DraggedItem = null;
             }
         }
 

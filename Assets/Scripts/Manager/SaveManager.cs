@@ -293,6 +293,39 @@ namespace IdleDefenseSurvival.Manager
                 data.version = 3;
             }
 
+            // v4: Save optimization - remove derived/computed fields, simplify equipment format
+            if (data.version < 4)
+            {
+                // Migrate equipment data from old EquippedItemData format to new EquipmentInstanceIdData format
+                if (data.equipmentData != null && data.equipmentData.EquippedItems != null)
+                {
+                    var oldEquippedItems = data.equipmentData.EquippedItems;
+                    var newEquippedItems = new List<EquipmentInstanceIdData>();
+
+                    foreach (var oldEquip in oldEquippedItems)
+                    {
+                        // Check for legacy Item field (from v3 EquippedItemData)
+                        if (oldEquip.HasLegacyItem)
+                        {
+                            newEquippedItems.Add(new EquipmentInstanceIdData
+                            {
+                                Slot = oldEquip.Slot,
+                                InstanceId = oldEquip.LegacyItem.InstanceId
+                            });
+                        }
+                        // Already migrated format (has InstanceId directly)
+                        else if (!string.IsNullOrEmpty(oldEquip.InstanceId))
+                        {
+                            newEquippedItems.Add(oldEquip);
+                        }
+                    }
+
+                    data.equipmentData.EquippedItems = newEquippedItems.ToArray();
+                }
+
+                data.version = 4;
+            }
+
             // Repair missing fields for any version
             data.account ??= new AccountData();
             data.currency ??= new CurrencyData();

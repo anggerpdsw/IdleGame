@@ -630,7 +630,7 @@ namespace IdleDefenseSurvival.Player
         {
             float diameter = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * 2f;
             _attackRangeRenderer.transform.localScale = new Vector3(diameter, diameter, 1f);
-            _attackRangeRenderer.color = new Color(0.10f, 0.95f, 1.00f, 0.09f);
+            _attackRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
         }
 
 #if UNITY_EDITOR
@@ -643,7 +643,7 @@ namespace IdleDefenseSurvival.Player
         private void OnDrawGizmosSelected()
         {
             // Draw attack range as subtle cyan dashed circle in Scene view
-            Gizmos.color = new Color(0f, 1f, 1f, 0.5f); // Cyan with transparency
+            Gizmos.color = GameColors.debugCyanGizmo.WithAlpha(0.5f); // Cyan with transparency
             DrawCircleGizmo(transform.position, AttackRange, 64);
             
             if (Application.isPlaying)

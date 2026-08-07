@@ -234,6 +234,9 @@ namespace IdleDefenseSurvival.Items
         /// </summary>
         public float GetDurabilityPercent(InventoryItem item) => item?.GetDurabilityPercent() ?? 0f;
 
+        /// <summary>Durability bar color from the data-driven table.</summary>
+        public Color GetDurabilityColor(InventoryItem item) => DurabilityColorTable.GetColor(GetDurabilityPercent(item));
+
         /// <summary>
         /// Gets missing durability points.
         /// </summary>

@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Save
 {
     /// <summary>
     /// Equipment serializer - handles serialization/deserialization of equipment data.
+    /// v4: EquippedItems stores only (Slot, InstanceId) - items live in inventory.
     /// </summary>
     public static class EquipmentSerializer
     {
@@ -18,14 +19,14 @@ namespace IdleDefenseSurvival.Save
         {
             if (equipment == null) return EquipmentSaveData.CreateEmpty();
 
-            var equippedItems = new List<EquippedItemData>();
+            var equippedItems = new List<EquipmentInstanceIdData>();
 
             foreach (var kvp in equipment.EquippedItems)
             {
-                equippedItems.Add(new EquippedItemData
+                equippedItems.Add(new EquipmentInstanceIdData
                 {
                     Slot = kvp.Key,
-                    Item = SerializeItem(kvp.Value)
+                    InstanceId = kvp.Value?.InstanceId
                 });
             }
 
@@ -61,42 +62,6 @@ namespace IdleDefenseSurvival.Save
         }
 
         /// <summary>
-        /// Serializes a single inventory item for equipment save.
-        /// </summary>
-        private static InventoryItem SerializeItem(InventoryItem item)
-        {
-            if (item == null) return null;
-
-            var serialized = new InventoryItem
-            {
-                InstanceId = item.InstanceId,
-                ItemId = item.ItemId,
-                Quantity = item.Quantity,
-                Level = item.Level,
-                EnhanceLevel = item.EnhanceLevel,
-                LimitBreakCount = item.LimitBreakCount,
-                RefineLevel = item.RefineLevel,
-                TranscendLevel = item.TranscendLevel,
-                EvolutionStage = item.EvolutionStage,
-                IsAwakened = item.IsAwakened,
-                IsMasterwork = item.IsMasterwork,
-                CurrentDurability = item.CurrentDurability,
-                MaxDurability = item.MaxDurability,
-                Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray(),
-                Enchantment = item.Enchantment?.Clone(),
-                IsFavorite = item.IsFavorite,
-                IsLocked = item.IsLocked,
-                IsEquipped = item.IsEquipped,
-                EquippedSlot = item.EquippedSlot,
-                IsNew = item.IsNew,
-                AcquiredTimestamp = item.AcquiredTimestamp,
-                CustomData = item.CustomData != null ? new Dictionary<string, object>(item.CustomData) : null
-            };
-
-            return serialized;
-        }
-
-        /// <summary>
         /// Validates equipment save data integrity.
         /// </summary>
         public static bool ValidateSaveData(EquipmentSaveData data, out string error)
@@ -120,20 +85,14 @@ namespace IdleDefenseSurvival.Save
 
             foreach (var equipData in data.EquippedItems)
             {
-                if (equipData?.Item == null) continue;
+                if (equipData == null || string.IsNullOrEmpty(equipData.InstanceId)) continue;
 
-                if (string.IsNullOrEmpty(equipData.Item.InstanceId))
+                if (seenInstanceIds.Contains(equipData.InstanceId))
                 {
-                    error = $"Equipped item in slot {equipData.Slot} has empty InstanceId";
+                    error = $"Duplicate InstanceId: {equipData.InstanceId}";
                     return false;
                 }
-
-                if (seenInstanceIds.Contains(equipData.Item.InstanceId))
-                {
-                    error = $"Duplicate InstanceId: {equipData.Item.InstanceId}";
-                    return false;
-                }
-                seenInstanceIds.Add(equipData.Item.InstanceId);
+                seenInstanceIds.Add(equipData.InstanceId);
 
                 if (seenSlots.Contains(equipData.Slot))
                 {
@@ -141,19 +100,6 @@ namespace IdleDefenseSurvival.Save
                     return false;
                 }
                 seenSlots.Add(equipData.Slot);
-
-                if (equipData.Item.Quantity != 1)
-                {
-                    error = $"Equipment item {equipData.Item.InstanceId} should have quantity 1";
-                    return false;
-                }
-
-                // Validate item matches slot
-                if (equipData.Item.GetEquipmentType() != equipData.Slot)
-                {
-                    error = $"Item {equipData.Item.ItemId} type {equipData.Item.GetEquipmentType()} doesn't match slot {equipData.Slot}";
-                    return false;
-                }
             }
 
             return true;
@@ -168,37 +114,34 @@ namespace IdleDefenseSurvival.Save
 
             var repaired = new EquipmentSaveData
             {
-                EquippedItems = data.EquippedItems ?? Array.Empty<EquippedItemData>(),
+                EquippedItems = data.EquippedItems ?? Array.Empty<EquipmentInstanceIdData>(),
                 UnlockedSlots = data.UnlockedSlots ?? Array.Empty<UnlockedSlotData>(),
                 LastModifiedTimestamp = data.LastModifiedTimestamp
             };
 
-            var validEquipped = new List<EquippedItemData>();
+            var validEquipped = new List<EquipmentInstanceIdData>();
             var seenIds = new HashSet<string>();
             var seenSlots = new HashSet<EquipmentType>();
 
             foreach (var equipData in repaired.EquippedItems)
             {
-                if (equipData?.Item == null) continue;
+                if (equipData == null || string.IsNullOrEmpty(equipData.InstanceId)) continue;
 
                 // Generate new InstanceId if empty or duplicate
-                if (string.IsNullOrEmpty(equipData.Item.InstanceId) || seenIds.Contains(equipData.Item.InstanceId))
+                if (seenIds.Contains(equipData.InstanceId))
                 {
-                    equipData.Item.InstanceId = Guid.NewGuid().ToString();
+                    equipData.InstanceId = Guid.NewGuid().ToString();
                 }
-                seenIds.Add(equipData.Item.InstanceId);
-
-                // Fix quantity
-                equipData.Item.Quantity = 1;
+                seenIds.Add(equipData.InstanceId);
 
                 // Fix slot conflicts - move to first available compatible slot
                 EquipmentType targetSlot = equipData.Slot;
-                if (seenSlots.Contains(targetSlot) || equipData.Item.GetEquipmentType() != targetSlot)
+                if (seenSlots.Contains(targetSlot))
                 {
-                    // Find first available compatible slot
+                    // Find first available slot
                     foreach (EquipmentType slot in EquipmentTypeExtensions.GetAllTypes())
                     {
-                        if (!seenSlots.Contains(slot) && equipData.Item.GetEquipmentType() == slot)
+                        if (!seenSlots.Contains(slot))
                         {
                             targetSlot = slot;
                             break;

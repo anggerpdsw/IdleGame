@@ -238,7 +238,7 @@ namespace IdleDefenseSurvival.Equipment
             _modifierService.ApplyItemStatModifiers(item, slot, true);
 
             _events.Equipped(slot, item, setId, newCount);
-            Inventory.InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
+            InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
 
             return true;
         }
@@ -269,7 +269,7 @@ namespace IdleDefenseSurvival.Equipment
             item.EquippedSlot = EquipmentType.None;
 
             _events.Unequipped(slot, item, setId, newCount);
-            Inventory.InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
+            InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
 
             return item;
         }
@@ -334,6 +334,9 @@ namespace IdleDefenseSurvival.Equipment
         public IReadOnlyList<SetBonusTier> GetActiveSetBonuses(string setId) => _setBonusService.GetActiveTiers(setId);
         public IReadOnlyDictionary<string, IReadOnlyList<SetBonusTier>> GetAllActiveSetBonuses() => _setBonusService.GetAllActiveBonuses();
         public bool IsSetBonusActive(string setId, int tierIndex) => _setBonusService.IsTierActive(setId, tierIndex);
+
+        /// <summary>True if any set bonus tier for this set is currently active.</summary>
+        public bool IsSetBonusActive(string setId) => GetActiveSetBonuses(setId).Count > 0;
         public int GetSetPieceCount(string setId) => _setBonusService.GetSetPieceCount(setId);
         #endregion
 
@@ -434,10 +437,17 @@ namespace IdleDefenseSurvival.Equipment
 
             _slots.RestoreUnlocks((data.UnlockedSlots ?? Array.Empty<UnlockedSlotData>()).Select(s => s.Slot));
 
-            foreach (var equipData in data.EquippedItems ?? Array.Empty<EquippedItemData>())
+            foreach (var equipData in data.EquippedItems ?? Array.Empty<EquipmentInstanceIdData>())
             {
-                if (equipData.Item != null)
-                    EquipInternal(equipData.Slot, equipData.Item);
+                if (!string.IsNullOrEmpty(equipData.InstanceId))
+                {
+                    var inventory = InventoryService.Instance;
+                    var item = inventory != null ? inventory.GetItem(equipData.InstanceId) : null;
+                    if (item != null)
+                        EquipInternal(equipData.Slot, item);
+                    else
+                        Debug.LogWarning($"[EquipmentService] Could not find item with InstanceId {equipData.InstanceId} for slot {equipData.Slot}");
+                }
             }
         }
 

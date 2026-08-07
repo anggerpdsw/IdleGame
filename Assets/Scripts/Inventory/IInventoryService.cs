@@ -301,17 +301,26 @@ namespace IdleDefenseSurvival.Inventory
 
     /// <summary>
     /// Save data for inventory.
+    /// Config is loaded from dataInventory.json - NOT saved.
+    /// Only CurrentCapacity (or ExpansionCount) and Slots are persisted.
     /// </summary>
     [Serializable]
     public class InventorySaveData
     {
-        public InventoryConfig Config;
+        public int CurrentCapacity; // BaseCapacity + expansions
         public InventorySlotData[] Slots;
         public long LastModifiedTimestamp;
 
+        // Migration helper: captures old "Config" field from v3 saves during deserialization.
+        // Not written back on save (ShouldSerialize pattern).
+        [Newtonsoft.Json.JsonProperty("Config")]
+        public InventoryConfig LegacyConfig { get; set; }
+
+        public bool ShouldSerializeLegacyConfig() => false;
+
         public static InventorySaveData CreateEmpty() => new()
         {
-            Config = new InventoryConfig(),
+            CurrentCapacity = 48, // BaseCapacity from config
             Slots = Array.Empty<InventorySlotData>(),
             LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
@@ -320,7 +329,15 @@ namespace IdleDefenseSurvival.Inventory
     [Serializable]
     public class InventorySlotData
     {
-        public int SlotIndex;
+        // SlotIndex REMOVED - array index IS the index
+        // IsLocked/AllowedCategory REMOVED - never set at runtime, use InventorySlot directly in memory
         public InventoryItem Item;
+
+        // Migration helper: captures old "SlotIndex" field from v3 saves during deserialization.
+        // Not written back on save (ShouldSerialize pattern).
+        [Newtonsoft.Json.JsonProperty("SlotIndex")]
+        public int LegacySlotIndex { get; set; }
+
+        public bool ShouldSerializeLegacySlotIndex() => false;
     }
 }

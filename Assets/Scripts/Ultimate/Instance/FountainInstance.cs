@@ -152,7 +152,7 @@ namespace IdleDefenseSurvival.Ultimate
         private void OnDrawGizmosSelected()
         {
             // Draw fountain radius in editor
-            Gizmos.color = new Color(0.2f, 0.8f, 0.2f, 0.3f); // Green with transparency
+            Gizmos.color = GameColors.uncommonGreen.WithAlpha(0.3f); // Green with transparency
             Gizmos.DrawWireSphere(transform.position, _fountainRadius);
         }
 #endif

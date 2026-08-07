@@ -161,7 +161,7 @@ namespace IdleDefenseSurvival.Ultimate
         private void OnDrawGizmosSelected()
         {
             // Draw explosion radius in editor
-            Gizmos.color = new Color(1f, 0.5f, 0f, 0.3f); // Orange with transparency
+            Gizmos.color = GameColors.debugOrangeGizmo.WithAlpha(0.3f); // Orange with transparency
             Gizmos.DrawWireSphere(transform.position, _explosionRadius);
         }
 #endif

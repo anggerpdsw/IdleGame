@@ -126,7 +126,7 @@ namespace IdleDefenseSurvival.Player
         {
             if (_collider != null && _collider.enabled)
             {
-                Gizmos.color = new Color(0f, 0.5f, 1f, 0.3f);
+                Gizmos.color = GameColors.debugBlueGizmo.WithAlpha(0.3f);
                 Gizmos.DrawWireSphere(transform.position, _collider.radius);
             }
         }

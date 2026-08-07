@@ -7,6 +7,7 @@ namespace IdleDefenseSurvival.Save
 {
     /// <summary>
     /// Inventory serializer - handles serialization/deserialization of inventory data.
+    /// v4: Config not saved, SlotIndex not saved (array index is the index), derived fields not serialized.
     /// </summary>
     public static class InventorySerializer
     {
@@ -26,7 +27,6 @@ namespace IdleDefenseSurvival.Save
                 {
                     slots.Add(new InventorySlotData
                     {
-                        SlotIndex = i,
                         Item = SerializeItem(slot.Item)
                     });
                 }
@@ -34,7 +34,7 @@ namespace IdleDefenseSurvival.Save
 
             return new InventorySaveData
             {
-                Config = inventory.Config,
+                CurrentCapacity = inventory.Capacity,
                 Slots = slots.ToArray(),
                 LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
@@ -52,12 +52,12 @@ namespace IdleDefenseSurvival.Save
 
         /// <summary>
         /// Serializes a single inventory item.
+        /// Derived/computed fields are NOT serialized (stored in [NonSerialized] fields).
         /// </summary>
         private static InventoryItem SerializeItem(InventoryItem item)
         {
             if (item == null) return null;
 
-            // Create a clean copy for serialization
             var serialized = new InventoryItem
             {
                 InstanceId = item.InstanceId,
@@ -77,8 +77,6 @@ namespace IdleDefenseSurvival.Save
                 Enchantment = item.Enchantment?.Clone(),
                 IsFavorite = item.IsFavorite,
                 IsLocked = item.IsLocked,
-                IsEquipped = item.IsEquipped,
-                EquippedSlot = item.EquippedSlot,
                 IsNew = item.IsNew,
                 AcquiredTimestamp = item.AcquiredTimestamp,
                 CustomData = item.CustomData != null ? new Dictionary<string, object>(item.CustomData) : null
@@ -113,7 +111,7 @@ namespace IdleDefenseSurvival.Save
 
                 if (string.IsNullOrEmpty(slotData.Item.InstanceId))
                 {
-                    error = $"Item at slot {slotData.SlotIndex} has empty InstanceId";
+                    error = "Item has empty InstanceId";
                     return false;
                 }
 
@@ -123,12 +121,6 @@ namespace IdleDefenseSurvival.Save
                     return false;
                 }
                 seenInstanceIds.Add(slotData.Item.InstanceId);
-
-                if (slotData.SlotIndex < 0)
-                {
-                    error = $"Invalid slot index: {slotData.SlotIndex}";
-                    return false;
-                }
 
                 if (slotData.Item.Quantity <= 0)
                 {
@@ -149,7 +141,7 @@ namespace IdleDefenseSurvival.Save
 
             var repaired = new InventorySaveData
             {
-                Config = data.Config ?? new InventoryConfig(),
+                CurrentCapacity = data.CurrentCapacity,
                 Slots = data.Slots ?? Array.Empty<InventorySlotData>(),
                 LastModifiedTimestamp = data.LastModifiedTimestamp
             };
@@ -172,10 +164,6 @@ namespace IdleDefenseSurvival.Save
                 // Fix quantity
                 if (slotData.Item.Quantity <= 0)
                     slotData.Item.Quantity = 1;
-
-                // Fix slot index
-                if (slotData.SlotIndex < 0)
-                    slotData.SlotIndex = validSlots.Count;
 
                 validSlots.Add(slotData);
             }
