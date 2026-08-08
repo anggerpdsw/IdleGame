@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Input System** (com.unity.inputsystem 1.19.0)
 - **UGUI** for UI (com.unity.ugui 2.0.0)
 - **Physics2D** for movement and collisions
+- **Test Framework** (com.unity.test-framework 1.6.0)
 - **DOTween** (Demigiant) for animations
 - **Newtonsoft.Json** for JSON serialization
 
@@ -21,7 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Open in Unity Hub by selecting the repository root folder.
 - Target platform: **Standalone** (Windows), configurable in Project Settings.
 - Main gameplay scene: `Assets/Scenes/MainGame.unity`
-- Other scenes: `Bootstrap.unity`, `MainMenu.unity`, `CardCollection.unity`
+- Other scenes: `Bootstrap.unity`, `MainMenu.unity`, `CardCollection.unity`, `Inventory.unity`
 
 ## Commands
 
@@ -87,9 +88,8 @@ Assets/
     Shockwave.prefab — Shockwave ultimate
     DamagePopup.prefab — Damage number popup
     HealthBar.prefab — Enemy health bar
-    UpgradeButton.prefab — Upgrade button UI
   Resources/
-    Data/         — JSON data files (dataPlayer, dataEnemy, dataWave, dataUltimate, dataCard)
+    Data/         — JSON data files (dataPlayer, dataEnemy, dataWave, dataUltimate, dataCard, dataItems, dataAttribute, dataConfigSocket)
     Art/
       Card/       — Card sprites
       Enemy/      — Enemy sprites (including Monsterpack)
@@ -100,22 +100,27 @@ Assets/
     MainMenu.unity    — Main menu scene
     MainGame.unity    — Main gameplay scene
     CardCollection.unity — Card collection UI scene
+    Inventory.unity   — Inventory UI scene
   Scripts/
-    Core/           — Bootstrap, ServiceLocator, SceneLoader, SceneCleanupHandler, interfaces
     Camera/         — CameraFollow, BackgroundScaler
-    Card/           — Card system (CardDatabase, CardRollService, CardUpgradeService, CardEquipmentService, CardManager, CardCollectionController)
-    Controller/     — UI Controllers (MainMenuController, SettingsController, VictoryController, CardCollectionController, GameSpeedController)
-    Data/           — All data classes (PlayerData, EnemyData, UpgradeData, CardData, DamageData, etc.)
-    Economy/        — EconomyManager, CurrencyData
-    Enemy/          — EnemyAi, EnemySpawner, EnemyHealthBarManager
-    IdleReward/     — IdleRewardManager, IdleRewardUI
-    Item/           — Items, ItemState, ItemClickManager
-    Manager/        — All managers (GameManager, WaveManager, SaveManager, UpgradeManager, EconomyManager, UltimateManager, ProjectilePool, DamagePopupManager, etc.)
-    Modifier/       — ModifierCalculator, ModifierManager
+    Card/           — Card system (CardDatabase, CardRollService, CardUpgradeService, CardEquipmentService, CardManager, CardCollectionController, CardInventory, CardModifierService, VirtualCardInventorySnapshot)
+    Controller/     — UI Controllers (MainMenuController, SettingsController, VictoryController, CardCollectionController, GameSpeedController, BootstrapController, InventoryController, GameController)
+    Core/           — Bootstrap, ServiceLocator, SceneLoader, SceneCleanupHandler, interfaces, CanvasRoot, Colorku, Constantku, Enumku, InventorySampleSeeder, ResourceCache
+    Daily/          — DailyRewardData, DailyRewardManager, DailyRewardSaveData, DailyRewardService, DailyRewardSlot, DailyRewardUI
+    Data/           — All data classes (PlayerData, EnemyData, UpgradeData, CardData, DamageData, DamagePopupData, GameStateData, ModifierData, SaveData, SpendingData, UltimateData, VictoryData, VIPData, WaveData, WaveProgressData, AccountData)
+    Economy/        — EconomyManager, CurrencyData, CurrencyPickup
+    Enemy/          — EnemyAi, EnemySpawner, EnemyHealthBarManager, EnemyStatusEffectController, StatusEffects (BaseStatusEffect, ConcreteStatusEffects, IStatusEffect)
+    Equipment/      — Full equipment system (EquipmentService, EquipmentSlotService, EquipmentEffectService, EquipmentModifierService, EquipmentSetBonusService, EquipmentDurabilityService, EquipmentComparisonService, EquipmentPersistenceService, EquipmentAutoEquipService, EquipmentVisualService, EquipmentType, EquipmentEventDispatcher, AttributeWeightsConfig, RarityMechanicConfig, SlotIdentityService, IEquipmentRepository, IEquipmentService, Tests)
+    IdleReward/     — IdleRewardManager, IdleRewardUI, IdleRewardData
+    Inventory/      — InventoryService, InventoryManager, InventoryItem, InventoryItemExtensions, IInventoryService
+    Item/           — ItemCategory, ItemClickManager, ItemRarity, Items, ItemState
+    Items/          — AutoRepairService, CraftCompletionService, CraftContextBuilder, CraftJob, CraftModifiers, CraftService, GemService, ItemDatabase, RecipeData
+    Manager/        — All managers (GameManager, WaveManager, SaveManager, UpgradeManager, EconomyManager, UltimateManager, ProjectilePool, DamagePopupManager, EnemyHealthBarManager, EnemySpawner, EnemyStatisticsManager, PlayerStatsManager, ModifierManager, CardManager, RewardManager, UIManager)
+    Modifier/       — ModifierCalculator, ModifierManager, StatModifier, ModifierSource, ModifierMode
     Player/         — Player, PlayerStats, Projectile, StatLoader, TankInstance
     Reward/         — RewardData, RewardManager, RewardPopup, RewardSlot, CardRewardSlot
-    UI/             — UI components (CardCollection, CurrencyDisplay, DamagePopup, EnemyHealthBar, Settings, Status, Upgrade)
-    Ultimate/       — Ultimate system (UltimateManager, UltimateFactory, handlers for each ultimate: Void, Tank, Root, Bomb, Fountain, Cloud, Shockwave)
+    UI/             — UI components (CardCollection, CurrencyDisplay, DamagePopup, EnemyHealthBar, Settings, Status, Upgrade, UpgradeButton, GameSpeedDisplay)
+    Ultimate/       — Ultimate system (UltimateManager, UltimateFactory, handlers for each ultimate: Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave)
     VisualScripting/ — Visual scripting graphs (if any)
   Settings/         — Input Action assets, Render Pipeline assets
   InputSystem_Actions.inputactions — Input mappings (currently unused, game is idle)
@@ -125,23 +130,27 @@ Assets/
 
 **Player (`Scripts/Player/Player.cs`)**
 - Fixed at screen center (0, 0)
-- Attributes: attack range, attack damage, attack speed, knockback force, health, regen, evasion, critical chance, multi-shoot, bounce, life steal, etc.
+- Attributes: attack range, attack damage, attack speed, knockback force, health, regen, evasion, critical chance, multi-shoot, bounce, life steal, mana, mana regen, etc.
 - Visual: dashed circle showing attack range (via `LineRenderer` or Gizmos)
-- Auto-attacks enemies within range
-- Handles player health, regeneration, death defy (immunity)
+- Auto-attacks enemies within range using `Physics2D.OverlapCircleAll`
+- Handles player health, regeneration, death defy (immunity), shield system
 - Spawns tanks at attack range boundary
-- Triggers ultimates (Void, Root, Fountain, Shockwave, Tank, Bomb, Cloud)
+- Triggers ultimates (Void, Root, Fountain, Shockwave, Tank, Bomb, Cloud, Lightning)
+- Supports Heal-over-Time and Mana-over-Time effects from potions
 
 **Enemy (`Scripts/Enemy/EnemyAi.cs`)**
 - Spawns outside player's attack range
-- Moves toward player using `Vector2.MoveTowards()`
+- Moves toward player using `Vector2.MoveTowards()` with steering (seek + separation)
 - Stops when within its own attack range to player
 - Gets knocked back by player attacks → resumes movement after knockback ends
 - Attributes: move speed, attack range, health, damage, evasion, element, role
 - Separation behavior to avoid stacking (uses `Physics2D.OverlapCircle` with ContactFilter2D)
 - Damage system with elemental multipliers, critical hits, knockback, stun
+- Slow effects (Permanent, Aura, Temporary) and Defense Break effects
+- Max health reduction (HeartBreak)
 - Rewards: gold, gems (daily limit), meat, EXP
 - Health bar managed by `EnemyHealthBarManager`
+- Drops physical pickups for gems and meat; gold/EXP instant
 
 **EnemySpawner (`Scripts/Enemy/EnemySpawner.cs`)**
 - Spawns enemies at random positions outside player's attack range
@@ -150,6 +159,7 @@ Assets/
 - Loads enemy data from `Resources/Data/dataEnemy.json`
 - Scales enemy stats by wave/tier difficulty
 - Calculates rewards based on enemy stats and wave/tier
+- Uses weighted spawn selection by role and spawnWeight
 
 **WaveManager (`Scripts/Manager/WaveManager.cs`)**
 - Central brain for wave-based gameplay
@@ -161,6 +171,7 @@ Assets/
 - Tier multiplier adds additional scaling for infinite progression
 - Tracks damage stats per wave per enemy
 - Handles victory (tier complete) and defeat
+- Interest wave bonus (gold/meat based on accumulated resources)
 
 **Projectile (`Scripts/Player/Projectile.cs`)**
 - Pooled via `ProjectilePool` (pre-instantiated, reusable)
@@ -168,73 +179,166 @@ Assets/
 - Supports: bounce (chain to nearby enemies), knockback, stun, critical hits (Critical, SuperCritical, UltraCritical), life steal, damage per range
 - Geometric damage reduction on bounce (50% per bounce)
 - Hits player or enemies based on owner
+- Enemy projectiles can apply slow, defense break
 
 **Enemy Health Bar (`Scripts/UI/EnemyHealthBarManager.cs`)**
 - Manages health bar pooling and display for enemies
 - Updates health in real-time
 - Shows above enemy with offset
+- Displays DefenseBreak and HeartBreak indicators
+
+**Equipment System (`Scripts/Equipment/`)**
+- Full equipment system with slots: Hat, Gloves, Armor, Pants, Belt, Boots, Ring, Necklace, Bracelet, Artifact
+- Items have: Level (1-50/60), Enhance level, Durability, Sockets (0-2), Prefix/Suffix affixes
+- Set bonuses (2/4 piece)
+- Special effects (on-hit procs, passive effects)
+- Gem socketing system (gems level up with experience)
+- Auto-equip best items
+- Comparison tooltips
+- Visual equipment models on player
+
+**Inventory System (`Scripts/Inventory/` & `Scripts/Items/`)**
+- Grid-based inventory with categories
+- Items: Consumables (potions, tickets), Materials (crafting), Equipment, Gems
+- Crafting system with recipes and queue
+- Gem service: leveling, socketing, random stats
+- Auto-repair service
+- Item comparison and tooltips
+
+**Card System (`Scripts/Card/`)**
+- Cards provide stat bonuses (flat or percent) or special effects
+- Rarities: Common, Rare, Epic, Legendary, Mythic
+- Pity system for Epic/Legendary/Mythic (thresholds: 30/70/200)
+- Cards can be equipped (max 5 slots)
+- Duplicates upgrade card level (max level 10)
+- Card collection UI in separate scene
+- Card effects: stat modifiers (via ModifierManager) + special effects (FrostAura, Shield, TimeFast, Gold, Meat)
+
+**Ultimate System (`Scripts/Ultimate/`)**
+- **Void**: Black hole that pulls enemies, slows, stuns
+- **Tank**: Stationary turrets at attack range boundary (max 4)
+- **Root**: Immobilizes enemies in area
+- **Bomb**: Explosion on enemy death (chain reaction)
+- **Fountain**: Healing fountain for player
+- **Cloud**: Toxic cloud damaging enemies over time + slow
+- **Lightning**: Chain lightning triggered by kill count (5 kills)
+- **Shockwave**: Expanding wave damaging enemies + knockback
+- Managed by `UltimateManager` + `UltimateFactory` + individual handlers
+- Each has cooldown, chance, active toggle, element type
+- Data from `dataUltimate.json`
+
+**Economy (`Scripts/Economy/`)**
+- **Gold**: Main currency, earned from kills, used for upgrades
+- **Gem**: Premium currency, daily limit (20/day), used for card rolls
+- **Meat**: Special resource, dropped by enemies
+- **EXP**: Permanent account EXP from enemy kills
+- `EconomyManager` singleton handles all currency operations
+- `SaveManager` handles persistence (JSON at `Application.persistentDataPath`)
+
+**Daily Rewards (`Scripts/Daily/`)**
+- 7-day login rewards
+- Tracks claimed days, streak
+- Resets daily at UTC midnight
+
+**Idle Rewards (`Scripts/IdleReward/`)**
+- Offline progress calculation
+- Gold, meat, EXP accumulation while offline
+- Claimable on game start
+
+**Save System (`Scripts/Manager/SaveManager.cs`)**
+- Single JSON file: `SaveData.json` at `Application.persistentDataPath`
+- Saves: Account, Currency, Spending, VIP, GameState, WaveProgress, IdleReward, DailyReward, CardInventory, Inventory, Equipment, CraftQueue
+- Auto-save interval (60s) + on pause/quit
+- Migration/repair for old save versions
+- Daily gem limit tracking (20/day)
 
 ### Game Mechanics
 
 1. **Attack Range Visualization**
    - Draw dashed circle around player using `LineRenderer` (material set to dashed)
    - Radius = player's attack range
-   - Updates if attack range increases via upgrades
+   - Updates if attack range increases via upgrades/cards/equipment
 
 2. **Enemy Spawning**
    - Spawn position: `player.position + Random.insideUnitCircle.normalized * (playerAttackRange + spawnBuffer)`
    - Ensure enemies spawn outside camera view or outside attack range
-   - Instantiate from `enemyPrefab`
+   - Instantiate from `enemyPrefab` (Basic prefab with EnemyAi)
+   - Weighted by role and spawnWeight from dataEnemy.json
 
 3. **Enemy AI States**
-   - **Approaching**: `Vector2.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime)`
-   - **Attacking**: Stop movement when `Vector2.Distance(transform.position, player.position) <= attackRange`
+   - **Approaching**: `Vector2.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime)` with steering (seek + separation)
+   - **Attacking**: Stop movement when `Vector2.Distance(transform.position, player.position) <= attackRange`, attack with cooldown
    - **Knockback**: Apply force via `Rigidbody2D.AddForce()`, resume approaching after knockback ends
+   - **Stun**: Frozen in place, cannot move or attack
 
 4. **Player Auto-Attack**
    - Every `attackSpeed` seconds, find all enemies in attack range
    - Use `Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer)`
    - Deal damage + apply knockback to enemies
+   - Multi-shoot: chance to fire additional projectiles at nearby enemies
    - No manual aiming (idle game)
 
 5. **Ultimate Abilities**
-   - **Void**: Black hole that pulls enemies
-   - **Tank**: Stationary turret at attack range boundary
-   - **Root**: Immobilizes enemies in area
-   - **Bomb**: Explosion on enemy death (chain reaction)
-   - **Fountain**: Healing fountain for player
-   - **Cloud**: Toxic cloud damaging enemies over time
-   - **Shockwave**: Expanding wave damaging enemies
+   - **Void**: Black hole pulls enemies, slows 77%, stuns ×4.3, cooldown 61s
+   - **Tank**: 4 turrets at attack range boundary, 1.7× damage, Metal element, 11% chance, 15.7s duration
+   - **Root**: Immobilizes enemies in area, Wood element, cooldown 17s, 8.5s duration
+   - **Bomb**: Explosion on death, 2.3× damage, 1.2× knockback, Fire element, 73% chance, 13.5s duration
+   - **Fountain**: Heals player, Water element, cooldown 39.63s, 8.1s duration
+   - **Cloud**: Toxic cloud DPS + 69% slow, Earth element, 81% chance, 6.3s duration
+   - **Lightning**: Chain lightning (7 targets), 2.3× damage, 2.1× stun, 22% defense break, Lightning element, triggers at 5 kills
+   - **Shockwave**: Expanding wave, 3.3× damage, 2.2× knockback, Wind element, cooldown 110s
    - Managed by `UltimateManager` + `UltimateFactory` + individual handlers
-   - Each has cooldown, chance, and active toggle
+   - Each has cooldown, chance, active toggle, element
 
 6. **Card System**
-   - Cards provide stat bonuses (flat or percent)
+   - Cards provide stat bonuses (flat or percent) or special effects
    - Rarities: Common, Rare, Epic, Legendary, Mythic
-   - Pity system for Epic/Legendary/Mythic
+   - Pity system: Epic at 30 rolls, Legendary at 70, Mythic at 200
    - Cards can be equipped (max 5 slots)
-   - Duplicates upgrade card level
-   - Card collection UI in separate scene
+   - Duplicates upgrade card level (max level 10)
+   - Card effects applied via `CardModifierService`:
+     - Stat modifiers → `ModifierManager` (e.g., AttackDamage +3%, AttackRange +0.2)
+     - Special effects → dictionary (FrostAura slow%, Shield%, TimeFast%)
+   - Roll costs: 1x = 50 gems, 10x = 450 gems, 100x = 4000 gems
 
 7. **Wave System**
    - Wave difficulty = f(waveTier, waveNumber)
    - Max wave: 350 (after that, only spawn count increases)
    - Tier progression: complete wave 350 → Victory UI → return to Main Menu → select next tier
-   - Use `ScriptableObject` for wave definitions (enemy count, types, spawn rate)
+   - Difficulty formulas:
+     - Health: `Lerp(1, 2.37, progress^1.2) * (1 + (tier-1) * 0.15)`
+     - Speed: `Lerp(1, 1.413, progress)`
+     - Damage: `Lerp(1, 1.15, progress^1.2) * (1 + (tier-1) * 0.15)`
+     - SpawnInterval: `base * decay^wave` (decay until min)
 
 8. **Economy**
-   - **Gold**: Main currency, earned from kills, used for upgrades
-   - **Gem**: Premium currency, daily limit (20/day), used for unlocks/cards
-   - **Meat**: Special resource, dropped by enemies
+   - **Gold**: Main currency, earned from kills, used for upgrades/repairs
+   - **Gem**: Premium currency, daily limit (20/day), used for card rolls
+   - **Meat**: Special resource, dropped by enemies, used for crafting
    - **EXP**: Permanent account EXP from enemy kills
    - `EconomyManager` singleton handles all currency operations
    - `SaveManager` handles persistence (JSON at `Application.persistentDataPath`)
 
+9. **Damage System**
+   - `DamageData` struct carries: Damage, Source, Element, Type (Normal/Critical/SuperCritical/UltraCritical/Heal/Mana/Miss), CriticalType, DefenseBreak
+   - Element matching: 1.5× counter / 0.75× same-or-unrelated / 0.5× weak
+   - ElementMastery (from Intelligence): universal multiplier (1 + Mastery/1000)
+   - Per-element bonus from equipment: (1 + Bonus/100)
+   - Final damage: `Utilityku.FinalDamage(rawDamage, targetDefense)`
+
+10. **Status Effects**
+    - Slow: Permanent, Aura, Temporary (multiplicative stack)
+    - Defense Break: Permanent, Aura, Temporary (multiplicative stack)
+    - Stun: Complete immobilization
+    - Max Health Reduction (HeartBreak): permanent reduction
+    - Applied via `EnemyStatusEffectController` or directly on EnemyAi
+
 ### Data-Driven Design
 
-- **ScriptableObject/JSON** for game balance data (enemy stats, upgrade costs, wave definitions, ultimate data, cards)
+- **JSON** for game balance data (enemy stats, upgrade costs, wave definitions, ultimate data, cards, items, equipment, gems, affixes)
 - **MonoBehaviour** only for runtime behavior tied to GameObjects
 - **Pure C# classes** for backend systems (economy calculations, wave generators, damage formulas) — test these in EditMode tests without a scene
+- **ScriptableObject** not used; JSON loaded at runtime via Resources
 
 ### Testing Strategy
 
@@ -244,23 +348,27 @@ Assets/
 
 ### Input System
 
-The project uses the **Unity Input System** package (not the legacy Input Manager). An Input Action Asset exists at `Assets/InputSystem_Actions.inputactions`. Wire up player actions via `PlayerInput` component or by generating a C# wrapper from the `.inputactions` asset.
+The project uses the **Unity Input System** package (not the legacy Input Manager). An Input Action Asset exists at `Assets/InputSystem_Actions.inputactions`. Wire up player actions via `PlayerInput` component or by generating a C# wrapper from the `.inputactions` asset. Currently unused as game is idle.
 
 ### Scene Management
 
 - Menu/main menu scene: `Scenes/MainMenu`
 - Gameplay scene: `Scenes/MainGame`
 - Card collection: `Scenes/CardCollection`
+- Inventory: `Scenes/Inventory`
 - Bootstrap: `Scenes/Bootstrap`
 - Keep scene loading additive (load scenes on top of a persistent manager scene)
+- `SceneLoader` handles additive loading/unloading
+- `SceneCleanupHandler` cleans up non-persistent objects on scene unload
 
 ### Common Patterns for This Project Type
 
-- **Object pooling**: Use for bullets, enemies, particle effects (avoid instantiate/destroy churn) — `ProjectilePool`, `DamagePopupPool`
+- **Object pooling**: Use for bullets, enemies, particle effects (avoid instantiate/destroy churn) — `ProjectilePool`, `DamagePopupPool`, `EnemyHealthBarManager`
 - **Wave system**: Difficulty increases with wave tier level and wave number, max wave 350. After wave 350, only spawn count increases.
 - **Economy**: `EconomyManager` singleton handles currency; use JSON data for upgrade/cost tables.
-- **Defense placement**: Grid- or slot-based placement system; serialize tower positions as part of save state.
-- **Save system**: Use `JsonUtility` or `Newtonsoft.Json` for persistent save data (player progress, unlocks, currency).
+- **Equipment**: Slot-based system with level, enhance, durability, sockets, affixes, set bonuses.
+- **Save system**: Single JSON file for all persistent data; auto-save + manual save on quit/pause.
+- **Service Locator**: `ServiceLocator` provides interface access to managers.
 
 ## Physics2D Usage
 
@@ -272,14 +380,19 @@ Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, attackRang
 Rigidbody2D enemyRb = enemy.GetComponent<Rigidbody2D>();
 Vector2 knockbackDir = (enemy.position - transform.position).normalized;
 enemyRb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
+
+// Separation (avoid stacking)
+int count = Physics2D.OverlapCircle(transform.position, separationRadius, enemyContactFilter, neighborBuffer);
 ```
 
 ## Enemy Movement
 
 ```csharp
-// Simple approach (no pathfinding needed for this game)
-Vector2 direction = (playerPos - (Vector2)transform.position).normalized;
-transform.position = Vector2.MoveTowards(transform.position, playerPos, moveSpeed * Time.deltaTime);
+// Simple approach with steering (no pathfinding needed)
+Vector2 seekForce = (playerPos - (Vector2)transform.position).normalized * moveSpeed;
+Vector2 separationForce = CalculateSeparation(); // from nearby enemies
+Vector2 finalVelocity = CalculateFinalVelocity(seekForce, separationForce);
+rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, finalVelocity, velocityDamping);
 ```
 
 ## Spawn Position
@@ -295,6 +408,7 @@ Vector2 spawnPos = (Vector2)player.position + randomDir * (playerAttackRange + s
 - **Object pooling**: Only add if profiling shows GC pressure (Unity 6 is efficient, YAGNI applies)
 - **Physics layers**: Use layers to avoid unnecessary collision checks
 - **Fixed spawn rate**: Don't spawn every frame; use timer-based spawning
+- **ContactFilter2D**: Reuse for overlap queries to avoid GC allocation
 
 ## Reference Game
 
@@ -304,27 +418,60 @@ Vector2 spawnPos = (Vector2)player.position + randomDir * (playerAttackRange + s
 
 | Task | File(s) |
 |------|---------|
-| Player stats/upgrades | `Scripts/Player/Player.cs`, `Scripts/Manager/UpgradeManager.cs`, `Scripts/Data/PlayerData.cs` |
+| Player stats/upgrades | `Scripts/Player/Player.cs`, `Scripts/Manager/UpgradeManager.cs`, `Scripts/Data/PlayerData.cs`, `Scripts/Player/StatLoader.cs`, `Scripts/Manager/PlayerStatsManager.cs` |
 | Enemy behavior | `Scripts/Enemy/EnemyAi.cs`, `Scripts/Enemy/EnemySpawner.cs`, `Scripts/Data/EnemyData.cs` |
-| Wave management | `Scripts/Manager/WaveManager.cs`, `Scripts/Data/WaveProgressData.cs` |
+| Wave management | `Scripts/Manager/WaveManager.cs`, `Scripts/Data/WaveProgressData.cs`, `Resources/Data/dataWave.json` |
 | Currency/Economy | `Scripts/Economy/EconomyManager.cs`, `Scripts/Manager/SaveManager.cs` |
-| Ultimate abilities | `Scripts/Ultimate/UltimateManager.cs`, `Scripts/Ultimate/UltimateFactory.cs`, handlers in `Scripts/Ultimate/` |
+| Ultimate abilities | `Scripts/Ultimate/UltimateManager.cs`, `Scripts/Ultimate/UltimateFactory.cs`, handlers in `Scripts/Ultimate/`, `Resources/Data/dataUltimate.json` |
 | Projectiles | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
-| Card system | `Scripts/Card/*`, `Scripts/Data/CardData.cs` |
-| Save/Load | `Scripts/Manager/SaveManager.cs` |
-| Damage/Combat | `Scripts/Data/DamageData.cs`, `Scripts/Manager/DamagePopupManager.cs` |
+| Card system | `Scripts/Card/*`, `Scripts/Data/CardData.cs`, `Resources/Data/dataCard.json` |
+| Save/Load | `Scripts/Manager/SaveManager.cs`, `Scripts/Data/SaveData.cs` |
+| Damage/Combat | `Scripts/Data/DamageData.cs`, `Scripts/Manager/DamagePopupManager.cs`, `Scripts/Enemy/EnemyStatusEffectController.cs` |
 | UI | `Scripts/UI/*`, `Scripts/Controller/*` |
+| Equipment | `Scripts/Equipment/*`, `Resources/Data/dataItems.json` (Equipment section) |
+| Inventory/Crafting | `Scripts/Inventory/*`, `Scripts/Items/*`, `Resources/Data/dataItems.json` |
+| Gems | `Scripts/Items/GemService.cs`, `Resources/Data/dataItems.json` (Gems section) |
+| Daily/Idle Rewards | `Scripts/Daily/*`, `Scripts/IdleReward/*` |
+| Status Effects | `Scripts/Enemy/StatusEffects/*` |
 
 ## JSON Data Files (Resources/Data/)
 
 | File | Purpose |
 |------|---------|
-| `dataPlayer.json` | Player base stats, upgrade costs, unlock costs |
-| `dataEnemy.json` | Enemy types, stats, spawn weights, rewards |
-| `dataWave.json` | Wave config: duration, multipliers, spawn intervals |
-| `dataUltimate.json` | Ultimate abilities: cooldown, chance, active state |
-| `dataCard.json` | Card definitions: rarity, stats, scaling |
+| `dataPlayer.json` | Player base stats, main attributes, skill base values |
+| `dataEnemy.json` | Enemy types, stats, spawn weights, rewards, roles, elements |
+| `dataWave.json` | Wave config: duration, multipliers, spawn intervals, max wave |
+| `dataUltimate.json` | Ultimate abilities: cooldown, chance, active state, parameters |
+| `dataCard.json` | Card definitions: rarity, stats, scaling, effects |
+| `dataItems.json` | Items (consumables, materials), Equipment, Gems, Affixes, Sets |
+| `dataAttribute.json` | Main attribute (CON/STR/INT/DEX) per-point bonuses to skills |
+| `dataConfigSocket.json` | Gem socket configuration |
 
-## Constants
+## Utility Classes
 
-See `Scripts/Core/GameConstants.cs` for shared constants like `MAX_WAVE_PER_TIER = 350`.
+- `Utilityku.cs`: Chance, FinalDamage, FinalDefense, ElementMultiplier, ElementBonus, WaveMultiplier, WaveDecayCalculate, WaveBonusInterest, WaveBonusVictory
+- `Colorku.cs`: Color constants for UI
+- `Constantku.cs`: String constants
+- `Enumku.cs`: Enum definitions (SkillType, CurrencyType, Element, Role, ItemRarity, EquipmentType, etc.)
+- `ModifierManager.cs`: Stacks stat modifiers from multiple sources (cards, equipment, attributes)
+- `PlayerStatsManager.cs`: Computes final player stats from base + modifiers
+
+## Service Locator
+
+```csharp
+ServiceLocator.SaveService      // ISaveService -> SaveManager
+ServiceLocator.EconomyService   // IEconomyService -> EconomyManager
+ServiceLocator.AudioService     // IAudioService -> AudioManager
+ServiceLocator.AdsService       // IAdsService -> AdvertisingManager
+ServiceLocator.AnalyticsService // IAnalyticsService -> AnalyticsManager
+ServiceLocator.Manager          // GameManager
+```
+
+## Key Patterns for New Features
+
+1. **New Ultimate**: Create handler inheriting `BaseUltimateHandler`, register in `UltimateManager.RegisterHandlers()`, add data to `dataUltimate.json`
+2. **New Card**: Add to `dataCard.json`, CardEffectType if special effect, update `CardModifierService.ParseEffectType()`
+3. **New Enemy**: Add to `dataEnemy.json`, uses Basic prefab with EnemyAi
+4. **New Equipment**: Add to `dataItems.json` Equipment section, supports affixes, sockets, set bonuses
+5. **New Status Effect**: Implement `IStatusEffect`, add to `ConcreteStatusEffects`, register in `EnemyStatusEffectController`
+6. **New Consumable**: Add to `dataItems.json` Items section, implement use logic in `ItemClickManager` or `InventoryController`

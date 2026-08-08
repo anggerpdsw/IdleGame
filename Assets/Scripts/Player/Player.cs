@@ -101,15 +101,7 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public void ReloadStats()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/dataPlayer");
-            if (jsonAsset == null)
-            {
-                Debug.LogError("[Player] Cannot reload stats - dataPlayer.json not found!");
-                return;
-            }
-
-            PlayerData baseData = JsonConvert.DeserializeObject<PlayerData>(jsonAsset.text);
-            StatLoader.LoadBaseStats(baseData);
+            BaseStatLoader.Instance.LoadBaseStats();
 
             // Update visuals
             DrawAttackRange();

@@ -50,7 +50,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<InventoryService>();
             EnsureSingleton<EquipmentService>();
             EnsureSingleton<CraftService>();
-            EnsureSingleton<UpgradeManager>();
+            EnsureSingleton<BaseStatLoader>();
             EnsureSingleton<SaveManager>();
             // Attribute stat modifiers need SaveManager (AccountData) to exist first.
             EnsureSingleton<AttributeModifierManager>();
