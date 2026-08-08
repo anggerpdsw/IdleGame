@@ -13,7 +13,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Input System** (com.unity.inputsystem 1.19.0)
 - **UGUI** for UI (com.unity.ugui 2.0.0)
 - **Physics2D** for movement and collisions
-- **Test Framework** (com.unity.test-framework 1.6.0)
 - **DOTween** (Demigiant) for animations
 - **Newtonsoft.Json** for JSON serialization
 
