@@ -50,6 +50,30 @@ namespace IdleDefenseSurvival.Core
         }
     }
 
+    public static class ItemResources
+    {
+        public static Sprite GetItemSource(string key)
+        {
+            if (string.IsNullOrEmpty(key)) return null;
+            string[] parts = key.Split('/');
+            // Single sprite → Art/Item/UltimateStone
+            if (parts.Length == 1)
+                return ResourceCache.Load<Sprite>($"Art/Item/{parts[0]}");
+
+            // Sprite sheet:
+            // Potion/hp
+            // Potion/Potion/hp
+            // Equipment/Hat/hat_leather
+            // Equipment/Armor/Heavy/armor_iron
+            //
+            // Last part = sprite name
+            // Everything before it = sheet path
+            string spriteName = parts[^1];
+            string sheetPath = string.Join("/", parts[..^1]);
+            return ResourceCache.LoadSpriteFromSheet($"Art/Item/{sheetPath}", spriteName);
+        }
+    }
+    
     public static class ButtonResources
     {
         public static Sprite GetColor(string color)
@@ -63,27 +87,6 @@ namespace IdleDefenseSurvival.Core
 
         public static Sprite GetIcon(string id)
             => ResourceCache.Load<Sprite>($"Art/Card/Icon/{id}");
-    }
-    
-    public static class ItemResources
-    {
-        /// <summary>
-        /// Resolves an item icon. IconKey formats:
-        ///   "UltimateStone"            → single sprite Resources/Art/Item/UltimateStone
-        ///   "UltimateStone/None"       → sprite named "None" from sheet Resources/Art/Item/UltimateStone
-        /// </summary>
-        public static Sprite GetItemSource(string key)
-        {
-            if (string.IsNullOrEmpty(key)) return null;
-
-            int sep = key.IndexOf('/');
-            if (sep < 0)
-                return ResourceCache.Load<Sprite>($"Art/Item/{key}");
-
-            string sheet = key[..sep];
-            string spriteName = key[(sep + 1)..];
-            return ResourceCache.LoadSpriteFromSheet($"Art/Item/{sheet}", spriteName);
-        }
     }
     
     public static class PlayerResources

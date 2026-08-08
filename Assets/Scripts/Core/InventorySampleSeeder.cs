@@ -16,8 +16,8 @@ namespace IdleDefenseSurvival.Core
             if (inv == null || ItemDatabase.Instance == null || inv.AllItems.Count > 0) return;
 
             inv.AddItem("potion_hp", 12);
-            inv.AddItem("iron_ore", 40);
-            inv.AddItem("magic_crystal", 9);
+            inv.AddItem("stone_dust", 40);
+            inv.AddItem("essence_of_hope", 9);
             inv.AddItem("gold_pouch", 3);
             inv.AddItem("equip_hat_leather");
             inv.AddItem("equip_gloves_fighter");
