@@ -274,120 +274,80 @@ namespace IdleDefenseSurvival.Inventory
     }
 
     /// <summary>
-    /// Save data for inventory.
-    /// Config is loaded from dataInventory.json - NOT saved.
-    /// Only CurrentCapacity, CategorizedSlots and LastModifiedTimestamp are persisted (v5+).
-    /// </summary>
-    [Serializable]
-    public class InventorySaveData
+/// Save data for inventory.
+/// Category is NOT persisted - it is derived from ItemId via ItemDatabase (presentation concern).
+/// Only capacity, flat items with explicit slot position, and timestamp are stored.
+/// </summary>
+[Serializable]
+public class InventorySaveData
+{
+    public int Capacity; // BaseCapacity + expansions
+    public long LastModifiedTimestamp;
+    /// <summary>Flat list, one entry per occupied slot, ordered by SlotIndex. Stackables + equipment.</summary>
+    public InventoryItemData[] Items;
+    /// <summary>Socketed gem instances (GemInstanceId-keyed). Runtime for socketed gems — never part of a stack.</summary>
+    public GemInstanceData[] SocketedGems;
+
+    // Migration helper: captures old "Config" field from v3 saves during deserialization.
+    // Not written back on save (ShouldSerialize pattern).
+    [Newtonsoft.Json.JsonProperty("Config")]
+    public InventoryConfig LegacyConfig { get; set; }
+
+    public bool ShouldSerializeLegacyConfig() => false;
+
+    public static InventorySaveData CreateEmpty() => new()
     {
-        public int CurrentCapacity; // BaseCapacity + expansions
-        /// <summary>Slots grouped by UI tab (v5+). Each shown only with fields that tab needs.</summary>
-        public InventoryCategorizedSlots CategorizedSlots;
-        public long LastModifiedTimestamp;
+        Capacity = 48, // BaseCapacity from config
+        LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+        Items = Array.Empty<InventoryItemData>(),
+        SocketedGems = Array.Empty<GemInstanceData>()
+    };
+}
 
-        /// <summary>
-        /// Flattens all categorized slots into one ordered list (slot position + item).
-        /// Missing categories / null slots are skipped. Used for loading the physical grid
-        /// and by simple consumers (aggregation over all items).
-        /// </summary>
-        [Newtonsoft.Json.JsonIgnore]
-        public IEnumerable<InventorySlotData> AllSlotsFlattened
-        {
-            get
-            {
-                if (CategorizedSlots == null)
-                {
-                    // Legacy flat list (pre-v5) fallback.
-                    if (LegacySlots == null) yield break;
-                    foreach (var s in LegacySlots)
-                    {
-                        if (s == null) continue;
-                        yield return s;
-                    }
-                    yield break;
-                }
-                var order = new[] { TabType.Equipment, TabType.Consumables, TabType.Materials, TabType.Gems, TabType.Other };
-                foreach (var tab in order)
-                {
-                    var slot = CategorizedSlots.GetSlots(tab);
-                    if (slot == null) continue;
-                    foreach (var s in slot)
-                    {
-                        if (s == null) continue;
-                        yield return s;
-                    }
-                }
-            }
-        }
+/// <summary>
+/// A single inventory stack/instance as persisted. Slot position is explicit; category is derived.
+/// Equipment fields are nullable: only equipment (unique instances) sets them;
+/// stackables persist identity + quantity + flags only (missing = default on load).
+/// InstanceId: equipment only. Stackables use Key = ItemId + StackId ('a'..'z', null for default).
+/// </summary>
+[Serializable]
+public class InventoryItemData
+{
+    // Identity
+    public string InstanceId; // Equipment only (unique instance). Null for stackables.
+    public string ItemId;
 
-        /// <summary>True when the save uses the new categorized layout (v5+).</summary>
-        [Newtonsoft.Json.JsonIgnore]
-        public bool IsCategorized => CategorizedSlots != null;
+    // Stack state
+    public int Quantity = 1;
 
-        /// <summary>
-        /// Legacy (v4 and older) flat slot list. Captured during deserialization only; NOT
-        /// written back on save (v5+ saves categorized). Read by migration/Tools.
-        /// </summary>
-        [Newtonsoft.Json.JsonProperty("Slots")]
-        public InventorySlotData[] LegacySlots { get; set; }
+    // Slot position (global grid index 0..Capacity-1)
+    public int SlotIndex;
 
-        public bool ShouldSerializeLegacySlots() => false;
+    // ---- Stack identity (instanceId replacement for stackables) ----
+    /// <summary>Runtime + persistence key for a stack entry (ItemId + StackId). Fallback covers
+    /// legacy saves that used InstanceId as the key; always non-empty after a save.</summary>
+    public string KeyId = "";
+    /// <summary>'a'..'z' distinguishing stacks of the same item in different slots. Missing/null = the canonical stack.</summary>
+    public string StackId;
 
-        // Migration helper: captures old "Config" field from v3 saves during deserialization.
-        // Not written back on save (ShouldSerialize pattern).
-        [Newtonsoft.Json.JsonProperty("Config")]
-        public InventoryConfig LegacyConfig { get; set; }
+    // ---- Equipment-only (unique instances) ----
+    public int? Level;
+    public int? EnhanceLevel;
+    public int? LimitBreakCount;
+    public int? RefineLevel;
+    public int? TranscendLevel;
+    public int? EvolutionStage;
+    public bool? IsAwakened;
+    public bool? IsMasterwork;
+    public int? CurrentDurability; // MaxDurability derived from EquipmentData
+    public SocketData[] Sockets; // { IsUnlocked, GemInstanceId }
+    public EnchantmentInstanceData Enchantment;
+    public Dictionary<string, object> CustomData; // rolled affixes/secondaries
 
-        public bool ShouldSerializeLegacyConfig() => false;
-
-        public static InventorySaveData CreateEmpty() => new()
-        {
-            CurrentCapacity = 48, // BaseCapacity from config
-            CategorizedSlots = InventoryCategorizedSlots.CreateEmpty(),
-            LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-        };
-    }
-
-    [Serializable]
-    public class InventoryCategorizedSlots
-    {
-        public InventorySlotData[] Equipment;
-        public InventorySlotData[] Consumables;
-        public InventorySlotData[] Materials;
-        public InventorySlotData[] Gems;
-        public InventorySlotData[] Other;
-
-        public InventorySlotData[] GetSlots(TabType tab) => tab switch
-        {
-            TabType.Equipment => Equipment,
-            TabType.Consumables => Consumables,
-            TabType.Materials => Materials,
-            TabType.Gems => Gems,
-            TabType.Other => Other,
-            _ => null,
-        };
-
-        public void SetSlots(TabType tab, InventorySlotData[] slots)
-        {
-            switch (tab)
-            {
-                case TabType.Equipment: Equipment = slots; break;
-                case TabType.Consumables: Consumables = slots; break;
-                case TabType.Materials: Materials = slots; break;
-                case TabType.Gems: Gems = slots; break;
-                case TabType.Other: Other = slots; break;
-            }
-        }
-
-        public static InventoryCategorizedSlots CreateEmpty() => new();
-    }
-
-    [Serializable]
-    public class InventorySlotData
-    {
-        /// <summary>Physical slot index in the inventory grid. Required for exact placement on load.</summary>
-        public int SlotIndex;
-        public InventoryItem Item;
-    }
+    // ---- Flags (user-facing, persisted) ----
+    public bool IsFavorite = false;
+    public bool IsLocked = false;
+    public bool IsNew = true;
+    public long AcquiredTimestamp = 0;
+}
 }

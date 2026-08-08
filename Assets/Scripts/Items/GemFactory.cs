@@ -56,7 +56,6 @@ namespace IdleDefenseSurvival.Items
         {
             return new InventoryItem
             {
-                InstanceId = Guid.NewGuid().ToString(),
                 ItemId = gemId,
                 Quantity = 1,
                 Level = level,

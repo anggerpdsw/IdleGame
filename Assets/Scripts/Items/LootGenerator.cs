@@ -271,7 +271,6 @@ namespace IdleDefenseSurvival.Items
                 default:
                     result = new InventoryItem
                     {
-                        InstanceId = Guid.NewGuid().ToString(),
                         ItemId = entry.ItemId,
                         Quantity = UnityEngine.Random.Range(entry.MinCount, entry.MaxCount + 1),
                         Level = level,
@@ -360,7 +359,6 @@ namespace IdleDefenseSurvival.Items
 
             return new InventoryItem
             {
-                InstanceId = Guid.NewGuid().ToString(),
                 ItemId = itemId,
                 Quantity = (int)Math.Min(amount, int.MaxValue),
                 Level = 1,

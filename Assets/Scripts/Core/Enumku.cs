@@ -1,6 +1,4 @@
 
-using IdleDefenseSurvival.Items;
-
 namespace IdleDefenseSurvival
 {
     public enum CriticalType { None, Critical, SuperCritical, UltraCritical,
@@ -139,39 +137,6 @@ namespace IdleDefenseSurvival
         Materials = 3,
         Gems = 4,
         Other = 5
-    }
-
-    /// <summary>
-    /// Maps ItemCategory to save/UI tab groups. Single source of truth for grouping.
-    /// </summary>
-    public static class TabTypeExtensions
-    {
-        public static ItemCategory[] ToCategories(this TabType tab) => tab switch
-        {
-            TabType.Equipment => new[] { ItemCategory.Equipment },
-            TabType.Consumables => new[] { ItemCategory.Consumable },
-            TabType.Materials => new[] { ItemCategory.Material },
-            TabType.Gems => new[] { ItemCategory.Gem },
-            TabType.Other => new[]
-            {
-                ItemCategory.Quest, ItemCategory.Currency, ItemCategory.Key, ItemCategory.Chest,
-                ItemCategory.UpgradeStone, ItemCategory.SkillBook, ItemCategory.Rune,
-                ItemCategory.Skin, ItemCategory.Pet, ItemCategory.Artifact
-            },
-            _ => new[] { ItemCategory.None }
-        };
-
-        public static TabType GetTabType(this ItemCategory category) => category switch
-        {
-            ItemCategory.Equipment => TabType.Equipment,
-            ItemCategory.Consumable => TabType.Consumables,
-            ItemCategory.Material => TabType.Materials,
-            ItemCategory.Gem => TabType.Gems,
-            ItemCategory.Quest or ItemCategory.Currency or ItemCategory.Key or ItemCategory.Chest
-                or ItemCategory.UpgradeStone or ItemCategory.SkillBook or ItemCategory.Rune
-                or ItemCategory.Skin or ItemCategory.Pet or ItemCategory.Artifact => TabType.Other,
-            _ => TabType.Other
-        };
     }
 
     /// <summary>

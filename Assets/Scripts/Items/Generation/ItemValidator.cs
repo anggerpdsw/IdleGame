@@ -23,8 +23,8 @@ namespace IdleDefenseSurvival.Items.Generation
                 errors.Add("Base data is null");
             }
 
-            // Validate InstanceId
-            if (string.IsNullOrEmpty(item.InstanceId))
+            // Validate InstanceId — equipment only (stackables have no instance identity)
+            if (string.IsNullOrEmpty(item.InstanceId) && baseData?.Category == ItemCategory.Equipment)
             {
                 errors.Add("InstanceId is empty");
             }

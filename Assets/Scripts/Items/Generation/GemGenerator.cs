@@ -74,7 +74,6 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             return new InventoryItem
             {
-                InstanceId = Guid.NewGuid().ToString(),
                 ItemId = baseGem.GemId,
                 Quantity = 1,
                 Level = Math.Clamp(level, 1, baseGem.MaxLevel),

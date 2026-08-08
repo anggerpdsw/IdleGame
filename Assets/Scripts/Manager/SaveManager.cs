@@ -784,8 +784,19 @@ namespace IdleDefenseSurvival.Manager
             _currentDailyReward = data ?? _currentDailyReward;
         }
 
-        private void ApplyInventoryData(InventorySaveData data) =>
+        private void ApplyInventoryData(InventorySaveData data)
+        {
             InventoryService.Instance?.LoadFromSaveData(data);
+
+            // Rehydrate socketed gem instances AFTER items exist (SocketData.GemInstanceId is a
+            // reference; the GemInstanceData itself lives in SaveData.SocketedGems, owned by
+            // GemService — level/experience survive restarts).
+            if (GemService.Instance != null && InventoryService.Instance != null)
+            {
+                GemService.Instance.LoadSocketedGems(data?.SocketedGems);
+                GemService.Instance.RestoreSocketedGems(InventoryService.Instance.AllItems);
+            }
+        }
 
         private void ApplyEquipmentData(EquipmentSaveData data) =>
             EquipmentService.Instance?.LoadFromSaveData(data);

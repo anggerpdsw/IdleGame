@@ -197,7 +197,6 @@ namespace IdleDefenseSurvival.Items
         {
             return new InventoryItem
             {
-                InstanceId = Guid.NewGuid().ToString(),
                 ItemId = itemData.Id,
                 Quantity = itemData.IsStackable ? 1 : 1,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()

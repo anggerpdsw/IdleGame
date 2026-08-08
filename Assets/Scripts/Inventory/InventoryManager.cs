@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Inventory;
@@ -64,11 +65,11 @@ namespace IdleDefenseSurvival.Manager
         private static Dictionary<string, long> AggregateById(InventorySaveData save)
         {
             var map = new Dictionary<string, long>();
-            foreach (var slot in save.AllSlotsFlattened)
+            foreach (var data in save.Items ?? Array.Empty<InventoryItemData>())
             {
-                if (slot?.Item == null) continue;
-                if (!map.TryGetValue(slot.Item.ItemId, out var cur)) cur = 0;
-                map[slot.Item.ItemId] = cur + slot.Item.Quantity;
+                if (data == null) continue;
+                if (!map.TryGetValue(data.ItemId, out var cur)) cur = 0;
+                map[data.ItemId] = cur + data.Quantity;
             }
             return map;
         }

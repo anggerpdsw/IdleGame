@@ -2,7 +2,7 @@ namespace IdleDefenseSurvival
 {
     public static class GameConstants
     {
-        public const int CURRENT_SAVE_VERSION = 2; // v2 = categorized inventory save (tab split + SlotIndex)
+        public const int CURRENT_SAVE_VERSION = 3; // v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
         public const int MAX_WAVE_PER_TIER = 350;
         public const int BASE_LEVEL = 9753;
         public const int STARTING_STAT_POINTS = 5;  // Level 1 start

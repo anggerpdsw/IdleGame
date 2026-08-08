@@ -173,7 +173,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             else if (itemData != null && itemData.IsConsumable())
             {
                 // Quick use
-                InventoryService.Instance?.UseItem(_currentItem.InstanceId);
+                InventoryService.Instance?.UseItem(_currentItem.GetStackKey() ?? _currentItem.InstanceId);
             }
         }
 

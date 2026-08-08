@@ -251,7 +251,7 @@ namespace IdleDefenseSurvival.Items
                 Category = ItemCategory.Gem,
                 ItemRarity = gem.ItemRarity,
                 Icon = gem.Icon,
-                StackSize = 1
+                StackSize = 999 // Gem in inventory stacks until socketed (then it becomes a GemInstance)
             };
 
             OnItemDataAdded?.Invoke(gem.GemId);

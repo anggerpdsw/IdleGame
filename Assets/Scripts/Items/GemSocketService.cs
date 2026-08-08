@@ -117,7 +117,7 @@ namespace IdleDefenseSurvival.Items
             if (!guard.Begin(item, socketIndex))
                 return false; // socket concurrently modified, abort before touching inventory
 
-            InventoryService.Instance?.RemoveItem(gemItem.InstanceId, 1);
+            InventoryService.Instance?.RemoveItem(gemItem.GetStackKey() ?? gemItem.InstanceId, 1);
 
             // Assign socket
             var socket = item.Sockets[socketIndex];
@@ -167,6 +167,11 @@ namespace IdleDefenseSurvival.Items
                 return false;
 
             var gemItem = GemFactory.Instance.CreateGemItem(socket.GemId, socket.GemLevel);
+            if (gemItem != null)
+            {
+                // Return to inventory: stacks with the SAME StackId keeps split-op-identity; counts merge via AddItemInstance.
+                gemItem.StackId = item.Sockets[socketIndex].StackId;
+            }
             if (gemItem != null)
                 InventoryService.Instance?.AddItemInstance(gemItem);
             if (gemInstance != null)

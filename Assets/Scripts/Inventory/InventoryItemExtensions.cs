@@ -24,6 +24,31 @@ namespace IdleDefenseSurvival.Inventory
             return Color.red;
         }
         /// <summary>
+        /// True when a stackable entry of 'item' can grow by stacking with 'other' (same item id,
+        /// any stackable kind — consumables, materials, gems, CardRoll, UltimateStone, SkinShard).
+        /// Unique (equipment) never stacks.
+        /// </summary>
+        public static bool CanStackWith(this InventoryItem item, InventoryItem other)
+        {
+            if (item == null || other == null || item.ItemId != other.ItemId) return false;
+            if (item.IsEquippable()) return false;
+            var data = ItemDatabase.Instance?.GetItem(item.ItemId);
+            return data?.StackSize > 1;
+        }
+
+        /// <summary>
+        /// Stable stack key for stackables (ItemId + StackId); null for unique (equipment) items.
+        /// StackId ('a'..'z') keeps stacks of the same item in different slots separate; missing/null
+        /// StackId = the canonical stack. Equipment/leaf items must never use this as a key.
+        /// </summary>
+        public static string GetStackKey(this InventoryItem item)
+        {
+            if (item == null || string.IsNullOrEmpty(item.ItemId)) return null;
+            if (item.IsEquippable()) return null;
+            return string.IsNullOrEmpty(item.StackId) ? item.ItemId : item.ItemId + "~" + item.StackId;
+        }
+
+        /// <summary>
         /// Checks if the item is a gem.
         /// </summary>
         public static bool IsGem(this InventoryItem item)
@@ -49,11 +74,6 @@ namespace IdleDefenseSurvival.Inventory
             var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId);
             return itemData?.Category ?? ItemCategory.None;
         }
-
-        /// <summary>
-        /// Gets the save/UI tab group this item belongs to.
-        /// </summary>
-        public static TabType GetTabType(this InventoryItem item) => item.GetItemCategory().GetTabType();
 
         /// <summary>
         /// Gets the item rarity.

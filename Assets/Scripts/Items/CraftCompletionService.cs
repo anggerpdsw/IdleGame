@@ -76,7 +76,7 @@ namespace IdleDefenseSurvival.Items
             {
                 var items = job.Results.Select(r => new InventoryItem
                 {
-                    InstanceId = Guid.NewGuid().ToString(),
+                    // ponytail: stackables need no InstanceId; equipment InstanceId is minted by AddItemInstance
                     ItemId = r.ItemId,
                     Quantity = r.Count,
                     Level = r.Level,

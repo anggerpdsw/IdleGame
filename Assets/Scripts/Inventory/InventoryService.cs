@@ -112,7 +112,7 @@ namespace IdleDefenseSurvival.Inventory
             {
                 foreach (var slot in _slots)
                 {
-                    if (!slot.IsEmpty && slot.Item.ItemId == itemId && !slot.Item.IsEquippable())
+                    if (!slot.IsEmpty && slot.Item.ItemId == itemId && slot.Item.CanStackWith(slot.Item))
                     {
                         int canAdd = Math.Min(quantity, maxStack - slot.Item.Quantity);
                         if (canAdd > 0)
@@ -121,7 +121,7 @@ namespace IdleDefenseSurvival.Inventory
                             quantity -= canAdd;
                             NotifyQuantityChanged(slot.Item, canAdd, slot.SlotIndex);
 
-                            if (quantity <= 0) return slot.Item.InstanceId;
+                            if (quantity <= 0) return slot.Item.GetStackKey() ?? slot.Item.ItemId;
                         }
                     }
                 }
@@ -149,7 +149,7 @@ namespace IdleDefenseSurvival.Inventory
 
                 NotifyAdded(newItem, emptySlot);
 
-                if (quantity <= 0) return newItem.InstanceId;
+                if (quantity <= 0) return newItem.GetStackKey() ?? newItem.InstanceId;
             }
 
             return string.Empty;
@@ -159,12 +159,12 @@ namespace IdleDefenseSurvival.Inventory
         {
             if (item == null) return false;
 
-            // Try stacking first
-            if (item.IsStackable)
+            // Try stacking first (stackables of the same item; equipment never stacks)
+            if (item.CanStackWith(item))
             {
                 foreach (var slot in _slots)
                 {
-                    if (!slot.IsEmpty && slot.Item.ItemId == item.ItemId && !slot.Item.IsMaxStack)
+                    if (!slot.IsEmpty && slot.Item.CanStackWith(item) && !slot.Item.IsMaxStack)
                     {
                         int canAdd = Math.Min(item.Quantity, slot.Item.GetMaxStackSize() - slot.Item.Quantity);
                         if (canAdd > 0)
@@ -203,7 +203,7 @@ namespace IdleDefenseSurvival.Inventory
             for (int i = 0; i < _slots.Count; i++)
             {
                 var slot = _slots[i];
-                if (!slot.IsEmpty && slot.Item.InstanceId == instanceId)
+                if (!slot.IsEmpty && MatchKey(slot.Item, instanceId))
                 {
                     int removed = Math.Min(quantity, slot.Item.Quantity);
                     slot.Item.Quantity -= removed;
@@ -264,7 +264,7 @@ namespace IdleDefenseSurvival.Inventory
             if (from.IsEmpty) return false;
 
             // Try to stack
-            if (!to.IsEmpty && to.Item.ItemId == from.Item.ItemId && from.Item.IsStackable && to.Item.IsStackable)
+            if (!to.IsEmpty && from.Item.CanStackWith(to.Item))
             {
                 int maxStack = to.Item.GetMaxStackSize();
                 int canMove = Math.Min(from.Item.Quantity, maxStack - to.Item.Quantity);
@@ -322,7 +322,7 @@ namespace IdleDefenseSurvival.Inventory
             for (int i = 0; i < _slots.Count; i++)
             {
                 var slot = _slots[i];
-                if (!slot.IsEmpty && slot.Item.InstanceId == instanceId)
+                if (!slot.IsEmpty && MatchKey(slot.Item, instanceId))
                 {
                     var splitItem = slot.Item.SplitStack(amount);
                     if (splitItem != null)
@@ -352,7 +352,7 @@ namespace IdleDefenseSurvival.Inventory
             int merges = 0;
             var itemGroups = _slots
                 .Where(s => !s.IsEmpty && s.Item.IsStackable)
-                .GroupBy(s => s.Item.ItemId)
+                .GroupBy(s => s.Item.GetStackKey())
                 .ToList();
 
             foreach (var group in itemGroups)
@@ -395,7 +395,18 @@ namespace IdleDefenseSurvival.Inventory
         public InventoryItem GetItem(string instanceId)
         {
             if (string.IsNullOrEmpty(instanceId)) return null;
-            return _slots.FirstOrDefault(s => !s.IsEmpty && s.Item.InstanceId == instanceId)?.Item;
+            return _slots.FirstOrDefault(s => !s.IsEmpty && MatchKey(s.Item, instanceId))?.Item;
+        }
+
+        /// <summary>
+        /// Key match for identity APIs: equipment by InstanceId, stackables by StackKey
+        /// (ItemId or ItemId~StackId). Callers pass the item's GetStackKey() when InstanceId is null.
+        /// </summary>
+        private static bool MatchKey(InventoryItem item, string key)
+        {
+            if (string.IsNullOrEmpty(key) || item == null) return false;
+            if (item.InstanceId == key) return true; // equipment
+            return item.GetStackKey() == key;        // stackables (ItemId / ItemId~StackId)
         }
 
         public InventoryItem GetItemAtSlot(int slotIndex)
@@ -579,7 +590,8 @@ namespace IdleDefenseSurvival.Inventory
 
         public long QuickSellByFilter(InventoryFilter filter)
         {
-            var items = _slots.Where(s => !s.IsEmpty && filter.Matches(s.Item) && !s.Item.IsLocked && !s.Item.IsFavorite).Select(s => s.Item.InstanceId).ToList();
+            var items = _slots.Where(s => !s.IsEmpty && filter.Matches(s.Item) && !s.Item.IsLocked && !s.Item.IsFavorite)
+                .Select(s => s.Item.GetStackKey() ?? s.Item.InstanceId).ToList();
             return QuickSell(items);
         }
 
@@ -596,7 +608,8 @@ namespace IdleDefenseSurvival.Inventory
 
         public long QuickSellAllExceptFavorites()
         {
-            var items = _slots.Where(s => !s.IsEmpty && !s.Item.IsFavorite && !s.Item.IsLocked).Select(s => s.Item.InstanceId).ToList();
+            var items = _slots.Where(s => !s.IsEmpty && !s.Item.IsFavorite && !s.Item.IsLocked)
+                .Select(s => s.Item.GetStackKey() ?? s.Item.InstanceId).ToList();
             return QuickSell(items);
         }
         #endregion
@@ -631,7 +644,7 @@ namespace IdleDefenseSurvival.Inventory
         {
             // Apply consumable effects
             // This would integrate with player stats, healing, buffs, etc.
-            ConsumeItem(item.InstanceId, 1);
+            ConsumeItem(item.GetStackKey() ?? item.InstanceId, 1);
             return true;
         }
 
@@ -639,21 +652,21 @@ namespace IdleDefenseSurvival.Inventory
         {
             // Open chest and give rewards
             // This would use DropTable/LootGenerator
-            ConsumeItem(item.InstanceId, 1);
+            ConsumeItem(item.GetStackKey() ?? item.InstanceId, 1);
             return true;
         }
 
         private bool UseSkillBook(InventoryItem item, ItemData data)
         {
             // Learn skill
-            ConsumeItem(item.InstanceId, 1);
+            ConsumeItem(item.GetStackKey() ?? item.InstanceId, 1);
             return true;
         }
 
         private bool UseUpgradeStone(InventoryItem item, ItemData data)
         {
             // Apply upgrade stone
-            ConsumeItem(item.InstanceId, 1);
+            ConsumeItem(item.GetStackKey() ?? item.InstanceId, 1);
             return true;
         }
         #endregion
@@ -672,7 +685,7 @@ namespace IdleDefenseSurvival.Inventory
                 var slot = _slots[i];
                 if (!slot.IsEmpty && filter.Matches(slot.Item) && !slot.Item.IsLocked)
                 {
-                    DestroyItem(slot.Item.InstanceId, slot.Item.Quantity);
+                    DestroyItem(slot.Item.GetStackKey() ?? slot.Item.InstanceId, slot.Item.Quantity);
                     destroyed++;
                 }
             }
@@ -683,36 +696,82 @@ namespace IdleDefenseSurvival.Inventory
         #region Persistence
         public InventorySaveData GetSaveData()
         {
-            var categorized = InventoryCategorizedSlots.CreateEmpty();
+            var items = _slots
+                .Where(s => !s.IsEmpty)
+                .OrderBy(s => s.SlotIndex)
+                .Select(s => ToSaveItem(s.SlotIndex, s.Item))
+                .ToArray();
 
-            foreach (var tab in new[] { TabType.Equipment, TabType.Consumables, TabType.Materials, TabType.Gems, TabType.Other })
-            {
-                categorized.SetSlots(tab, _slots
-                    .Where(s => !s.IsEmpty)
-                    .Where(s => s.Item.GetTabType() == tab)
-                    .Select(s => new InventorySlotData
-                    {
-                        SlotIndex = s.SlotIndex,
-                        Item = s.Item.TrimForSave(tab)
-                    })
-                    .ToArray());
-            }
+            // Socketed gems live outside the stack; GemService owns them (GemInstanceId-keyed).
+            var socketedGems = IdleDefenseSurvival.Items.GemService.Instance?.GetSocketedGemsSaveData()
+                ?? Array.Empty<GemInstanceData>();
 
             return new InventorySaveData
             {
-                CurrentCapacity = Capacity, // Current expanded capacity
-                CategorizedSlots = categorized,
-                LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                Capacity = Capacity, // Current expanded capacity
+                LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Items = items,
+                SocketedGems = socketedGems
             };
+        }
+
+        /// <summary>
+        /// Persists only what the item needs: stackables = identity (ItemId + StackId) + quantity + flags;
+        /// equipment (unique) additionally keep InstanceId + progression/sockets/etc.
+        /// MaxDurability excluded — derived from EquipmentData on load.
+        /// Socketed gems are NOT part of a stack: only their GemInstanceId reference is persisted
+        /// on the equipment socket; the GemInstanceData itself lives in SaveData.SocketedGems
+        /// (GemService.GetSocketedGemsSaveData).
+        /// </summary>
+        private static InventoryItemData ToSaveItem(int slotIndex, InventoryItem item)
+        {
+            var data = new InventoryItemData
+            {
+                ItemId = item.ItemId,
+                Quantity = item.Quantity,
+                SlotIndex = slotIndex,
+                IsFavorite = item.IsFavorite,
+                IsLocked = item.IsLocked,
+                IsNew = item.IsNew,
+                AcquiredTimestamp = item.AcquiredTimestamp
+            };
+
+            if (item.IsEquippable())
+            {
+                // Unique instance: identity + full state.
+                data.InstanceId = item.InstanceId;
+                data.Level = item.Level;
+                data.EnhanceLevel = item.EnhanceLevel;
+                data.LimitBreakCount = item.LimitBreakCount;
+                data.RefineLevel = item.RefineLevel;
+                data.TranscendLevel = item.TranscendLevel;
+                data.EvolutionStage = item.EvolutionStage;
+                data.IsAwakened = item.IsAwakened;
+                data.IsMasterwork = item.IsMasterwork;
+                data.CurrentDurability = item.CurrentDurability;
+                data.Enchantment = item.Enchantment?.Clone();
+                data.Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray();
+                if (item.CustomData != null && item.CustomData.Count > 0)
+                    data.CustomData = new Dictionary<string, object>(item.CustomData);
+            }
+            else
+            {
+                // Stackable: identity + quantity + flags. StackId ('a'..'z') keeps distinct stacks of the
+                // same item separate; KeyId = ItemId + StackId is the stable stack key across saves.
+                data.InstanceId = null;
+                data.StackId = item.StackId;
+                data.KeyId = item.GetStackKey();
+            }
+            return data;
         }
 
         public void LoadFromSaveData(InventorySaveData data)
         {
             if (data == null) return;
 
-            // Config is loaded from dataInventory.json - we only restore CurrentCapacity
+            // Config is loaded from dataInventory.json - we only restore capacity.
             // Handle legacy Config field from v3 saves (Width * Height preserves expansions)
-            int capacity = data.CurrentCapacity;
+            int capacity = data.Capacity;
             if (capacity == 0 && data.LegacyConfig != null)
             {
                 capacity = data.LegacyConfig.Width * data.LegacyConfig.Height;
@@ -726,20 +785,19 @@ namespace IdleDefenseSurvival.Inventory
             _config.Height = (capacity + _config.Width - 1) / _config.Width;
             CreateSlots(capacity);
 
-            // Place items by explicit SlotIndex; fall back to first empty slot if out of range.
-            foreach (var slotData in data.AllSlotsFlattened)
+            if (data.Items != null)
             {
-                if (slotData?.Item == null) continue;
-
-                int targetSlot = slotData.SlotIndex >= 0 && slotData.SlotIndex < _slots.Count
-                    ? slotData.SlotIndex
-                    : FindEmptySlot();
-
-                if (targetSlot >= 0)
+                foreach (var saveItem in data.Items)
                 {
-                    var item = slotData.Item;
-                    item.SlotIndex = targetSlot; // item is the same reference persisted; re-bind on load
-                    _slots[targetSlot].Item = item;
+                    if (saveItem == null || string.IsNullOrEmpty(saveItem.ItemId)) continue;
+
+                    var item = RestoreItem(saveItem);
+                    if (item == null) continue;
+
+                    int targetSlot = saveItem.SlotIndex >= 0 && saveItem.SlotIndex < _slots.Count
+                        ? saveItem.SlotIndex
+                        : FindEmptySlot();
+                    if (targetSlot >= 0) _slots[targetSlot].Item = item;
                 }
             }
 
@@ -747,6 +805,74 @@ namespace IdleDefenseSurvival.Inventory
             // Notify UI subscribers (CardCollection button state, InventoryUI, etc.)
             OnInventoryChanged?.Invoke(InventoryChangedEventArgs.CreateRemoved(string.Empty, string.Empty, 0, 0, null));
             FlushDirtySlots();
+        }
+
+        /// <summary>
+        /// Rebuilds a runtime InventoryItem. Stackables get hardening defaults;
+        /// equipment restores full state and recomputes MaxDurability from EquipmentData.
+        /// Socketed gems get GemInstanceId bound so GemService can rehydrate the instance.
+        /// </summary>
+        private static InventoryItem RestoreItem(InventoryItemData data)
+        {
+            var item = new InventoryItem
+            {
+                InstanceId = data.InstanceId,
+                ItemId = data.ItemId,
+                Quantity = data.Quantity,
+                // Defaults (Level=1, etc.) when the equipment fields are missing — stackables never set them.
+                Level = data.Level ?? 1,
+                EnhanceLevel = data.EnhanceLevel ?? 0,
+                LimitBreakCount = data.LimitBreakCount ?? 0,
+                RefineLevel = data.RefineLevel ?? 0,
+                TranscendLevel = data.TranscendLevel ?? 0,
+                EvolutionStage = data.EvolutionStage ?? 0,
+                IsAwakened = data.IsAwakened ?? false,
+                IsMasterwork = data.IsMasterwork ?? false,
+                CurrentDurability = data.CurrentDurability ?? 0,
+                Enchantment = data.Enchantment,
+                IsFavorite = data.IsFavorite,
+                IsLocked = data.IsLocked,
+                IsNew = data.IsNew,
+                AcquiredTimestamp = data.AcquiredTimestamp,
+                CustomData = data.CustomData
+            };
+
+            if (ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(data.ItemId) is EquipmentData)
+            {
+                // ---- Equipment: restore full state ----
+                // MaxDurability is static config - derive from ItemDatabase, never persist.
+                var equip = ItemDatabase.Instance.GetEquipment(data.ItemId);
+                item.MaxDurability = equip?.MaxDurability ?? 0;
+                if (item.MaxDurability > 0 && item.CurrentDurability == 0)
+                {
+                    // Full durability on first load for items saved before durability existed.
+                    item.CurrentDurability = item.MaxDurability;
+                }
+
+                // Sockets: keep only unlocked entries. SocketIndex re-derived from array position.
+                if (data.Sockets != null)
+                {
+                    var sockets = data.Sockets.Where(s => s != null && s.IsUnlocked).ToArray();
+                    for (int i = 0; i < sockets.Length; i++)
+                    {
+                        sockets[i].SocketIndex = i;
+                        // GemInstanceId persisted on SocketData; GemService rehydrates the instance on load.
+                    }
+                    item.Sockets = sockets;
+                }
+
+                // Rare safety: equipment without InstanceId gets one (identity is required).
+                if (string.IsNullOrEmpty(item.InstanceId))
+                    item.InstanceId = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                // ---- Stackable: no instance identity, StackKey is the stack's handle ----
+                item.InstanceId = null;
+                item.StackId = data.StackId;
+            }
+
+            return item;
         }
 
         public void Reset()
@@ -764,11 +890,12 @@ namespace IdleDefenseSurvival.Inventory
         #region Utility
         public void ValidateIntegrity()
         {
-            // Remove null items
+            // Identity rule: equipment (unique instances) must carry an InstanceId;
+            // stackables key on StackKey and may have null InstanceId.
             for (int i = _slots.Count - 1; i >= 0; i--)
             {
                 if (_slots[i].Item == null) continue;
-                if (string.IsNullOrEmpty(_slots[i].Item.InstanceId))
+                if (_slots[i].Item.IsEquippable() && string.IsNullOrEmpty(_slots[i].Item.InstanceId))
                 {
                     _slots[i].Item = null;
                 }
@@ -810,7 +937,6 @@ namespace IdleDefenseSurvival.Inventory
 
             var item = new InventoryItem
             {
-                InstanceId = Guid.NewGuid().ToString(),
                 ItemId = itemId,
                 Quantity = quantity,
                 Level = equipmentData?.BaseLevel ?? 1,
@@ -819,6 +945,11 @@ namespace IdleDefenseSurvival.Inventory
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 CustomData = customData
             };
+
+            // Identity rule: only unique instances (equipment) carry an InstanceId.
+            // Stackables have no instance identity — their stack key is ItemId (+ StackId for splits).
+            if (itemData != null && itemData.Category == ItemCategory.Equipment)
+                item.InstanceId = Guid.NewGuid().ToString();
 
             // Initialize sockets if equipment
             if (equipmentData != null && equipmentData.MaxSockets > 0)

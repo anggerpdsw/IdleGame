@@ -83,7 +83,7 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void OnItemEquipped(EquipmentType slot, InventoryItem item)
         {
             // Hide panel if the equipped item is the one currently displayed
-            if (_currentItem != null && _currentItem.InstanceId == item.InstanceId)
+            if (_currentItem != null && ReferenceEquals(_currentItem, item))
                 Hide();
         }
 
@@ -243,7 +243,7 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void OnUse()
         {
             if (_currentItem != null)
-                InventoryService.Instance?.UseItem(_currentItem.InstanceId);
+                InventoryService.Instance?.UseItem(_currentItem.GetStackKey() ?? _currentItem.InstanceId);
         }
 
         private void OnEquip()
@@ -258,7 +258,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             {
                 long price = ItemDatabase.Instance?.GetSellPrice(_currentItem.ItemId) ?? 0;
                 price *= _currentItem.Quantity;
-                InventoryService.Instance?.RemoveItem(_currentItem.InstanceId, _currentItem.Quantity);
+                InventoryService.Instance?.RemoveItem(_currentItem.GetStackKey() ?? _currentItem.InstanceId, _currentItem.Quantity);
                 EconomyManager.Instance?.AddCurrency(CurrencyType.Gold, price);
             }
         }
@@ -269,7 +269,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             {
                 // Show split dialog - for now split in half
                 int half = _currentItem.Quantity / 2;
-                var splitItem = InventoryService.Instance?.SplitStack(_currentItem.InstanceId, half);
+                var splitItem = InventoryService.Instance?.SplitStack(_currentItem.GetStackKey() ?? _currentItem.InstanceId, half);
             }
         }
 
@@ -281,14 +281,14 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void OnFavoriteChanged(bool isFavorite)
         {
             if (_currentItem != null)
-                InventoryService.Instance?.SetFavorite(_currentItem.InstanceId, isFavorite);
+                InventoryService.Instance?.SetFavorite(_currentItem.GetStackKey() ?? _currentItem.InstanceId, isFavorite);
         }
 
         private void OnLockChanged(bool isLocked)
         {
             if (_currentItem != null)
             {
-                InventoryService.Instance?.SetLocked(_currentItem.InstanceId, isLocked);
+                InventoryService.Instance?.SetLocked(_currentItem.GetStackKey() ?? _currentItem.InstanceId, isLocked);
                 // Refresh button visibility (sell/destroy buttons depend on IsLocked)
                 _currentItem.IsLocked = isLocked;
                 UpdateButtonVisibility(_currentItem);

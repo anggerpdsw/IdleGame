@@ -17,8 +17,12 @@ namespace IdleDefenseSurvival.Inventory
     public class InventoryItem
     {
         // ============ Identity ============
-        public string InstanceId; // Unique instance ID (GUID)
+        public string InstanceId; // Unique instance ID (GUID) — equipment (unique) only; null for stackables
         public string ItemId; // Reference to ItemData/EquipmentData
+
+        // ============ Stack Identity ============
+        /// <summary>'a'..'z' distinguishing stacks of the same item in different slots. Null = the canonical stack.</summary>
+        public string StackId;
 
         // ============ Runtime State ============
         public int Quantity = 1; // For stackable items
@@ -47,11 +51,6 @@ namespace IdleDefenseSurvival.Inventory
         public bool IsNew = true; // Newly acquired (for UI highlight)
         public long AcquiredTimestamp = 0; // When item was obtained (for Sort by Newest)
 
-        // ============ Slot (persisted) ============
-        /// <summary>Physical slot index in InventoryService._slots. Stored on the item so each
-        /// category view carries its slot position and the grid can be rebuilt exactly on load.</summary>
-        public int SlotIndex = -1;
-
         // Runtime mirror of EquipmentService state - NOT saved (EquipmentService owns equip state)
         [Newtonsoft.Json.JsonIgnore]
         public bool IsEquipped = false;
@@ -62,7 +61,8 @@ namespace IdleDefenseSurvival.Inventory
         public Dictionary<string, object> CustomData; // For modding/extensibility
 
         // ============ Computed Properties (NOT serialized - [JsonIgnore]) ============
-        [Newtonsoft.Json.JsonIgnore] public bool IsStackable => Quantity > 1;
+        [Newtonsoft.Json.JsonIgnore] public bool IsStackable =>
+            ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(ItemId)?.StackSize > 1;
         [Newtonsoft.Json.JsonIgnore] public bool IsMaxStack => Quantity >= GetMaxStackSize();
         [Newtonsoft.Json.JsonIgnore] public bool IsBroken => CurrentDurability <= 0;
         [Newtonsoft.Json.JsonIgnore] public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
@@ -141,72 +141,53 @@ namespace IdleDefenseSurvival.Inventory
             var splitItem = Clone();
             splitItem.Quantity = amount;
             Quantity -= amount;
-            splitItem.InstanceId = Guid.NewGuid().ToString();
             splitItem.IsNew = false;
+
+            // Stack identity: instance ids are equipment-only; a split stack gets a fresh StackId
+            // ('a'..'z', canonical stack stays null) so both halves keep separate save keys.
+            splitItem.InstanceId = null;
+            splitItem.StackId = NextStackId(StackId);
             return splitItem;
         }
 
-        /// <summary>
-        /// Returns the fields required to persist this item for its UI tab.
-        /// Derived/static data (level progression, durability, sockets, enchantment) is omitted
-        /// for stackable categories - it is re-derived from ItemData on load.
-        /// Slot position (SlotIndex) is always kept.
-        /// </summary>
-        public InventoryItem TrimForSave(TabType tab)
+        /// <summary>Next free stack tag for a split: 'a'..'z', skipping the source stack's tag.</summary>
+        private static string NextStackId(string source)
         {
-            var copy = new InventoryItem
+            for (int i = 0; i < 26; i++)
             {
-                InstanceId = InstanceId,
-                ItemId = ItemId,
-                Quantity = Quantity,
-                SlotIndex = SlotIndex,
-            };
-
-            // Consumables/Materials/Gems stack, stat-less: only identity + quantity needed.
-            if (tab is TabType.Consumables or TabType.Materials or TabType.Gems)
-                return copy;
-
-            // Equipment (and anything ungrouped) keeps full progression state.
-            copy.Level = Level;
-            copy.EnhanceLevel = EnhanceLevel;
-            copy.LimitBreakCount = LimitBreakCount;
-            copy.RefineLevel = RefineLevel;
-            copy.TranscendLevel = TranscendLevel;
-            copy.EvolutionStage = EvolutionStage;
-            copy.IsAwakened = IsAwakened;
-            copy.IsMasterwork = IsMasterwork;
-            copy.CurrentDurability = CurrentDurability;
-            copy.MaxDurability = MaxDurability;
-            copy.Enchantment = Enchantment?.Clone();
-            if (Sockets != null)
-            {
-                copy.Sockets = new SocketData[Sockets.Length];
-                for (int i = 0; i < Sockets.Length; i++)
-                    copy.Sockets[i] = Sockets[i]?.Clone();
+                string candidate = ((char)('a' + i)).ToString();
+                if (candidate != source) return candidate;
             }
-            // Rolled affixes/secondaries live in CustomData - required to recompute stats on load.
-            if (CustomData != null && CustomData.Count > 0)
-                copy.CustomData = new Dictionary<string, object>(CustomData);
-            return copy;
+            return Guid.NewGuid().ToString("N")[..4];
         }
     }
 
     /// <summary>
     /// Socket data - represents a single socket on an equipment item.
-    /// Runtime state only - config is in SocketConfigData.SocketRules
+    /// Persisted: IsUnlocked + GemInstanceId (socketed gem instance reference; null = empty).
+    /// GemId/GemLevel/IsLocked/Experience live on the GemInstanceData (GemService owns them).
     /// </summary>
     [Serializable]
     public class SocketData
     {
-        public int SocketIndex; // 0-based index
-        public string GemId; // ID of socketed gem (null = empty)
-        public int GemLevel = 1; // Gem level
-        public bool IsLocked = false; // Prevents gem removal
-        public bool IsUnlocked = true; // Socket unlocked (some sockets unlock at higher enhance)
-        public string GemInstanceId; // InstanceId of the GemInstanceData for this socket
+        /// <summary>0-based index (runtime only — re-derived from array position, never saved).</summary>
+        [Newtonsoft.Json.JsonIgnore] public int SocketIndex;
+
+        /// <summary>ID of socketed gem (transient, restored from the persisted GemInstanceData via GemInstanceId).</summary>
+        [Newtonsoft.Json.JsonIgnore] public string GemId;
+        public bool IsUnlocked = true; // Socket unlocked (some only unlock at higher enhance)
+
+        /// <summary>InstanceId of the GemInstanceData for this socket. Null = empty socket.</summary>
+        public string GemInstanceId;
+
+        /// <summary>StackId of the inventory stack the socketed gem came from — unsocket returns gems to their own (split) stack.</summary>
+        [Newtonsoft.Json.JsonIgnore] public string StackId;
+
+        [Newtonsoft.Json.JsonIgnore] public int GemLevel = 1; // runtime; from GemInstanceData
+        [Newtonsoft.Json.JsonIgnore] public bool IsLocked = false; // runtime; anti-destroy guard
 
         [Newtonsoft.Json.JsonIgnore] // computed, not saved
-        public bool IsEmpty => string.IsNullOrEmpty(GemId);
+        public bool IsEmpty => string.IsNullOrEmpty(GemInstanceId) && string.IsNullOrEmpty(GemId);
 
         public SocketData Clone()
         {

@@ -7,13 +7,12 @@ namespace IdleDefenseSurvival.Save
 {
     /// <summary>
     /// Inventory serializer - handles serialization/deserialization of inventory data.
-    /// v4: Config not saved, SlotIndex not saved (array index is the index), derived fields not serialized.
+    /// Flat items list, explicit SlotIndex, category derived from ItemId (never persisted).
     /// </summary>
     public static class InventorySerializer
     {
         /// <summary>
-        /// Serializes inventory to categorized save data (v5+).
-        /// Each tab keeps only the fields that tab needs (see InventoryItem.TrimForSave).
+        /// Serializes inventory to save data.
         /// </summary>
         public static InventorySaveData Serialize(IInventoryService inventory)
         {
@@ -31,7 +30,9 @@ namespace IdleDefenseSurvival.Save
         }
 
         /// <summary>
-        /// Validates inventory save data integrity across every category.
+        /// Validates inventory save data integrity.
+        /// Identity rule: equipment entries must carry an InstanceId (unique); stackables must not
+        /// (their key is KeyId = ItemId [+ StackId], instance identity is equipment-only).
         /// </summary>
         public static bool ValidateSaveData(InventorySaveData data, out string error)
         {
@@ -43,34 +44,49 @@ namespace IdleDefenseSurvival.Save
                 return false;
             }
 
-            if (!data.IsCategorized)
+            if (data.Items == null)
             {
-                // Legacy flat save - acceptable during migration.
-                return true;
+                error = "Items array is null";
+                return false;
             }
 
-            var seenInstanceIds = new HashSet<string>();
-            foreach (var slotData in data.AllSlotsFlattened)
+            var seenEquipmentIds = new HashSet<string>();
+            var seenStackKeys = new HashSet<string>();
+            foreach (var item in data.Items)
             {
-                if (slotData?.Item == null) continue;
+                if (item == null) continue;
 
-                if (string.IsNullOrEmpty(slotData.Item.InstanceId))
+                if (item.Quantity <= 0)
                 {
-                    error = "Item has empty InstanceId";
+                    error = $"Item {item.ItemId} has invalid quantity: {item.Quantity}";
                     return false;
                 }
 
-                if (seenInstanceIds.Contains(slotData.Item.InstanceId))
-                {
-                    error = $"Duplicate InstanceId: {slotData.Item.InstanceId}";
-                    return false;
-                }
-                seenInstanceIds.Add(slotData.Item.InstanceId);
+                if (string.IsNullOrEmpty(item.ItemId)) continue; // skipped on load
 
-                if (slotData.Item.Quantity <= 0)
+                if (string.IsNullOrEmpty(item.InstanceId))
                 {
-                    error = $"Item {slotData.Item.InstanceId} has invalid quantity: {slotData.Item.Quantity}";
-                    return false;
+                    // Stackable entry: key must be present and unique.
+                    string key = string.IsNullOrEmpty(item.KeyId) ? BuildStackKey(item) : item.KeyId;
+                    if (string.IsNullOrEmpty(key))
+                    {
+                        error = $"Stackable item {item.ItemId} has no stack key";
+                        return false;
+                    }
+                    if (!seenStackKeys.Add(key))
+                    {
+                        error = $"Duplicate stack key: {key}";
+                        return false;
+                    }
+                }
+                else
+                {
+                    // Equipment entry: unique instance identity.
+                    if (!seenEquipmentIds.Add(item.InstanceId))
+                    {
+                        error = $"Duplicate InstanceId: {item.InstanceId}";
+                        return false;
+                    }
                 }
             }
 
@@ -78,44 +94,62 @@ namespace IdleDefenseSurvival.Save
         }
 
         /// <summary>
-        /// Repairs common save data issues. Rebuilds categorized layout from valid slots.
+        /// Repairs common save data issues (missing/duplicate instance ids, missing stack keys, bad quantities).
         /// </summary>
         public static InventorySaveData RepairSaveData(InventorySaveData data)
         {
             if (data == null) return InventorySaveData.CreateEmpty();
 
-            var categorized = InventoryCategorizedSlots.CreateEmpty();
-            var seenIds = new HashSet<string>();
+            var valid = new List<InventoryItemData>();
+            var seenEquipmentIds = new HashSet<string>();
+            var seenStackKeys = new HashSet<string>();
 
-            // Iterate existing groups in place so items keep their tab assignment.
-            foreach (var tab in new[] { TabType.Equipment, TabType.Consumables, TabType.Materials, TabType.Gems, TabType.Other })
+            foreach (var item in data.Items ?? Array.Empty<InventoryItemData>())
             {
-                var valid = new List<InventorySlotData>();
-                var group = data.CategorizedSlots?.GetSlots(tab);
-                if (group == null) continue;
+                if (item == null) continue;
 
-                foreach (var slotData in group)
+                if (item.Quantity <= 0)
+                    item.Quantity = 1;
+
+                if (string.IsNullOrEmpty(item.InstanceId))
                 {
-                    if (slotData?.Item == null) continue;
-
-                    if (string.IsNullOrEmpty(slotData.Item.InstanceId) || seenIds.Contains(slotData.Item.InstanceId))
-                        slotData.Item.InstanceId = Guid.NewGuid().ToString();
-                    seenIds.Add(slotData.Item.InstanceId);
-
-                    if (slotData.Item.Quantity <= 0)
-                        slotData.Item.Quantity = 1;
-
-                    valid.Add(slotData);
+                    // Stackable: ensure a unique stack key exists.
+                    string key = string.IsNullOrEmpty(item.KeyId) ? BuildStackKey(item) : item.KeyId;
+                    if (string.IsNullOrEmpty(key) || !seenStackKeys.Add(key))
+                    {
+                        item.StackId = AllocStackId(seenStackKeys);
+                        item.KeyId = BuildStackKey(item);
+                        seenStackKeys.Add(item.KeyId);
+                    }
                 }
-                categorized.SetSlots(tab, valid.ToArray());
+                else
+                {
+                    if (!seenEquipmentIds.Add(item.InstanceId))
+                        item.InstanceId = Guid.NewGuid().ToString();
+                }
+
+                valid.Add(item);
             }
 
             return new InventorySaveData
             {
-                CurrentCapacity = data.CurrentCapacity,
-                CategorizedSlots = categorized,
-                LastModifiedTimestamp = data.LastModifiedTimestamp
+                Capacity = data.Capacity,
+                LastModifiedTimestamp = data.LastModifiedTimestamp,
+                Items = valid.ToArray()
             };
+        }
+
+        private static string BuildStackKey(InventoryItemData item) =>
+            string.IsNullOrEmpty(item.StackId) ? item.ItemId : item.ItemId + "~" + item.StackId;
+
+        private static string AllocStackId(HashSet<string> taken)
+        {
+            for (int i = 0; i < 26; i++)
+            {
+                string id = ((char)('a' + i)).ToString();
+                if (!taken.Contains(id)) return id;
+            }
+            return Guid.NewGuid().ToString("N")[..4];
         }
     }
 }

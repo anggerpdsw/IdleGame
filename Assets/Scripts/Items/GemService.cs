@@ -339,6 +339,63 @@ namespace IdleDefenseSurvival.Items
         }
 
         /// <summary>
+        /// All live GemInstances (socketed gems), keyed by GemInstanceId.
+        /// Persisted separately from the stack inventory (SaveData.SocketedGems) so
+        /// level/experience survive restarts — socket.GemInstanceId alone is just a reference.
+        /// </summary>
+        public GemInstanceData[] GetSocketedGemsSaveData() => _socketedGems.Values.ToArray();
+
+        /// <summary>
+        /// Restores the runtime GemInstance registry before Rehydrate. Stable InstanceIds
+        /// keep modifier keys (Gem:{id}) valid across saves.
+        /// </summary>
+        public void LoadSocketedGems(IEnumerable<GemInstanceData> instances)
+        {
+            _socketedGems.Clear();
+            if (instances == null) return;
+            foreach (var instance in instances)
+            {
+                if (instance != null && !string.IsNullOrEmpty(instance.InstanceId))
+                    _socketedGems[instance.InstanceId] = instance;
+            }
+        }
+
+        /// <summary>
+        /// Rehydrates socketed GemInstanceData from persisted SocketData references.
+        /// Called after InventoryService.LoadFromSaveData. Gem instances keep stable
+        /// GemInstanceId so modifiers can be re-applied (GemModifierService is id-stable).
+        /// </summary>
+        public void RestoreSocketedGems(IEnumerable<InventoryItem> items)
+        {
+            if (items == null) return;
+
+            foreach (var item in items)
+            {
+                if (item?.Sockets == null) continue;
+
+                foreach (var socket in item.Sockets)
+                {
+                    if (socket == null || socket.IsEmpty) continue;
+
+                    // LoadSocketedGems (SaveManager) restored the registry first; the socket's
+                    // GemInstanceId reference wins. Only fall back to a fresh instance when the
+                    // id was lost (pre-SocketedGems saves).
+                    if (!_socketedGems.TryGetValue(socket.GemInstanceId, out var instance))
+                    {
+                        instance = GemFactory.Instance?.CreateGemInstanceFromSocket(socket.GemId, socket.GemLevel);
+                        if (instance == null) continue;
+
+                        socket.GemInstanceId = instance.InstanceId;
+                        _socketedGems[instance.InstanceId] = instance;
+                    }
+
+                    // Re-apply modifiers with the restored instance (id-stable replace).
+                    GemModifierService.Instance?.Apply(item, socket.SocketIndex, instance);
+                }
+            }
+        }
+
+        /// <summary>
         /// Counts how many gems of a specific type are socketed.
         /// </summary>
         public int CountGemType(InventoryItem item, GemType gemType)

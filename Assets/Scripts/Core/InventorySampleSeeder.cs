@@ -23,7 +23,7 @@ namespace IdleDefenseSurvival.Core
             inv.AddItem("equip_gloves_fighter");
             inv.AddItem("equip_armor_iron");
             inv.AddItem("equip_ring_ruby");
-            inv.AddItem("gem_sapphire", 11);
+            inv.AddItem("gem_sapphire", 3);
         }
     }
 }

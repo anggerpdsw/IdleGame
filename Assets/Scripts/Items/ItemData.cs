@@ -335,7 +335,6 @@ namespace IdleDefenseSurvival.Items
                     => ItemGenerator.Instance.Consumable.Generate(itemData, ItemGenerationContext.Drop(tier, 0).With(category: itemData.Category, forcedQuality: (int)rarity)),
                 _ => new InventoryItem
                 {
-                    InstanceId = Guid.NewGuid().ToString(),
                     ItemId = entry.ItemId,
                     Quantity = UnityEngine.Random.Range(entry.MinCount, entry.MaxCount + 1),
                     Level = level,
