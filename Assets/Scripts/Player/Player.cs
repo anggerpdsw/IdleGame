@@ -280,6 +280,79 @@ namespace IdleDefenseSurvival.Player
             return true;
         }
 
+        // ===== Heal / Mana Over Time (from potions) =====
+        private readonly List<Coroutine> _activeHoTs = new();
+        private readonly List<Coroutine> _activeMoTs = new();
+        private static readonly WaitForSeconds _oneSecond = new(1f);
+
+        /// <summary>
+        /// Starts a Heal-over-Time effect. Ticks every second for <paramref name="duration"/> seconds.
+        /// Each tick heals <paramref name="totalAmount"/> / <paramref name="duration"/>.
+        /// </summary>
+        public void StartHealOverTime(float totalAmount, float duration = 10f)
+        {
+            if (totalAmount <= 0f || duration <= 0f) return;
+            float tickAmount = totalAmount / duration;
+            var routine = StartCoroutine(HealOverTimeRoutine(tickAmount, duration));
+            _activeHoTs.Add(routine);
+        }
+
+        /// <summary>
+        /// Starts a Mana-over-Time effect. Ticks every second for <paramref name="duration"/> seconds.
+        /// Each tick restores <paramref name="totalAmount"/> / <paramref name="duration"/> mana.
+        /// </summary>
+        public void StartManaOverTime(float totalAmount, float duration = 10f)
+        {
+            if (totalAmount <= 0f || duration <= 0f) return;
+            float tickAmount = totalAmount / duration;
+            var routine = StartCoroutine(ManaOverTimeRoutine(tickAmount, duration));
+            _activeMoTs.Add(routine);
+        }
+
+        private IEnumerator HealOverTimeRoutine(float tickAmount, float duration)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                yield return _oneSecond;
+                elapsed += 1f;
+
+                float maxHealth = PlayerStatsManager.Instance?.GetStat(SkillType.HealthPoint) ?? 0f;
+                if (_currentHealth < maxHealth)
+                {
+                    float before = _currentHealth;
+                    _currentHealth = Mathf.Min(_currentHealth + tickAmount, maxHealth);
+                    float actual = _currentHealth - before;
+                    if (actual >= 1f)
+                        UpdateHealthUI();
+                }
+                // Show heal tick popup every second regardless of actual heal (visual feedback)
+                ShowDamagePopup(tickAmount, DamageType.Heal, CriticalType.None, "+");
+            }
+        }
+
+        private IEnumerator ManaOverTimeRoutine(float tickAmount, float duration)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                yield return _oneSecond;
+                elapsed += 1f;
+
+                float maxMana = PlayerStatsManager.Instance?.GetStat(SkillType.ManaPoint) ?? 0f;
+                if (_currentMana < maxMana)
+                {
+                    float before = _currentMana;
+                    _currentMana = Mathf.Min(_currentMana + tickAmount, maxMana);
+                    float actual = _currentMana - before;
+                    if (actual >= 1f)
+                        UpdateManaUI();
+                }
+                // Show mana tick popup every second regardless of actual gain (visual feedback)
+                ShowDamagePopup(tickAmount, DamageType.Mana, CriticalType.None, "+");
+            }
+        }
+
         /// <summary>
         /// Update shield system - regenerate shield when at full HP.
         /// </summary>

@@ -302,19 +302,15 @@ namespace IdleDefenseSurvival.UI.Equipment
         public void OnSlotClick(EquipmentSlotUI slotUI)
         {
             if (slotUI == null) return;
-
             var item = slotUI.CurrentItem;
             if (item != null)
-            {
                 // Show item detail / comparison
                 ShowComparison(item);
-            }
         }
 
         public void OnSlotRightClick(EquipmentSlotUI slotUI)
         {
             if (slotUI == null) return;
-
             var item = slotUI.CurrentItem;
             if (item != null)
             {

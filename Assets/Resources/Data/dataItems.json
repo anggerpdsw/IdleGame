@@ -112,7 +112,7 @@
     {
       "Id": "potion_hp",
       "Name": "Health Potion",
-      "Description": "Restores 500 Health Point when used.",
+      "Description": "Restores 500 Health Points over 10s when used. Cooldown in 5s.",
       "Category": 2,
       "ItemRarity": 1,
       "IconKey": "Potion/potion/hp",
@@ -122,7 +122,7 @@
     {
       "Id": "potion_mp",
       "Name": "Mana Potion",
-      "Description": "Restores 500 Mana Point when used.",
+      "Description": "Restores 500 Mana Points over 10s when used. Cooldown in 5s.",
       "Category": 2,
       "ItemRarity": 1,
       "IconKey": "potion/mp",
@@ -132,7 +132,7 @@
     {
       "Id": "potion_sp",
       "Name": "Stamina Potion",
-      "Description": "Restores 500 Stamina Point when used.",
+      "Description": "Restores 500 Stamina Points over 10s when used. Cooldown in 5s.",
       "Category": 2,
       "ItemRarity": 1,
       "IconKey": "potion/sp",

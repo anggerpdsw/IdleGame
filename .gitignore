@@ -41,6 +41,8 @@
 
 # Visual Studio cache directory
 .vs/
+.claude-tmp/
+/node_modules/
 
 # Gradle cache directory
 .gradle/
