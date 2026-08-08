@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Equipment;
 using TMPro;
 
 namespace IdleDefenseSurvival.UI.Inventory
@@ -19,9 +19,6 @@ namespace IdleDefenseSurvival.UI.Inventory
         [SerializeField] private RectTransform _gridContainer;
         [SerializeField] private GameObject _slotPrefab;
 
-        [Header("Filter/Sort")]
-        [SerializeField] private InventorySortUI _sortUI;
-
         [Header("Tabs")]
         [SerializeField] private InventoryTabButton[] _tabs;
         [SerializeField] private TabType _currentTab = TabType.All;
@@ -32,10 +29,6 @@ namespace IdleDefenseSurvival.UI.Inventory
         [Header("Drag Drop")]
         [SerializeField] private Canvas _dragCanvas;
         [SerializeField] private InventoryDragItem _dragItemPrefab;
-
-        [Header("Dev")]
-        [Tooltip("Seed sample items when inventory is empty")]
-        [SerializeField] private bool _seedSampleItems = true;
 
         // State
         private InventorySlotUI[] _slotUIs;
@@ -59,15 +52,6 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void OnDisable()
         {
             UnsubscribeEvents();
-        }
-
-        private void Update()
-        {
-            // Handle drag visual
-            if (_activeDragItem != null)
-            {
-                _activeDragItem.transform.position = Mouse.current.position.ReadValue();
-            }
         }
         #endregion
 
@@ -95,43 +79,13 @@ namespace IdleDefenseSurvival.UI.Inventory
             }
             SetTab(_currentTab);
 
-            // Setup sort
-            if (_sortUI != null)
-            {
-                _sortUI.OnSortChanged += OnSortChanged;
-            }
-
             // Setup info panel
             if (_infoPanel != null)
             {
                 _infoPanel.Initialize(this);
             }
 
-            // Ensure inventory has content for demo/debug (no-op if already populated)
-            SeedSampleItemsIfEmpty();
-
             _isInitialized = true;
-        }
-
-        /// <summary>
-        /// Dev convenience: sample items so the grid is never blank in a fresh save.
-        /// Disable via flag in Inspector for a real empty inventory.
-        /// </summary>
-        private void SeedSampleItemsIfEmpty()
-        {
-            if (!_seedSampleItems) return;
-            var inv = InventoryService.Instance;
-            if (inv == null || ItemDatabase.Instance == null || inv.AllItems.Count > 0) return;
-
-            inv.AddItem("potion_hp", 12);
-            inv.AddItem("iron_ore", 40);
-            inv.AddItem("magic_crystal", 9);
-            inv.AddItem("upgrade_stone_basic", 5);
-            inv.AddItem("gold_pouch", 3);
-            inv.AddItem("equip_hat_leather");
-            inv.AddItem("equip_gloves_fighter");
-            inv.AddItem("equip_armor_iron");
-            inv.AddItem("equip_ring_ruby");
         }
 
         private void SubscribeEvents()
@@ -139,8 +93,12 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (InventoryService.Instance != null)
             {
                 InventoryService.Instance.OnInventoryChanged += OnInventoryChanged;
-                InventoryService.Instance.OnInventorySorted += OnInventorySorted;
-                InventoryService.Instance.OnInventoryFiltered += OnInventoryFiltered;
+            }
+
+            if (EquipmentService.Instance != null)
+            {
+                EquipmentService.Instance.OnItemEquipped += OnEquipmentChanged;
+                EquipmentService.Instance.OnItemUnequipped += OnEquipmentChanged;
             }
         }
 
@@ -149,8 +107,12 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (InventoryService.Instance != null)
             {
                 InventoryService.Instance.OnInventoryChanged -= OnInventoryChanged;
-                InventoryService.Instance.OnInventorySorted -= OnInventorySorted;
-                InventoryService.Instance.OnInventoryFiltered -= OnInventoryFiltered;
+            }
+
+            if (EquipmentService.Instance != null)
+            {
+                EquipmentService.Instance.OnItemEquipped -= OnEquipmentChanged;
+                EquipmentService.Instance.OnItemUnequipped -= OnEquipmentChanged;
             }
         }
         #endregion
@@ -161,17 +123,12 @@ namespace IdleDefenseSurvival.UI.Inventory
             RefreshUI();
         }
 
-        private void OnInventorySorted()
+        private void OnEquipmentChanged(EquipmentType slot, InventoryItem item)
         {
             RefreshUI();
         }
 
-        private void OnInventoryFiltered()
-        {
-            RefreshUI();
-        }
-
-                #endregion
+        #endregion
 
         #region Public API
         public void RefreshUI()
@@ -182,41 +139,39 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (inventory == null) return;
 
             var items = GetFilteredItems();
-            int index = 0;
 
-            foreach (var item in items)
+            // UI slot N shows filtered entry N, but keeps its PHYSICAL inventory index.
+            // Drag/drop and MoveItem operate on physical indices, never on UI positions.
+            for (int i = 0; i < _slotUIs.Length; i++)
             {
-                if (index < _slotUIs.Length)
+                if (i < items.Count)
                 {
-                    _slotUIs[index].SetItem(item);
-                    index++;
+                    var (item, inventoryIndex) = items[i];
+                    _slotUIs[i].SetItem(item, inventoryIndex);
                 }
-            }
-
-            // Clear remaining slots
-            for (int i = index; i < _slotUIs.Length; i++)
-            {
-                _slotUIs[i].Clear();
+                else
+                {
+                    _slotUIs[i].Clear();
+                }
             }
 
             // Update capacity display
             UpdateCapacityDisplay();
         }
 
-        private List<InventoryItem> GetFilteredItems()
+        private List<(InventoryItem item, int inventoryIndex)> GetFilteredItems()
         {
             var inventory = InventoryService.Instance;
-            if (inventory == null) return new List<InventoryItem>();
+            if (inventory == null) return new List<(InventoryItem, int)>();
 
-            var items = new List<InventoryItem>(inventory.AllItems);
-
-            // Equipment currently worn is shown in the paper-doll slots, never in the list.
-            items.RemoveAll(item => item.IsEquipped);
-
-            if (_currentTab != TabType.All)
-                items.RemoveAll(item => !TabMatches(item));
-
-            return items;
+            // Slots preserve physical order; item + its real slot index travel together.
+            return inventory.Slots
+                .Select((slot, index) => (slot, index))
+                .Where(x => !x.slot.IsEmpty)
+                .Where(x => !x.slot.Item.IsEquipped)
+                .Where(x => _currentTab == TabType.All || TabMatches(x.slot.Item))
+                .Select(x => (x.slot.Item, x.index))
+                .ToList();
         }
 
         private bool TabMatches(InventoryItem item) => _currentTab switch
@@ -253,11 +208,6 @@ namespace IdleDefenseSurvival.UI.Inventory
         {
             if (_infoPanel == null) return;
             _infoPanel.ShowItem(item);
-        }
-
-        public void OnSortChanged(InventorySortType sortType, bool ascending)
-        {
-            InventoryService.Instance?.Sort(sortType, ascending);
         }
 
         private void UpdateCapacityDisplay()
@@ -347,17 +297,6 @@ namespace IdleDefenseSurvival.UI.Inventory
         }
         #endregion
 
-        #region Tab Types
-        public enum TabType
-        {
-            All = 0,
-            Equipment = 1,
-            Consumables = 2,
-            Materials = 3,
-            Gems = 4,
-            Other = 5
-        }
-        #endregion
     }
 
 

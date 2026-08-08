@@ -166,7 +166,7 @@ namespace IdleDefenseSurvival.UI.CardCollection
 
         #region Visual
         private void RefreshIcon() => _cardIcon.sprite = CardResources.GetIcon(_cardData.Id);
-        private void RefreshRarity() => _cardFrame.sprite = CardResources.GetFrame($"{_cardData.CardRarity}");
+        private void RefreshRarity() => _cardFrame.sprite = CardResources.GetFrame($"{_cardData.ItemRarity}");
 
         private void RefreshLevel()
         {

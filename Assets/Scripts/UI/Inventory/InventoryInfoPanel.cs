@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Inventory;
@@ -29,6 +30,7 @@ namespace IdleDefenseSurvival.UI.Inventory
         [SerializeField] private Button _destroyButton;
         [SerializeField] private Toggle _favoriteToggle;
         [SerializeField] private Toggle _lockToggle;
+        [SerializeField] private Image _lockIcon;
 
         private InventoryItem _currentItem;
         private InventoryUI _parentUI;
@@ -51,7 +53,43 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (_lockToggle != null)
                 _lockToggle.onValueChanged.AddListener(OnLockChanged);
 
+            SubscribeEquipmentEvents();
             Hide();
+        }
+
+        private void SubscribeEquipmentEvents()
+        {
+            if (EquipmentService.Instance != null)
+            {
+                EquipmentService.Instance.OnItemEquipped += OnItemEquipped;
+                EquipmentService.Instance.OnItemUnequipped += OnItemUnequipped;
+            }
+        }
+
+        private void OnDisable()
+        {
+            UnsubscribeEquipmentEvents();
+        }
+
+        private void UnsubscribeEquipmentEvents()
+        {
+            if (EquipmentService.Instance != null)
+            {
+                EquipmentService.Instance.OnItemEquipped -= OnItemEquipped;
+                EquipmentService.Instance.OnItemUnequipped -= OnItemUnequipped;
+            }
+        }
+
+        private void OnItemEquipped(EquipmentType slot, InventoryItem item)
+        {
+            // Hide panel if the equipped item is the one currently displayed
+            if (_currentItem != null && _currentItem.InstanceId == item.InstanceId)
+                Hide();
+        }
+
+        private void OnItemUnequipped(EquipmentType slot, InventoryItem item)
+        {
+            // Optional: could refresh panel if this item becomes selected again
         }
 
         public void ShowItem(InventoryItem item)
@@ -123,9 +161,10 @@ namespace IdleDefenseSurvival.UI.Inventory
                 _favoriteToggle.isOn = item.IsFavorite;
                 _favoriteToggle.interactable = !item.IsLocked;
             }
-            if (_lockToggle != null)
+            if (_lockToggle != null && _lockIcon != null)
             {
                 _lockToggle.isOn = item.IsLocked;
+                RefreshIconLock(item.IsLocked);
             }
         }
 
@@ -248,7 +287,26 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void OnLockChanged(bool isLocked)
         {
             if (_currentItem != null)
+            {
                 InventoryService.Instance?.SetLocked(_currentItem.InstanceId, isLocked);
+                // Refresh button visibility (sell/destroy buttons depend on IsLocked)
+                _currentItem.IsLocked = isLocked;
+                UpdateButtonVisibility(_currentItem);
+            }
+            RefreshIconLock(isLocked);
+        }
+
+        private void UpdateButtonVisibility(InventoryItem item)
+        {
+            if (_sellButton != null)
+                _sellButton.gameObject.SetActive(!item.IsEquipped && !item.IsLocked);
+            if (_destroyButton != null)
+                _destroyButton.gameObject.SetActive(!item.IsEquipped && !item.IsLocked);
+        }
+
+        private void RefreshIconLock(bool isLocked)
+        {
+            _lockIcon.sprite = isLocked ? ItemResources.GetItemSource("lock_unlock/lock") : ItemResources.GetItemSource("lock_unlock/unlock");
         }
     }
 }

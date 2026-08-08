@@ -55,8 +55,20 @@ namespace IdleDefenseSurvival.Core
             // Attribute stat modifiers need SaveManager (AccountData) to exist first.
             EnsureSingleton<AttributeModifierManager>();
 
+            // Dev: fill inventory once when the save is truly fresh (no save file yet)
+            if (SaveManager.Instance?.IsSaveLoaded == true)
+                InventorySampleSeeder.SeedIfEmpty();
+            else
+                SaveManager.OnSaveLoaded += OnSaveLoaded_SeedIfEmpty;
+
             // Load save data AFTER all managers exist (SaveManager.Start() will handle loading via coroutine)
             StartCoroutine(LoadMainMenu());
+        }
+
+        private void OnSaveLoaded_SeedIfEmpty()
+        {
+            SaveManager.OnSaveLoaded -= OnSaveLoaded_SeedIfEmpty;
+            InventorySampleSeeder.SeedIfEmpty();
         }
 
         private IEnumerator LoadMainMenu()

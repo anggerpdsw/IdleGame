@@ -243,6 +243,7 @@ namespace IdleDefenseSurvival.Manager
                     };
                     SaveToFile(initialData);
                     Debug.Log("[SaveManager] Initial save created.");
+                    IsSaveLoaded = true;
                     OnSaveLoaded?.Invoke();
                     return;
                 }
@@ -250,7 +251,19 @@ namespace IdleDefenseSurvival.Manager
                 var saveData = LoadFromFile();
                 if (saveData == null)
                 {
-                    Debug.LogWarning("[SaveManager] Save file corrupted or empty.");
+                    // Broken or empty file: keep it for manual recovery, then start fresh.
+                    if (new FileInfo(SaveFile).Length == 0)
+                        File.Delete(SaveFile);
+                    else
+                        File.Move(SaveFile, SaveFile + ".corrupt");
+                    Debug.LogWarning("[SaveManager] Save file corrupted or empty - starting fresh save.");
+                    var initialData = new SaveData
+                    {
+                        currency = GatherCurrency()
+                    };
+                    SaveToFile(initialData);
+                    Debug.Log("[SaveManager] Initial save created.");
+                    IsSaveLoaded = true;
                     OnSaveLoaded?.Invoke();
                     return;
                 }
@@ -280,51 +293,6 @@ namespace IdleDefenseSurvival.Manager
         private void UpgradeSave(SaveData data)
         {
             if (data == null) return;
-
-            if (data.version < 2)
-            {
-                data.inventoryData ??= InventorySaveData.CreateEmpty();
-                data.version = 2;
-            }
-
-            if (data.version < 3)
-            {
-                data.equipmentData ??= EquipmentSaveData.CreateEmpty();
-                data.version = 3;
-            }
-
-            // v4: Save optimization - remove derived/computed fields, simplify equipment format
-            if (data.version < 4)
-            {
-                // Migrate equipment data from old EquippedItemData format to new EquipmentInstanceIdData format
-                if (data.equipmentData != null && data.equipmentData.EquippedItems != null)
-                {
-                    var oldEquippedItems = data.equipmentData.EquippedItems;
-                    var newEquippedItems = new List<EquipmentInstanceIdData>();
-
-                    foreach (var oldEquip in oldEquippedItems)
-                    {
-                        // Check for legacy Item field (from v3 EquippedItemData)
-                        if (oldEquip.HasLegacyItem)
-                        {
-                            newEquippedItems.Add(new EquipmentInstanceIdData
-                            {
-                                Slot = oldEquip.Slot,
-                                InstanceId = oldEquip.LegacyItem.InstanceId
-                            });
-                        }
-                        // Already migrated format (has InstanceId directly)
-                        else if (!string.IsNullOrEmpty(oldEquip.InstanceId))
-                        {
-                            newEquippedItems.Add(oldEquip);
-                        }
-                    }
-
-                    data.equipmentData.EquippedItems = newEquippedItems.ToArray();
-                }
-
-                data.version = 4;
-            }
 
             // Repair missing fields for any version
             data.account ??= new AccountData();
@@ -742,9 +710,7 @@ namespace IdleDefenseSurvival.Manager
 
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftService.Instance != null && data.craftQueue != null)
-            {
                 CraftService.Instance.LoadQueueSaveData(data.craftQueue);
-            }
         }
 
         private void ApplyCardInventory(CardInventoryData data)

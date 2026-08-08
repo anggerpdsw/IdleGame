@@ -51,6 +51,11 @@ namespace IdleDefenseSurvival.Inventory
         }
 
         /// <summary>
+        /// Gets the save/UI tab group this item belongs to.
+        /// </summary>
+        public static TabType GetTabType(this InventoryItem item) => item.GetItemCategory().GetTabType();
+
+        /// <summary>
         /// Gets the item rarity.
         /// </summary>
         public static ItemRarity GetRarity(this InventoryItem item)

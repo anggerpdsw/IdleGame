@@ -31,7 +31,7 @@ namespace IdleDefenseSurvival.Reward
 
             // Set rarity frame color
             if (rarityFrame != null)
-                rarityFrame.sprite = CardResources.GetFrame(cardReward.CardRarity.ToString());
+                rarityFrame.sprite = CardResources.GetFrame(cardReward.ItemRarity.ToString());
 
             // Show duplicate badge
             if (duplicateBadge != null)

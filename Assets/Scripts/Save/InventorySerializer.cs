@@ -12,32 +12,12 @@ namespace IdleDefenseSurvival.Save
     public static class InventorySerializer
     {
         /// <summary>
-        /// Serializes inventory to save data.
+        /// Serializes inventory to categorized save data (v5+).
+        /// Each tab keeps only the fields that tab needs (see InventoryItem.TrimForSave).
         /// </summary>
         public static InventorySaveData Serialize(IInventoryService inventory)
         {
-            if (inventory == null) return InventorySaveData.CreateEmpty();
-
-            var slots = new List<InventorySlotData>();
-
-            for (int i = 0; i < inventory.Slots.Count; i++)
-            {
-                var slot = inventory.Slots[i];
-                if (!slot.IsEmpty)
-                {
-                    slots.Add(new InventorySlotData
-                    {
-                        Item = SerializeItem(slot.Item)
-                    });
-                }
-            }
-
-            return new InventorySaveData
-            {
-                CurrentCapacity = inventory.Capacity,
-                Slots = slots.ToArray(),
-                LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            };
+            return inventory?.GetSaveData() ?? InventorySaveData.CreateEmpty();
         }
 
         /// <summary>
@@ -51,42 +31,7 @@ namespace IdleDefenseSurvival.Save
         }
 
         /// <summary>
-        /// Serializes a single inventory item.
-        /// Derived/computed fields are NOT serialized (stored in [NonSerialized] fields).
-        /// </summary>
-        private static InventoryItem SerializeItem(InventoryItem item)
-        {
-            if (item == null) return null;
-
-            var serialized = new InventoryItem
-            {
-                InstanceId = item.InstanceId,
-                ItemId = item.ItemId,
-                Quantity = item.Quantity,
-                Level = item.Level,
-                EnhanceLevel = item.EnhanceLevel,
-                LimitBreakCount = item.LimitBreakCount,
-                RefineLevel = item.RefineLevel,
-                TranscendLevel = item.TranscendLevel,
-                EvolutionStage = item.EvolutionStage,
-                IsAwakened = item.IsAwakened,
-                IsMasterwork = item.IsMasterwork,
-                CurrentDurability = item.CurrentDurability,
-                MaxDurability = item.MaxDurability,
-                Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray(),
-                Enchantment = item.Enchantment?.Clone(),
-                IsFavorite = item.IsFavorite,
-                IsLocked = item.IsLocked,
-                IsNew = item.IsNew,
-                AcquiredTimestamp = item.AcquiredTimestamp,
-                CustomData = item.CustomData != null ? new Dictionary<string, object>(item.CustomData) : null
-            };
-
-            return serialized;
-        }
-
-        /// <summary>
-        /// Validates inventory save data integrity.
+        /// Validates inventory save data integrity across every category.
         /// </summary>
         public static bool ValidateSaveData(InventorySaveData data, out string error)
         {
@@ -98,14 +43,14 @@ namespace IdleDefenseSurvival.Save
                 return false;
             }
 
-            if (data.Slots == null)
+            if (!data.IsCategorized)
             {
-                error = "Slots array is null";
-                return false;
+                // Legacy flat save - acceptable during migration.
+                return true;
             }
 
             var seenInstanceIds = new HashSet<string>();
-            foreach (var slotData in data.Slots)
+            foreach (var slotData in data.AllSlotsFlattened)
             {
                 if (slotData?.Item == null) continue;
 
@@ -133,43 +78,44 @@ namespace IdleDefenseSurvival.Save
         }
 
         /// <summary>
-        /// Repairs common save data issues.
+        /// Repairs common save data issues. Rebuilds categorized layout from valid slots.
         /// </summary>
         public static InventorySaveData RepairSaveData(InventorySaveData data)
         {
             if (data == null) return InventorySaveData.CreateEmpty();
 
-            var repaired = new InventorySaveData
-            {
-                CurrentCapacity = data.CurrentCapacity,
-                Slots = data.Slots ?? Array.Empty<InventorySlotData>(),
-                LastModifiedTimestamp = data.LastModifiedTimestamp
-            };
-
-            // Remove null items and fix indices
-            var validSlots = new List<InventorySlotData>();
+            var categorized = InventoryCategorizedSlots.CreateEmpty();
             var seenIds = new HashSet<string>();
 
-            foreach (var slotData in repaired.Slots)
+            // Iterate existing groups in place so items keep their tab assignment.
+            foreach (var tab in new[] { TabType.Equipment, TabType.Consumables, TabType.Materials, TabType.Gems, TabType.Other })
             {
-                if (slotData?.Item == null) continue;
+                var valid = new List<InventorySlotData>();
+                var group = data.CategorizedSlots?.GetSlots(tab);
+                if (group == null) continue;
 
-                // Generate new InstanceId if empty or duplicate
-                if (string.IsNullOrEmpty(slotData.Item.InstanceId) || seenIds.Contains(slotData.Item.InstanceId))
+                foreach (var slotData in group)
                 {
-                    slotData.Item.InstanceId = Guid.NewGuid().ToString();
+                    if (slotData?.Item == null) continue;
+
+                    if (string.IsNullOrEmpty(slotData.Item.InstanceId) || seenIds.Contains(slotData.Item.InstanceId))
+                        slotData.Item.InstanceId = Guid.NewGuid().ToString();
+                    seenIds.Add(slotData.Item.InstanceId);
+
+                    if (slotData.Item.Quantity <= 0)
+                        slotData.Item.Quantity = 1;
+
+                    valid.Add(slotData);
                 }
-                seenIds.Add(slotData.Item.InstanceId);
-
-                // Fix quantity
-                if (slotData.Item.Quantity <= 0)
-                    slotData.Item.Quantity = 1;
-
-                validSlots.Add(slotData);
+                categorized.SetSlots(tab, valid.ToArray());
             }
 
-            repaired.Slots = validSlots.ToArray();
-            return repaired;
+            return new InventorySaveData
+            {
+                CurrentCapacity = data.CurrentCapacity,
+                CategorizedSlots = categorized,
+                LastModifiedTimestamp = data.LastModifiedTimestamp
+            };
         }
     }
 }

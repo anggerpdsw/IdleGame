@@ -10,41 +10,35 @@ namespace IdleDefenseSurvival.Equipment
     /// </summary>
     public static class RarityMechanicConfig
     {
-        // Design ladder: Common 1 attr / Uncommon +1 secondary / Rare +1 socket / Epic +1 secondary /
-        // Legendary +1 secondary +passive / Mythic +1 secondary / Ancient +1 socket / Divine +1 secondary.
+        // Design ladder: Common 1 attr / Rare +1 socket / Epic +1 secondary / Legendary +1 secondary +passive /
+        // Mythic +1 secondary +socket / Divine +1 secondary +socket.
         private static readonly Dictionary<ItemRarity, int> SecondaryCounts = new()
         {
             { ItemRarity.Common, 0 },
-            { ItemRarity.Uncommon, 1 },
             { ItemRarity.Rare, 1 },
             { ItemRarity.Epic, 2 },
             { ItemRarity.Legendary, 3 },
             { ItemRarity.Mythic, 4 },
-            { ItemRarity.Ancient, 5 },
             { ItemRarity.Divine, 6 },
         };
 
         private static readonly Dictionary<ItemRarity, int> SocketCounts = new()
         {
             { ItemRarity.Common, 0 },
-            { ItemRarity.Uncommon, 0 },
             { ItemRarity.Rare, 1 },
             { ItemRarity.Epic, 1 },
             { ItemRarity.Legendary, 2 },
-            { ItemRarity.Mythic, 2 },
-            { ItemRarity.Ancient, 3 },
+            { ItemRarity.Mythic, 3 },
             { ItemRarity.Divine, 3 },
         };
 
         private static readonly Dictionary<ItemRarity, int> PassiveTiers = new()
         {
             { ItemRarity.Common, 0 },
-            { ItemRarity.Uncommon, 0 },
             { ItemRarity.Rare, 0 },
             { ItemRarity.Epic, 0 },
             { ItemRarity.Legendary, 1 }, // minor
             { ItemRarity.Mythic, 2 },    // standard
-            { ItemRarity.Ancient, 3 },   // strong
             { ItemRarity.Divine, 4 },    // unique
         };
 

@@ -32,12 +32,10 @@ namespace IdleDefenseSurvival.Items
         public static string GetDisplayName(this ItemRarity rarity) => rarity switch
         {
             ItemRarity.Common => "Common",
-            ItemRarity.Uncommon => "Uncommon",
             ItemRarity.Rare => "Rare",
             ItemRarity.Epic => "Epic",
             ItemRarity.Legendary => "Legendary",
             ItemRarity.Mythic => "Mythic",
-            ItemRarity.Ancient => "Ancient",
             ItemRarity.Divine => "Divine",
             _ => "Unknown"
         };
@@ -48,12 +46,10 @@ namespace IdleDefenseSurvival.Items
         public static Color GetDefaultColor(this ItemRarity rarity) => rarity switch
         {
             ItemRarity.Common => GameColors.commonGray,      // Gray
-            ItemRarity.Uncommon => GameColors.uncommonGreen,    // Green
             ItemRarity.Rare => GameColors.rareBlue,          // Blue
             ItemRarity.Epic => GameColors.epicPurple,          // Purple
             ItemRarity.Legendary => GameColors.legendaryOrange,     // Orange
             ItemRarity.Mythic => GameColors.mythicPink,        // Pink/Magenta
-            ItemRarity.Ancient => GameColors.ancientPurple,       // Deep Purple
             ItemRarity.Divine => GameColors.divineGold,        // Gold
             _ => Color.white
         };
@@ -64,12 +60,10 @@ namespace IdleDefenseSurvival.Items
         public static float GetDefaultStatMultiplier(this ItemRarity rarity) => rarity switch
         {
             ItemRarity.Common => 1.0f,
-            ItemRarity.Uncommon => 1.15f,
             ItemRarity.Rare => 1.35f,
             ItemRarity.Epic => 1.6f,
             ItemRarity.Legendary => 2.0f,
             ItemRarity.Mythic => 2.5f,
-            ItemRarity.Ancient => 3.2f,
             ItemRarity.Divine => 4.0f,
             _ => 1.0f
         };
@@ -80,12 +74,10 @@ namespace IdleDefenseSurvival.Items
         public static float GetDefaultUpgradeMultiplier(this ItemRarity rarity) => rarity switch
         {
             ItemRarity.Common => 1.0f,
-            ItemRarity.Uncommon => 1.2f,
             ItemRarity.Rare => 1.5f,
             ItemRarity.Epic => 2.0f,
             ItemRarity.Legendary => 3.0f,
             ItemRarity.Mythic => 5.0f,
-            ItemRarity.Ancient => 8.0f,
             ItemRarity.Divine => 12.0f,
             _ => 1.0f
         };
@@ -96,12 +88,10 @@ namespace IdleDefenseSurvival.Items
         public static float GetDefaultDropRate(this ItemRarity rarity) => rarity switch
         {
             ItemRarity.Common => 100f,
-            ItemRarity.Uncommon => 50f,
             ItemRarity.Rare => 20f,
             ItemRarity.Epic => 5f,
             ItemRarity.Legendary => 1f,
             ItemRarity.Mythic => 0.2f,
-            ItemRarity.Ancient => 0.05f,
             ItemRarity.Divine => 0.01f,
             _ => 100f
         };
@@ -112,12 +102,10 @@ namespace IdleDefenseSurvival.Items
         public static float GetDefaultSellMultiplier(this ItemRarity rarity) => rarity switch
         {
             ItemRarity.Common => 1f,
-            ItemRarity.Uncommon => 1.5f,
             ItemRarity.Rare => 2.5f,
             ItemRarity.Epic => 5f,
             ItemRarity.Legendary => 10f,
             ItemRarity.Mythic => 25f,
-            ItemRarity.Ancient => 50f,
             ItemRarity.Divine => 100f,
             _ => 1f
         };

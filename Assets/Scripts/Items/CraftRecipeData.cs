@@ -142,7 +142,7 @@ namespace IdleDefenseSurvival.Items
     [Serializable]
     public class QualityChance
     {
-        public int QualityLevel;       // Quality tier (1 = Common, 2 = Uncommon, etc.)
+        public int QualityLevel;       // Quality tier (1 = Common, 2 = Rare, etc.)
         public float BaseChance = 0f;  // Base percentage chance
         public float ChancePerLevel = 0f; // Bonus per crafting level
         public float ChancePerLuck = 0f;  // Bonus per luck stat

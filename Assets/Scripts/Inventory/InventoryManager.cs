@@ -52,9 +52,8 @@ namespace IdleDefenseSurvival.Manager
 
         public Dictionary<string, long> GetSaveData()
         {
-            return InventoryService.Instance?.GetSaveData()?.Slots != null
-                ? AggregateById(InventoryService.Instance.GetSaveData())
-                : new Dictionary<string, long>();
+            var save = InventoryService.Instance?.GetSaveData();
+            return save != null ? AggregateById(save) : new Dictionary<string, long>();
         }
 
         public void LoadInventory(Dictionary<string, long> savedItems)
@@ -65,8 +64,7 @@ namespace IdleDefenseSurvival.Manager
         private static Dictionary<string, long> AggregateById(InventorySaveData save)
         {
             var map = new Dictionary<string, long>();
-            if (save?.Slots == null) return map;
-            foreach (var slot in save.Slots)
+            foreach (var slot in save.AllSlotsFlattened)
             {
                 if (slot?.Item == null) continue;
                 if (!map.TryGetValue(slot.Item.ItemId, out var cur)) cur = 0;

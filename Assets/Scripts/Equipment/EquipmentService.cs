@@ -439,14 +439,32 @@ namespace IdleDefenseSurvival.Equipment
 
             foreach (var equipData in data.EquippedItems ?? Array.Empty<EquipmentInstanceIdData>())
             {
-                if (!string.IsNullOrEmpty(equipData.InstanceId))
+                if (string.IsNullOrEmpty(equipData.InstanceId)) continue;
+
+                var inventory = InventoryService.Instance;
+                if (inventory == null) continue;
+
+                // Try find by InstanceId first
+                var item = inventory.GetItem(equipData.InstanceId);
+
+                // Fallback: find by ItemId from legacy data if InstanceId not found (handles migration/corrupted saves)
+                if (item == null && equipData.HasLegacyItem)
                 {
-                    var inventory = InventoryService.Instance;
-                    var item = inventory != null ? inventory.GetItem(equipData.InstanceId) : null;
-                    if (item != null)
-                        EquipInternal(equipData.Slot, item);
-                    else
-                        Debug.LogWarning($"[EquipmentService] Could not find item with InstanceId {equipData.InstanceId} for slot {equipData.Slot}");
+                    string itemId = equipData.LegacyItem.ItemId;
+                    var candidates = inventory.GetItemsById(itemId);
+                    // Prefer non-equipped, non-favorite, non-locked item
+                    item = candidates.FirstOrDefault(i => !i.IsEquipped && !i.IsFavorite && !i.IsLocked)
+                        ?? candidates.FirstOrDefault(i => !i.IsEquipped)
+                        ?? candidates.FirstOrDefault();
+                }
+
+                if (item != null)
+                {
+                    EquipInternal(equipData.Slot, item);
+                }
+                else
+                {
+                    Debug.Log($"[EquipmentService] Skipping equip load: item {equipData.InstanceId} not in inventory (may have been sold/consumed)");
                 }
             }
         }

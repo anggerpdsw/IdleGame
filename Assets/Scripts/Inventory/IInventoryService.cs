@@ -37,7 +37,6 @@ namespace IdleDefenseSurvival.Inventory
         event Action<InventoryItem> OnItemRemoved;
         event Action<InventoryItem, int> OnItemQuantityChanged;
         event Action<int> OnCapacityChanged;
-        event Action OnInventorySorted;
         event Action OnInventoryFiltered;
 
         // ============ Properties ============
@@ -108,15 +107,7 @@ namespace IdleDefenseSurvival.Inventory
         /// <summary>Checks if inventory has specific item.</summary>
         bool HasItem(string itemId, int quantity = 1);
 
-        // ============ Sorting & Filtering ============
-        void Sort(InventorySortType sortType, bool ascending = true);
-        void SortByCategory();
-        void SortByRarity();
-        void SortByLevel();
-        void SortByName();
-        void SortByValue();
-        void SortByNewest();
-
+        // ============ Filtering ============
         void SetFilter(InventoryFilter filter);
         void ClearFilter();
         InventoryFilter GetCurrentFilter();
@@ -134,7 +125,7 @@ namespace IdleDefenseSurvival.Inventory
         // ============ Quick Actions ============
         long QuickSell(IEnumerable<string> instanceIds);
         long QuickSellByFilter(InventoryFilter filter);
-        long QuickSellJunk(); // Sells Common/Uncommon non-favorite non-locked items
+        long QuickSellJunk(); // Sells Common non-favorite non-locked items
         long QuickSellAllExceptFavorites();
 
         // ============ Consumption & Usage ============
@@ -283,33 +274,65 @@ namespace IdleDefenseSurvival.Inventory
     }
 
     /// <summary>
-    /// Sort types for inventory.
-    /// </summary>
-    public enum InventorySortType
-    {
-        None = 0,
-        Category = 1,
-        Rarity = 2,
-        Level = 3,
-        Name = 4,
-        Value = 5,
-        Newest = 6,
-        Quantity = 7,
-        EnhanceLevel = 8,
-        Durability = 9,
-    }
-
-    /// <summary>
     /// Save data for inventory.
     /// Config is loaded from dataInventory.json - NOT saved.
-    /// Only CurrentCapacity (or ExpansionCount) and Slots are persisted.
+    /// Only CurrentCapacity, CategorizedSlots and LastModifiedTimestamp are persisted (v5+).
     /// </summary>
     [Serializable]
     public class InventorySaveData
     {
         public int CurrentCapacity; // BaseCapacity + expansions
-        public InventorySlotData[] Slots;
+        /// <summary>Slots grouped by UI tab (v5+). Each shown only with fields that tab needs.</summary>
+        public InventoryCategorizedSlots CategorizedSlots;
         public long LastModifiedTimestamp;
+
+        /// <summary>
+        /// Flattens all categorized slots into one ordered list (slot position + item).
+        /// Missing categories / null slots are skipped. Used for loading the physical grid
+        /// and by simple consumers (aggregation over all items).
+        /// </summary>
+        [Newtonsoft.Json.JsonIgnore]
+        public IEnumerable<InventorySlotData> AllSlotsFlattened
+        {
+            get
+            {
+                if (CategorizedSlots == null)
+                {
+                    // Legacy flat list (pre-v5) fallback.
+                    if (LegacySlots == null) yield break;
+                    foreach (var s in LegacySlots)
+                    {
+                        if (s == null) continue;
+                        yield return s;
+                    }
+                    yield break;
+                }
+                var order = new[] { TabType.Equipment, TabType.Consumables, TabType.Materials, TabType.Gems, TabType.Other };
+                foreach (var tab in order)
+                {
+                    var slot = CategorizedSlots.GetSlots(tab);
+                    if (slot == null) continue;
+                    foreach (var s in slot)
+                    {
+                        if (s == null) continue;
+                        yield return s;
+                    }
+                }
+            }
+        }
+
+        /// <summary>True when the save uses the new categorized layout (v5+).</summary>
+        [Newtonsoft.Json.JsonIgnore]
+        public bool IsCategorized => CategorizedSlots != null;
+
+        /// <summary>
+        /// Legacy (v4 and older) flat slot list. Captured during deserialization only; NOT
+        /// written back on save (v5+ saves categorized). Read by migration/Tools.
+        /// </summary>
+        [Newtonsoft.Json.JsonProperty("Slots")]
+        public InventorySlotData[] LegacySlots { get; set; }
+
+        public bool ShouldSerializeLegacySlots() => false;
 
         // Migration helper: captures old "Config" field from v3 saves during deserialization.
         // Not written back on save (ShouldSerialize pattern).
@@ -321,23 +344,50 @@ namespace IdleDefenseSurvival.Inventory
         public static InventorySaveData CreateEmpty() => new()
         {
             CurrentCapacity = 48, // BaseCapacity from config
-            Slots = Array.Empty<InventorySlotData>(),
+            CategorizedSlots = InventoryCategorizedSlots.CreateEmpty(),
             LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         };
     }
 
     [Serializable]
+    public class InventoryCategorizedSlots
+    {
+        public InventorySlotData[] Equipment;
+        public InventorySlotData[] Consumables;
+        public InventorySlotData[] Materials;
+        public InventorySlotData[] Gems;
+        public InventorySlotData[] Other;
+
+        public InventorySlotData[] GetSlots(TabType tab) => tab switch
+        {
+            TabType.Equipment => Equipment,
+            TabType.Consumables => Consumables,
+            TabType.Materials => Materials,
+            TabType.Gems => Gems,
+            TabType.Other => Other,
+            _ => null,
+        };
+
+        public void SetSlots(TabType tab, InventorySlotData[] slots)
+        {
+            switch (tab)
+            {
+                case TabType.Equipment: Equipment = slots; break;
+                case TabType.Consumables: Consumables = slots; break;
+                case TabType.Materials: Materials = slots; break;
+                case TabType.Gems: Gems = slots; break;
+                case TabType.Other: Other = slots; break;
+            }
+        }
+
+        public static InventoryCategorizedSlots CreateEmpty() => new();
+    }
+
+    [Serializable]
     public class InventorySlotData
     {
-        // SlotIndex REMOVED - array index IS the index
-        // IsLocked/AllowedCategory REMOVED - never set at runtime, use InventorySlot directly in memory
+        /// <summary>Physical slot index in the inventory grid. Required for exact placement on load.</summary>
+        public int SlotIndex;
         public InventoryItem Item;
-
-        // Migration helper: captures old "SlotIndex" field from v3 saves during deserialization.
-        // Not written back on save (ShouldSerialize pattern).
-        [Newtonsoft.Json.JsonProperty("SlotIndex")]
-        public int LegacySlotIndex { get; set; }
-
-        public bool ShouldSerializeLegacySlotIndex() => false;
     }
 }

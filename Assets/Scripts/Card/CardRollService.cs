@@ -89,7 +89,7 @@ namespace IdleDefenseSurvival.Manager
                 bool guaranteedLegendary = legendaryPity >= GameConstants.PITY_LEGENDARY_THRESHOLD;
                 bool guaranteedMythic = mythicPity >= GameConstants.PITY_MYTHIC_THRESHOLD;
 
-                CardRarity chosenRarity = SelectRarity(guaranteedEpic, guaranteedLegendary, guaranteedMythic, virtualInventory);
+                ItemRarity chosenRarity = SelectRarity(guaranteedEpic, guaranteedLegendary, guaranteedMythic, virtualInventory);
                 string chosenCardId = PickRandomCard(chosenRarity, virtualInventory);
 
                 // If no valid card can be picked (all cards at max level), refund gems for this roll
@@ -133,7 +133,7 @@ namespace IdleDefenseSurvival.Manager
                     reward = new CardReward
                     {
                         CardId = chosenCardId,
-                        CardRarity = cardData.CardRarity,
+                        ItemRarity = cardData.ItemRarity,
                         Quantity = 1,
                         IsDuplicate = isDuplicate,
                         IsNewCard = isNewCard,
@@ -173,7 +173,7 @@ namespace IdleDefenseSurvival.Manager
 
             result.Cards.Sort((a, b) =>
             {
-                int rarityCompare = a.CardRarity.CompareTo(b.CardRarity);
+                int rarityCompare = a.ItemRarity.CompareTo(b.ItemRarity);
                 if (rarityCompare != 0) return rarityCompare;
                 return string.CompareOrdinal(a.CardId, b.CardId);
             });
@@ -189,22 +189,22 @@ namespace IdleDefenseSurvival.Manager
         // Rarity selection logic (pure, no side effects)
         // Uses virtual inventory to filter out max-level cards
         // ----------------------------------------------------
-        private static CardRarity SelectRarity(
+        private static ItemRarity SelectRarity(
             bool guaranteedEpic,
             bool guaranteedLegendary,
             bool guaranteedMythic,
             VirtualCardInventorySnapshot virtualInventory)
         {
             var db = CardDatabase.Instance;
-            if (guaranteedMythic && HasAvailableCardsOfRarity(db, virtualInventory, CardRarity.Mythic))
-                return CardRarity.Mythic;
-            if (guaranteedLegendary && HasAvailableCardsOfRarity(db, virtualInventory, CardRarity.Legendary))
-                return CardRarity.Legendary;
-            if (guaranteedEpic && HasAvailableCardsOfRarity(db, virtualInventory, CardRarity.Epic))
-                return CardRarity.Epic;
+            if (guaranteedMythic && HasAvailableCardsOfRarity(db, virtualInventory, ItemRarity.Mythic))
+                return ItemRarity.Mythic;
+            if (guaranteedLegendary && HasAvailableCardsOfRarity(db, virtualInventory, ItemRarity.Legendary))
+                return ItemRarity.Legendary;
+            if (guaranteedEpic && HasAvailableCardsOfRarity(db, virtualInventory, ItemRarity.Epic))
+                return ItemRarity.Epic;
 
             // Build list of rarities that have available cards
-            var availableRarities = new List<CardRarity>();
+            var availableRarities = new List<ItemRarity>();
             float totalWeight = 0f;
             foreach (var rarity in db.RarityConfigs.Values)
             {
@@ -218,7 +218,7 @@ namespace IdleDefenseSurvival.Manager
             if (availableRarities.Count == 0)
             {
                 if (_debug) Debug.LogWarning("No available cards of any rarity (all at max level)");
-                return CardRarity.Common; // fallback
+                return ItemRarity.Common; // fallback
             }
 
             float roll = Random.value * totalWeight;
@@ -236,7 +236,7 @@ namespace IdleDefenseSurvival.Manager
         /// <summary>
         /// Checks if there are any available (non-max-level) cards of the given rarity using virtual inventory.
         /// </summary>
-        private static bool HasAvailableCardsOfRarity(CardDatabase db, VirtualCardInventorySnapshot virtualInventory, CardRarity rarity)
+        private static bool HasAvailableCardsOfRarity(CardDatabase db, VirtualCardInventorySnapshot virtualInventory, ItemRarity rarity)
         {
             var allCards = db.GetCardsByRarity(rarity);
             foreach (var cardId in allCards)
@@ -252,11 +252,11 @@ namespace IdleDefenseSurvival.Manager
         // Pick a random card of the given rarity (pure, no side effects)
         // Uses virtual inventory to filter out max-level cards
         // ----------------------------------------------------
-        private static string PickRandomCard(CardRarity rarity, VirtualCardInventorySnapshot virtualInventory)
+        private static string PickRandomCard(ItemRarity rarity, VirtualCardInventorySnapshot virtualInventory)
         {
-            for (int rarityIndex = (int)rarity; rarityIndex >= (int)CardRarity.Common; rarityIndex--)
+            for (int rarityIndex = (int)rarity; rarityIndex >= (int)ItemRarity.Common; rarityIndex--)
             {
-                CardRarity currentRarity = (CardRarity)rarityIndex;
+                ItemRarity currentRarity = (ItemRarity)rarityIndex;
                 List<string> candidates = new(CardDatabase.Instance.GetCardsByRarity(currentRarity));
                 candidates.RemoveAll(cardId =>
                 {
@@ -297,7 +297,7 @@ namespace IdleDefenseSurvival.Manager
             if (_debug)
             {
                 Debug.LogWarning(
-                    $"All card rarities from {rarity} down to {CardRarity.Common} " +
+                    $"All card rarities from {rarity} down to {ItemRarity.Common} " +
                     $"are unavailable. Cannot roll card."
                 );
             }

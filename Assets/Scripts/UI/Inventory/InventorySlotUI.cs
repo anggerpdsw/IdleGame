@@ -26,8 +26,12 @@ namespace IdleDefenseSurvival.UI.Inventory
         [SerializeField] private GameObject _enhanceIndicator;
 
         private InventoryUI _parentUI;
-        private int _slotIndex;
+        private int _slotIndex;        // UI grid position (0..capacity-1, fixed)
+        private int _inventoryIndex;    // Physical slot index in InventoryService
         private InventoryItem _currentItem;
+
+        /// <summary>Physical index in InventoryService.Slots (-1 when empty).</summary>
+        public int InventoryIndex => _inventoryIndex;
 
         public void Initialize(int slotIndex, InventoryUI parentUI)
         {
@@ -36,8 +40,9 @@ namespace IdleDefenseSurvival.UI.Inventory
             Clear();
         }
 
-        public void SetItem(InventoryItem item)
+        public void SetItem(InventoryItem item, int inventoryIndex)
         {
+            _inventoryIndex = inventoryIndex;
             _currentItem = item;
 
             if (item == null)
@@ -112,6 +117,7 @@ namespace IdleDefenseSurvival.UI.Inventory
 
         public void Clear()
         {
+            _inventoryIndex = -1;
             _currentItem = null;
 
             if (_iconImage != null)
@@ -174,7 +180,8 @@ namespace IdleDefenseSurvival.UI.Inventory
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (_currentItem == null || _currentItem.IsLocked) return;
-            _parentUI?.BeginDrag(_currentItem, _slotIndex, eventData.position);
+            // Drag uses the PHYSICAL inventory index, not the UI grid position
+            _parentUI?.BeginDrag(_currentItem, _inventoryIndex, eventData.position);
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -194,7 +201,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                 var slotUI = result.gameObject.GetComponent<InventorySlotUI>();
                 if (slotUI != null)
                 {
-                    targetSlot = slotUI._slotIndex;
+                    targetSlot = slotUI.InventoryIndex; // Physical slot, not UI position
                     break;
                 }
             }

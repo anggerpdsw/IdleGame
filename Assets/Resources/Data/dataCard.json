@@ -30,7 +30,7 @@
             "Mode": "Percent",
             "BaseValue": 120,
             "ValuePerLevel": 20,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "meat",
             "Name": "Meat",
@@ -40,7 +40,7 @@
             "Mode": "Percent",
             "BaseValue": 180,
             "ValuePerLevel": 20,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "long_reach",
             "Name": "Long Reach",
@@ -50,7 +50,7 @@
             "Mode": "Flat",
             "BaseValue": 0.2,
             "ValuePerLevel": 0.2,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "swift_strike",
             "Name": "Swift Strike",
@@ -60,7 +60,7 @@
             "Mode": "Percent",
             "BaseValue": 2,
             "ValuePerLevel": 2,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "power_strike",
             "Name": "Power Strike",
@@ -70,7 +70,7 @@
             "Mode": "Percent",
             "BaseValue": 3,
             "ValuePerLevel": 3,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "ricochet",
             "Name": "Ricochet",
@@ -80,7 +80,7 @@
             "Mode": "Flat",
             "BaseValue": 2,
             "ValuePerLevel": 2,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "keen_eye",
             "Name": "Keen Eye",
@@ -90,7 +90,7 @@
             "Mode": "Flat",
             "BaseValue": 1.8,
             "ValuePerLevel": 1.8,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "deadly_blow",
             "Name": "Deadly Blow",
@@ -100,7 +100,7 @@
             "Mode": "Percent",
             "BaseValue": 5,
             "ValuePerLevel": 5,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "sniper",
             "Name": "Sniper",
@@ -110,7 +110,7 @@
             "Mode": "Percent",
             "BaseValue": 2,
             "ValuePerLevel": 2,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "heavy_impact",
             "Name": "Heavy Impact",
@@ -120,7 +120,7 @@
             "Mode": "Flat",
             "BaseValue": 1.65,
             "ValuePerLevel": 0.15,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "knockback_force",
             "Name": "Knockback Force",
@@ -130,7 +130,7 @@
             "Mode": "Percent",
             "BaseValue": 125,
             "ValuePerLevel": 15,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "blood_pact",
             "Name": "Blood Pact",
@@ -140,7 +140,7 @@
             "Mode": "Flat",
             "BaseValue": 1,
             "ValuePerLevel": 1,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "twin_shot",
             "Name": "Twin Shot",
@@ -150,7 +150,7 @@
             "Mode": "Flat",
             "BaseValue": 2,
             "ValuePerLevel": 2,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "thunder_strike",
             "Name": "Thunder Strike",
@@ -160,7 +160,7 @@
             "Mode": "Flat",
             "BaseValue": 2,
             "ValuePerLevel": 2,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "paralyzer",
             "Name": "Paralyzer",
@@ -170,7 +170,7 @@
             "Mode": "Percent",
             "BaseValue": 5,
             "ValuePerLevel": 5,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "arcane_power",
             "Name": "Arcane Power",
@@ -180,7 +180,7 @@
             "Mode": "Percent",
             "BaseValue": 4,
             "ValuePerLevel": 4,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "last_stand",
             "Name": "Last Stand",
@@ -190,7 +190,7 @@
             "Mode": "Flat",
             "BaseValue": 1,
             "ValuePerLevel": 1,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "iron_wall",
             "Name": "Iron Wall",
@@ -200,7 +200,7 @@
             "Mode": "Percent",
             "BaseValue": 130,
             "ValuePerLevel": 15,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "phantom_step",
             "Name": "Phantom Step",
@@ -210,7 +210,7 @@
             "Mode": "Flat",
             "BaseValue": 1,
             "ValuePerLevel": 1,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "vitality",
             "Name": "Vitality",
@@ -220,7 +220,7 @@
             "Mode": "Percent",
             "BaseValue": 150,
             "ValuePerLevel": 51,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "recovery",
             "Name": "Recovery",
@@ -230,7 +230,7 @@
             "Mode": "Flat",
             "BaseValue": 140,
             "ValuePerLevel": 23,
-            "CardRarity": "Common"
+            "ItemRarity": "Common"
         }, {
             "Id": "compound_interest",
             "Name": "Compound Interest",
@@ -240,7 +240,7 @@
             "Mode": "Percent",
             "BaseValue": 0.5,
             "ValuePerLevel": 0.5,
-            "CardRarity": "Rare"
+            "ItemRarity": "Rare"
         }, {
             "Id": "frost_aura",
             "Name": "Frost Aura",
@@ -250,7 +250,7 @@
             "Mode": "Percent",
             "BaseValue": 8,
             "ValuePerLevel": 2,
-            "CardRarity": "Rare"
+            "ItemRarity": "Rare"
         }, {
             "Id": "shield",
             "Name": "Shield",
@@ -260,7 +260,7 @@
             "Mode": "Percent",
             "BaseValue": 10,
             "ValuePerLevel": 4,
-            "CardRarity": "Rare"
+            "ItemRarity": "Rare"
         }, {
             "Id": "time_fast",
             "Name": "Time Fast",
@@ -270,7 +270,7 @@
             "Mode": "Percent",
             "BaseValue": 28,
             "ValuePerLevel": 2,
-            "CardRarity": "Epic"
+            "ItemRarity": "Epic"
         }
 
 

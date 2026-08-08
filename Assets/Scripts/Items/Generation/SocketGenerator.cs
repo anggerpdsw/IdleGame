@@ -97,10 +97,10 @@ namespace IdleDefenseSurvival.Items.Generation
     {
         public Dictionary<int, int> SocketUnlockRarity = new()
         {
-            { 1, 3 }, // 2nd socket at Rare
-            { 2, 5 }, // 3rd socket at Legendary
-            { 3, 7 }, // 4th socket at Ancient
-            { 4, 8 }, // 5th socket at Divine
+            { 1, 2 }, // 2nd socket at Rare
+            { 2, 4 }, // 3rd socket at Legendary
+            { 3, 5 }, // 4th socket at Mythic
+            { 4, 6 }, // 5th socket at Divine
         };
 
         public Dictionary<int, int> SocketUnlockEnhance = new()

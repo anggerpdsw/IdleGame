@@ -205,24 +205,20 @@ namespace IdleDefenseSurvival.Items.Generation
         public Dictionary<ItemRarity, int> AffixCountPerRarity = new()
         {
             { ItemRarity.Common, 0 },
-            { ItemRarity.Uncommon, 1 },
             { ItemRarity.Rare, 1 },
             { ItemRarity.Epic, 2 },
             { ItemRarity.Legendary, 2 },
             { ItemRarity.Mythic, 3 },
-            { ItemRarity.Ancient, 3 },
             { ItemRarity.Divine, 4 }
         };
 
         public Dictionary<ItemRarity, int> MaxTierPerRarity = new()
         {
             { ItemRarity.Common, 1 },
-            { ItemRarity.Uncommon, 2 },
             { ItemRarity.Rare, 3 },
             { ItemRarity.Epic, 4 },
             { ItemRarity.Legendary, 5 },
             { ItemRarity.Mythic, 6 },
-            { ItemRarity.Ancient, 7 },
             { ItemRarity.Divine, 8 }
         };
 

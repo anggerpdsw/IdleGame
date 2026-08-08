@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 921e140ccf5b80f4d9c0c0f2039ae042
+guid: b0c810cdd02d9e54a8b3976ea3ecf00b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3846330120125846787
-    second: locked_0
+      213: -682606848286440497
+    second: lock_unlock_0
+  - first:
+      213: 4507026705345701349
+    second: lock_unlock_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: locked
+      name: unlock
       rect:
         serializedVersion: 2
-        x: 53
-        y: 0
-        width: 406
-        height: 512
+        x: 58
+        y: 322
+        width: 426
+        height: 434
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +131,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: dfa630d62271f9ac0800000000000000
-      internalID: -3846330120125846787
+      spriteID: fc343a620b4e686f0800000000000000
+      internalID: -682606848286440497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lock
+      rect:
+        serializedVersion: 2
+        x: 539
+        y: 323
+        width: 425
+        height: 433
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e56455c8ec2c8e30800000000000000
+      internalID: 4507026705345701349
       vertices: []
       indices: 
       edges: []
@@ -138,7 +163,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 7a6bf5879ee11fb4c8cfabf1750019e3
+    spriteID: f24d44d9695ebdb4ca969203d49fb6df
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      locked: -3846330120125846787
+      lock: 4507026705345701349
+      unlock: -682606848286440497
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

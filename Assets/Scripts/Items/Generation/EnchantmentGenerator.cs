@@ -163,36 +163,30 @@ namespace IdleDefenseSurvival.Items.Generation
         public Dictionary<ItemRarity, float> BaseChancePerRarity = new()
         {
             { ItemRarity.Common, 0f },
-            { ItemRarity.Uncommon, 0.05f },
             { ItemRarity.Rare, 0.1f },
             { ItemRarity.Epic, 0.2f },
             { ItemRarity.Legendary, 0.35f },
             { ItemRarity.Mythic, 0.5f },
-            { ItemRarity.Ancient, 0.7f },
             { ItemRarity.Divine, 0.9f }
         };
 
         public Dictionary<ItemRarity, int> MaxLevelPerRarity = new()
         {
             { ItemRarity.Common, 1 },
-            { ItemRarity.Uncommon, 2 },
             { ItemRarity.Rare, 3 },
             { ItemRarity.Epic, 4 },
             { ItemRarity.Legendary, 5 },
             { ItemRarity.Mythic, 5 },
-            { ItemRarity.Ancient, 5 },
             { ItemRarity.Divine, 5 }
         };
 
         public Dictionary<ItemRarity, int> StatCountPerRarity = new()
         {
             { ItemRarity.Common, 1 },
-            { ItemRarity.Uncommon, 1 },
             { ItemRarity.Rare, 2 },
             { ItemRarity.Epic, 2 },
             { ItemRarity.Legendary, 3 },
             { ItemRarity.Mythic, 3 },
-            { ItemRarity.Ancient, 4 },
             { ItemRarity.Divine, 4 }
         };
 

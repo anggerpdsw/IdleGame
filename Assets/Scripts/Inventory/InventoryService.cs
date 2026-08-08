@@ -40,7 +40,6 @@ namespace IdleDefenseSurvival.Inventory
         public event Action<InventoryItem> OnItemRemoved;
         public event Action<InventoryItem, int> OnItemQuantityChanged;
         public event Action<int> OnCapacityChanged;
-        public event Action OnInventorySorted;
         public event Action OnInventoryFiltered;
 
         /// <summary>
@@ -459,44 +458,7 @@ namespace IdleDefenseSurvival.Inventory
         }
         #endregion
 
-        #region Sorting & Filtering
-        public void Sort(InventorySortType sortType, bool ascending = true)
-        {
-            var items = _slots.Where(s => !s.IsEmpty).Select(s => s.Item).ToList();
-
-            Func<InventoryItem, IComparable> selector = sortType switch
-            {
-                InventorySortType.Category => i => i.GetItemCategory().ToString(),
-                InventorySortType.Rarity => i => (int)i.GetRarity(),
-                InventorySortType.Level => i => i.Level,
-                InventorySortType.Name => i => ItemDatabase.Instance?.GetItem(i.ItemId)?.Name ?? i.ItemId,
-                InventorySortType.Value => i => ItemDatabase.Instance?.GetSellPrice(i.ItemId) ?? 0L,
-                InventorySortType.Newest => i => -i.AcquiredTimestamp,
-                InventorySortType.Quantity => i => i.Quantity,
-                InventorySortType.EnhanceLevel => i => i.EnhanceLevel,
-                InventorySortType.Durability => i => i.CurrentDurability,
-                _ => i => i.InstanceId
-            };
-
-            items = ascending ? items.OrderBy(selector).ToList() : items.OrderByDescending(selector).ToList();
-
-            // Rebuild slots
-            ClearAllSlots();
-            for (int i = 0; i < items.Count && i < _slots.Count; i++)
-            {
-                _slots[i].Item = items[i];
-            }
-            MarkAllSlotsDirty(DirtyType.All);
-            OnInventorySorted?.Invoke();
-        }
-
-        public void SortByCategory() => Sort(InventorySortType.Category);
-        public void SortByRarity() => Sort(InventorySortType.Rarity);
-        public void SortByLevel() => Sort(InventorySortType.Level);
-        public void SortByName() => Sort(InventorySortType.Name);
-        public void SortByValue() => Sort(InventorySortType.Value);
-        public void SortByNewest() => Sort(InventorySortType.Newest);
-
+        #region Filtering
         public void SetFilter(InventoryFilter filter)
         {
             _currentFilter = filter ?? new InventoryFilter();
@@ -524,7 +486,12 @@ namespace IdleDefenseSurvival.Inventory
             {
                 item.IsFavorite = favorite;
                 int slotIndex = _slots.FindIndex(s => s.Item == item);
-                if (slotIndex >= 0) MarkDirty(slotIndex, DirtyType.Favorite);
+                if (slotIndex >= 0)
+                {
+                    MarkDirty(slotIndex, DirtyType.Favorite);
+                    FlushDirtySlots();
+                    OnInventoryChanged?.Invoke(InventoryChangedEventArgs.CreateRemoved(instanceId, item.ItemId, slotIndex, 0, item));
+                }
             }
         }
 
@@ -535,7 +502,12 @@ namespace IdleDefenseSurvival.Inventory
             {
                 item.IsLocked = locked;
                 int slotIndex = _slots.FindIndex(s => s.Item == item);
-                if (slotIndex >= 0) MarkDirty(slotIndex, DirtyType.Lock);
+                if (slotIndex >= 0)
+                {
+                    MarkDirty(slotIndex, DirtyType.Lock);
+                    FlushDirtySlots();
+                    OnInventoryChanged?.Invoke(InventoryChangedEventArgs.CreateRemoved(instanceId, item.ItemId, slotIndex, 0, item));
+                }
             }
         }
 
@@ -615,7 +587,7 @@ namespace IdleDefenseSurvival.Inventory
         {
             var filter = new InventoryFilter
             {
-                Rarities = new[] { ItemRarity.Common, ItemRarity.Uncommon },
+                Rarities = new[] { ItemRarity.Common },
                 HideEquipped = true,
                 HideMaxStack = false
             };
@@ -711,15 +683,25 @@ namespace IdleDefenseSurvival.Inventory
         #region Persistence
         public InventorySaveData GetSaveData()
         {
-            var slotData = _slots
-                .Where(s => !s.IsEmpty)
-                .Select(s => new InventorySlotData { Item = s.Item })
-                .ToArray();
+            var categorized = InventoryCategorizedSlots.CreateEmpty();
+
+            foreach (var tab in new[] { TabType.Equipment, TabType.Consumables, TabType.Materials, TabType.Gems, TabType.Other })
+            {
+                categorized.SetSlots(tab, _slots
+                    .Where(s => !s.IsEmpty)
+                    .Where(s => s.Item.GetTabType() == tab)
+                    .Select(s => new InventorySlotData
+                    {
+                        SlotIndex = s.SlotIndex,
+                        Item = s.Item.TrimForSave(tab)
+                    })
+                    .ToArray());
+            }
 
             return new InventorySaveData
             {
                 CurrentCapacity = Capacity, // Current expanded capacity
-                Slots = slotData,
+                CategorizedSlots = categorized,
                 LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
         }
@@ -744,27 +726,20 @@ namespace IdleDefenseSurvival.Inventory
             _config.Height = (capacity + _config.Width - 1) / _config.Width;
             CreateSlots(capacity);
 
-            if (data.Slots != null)
+            // Place items by explicit SlotIndex; fall back to first empty slot if out of range.
+            foreach (var slotData in data.AllSlotsFlattened)
             {
-                foreach (var slotData in data.Slots)
+                if (slotData?.Item == null) continue;
+
+                int targetSlot = slotData.SlotIndex >= 0 && slotData.SlotIndex < _slots.Count
+                    ? slotData.SlotIndex
+                    : FindEmptySlot();
+
+                if (targetSlot >= 0)
                 {
-                    int targetSlot = -1;
-
-                    // Use legacy SlotIndex if available (migrated from v3)
-                    if (slotData.LegacySlotIndex >= 0 && slotData.LegacySlotIndex < _slots.Count)
-                    {
-                        targetSlot = slotData.LegacySlotIndex;
-                    }
-                    else
-                    {
-                        // Fallback: find first empty slot
-                        targetSlot = FindEmptySlot();
-                    }
-
-                    if (targetSlot >= 0 && slotData.Item != null)
-                    {
-                        _slots[targetSlot].Item = slotData.Item;
-                    }
+                    var item = slotData.Item;
+                    item.SlotIndex = targetSlot; // item is the same reference persisted; re-bind on load
+                    _slots[targetSlot].Item = item;
                 }
             }
 
@@ -869,14 +844,6 @@ namespace IdleDefenseSurvival.Inventory
                 if (_slots[i].IsEmpty) return i;
             }
             return -1;
-        }
-
-        private void ClearAllSlots()
-        {
-            foreach (var slot in _slots)
-            {
-                slot.Item = null;
-            }
         }
 
         private void RebuildFilteredIndices()

@@ -47,6 +47,11 @@ namespace IdleDefenseSurvival.Inventory
         public bool IsNew = true; // Newly acquired (for UI highlight)
         public long AcquiredTimestamp = 0; // When item was obtained (for Sort by Newest)
 
+        // ============ Slot (persisted) ============
+        /// <summary>Physical slot index in InventoryService._slots. Stored on the item so each
+        /// category view carries its slot position and the grid can be rebuilt exactly on load.</summary>
+        public int SlotIndex = -1;
+
         // Runtime mirror of EquipmentService state - NOT saved (EquipmentService owns equip state)
         [Newtonsoft.Json.JsonIgnore]
         public bool IsEquipped = false;
@@ -139,6 +144,50 @@ namespace IdleDefenseSurvival.Inventory
             splitItem.InstanceId = Guid.NewGuid().ToString();
             splitItem.IsNew = false;
             return splitItem;
+        }
+
+        /// <summary>
+        /// Returns the fields required to persist this item for its UI tab.
+        /// Derived/static data (level progression, durability, sockets, enchantment) is omitted
+        /// for stackable categories - it is re-derived from ItemData on load.
+        /// Slot position (SlotIndex) is always kept.
+        /// </summary>
+        public InventoryItem TrimForSave(TabType tab)
+        {
+            var copy = new InventoryItem
+            {
+                InstanceId = InstanceId,
+                ItemId = ItemId,
+                Quantity = Quantity,
+                SlotIndex = SlotIndex,
+            };
+
+            // Consumables/Materials/Gems stack, stat-less: only identity + quantity needed.
+            if (tab is TabType.Consumables or TabType.Materials or TabType.Gems)
+                return copy;
+
+            // Equipment (and anything ungrouped) keeps full progression state.
+            copy.Level = Level;
+            copy.EnhanceLevel = EnhanceLevel;
+            copy.LimitBreakCount = LimitBreakCount;
+            copy.RefineLevel = RefineLevel;
+            copy.TranscendLevel = TranscendLevel;
+            copy.EvolutionStage = EvolutionStage;
+            copy.IsAwakened = IsAwakened;
+            copy.IsMasterwork = IsMasterwork;
+            copy.CurrentDurability = CurrentDurability;
+            copy.MaxDurability = MaxDurability;
+            copy.Enchantment = Enchantment?.Clone();
+            if (Sockets != null)
+            {
+                copy.Sockets = new SocketData[Sockets.Length];
+                for (int i = 0; i < Sockets.Length; i++)
+                    copy.Sockets[i] = Sockets[i]?.Clone();
+            }
+            // Rolled affixes/secondaries live in CustomData - required to recompute stats on load.
+            if (CustomData != null && CustomData.Count > 0)
+                copy.CustomData = new Dictionary<string, object>(CustomData);
+            return copy;
         }
     }
 

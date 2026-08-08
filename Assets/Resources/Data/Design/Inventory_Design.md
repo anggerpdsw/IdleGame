@@ -143,11 +143,61 @@ Governance default: Hat, Armor, Pants terbuka; sisanya `_lockedOverlay` (locked 
 - `InventoryUI.BeginDrag`: fallback jika `_dragItemPrefab`/`_dragCanvas` belum diisi scene → tetap set `DraggedItem` (drop jalan; visual drag aja belum).
 - `InventoryUI.ClearDrag`: clear static drag juga.
 
-## 6. TODO / Next Step
+## 6. Kontrak InventoryUI ↔ InventoryService (revisi arsitektur)
 
-- [ ] **Selesai (pass 1): ViewModel layer + presenter + cached def + per-slot refresh.**
+**Prinsip: UI slot ≠ inventory slot.** UI grid menampilkan hasil filter/sort (item bisa berpindah posisi visual),
+tapi **drag/drop dan `MoveItem` selalu memakai physical inventory index.**
+
+### Mapping
+
+```
+UI Slot #0 ──► entry (item, inventoryIndex=17)
+UI Slot #1 ──► entry (item, inventoryIndex=4)
+...
+```
+
+- `InventorySlotUI` simpan **dua index**: `_slotIndex` (posisi UI grid, tetap 0..capacity-1) dan
+  `_inventoryIndex` (index physical di `InventoryService.Slots`, -1 saat kosong; properti `InventoryIndex`).
+- `InventoryUI.GetFilteredItems()` → `List<(InventoryItem item, int inventoryIndex)>`:
+  iterasi `InventoryService.Slots` (bukan `AllItems`), filter `IsEquipped` + tab, item dibawa
+  beserta index aslinya.
+- `RefreshUI()` → `_slotUIs[i].SetItem(item, inventoryIndex)`.
+- Drag: `OnBeginDrag` kirim `_inventoryIndex`; `OnEndDrag` raycast baca `InventoryIndex` slot target,
+  lalu `MoveItem(fromPhysical, toPhysical)`. **Bukan** `MoveItem(UI 0, UI 1)`.
+- `InventoryService.Slots` = `IReadOnlyList<InventorySlot>`, list berorder physical; UI source of truth.
+
+### Perubahan lain (pass 3)
+
+- **Seed sample pindah dari UI ke bootstrap** — `Core/InventorySampleSeeder.cs`, di-subscribe
+  `BootstrapController` ke `SaveManager.OnSaveLoaded`; jalan sekali hanya saat save fresh
+  (inv kosong setelah load). `InventoryUI` tidak lagi punya `_seedSampleItems`/`SeedSampleItemsIfEmpty`
+  maupun subscribe `OnSaveLoaded`; `_saveLoaded` dihapus.
+- **Drag visual** — `InventoryUI.Update` tidak pakai `Mouse.current` lagi; posisi drag dari
+  `PointerEventData.position` (multi-input: touch/pen/Unity Input System).
+- Context menu = TODO (bukan di UI langsung): lanjut lewat `ShowContextMenu` di InventoryUI,
+  memanggil service, bukan aksi langsung di slot view.
+
+### Sort dihapus (pass 4) ✅
+
+Sistem sort **dihapus total** — user mengatur posisi item sendiri via drag-and-drop; item baru
+masuk ke slot kosong pertama yang tersedia (`FindEmptySlot`, urutan physical).
+
+File/fitur yang dihapus:
+- `InventorySortUI.cs` + wiring di scene (component + `_sortUI` field + dropdown/toggle objek).
+- `InventoryService.Sort()`, `SortByXxx()` — service tidak lagi mengubah urutan slot.
+- Event `OnInventorySorted`, enum `InventorySortType`, API sort di `IInventoryService`.
+
+Konsekuensi:
+- Tidak ada lagi operasi yang merombak posisi physical item — drag-drop satu-satunya cara
+  memindahkan item; posisi = pilihan user, disimpan apa adanya (urgbase slot index di save).
+- Refresh UI = baca `Slots` + filter tab + tampilkan berurutan; mapping `InventoryIndex` tetap.
+
+## 7. TODO / Next Step
+
+- [ ] **Selesai (pass 1): ViewModel layer + presenter + per-slot refresh.**
 - [ ] **Selesai (pass 2): durability color table, SlotUnlockState, drag E2E.**
-- [x] **Unlock slot lewat klik** (bukan butuh Button scene). `EquipmentSlotUI.OnPointerClick` — slot locked → `UnlockSlot(Slot)` langsung (via gold/level/quest gate service). Zero scene change.
-- [x] **Wiring scene unlock button** — user wire ke-11 slot Locked (Button) + Requirement (TMP) ke field baru `_unlockButton`/`_unlockButtonText`.
-- [x] **Drag E2E visual** — ref baru `Assets/Prefabs/InventoryDragItem.prefab` (InventoryDragItem: icon/quantity/rarity/canvasgroup), wire `_dragCanvas` (Canvas komponen) + `_dragItemPrefab` di InventoryUI.
-- [ ] **Compare panel** (deferral) — `EquipmentComparePanel` tak ada di scene, dan tak ada prefab stat/effect entry utk panel itu. Ditangani di editor (bukan teks): buat obj ComparePanel, wire ke `EquipmentUI._comparePanel`, isi prefab `EquipmentStatEntryUI`/`EquipmentComparisonStatUI`. InfoPanel Inventory tetap ada utk detail.
+- [x] **Unlock slot lewat klik** — zero scene change.
+- [x] **Wiring scene unlock button** — ke-11 slot Locked + Requirement → `_unlockButton`/`_unlockButtonText`.
+- [x] **Drag E2E visual** — `InventoryDragItem.prefab`, `_dragCanvas` + `_dragItemPrefab` di InventoryUI.
+- [ ] **Compare panel** (deferral) — `EquipmentComparePanel` tak ada di scene; ditangani editor: buat obj
+      ComparePanel, wire ke `EquipmentUI._comparePanel`, isi prefab stat entry. InfoPanel Inventory tetap ada.

@@ -36,8 +36,8 @@ namespace IdleDefenseSurvival.Manager
         #endregion
 
         private readonly Dictionary<string, CardData> _cards = new();
-        private readonly Dictionary<CardRarity, RarityConfig> _rarities = new();
-        private readonly Dictionary<CardRarity, List<string>> _cardsByRarity = new();
+        private readonly Dictionary<ItemRarity, RarityConfig> _rarities = new();
+        private readonly Dictionary<ItemRarity, List<string>> _cardsByRarity = new();
         private bool _initialized = false;
         private float _totalRarityWeight;
 
@@ -85,11 +85,11 @@ namespace IdleDefenseSurvival.Manager
             // Cards By Rarity
             // -----------------------------------------
             _cardsByRarity.Clear();
-            foreach (CardRarity rarity in System.Enum.GetValues(typeof(CardRarity)))
+            foreach (ItemRarity rarity in System.Enum.GetValues(typeof(ItemRarity)))
                 _cardsByRarity[rarity] = new List<string>();
 
             foreach (CardData card in _cards.Values)
-                if (_cardsByRarity.TryGetValue(card.CardRarity, out var cards))
+                if (_cardsByRarity.TryGetValue(card.ItemRarity, out var cards))
                     cards.Add(card.Id);
 
             // -----------------------------------------
@@ -111,23 +111,23 @@ namespace IdleDefenseSurvival.Manager
         public CardData GetCard(string cardId) => 
             _cards.TryGetValue(cardId, out var c) ? c : null;
 
-        public IReadOnlyDictionary<CardRarity, RarityConfig> RarityConfigs => _rarities;
-        public IReadOnlyList<string> GetCardsByRarity(CardRarity rarity)
+        public IReadOnlyDictionary<ItemRarity, RarityConfig> RarityConfigs => _rarities;
+        public IReadOnlyList<string> GetCardsByRarity(ItemRarity rarity)
         {
              if (_cardsByRarity.TryGetValue(rarity, out var cards))
                 return cards;
 
             return System.Array.Empty<string>();
         }
-        public bool HasCards(CardRarity rarity) => GetCardsByRarity(rarity).Count > 0;
+        public bool HasCards(ItemRarity rarity) => GetCardsByRarity(rarity).Count > 0;
 
-        public float GetRarityMultiplier(CardRarity rarityId) =>
+        public float GetRarityMultiplier(ItemRarity rarityId) =>
             _rarities.TryGetValue(rarityId, out var r) ? r.Multiplier : 1f;
 
         /// <summary>
         /// Gets cards of the given rarity that are not at max level.
         /// </summary>
-        public IReadOnlyList<string> GetAvailableCardsByRarity(CardRarity rarity)
+        public IReadOnlyList<string> GetAvailableCardsByRarity(ItemRarity rarity)
         {
             var allCards = GetCardsByRarity(rarity);
             var inventory = CardInventory.Instance;
@@ -148,7 +148,7 @@ namespace IdleDefenseSurvival.Manager
         /// <summary>
         /// Checks if there are any available (non-max-level) cards of the given rarity.
         /// </summary>
-        public bool HasAvailableCards(CardRarity rarity)
+        public bool HasAvailableCards(ItemRarity rarity)
         {
             return GetAvailableCardsByRarity(rarity).Count > 0;
         }

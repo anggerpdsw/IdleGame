@@ -43,22 +43,18 @@ Four laws:
 
 | Rarity | Attribute | Secondary | Socket | Passive | Visual |
 |---|---|---|---|---|---|
-| Common | 1 attr | — | 0 | — | — |
-| Uncommon | 1–2 attr | 1 | 0 | — | — |
+| Common | 1 attr | 0 | 0 | — | — |
 | Rare | 1–2 attr | 1 | 1 | — | — |
 | Epic | 1–2 attr | 2 | 1 | — | — |
 | Legendary | 1–2 attr | 3 | 2 | 1 passive | — |
-| Mythic | 2 attr | 4 | 2 | 1 passive | — |
-| Ancient | 2 attr | 5 | 3 | 1 strong passive | glow |
+| Mythic | 2 attr | 4 | 3 | 2 passives | — |
 | Divine | 2 attr | 6 | 3 | 1 unique passive | particle aura + sound |
 
 **Mechanics ladder (each rarity adds a DOOR):**
-- **Uncommon** — a secondary stat appears. First choice.
 - **Rare** — first socket. First gem decision.
 - **Epic** — a second secondary. Two axes of choice.
 - **Legendary** — a passive effect. Gameplay changes, not just math.
-- **Mythic** — second attribute (hybrid). Build diversification.
-- **Ancient** — strong passive. A build-defining tier.
+- **Mythic** — second attribute (hybrid) + extra socket. Build diversification.
 - **Divine** — unique passive + FX. Signature item, trade-able, one per slot.
 
 Sockets unlock gem economy (which is itself a secondary-stat sink). Passives unlock the effect registry. Never rebalance passives and base numbers together — **design rule: magnitude changes at rarity boundaries must be ≤15%**; mechanics do the heavy lifting.
@@ -79,12 +75,10 @@ Budget per rarity (flat base values, scale with level/enhance):
 | Rarity | Budget (approx. stat points at max level) |
 |---|---|
 | Common | 0 |
-| Uncommon | 12 |
 | Rare | 16 |
 | Epic | 22 |
 | Legendary | 30 |
 | Mythic | 40 |
-| Ancient | 55 |
 | Divine | 75 |
 
 Secondaries = **at most 20%** of total item value; attributes are always ≥80%.
@@ -96,7 +90,7 @@ Secondaries = **at most 20%** of total item value; attributes are always ≥80%.
 **Critique 7 answer:** the design previously had no random modifiers — every item of a kind was identical, so drops were interchangeable. Affixes make each drop roll an identity.
 
 - Every generated equipment item rolls **prefix + suffix** from `dataItems.json → Affixes` (AffixType: Prefix=0, Suffix=1). Prefix then suffix alternate per roll — a 2-affix item always gets one of each, never two prefixes.
-- Affix count scales with rarity (Common 0, Uncommon/Rare 1, Epic 2, Legendary 2, Mythic 3, Ancient 3, Divine 4 — see `AffixGeneratorConfig`).
+- Affix count scales with rarity (Common 0, Rare 1, Epic 2, Legendary 2, Mythic 3, Divine 4 — see `AffixGeneratorConfig`).
 - **Slot + rarity restriction (the pool is filtered, not flat):** each affix declares `MinRarity/MaxRarity` (gates the pool) + `ApplicableTypes` (which equipment slots it can land on — slot identity preserved: Ring rolls Crit/CritDmg/INT but never LifeRegen/Knockback/Defense), + `Weight` (drop weight, cumulative-sum roll). Generator removes same-affix-id after each pick so no duplicate on one item.
 - **Three affix classes** (an affix grants one or more):
   1. **Stat affix** (original): `Stats` = `CombatStatEntry` curve → combat-secondary pool, `ModifierSource.Equipment`.
@@ -113,8 +107,8 @@ Secondaries = **at most 20%** of total item value; attributes are always ≥80%.
 
 ## 5. Socket Progression
 
-- Common–Uncommon: 0 sockets.
-- Rare: 1. Epic: 1. Legendary–Mythic: 2. Ancient–Divine: 3.
+- Common: 0 sockets.
+- Rare: 1. Epic: 1. Legendary: 2. Mythic–Divine: 3.
 - Socket 1 unlocks at level 10, socket 2 at level 30, socket 3 at level 50 (item level gates, so sockets feel earned, not granted).
 - Gem stat values are **pre-scaled, never multiplied by item rarity**. A gem is a gem. Rarity of item determines how many gems it can hold, not how strong they are — otherwise gems become double-dipping.
 - Socket colors restrict gem types (see dataItems.json SocketConfigData) so gem choice is a decision, not an autofill.
@@ -127,9 +121,8 @@ Legendary+ only. Progression = gameplay complexity, not damage:
 
 | Rarity | Passive tier | Examples |
 |---|---|---|
-| Legendary | Minor | On kill: +3% AttackSpeed for 3s; 15% chance to fire an extra projectile |
-| Mythic | Standard | On critical: chain to 1 nearby enemy; +10% Ultimate damage while at full HP |
-| Ancient | Strong | While above 50% HP: +25% AttackDamage; on death: revive once with 30% HP per wave |
+| Legendary | Minor | 1 passive: On kill: +3% AttackSpeed for 3s; 15% chance to fire an extra projectile |
+| Mythic | Standard | 2 passives: On critical: chain to 1 nearby enemy; +30% Ultimate damage while at full HP |
 | Divine | Unique | "Vampiric Shots": every 5th attack heals 2% max HP; "Arcane Storm": kill grants UltimateAttack stack, max 10, resets on damage |
 
 Rules: passives live in the existing effect registry (SpecialEffectEntry / PassiveSkillEntry), one per item, no stacking same-id passives, all condition-based (no passive that is "just a bigger number"). Design ceiling: a player runs 11 items → 11 passive interactions max; keep each readable in one line of tooltip.
@@ -154,7 +147,7 @@ Sets exist to reward **cohesion**, not to beat raw stats:
 2. **One axis per item.** An item is either tanky, or fast, or crit, or caster — never all. Item budget is spent on ONE identity (2 stats max).
 3. **Multiplicative game, additive items.** Keep item bonuses additive within an item; multiplicative stacking happens through the attribute system, which is the only global multiplier. This is what keeps "thousands of items" balanceable: per-item math never compounds.
 4. **The 15% rule.** A rarity's *numbers* never exceed +15% over the tier below. Mechanics are the differentiator, so numbers can afford to be boring.
-5. **Power spike check:** at any point, the strongest hypothetical loadout (all Ancient+) must be beatable by a deliberately-built Common/Uncommon set with good gems — otherwise rarity replaces skill/build and the game dies.
+5. **Power spike check:** at any point, the strongest hypothetical loadout (all Divine+) must be beatable by a deliberately-built Common/Rare set with good gems — otherwise rarity replaces skill/build and the game dies.
 
 ---
 
@@ -162,7 +155,7 @@ Sets exist to reward **cohesion**, not to beat raw stats:
 
 Drop chance scales with **item level + rarity weight**, but the REAL currency is attribute pressure:
 
-- Drop table rolls rarity first (Common 40% / Uncommon 30% / Rare 18% / Epic 8% / Legendary 3.2% / Mythic 0.7% / Ancient 0.1% / Divine 0.01% — tunable per zone/wave).
+- Drop table rolls rarity first (Common 40% / Rare 30% / Epic 18% / Legendary 8% / Mythic 3.9% / Divine 0.1% — tunable per zone/wave).
 - Within rarity, roll which slot — weighted by what the player is missing (guaranteed pity: no repeated slot within a drop window).
 - Within slot, roll the item — each item in a slot is equally likely (design must keep per-slot item counts balanced, or the pity is wasted).
 - **Guaranteed drops:** every Nth kill (N = rarity weight × 10) grants a Rare+; first kill of a boss grants an Epic+.
@@ -183,7 +176,7 @@ score(item) = Σ (attrValue × attrWeight)       // ~80% share, per-build weight
 
 - **attrWeight:** per-build `AttributeWeightsConfig` (`EquipmentAutoEquipService`). Default profile `"all"` = CON/STR/INT/DEX all ×1 (flat equivalence). Focus profiles (`"strength"`, `"constitution"`, `"intelligence"`, `"dexterity"`) weight the build's primary attribute ×3 and the others ×0.5 — so a DEX build auto-equips DEX gear, CON gear still scores but no longer ties.
 - **statWeight:** per-build config (e.g., crit build weighs CriticalChance ×3, others ×1). Default profile = even weights, tuned to ~20% share.
-- Normalize by item level: `score / sqrt(itemLevel)` so a level-5 Ancient doesn't auto-beat a level-50 Common in a slot the player is under-leveled for.
+- Normalize by item level: `score / sqrt(itemLevel)` so a level-5 Divine doesn't auto-beat a level-50 Common in a slot the player is under-leveled for.
 - Anti-power-creep: score displayed to player as 4 bars (Attribute / Combat / Sockets / Passive). Auto-equip defaults to the best *attribute* score; secondaries only break ties. **Player sees the tradeoff, never a blind "best"**.
 
 ---
@@ -198,8 +191,7 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 **Rare — Apprentice Hat** — INT 8 / 0.6 / 1.0, 1 socket
 **Epic — Sorcerer Hat** — INT 12 / 0.9 / 1.5, +Fire Damage 2%, 1 socket
 **Legendary — Archmage Crown** — INT 15 / 1.1 / 2.0, +Water Damage 3%, +UltimateAttack 4%, 2 sockets, passive: "On ultimate cast: +10% UltimateAttack for 5s"
-**Mythic — Star Caller Crown** — INT 18 / 1.3 / 2.5, +Lightning Damage 4%, +UltimateAttack 6%, +CriticalChance 2%, 2 sockets, passive: "On kill: -0.5s ultimate cooldown"
-**Ancient — Void Sovereign Crown** — INT 22 / 1.5 / 3.0, +Fire Damage 6%, +UltimateAttack 8%, +CriticalChance 3%, +BounceChance 5%, 3 sockets, strong passive: "While above 50% HP: +25% UltimateAttack; on death: revive once with 30% HP per wave"
+**Mythic — Star Caller Crown** — INT 18 / 1.3 / 2.5, +Lightning Damage 4%, +UltimateAttack 6%, +CriticalChance 2%, 3 sockets, passive: "On kill: -0.5s ultimate cooldown"
 **Divine — Crown of the First Flame** — INT 28 / 1.8 / 3.5, +Fire Damage 8%, +UltimateAttack 10%, +CriticalChance 4%, +BounceChance 8%, +AttackSpeed 3%, 3 sockets, unique passive: "Arcane Storm — every kill grants 1 stack of +2% Fire Damage, max 10; resets on taking damage", FX: flame aura
 
 ### Gloves (Physical DPS — STR)
@@ -208,8 +200,7 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 **Rare — Fighter Gloves** — STR 10 / 0.8 / 1.2, +CriticalDamage 5%, 1 socket
 **Epic — Berserker Gauntlets** — STR 14 / 1.0 / 1.8, +CriticalDamage 8%, +KnockbackForce 10, 1 socket
 **Legendary — Dragonclaw Gauntlets** — STR 18 / 1.2 / 2.2, +CriticalDamage 10%, +KnockbackForce 15, +DamagePerRange 5%, 2 sockets, passive: "On crit: 10% chance to chain 1 extra projectile"
-**Mythic — Titan Fists** — STR 22 / 1.4 / 2.8, +CriticalDamage 12%, +KnockbackForce 20, +DamagePerRange 7%, +MultiShootChance 3%, 2 sockets, passive: "On kill: +3% AttackDamage stacking, max 10, lasts 5s"
-**Ancient — Fist of the Unmaker** — STR 26 / 1.6 / 3.2, +CriticalDamage 15%, +KnockbackForce 25, +DamagePerRange 10%, +MultiShootChance 5%, +BounceChance 5%, 3 sockets, strong passive: "Deal +15% damage to enemies below 30% HP"
+**Mythic — Titan Fists** — STR 22 / 1.4 / 2.8, +CriticalDamage 12%, +KnockbackForce 20, +DamagePerRange 7%, +MultiShootChance 3%, 3 sockets, passive: "On kill: +3% AttackDamage stacking, max 10, lasts 5s"
 **Divine — Godslayer Gauntlets** — STR 32 / 1.9 / 3.8, +CriticalDamage 18%, +KnockbackForce 30, +DamagePerRange 12%, +MultiShootChance 7%, +BounceChance 8%, +AttackSpeed 2%, 3 sockets, unique passive: "Vampiric Shots — every 5th attack heals 2% max HP", FX: red crackle
 
 ### Armor (Tank — CON)
@@ -218,8 +209,7 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 **Rare — Iron Armor** — CON 20 / 1.5 / 2.5, +DefenseAmount 5, 1 socket
 **Epic — Steel Plate** — CON 26 / 1.8 / 3.0, +DefenseAmount 8, +HealthRegen 1, 1 socket
 **Legendary — Aegis Cuirass** — CON 32 / 2.0 / 3.5, +DefenseAmount 10, +HealthRegen 2, +Evasion 2%, 2 sockets, passive: "On hit: 15% chance to reflect 50% of damage taken"
-**Mythic — Titan Shell** — CON 38 / 2.2 / 4.0, +DefenseAmount 13, +HealthRegen 3, +Evasion 3%, +LifeSteal 1%, 2 sockets, passive: "While above 70% HP: take 10% less damage"
-**Ancient — Mountain's Heart** — CON 45 / 2.5 / 4.5, +DefenseAmount 16, +HealthRegen 4, +Evasion 4%, +LifeSteal 2%, +DeathDefy 5%, 3 sockets, strong passive: "On death: survive with 50% HP once per 60s"
+**Mythic — Titan Shell** — CON 38 / 2.2 / 4.0, +DefenseAmount 13, +HealthRegen 3, +Evasion 3%, +LifeSteal 1%, 3 sockets, passive: "While above 70% HP: take 10% less damage"
 **Divine — Dragonhide Vest** — CON 55 / 3.0 / 5.5, +DefenseAmount 20, +HealthRegen 5, +Evasion 5%, +LifeSteal 3%, +DeathDefy 8%, +StuntChance 5%, 3 sockets, unique passive: "Dragon's Blood — heal 5% max HP per second while below 30% HP", FX: molten veins
 
 ### Ring (Crit Specialist — INT)
@@ -228,8 +218,7 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 **Rare — Ruby Ring** — INT 10 / 0.7 / 1.3, +CriticalRate 3%, 1 socket
 **Epic — Garnet Ring** — INT 14 / 0.9 / 1.6, +CriticalRate 5%, +CriticalDamage 5%, 1 socket
 **Legendary — Eternity Ring** — INT 18 / 1.1 / 2.0, +CriticalRate 7%, +CriticalDamage 8%, +BounceChance 3%, 2 sockets, passive: "Crits deal +10% damage for every 100 INT"
-**Mythic — Soulfire Ring** — INT 22 / 1.3 / 2.4, +CriticalRate 9%, +CriticalDamage 10%, +BounceChance 5%, +AttackSpeed 1%, 2 sockets, passive: "On crit: 5% chance to reset ultimate cooldown"
-**Ancient — Ring of the Undying** — INT 26 / 1.5 / 2.8, +CriticalRate 11%, +CriticalDamage 13%, +BounceChance 7%, +AttackSpeed 2%, +MultiShootChance 2%, 3 sockets, strong passive: "Crits apply a mark; killing marked enemies grants +5% CriticalChance for 5s"
+**Mythic — Soulfire Ring** — INT 22 / 1.3 / 2.4, +CriticalRate 9%, +CriticalDamage 10%, +BounceChance 5%, +AttackSpeed 1%, 3 sockets, passive: "On crit: 5% chance to reset ultimate cooldown"
 **Divine — Primordial Ring** — INT 32 / 1.8 / 3.2, +CriticalRate 14%, +CriticalDamage 16%, +BounceChance 10%, +AttackSpeed 3%, +MultiShootChance 3%, +BounceCount 1, 3 sockets, unique passive: "Echoing Crits — every 3rd crit fires a copy of the shot at a random enemy", FX: orbiting runes
 
 ### Belt (Hybrid — CON+STR)
@@ -238,8 +227,7 @@ All values = BaseValue / ValuePerLevel / ValuePerEnhance. Slots not shown follow
 **Rare — Warrior Belt** — CON 10 / 0.8 / 1.3, +STR 6 / 0.4 / 0.8, +HealthRegen 1, 1 socket
 **Epic — Plated Belt** — CON 14 / 1.0 / 1.7, +STR 8 / 0.6 / 1.0, +HealthRegen 2, +LifeSteal 1%, 1 socket
 **Legendary — Dragonbone Belt** — CON 18 / 1.2 / 2.0, +STR 10 / 0.8 / 1.3, +HealthRegen 3, +LifeSteal 2%, +DefenseAmount 4, 2 sockets, passive: "On kill: +2% max HP (capped at 30% bonus)"
-**Mythic — Titan Girdle** — CON 22 / 1.4 / 2.4, +STR 12 / 1.0 / 1.6, +HealthRegen 4, +LifeSteal 3%, +DefenseAmount 6, +Evasion 2%, 2 sockets, passive: "While above 80% HP: +10% AttackDamage"
-**Ancient — Girdle of the War God** — CON 26 / 1.6 / 2.8, +STR 15 / 1.2 / 1.9, +HealthRegen 5, +LifeSteal 4%, +DefenseAmount 8, +Evasion 3%, +StuntChance 3%, 3 sockets, strong passive: "On hit taken: 20% chance to gain 10% AttackSpeed for 3s"
+**Mythic — Titan Girdle** — CON 22 / 1.4 / 2.4, +STR 12 / 1.0 / 1.6, +HealthRegen 4, +LifeSteal 3%, +DefenseAmount 6, +Evasion 2%, 3 sockets, passive: "While above 80% HP: +10% AttackDamage"
 **Divine — Infinite Waist** — CON 32 / 1.9 / 3.3, +STR 18 / 1.4 / 2.2, +HealthRegen 6, +LifeSteal 5%, +DefenseAmount 10, +Evasion 4%, +StuntChance 5%, +CriticalDamage 3%, 3 sockets, unique passive: "Unbreakable — below 50% HP, take 30% less damage", FX: golden chain aura
 
 ### Cape / Pants / Pendant / Earring / Bracelet / Shoes
@@ -256,7 +244,7 @@ Follow the same ladder with their identities:
 
 ## 12. Progression Philosophy (Player Journey)
 
-1. **Level 1–20 (Common→Uncommon):** learn attributes exist. Items = "which 2 attributes do I want?" — the answer trains the player to think in CON/STR/INT/DEX.
+1. **Level 1–20 (Common→Rare):** learn attributes exist. Items = "which 2 attributes do I want?" — the answer trains the player to think in CON/STR/INT/DEX.
 2. **Level 20–40 (Rare→Epic):** sockets appear. Gems teach that combat stats come from *investment* (gems, not drops).
 3. **Level 40–60 (Epic→Legendary):** passives appear. Builds become identifiable ("I'm a crit ring build").
 4. **Level 60+ (Mythic→Divine):** hybrid attributes, strong/unique passives. Item identity = character identity. Trading becomes meaningful because items are build-defining, not number-barrels.
@@ -266,7 +254,7 @@ Follow the same ladder with their identities:
 
 ## 13. Expansion Paths (without breaking attributes)
 
-The rule: **every expansion converts to attributes or consumes them — never bypasses.**
+The rule: **every expansion converts to attributes or consumes them — never bypasses**
 
 - **Relics** — a 6th "overlay" slot above the 11; contribute CON/STR/INT/DEX directly. Designed to make a weak attribute playable late (e.g., an INT relic for a STR build — cross-build fixes).
 - **Artifacts** — 3 slots that grant ONE strong secondary each (the 20% side only). Never attributes — keeps attribute share sacred; artifacts are the "spend your secondaries here" endgame sink.
