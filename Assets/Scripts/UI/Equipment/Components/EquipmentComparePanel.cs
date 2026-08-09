@@ -107,8 +107,7 @@ namespace IdleDefenseSurvival.UI.Equipment
                 {
                     if (Math.Abs(kvp.Value) < 0.001f) continue;
                     var entryObj = Instantiate(_statEntryPrefab, statsContainer);
-                    var entryUI = entryObj.GetComponent<EquipmentStatEntryUI>();
-                    if (entryUI != null)
+                    if (entryObj.TryGetComponent<EquipmentStatEntryUI>(out var entryUI))
                     {
                         string sign = kvp.Value >= 0 ? "+" : "";
                         entryUI.Initialize(kvp.Key.GetDisplayName(), $"{sign}{kvp.Value:F1}", kvp.Value >= 0 ? Color.green : Color.red);
@@ -127,8 +126,7 @@ namespace IdleDefenseSurvival.UI.Equipment
                     if (effect.IsActive)
                     {
                         var entryObj = Instantiate(_effectEntryPrefab, effectsContainer);
-                        var entryUI = entryObj.GetComponent<EquipmentEffectEntryUI>();
-                        if (entryUI != null)
+                        if (entryObj.TryGetComponent<EquipmentEffectEntryUI>(out var entryUI))
                             entryUI.Initialize(effect.EffectType.GetDisplayName(), effect.Value, effect.Chance);
                     }
                 }
@@ -152,8 +150,7 @@ namespace IdleDefenseSurvival.UI.Equipment
                 if (Math.Abs(kvp.Value.Difference) < 0.001f) continue;
 
                 var entryObj = Instantiate(_comparisonStatPrefab, _comparisonStatsContainer);
-                var entryUI = entryObj.GetComponent<EquipmentComparisonStatUI>();
-                if (entryUI != null)
+                if (entryObj.TryGetComponent<EquipmentComparisonStatUI>(out var entryUI))
                     entryUI.Initialize(kvp.Value);
             }
         }

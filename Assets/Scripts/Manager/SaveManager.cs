@@ -243,8 +243,8 @@ namespace IdleDefenseSurvival.Manager
                     };
                     SaveToFile(initialData);
                     Debug.Log("[SaveManager] Initial save created.");
-                    IsSaveLoaded = true;
-                    OnSaveLoaded?.Invoke();
+                    NotifySaveLoaded();
+                    AccountManager.Instance?.NotifyDataLoaded();
                     return;
                 }
 
@@ -263,8 +263,8 @@ namespace IdleDefenseSurvival.Manager
                     };
                     SaveToFile(initialData);
                     Debug.Log("[SaveManager] Initial save created.");
-                    IsSaveLoaded = true;
-                    OnSaveLoaded?.Invoke();
+                    NotifySaveLoaded();
+                    AccountManager.Instance?.NotifyDataLoaded();
                     return;
                 }
 
@@ -272,8 +272,7 @@ namespace IdleDefenseSurvival.Manager
                 UpgradeSave(saveData);
 
                 ApplyAllData(saveData);
-                IsSaveLoaded = true;
-                OnSaveLoaded?.Invoke();
+                NotifySaveLoaded();
             }
             catch (Exception e)
             {
@@ -284,6 +283,12 @@ namespace IdleDefenseSurvival.Manager
             {
                 _isLoading = false;
             }
+        }
+
+        private void NotifySaveLoaded()
+        {
+            IsSaveLoaded = true;
+            OnSaveLoaded?.Invoke();
         }
 
         /// <summary>
@@ -711,6 +716,8 @@ namespace IdleDefenseSurvival.Manager
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftService.Instance != null && data.craftQueue != null)
                 CraftService.Instance.LoadQueueSaveData(data.craftQueue);
+
+            AccountManager.Instance?.NotifyDataLoaded();
         }
 
         private void ApplyCardInventory(CardInventoryData data)

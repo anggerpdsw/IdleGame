@@ -111,6 +111,58 @@ namespace IdleDefenseSurvival
         HitRate = 32,
     }
 
+    /// <summary>
+    /// Display helpers for SkillType (player runtime stats).
+    /// Lives in this same file so it is always compiled alongside the enum;
+    /// its namespace (IdleDefenseSurvival) is an enclosing namespace of every caller.
+    /// </summary>
+    public static class SkillTypeExtensions
+    {
+        public static string GetDisplayName(this SkillType stat) => stat switch
+        {
+            SkillType.AttackDamage => "Attack Damage",
+            SkillType.AttackSpeed => "Attack Speed",
+            SkillType.AttackRange => "Attack Range",
+            SkillType.CriticalChance => "Critical Chance",
+            SkillType.CriticalDamage => "Critical Damage",
+            SkillType.DamagePerRange => "Damage per Range",
+            SkillType.BounceChance => "Bounce Chance",
+            SkillType.BounceCount => "Bounce Count",
+            SkillType.MultiShootChance => "Multi-Shot Chance",
+            SkillType.MultiShootCount => "Multi-Shot Count",
+            SkillType.KnockbackChance => "Knockback Chance",
+            SkillType.KnockbackForce => "Knockback Force",
+            SkillType.StuntChance => "Stun Chance",
+            SkillType.StuntDuration => "Stun Duration",
+            SkillType.HealthPoint => "Health Points",
+            SkillType.HealthRegen => "Health Regen",
+            SkillType.DefenseAmount => "Defense",
+            SkillType.LifeSteal => "Life Steal",
+            SkillType.DeathDefy => "Death Defy",
+            SkillType.Evasion => "Evasion",
+            SkillType.ElementMastery => "Element Mastery",
+            SkillType.UltimateAttack => "Ultimate Attack",
+            SkillType.ManaPoint => "Mana Points",
+            SkillType.ManaRegen => "Mana Regen",
+            SkillType.MetalDamageBonus => "Metal Damage",
+            SkillType.WoodDamageBonus => "Wood Damage",
+            SkillType.FireDamageBonus => "Fire Damage",
+            SkillType.WaterDamageBonus => "Water Damage",
+            SkillType.EarthDamageBonus => "Earth Damage",
+            SkillType.LightningDamageBonus => "Lightning Damage",
+            SkillType.WindDamageBonus => "Wind Damage",
+            SkillType.InterestWave => "Interest Wave",
+            SkillType.GoldGain => "Gold Gain",
+            SkillType.DropRate => "Drop Rate",
+            SkillType.MoveSpeed => "Move Speed",
+            SkillType.CooldownReduction => "Cooldown Reduction",
+            SkillType.BossDamage => "Boss Damage",
+            SkillType.EliteDamage => "Elite Damage",
+            SkillType.HitRate => "Hit Rate",
+            _ => stat.ToString(),
+        };
+    }
+
     
     /// <summary>
     /// Universal rarity tier shared by Cards and Equipment.

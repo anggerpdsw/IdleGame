@@ -198,8 +198,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             int targetSlot = -1;
             foreach (var result in results)
             {
-                var slotUI = result.gameObject.GetComponent<InventorySlotUI>();
-                if (slotUI != null)
+                if (result.gameObject.TryGetComponent<InventorySlotUI>(out var slotUI))
                 {
                     targetSlot = slotUI.InventoryIndex; // Physical slot, not UI position
                     break;

@@ -5,6 +5,7 @@ using IdleDefenseSurvival.UI.Inventory;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using IdleDefenseSurvival.UI.Tooltip;
 
 namespace IdleDefenseSurvival.UI.Equipment
 {
@@ -145,13 +146,13 @@ namespace IdleDefenseSurvival.UI.Equipment
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (_parentUI != null) _parentUI._hoveredSlot = this;
-            ShowTooltip();
+            ShowEquipmentInfo();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             if (_parentUI != null) _parentUI._hoveredSlot = null;
-            HideTooltip();
+            HideEquipmentInfo();
         }
 
         public void OnDrop(PointerEventData eventData)
@@ -171,16 +172,14 @@ namespace IdleDefenseSurvival.UI.Equipment
         #endregion
 
         #region Tooltip
-        private void ShowTooltip()
+        private void ShowEquipmentInfo()
         {
             if (_currentItem == null) return;
-            TooltipUI.Instance?.ShowEquipment(_currentItem, transform.position);
+            var tooltip = TooltipUI.Instance;
+            if (tooltip == null) return;
+            tooltip.ShowEquipment(_currentItem, transform.position);
         }
-
-        private void HideTooltip()
-        {
-            TooltipUI.Instance?.Hide();
-        }
+        private void HideEquipmentInfo() => TooltipUI.Instance?.Hide();
         #endregion
     }
 }

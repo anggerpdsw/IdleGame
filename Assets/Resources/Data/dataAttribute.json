@@ -1,12 +1,12 @@
 {
   "constitution": [{
       "stat": "HealthPoint",
-      "flat": 40,
+      "flat": 13,
       "percent": 0
     },
     {
       "stat": "DefenseAmount",
-      "flat": 1,
+      "flat": 0.1,
       "percent": 0
     },
     {
@@ -22,54 +22,64 @@
   ],
   "strength": [{
       "stat": "AttackDamage",
-      "flat": 5,
+      "flat": 0.3,
       "percent": 0
     },
     {
       "stat": "KnockbackChance",
-      "flat": 0.2,
+      "flat": 0.12,
+      "percent": 0
+    },
+    {
+      "stat": "BounceChance",
+      "flat": 0.27,
       "percent": 0
     },
     {
       "stat": "UltimateAttack",
-      "flat": 2,
+      "flat": 0.2,
       "percent": 0
     }
   ],
   "intelligence": [{
       "stat": "ManaPoint",
-      "flat": 20,
+      "flat": 15,
       "percent": 0
     },
     {
       "stat": "ManaRegen",
-      "flat": 0.5,
+      "flat": 0.25,
       "percent": 0
     },
     {
       "stat": "ElementMastery",
-      "flat": 0.8,
+      "flat": 0.51,
       "percent": 0
     },
     {
-      "stat": "UltimateAttack",
-      "flat": 2,
+      "stat": "AttackRange",
+      "flat": 0.011,
       "percent": 0
     }
   ],
   "dexterity": [{
       "stat": "AttackSpeed",
-      "flat": 0.04,
+      "flat": 0.03,
       "percent": 0
     },
     {
       "stat": "CriticalChance",
-      "flat": 0.15,
+      "flat": 0.21,
       "percent": 0
     },
     {
       "stat": "Evasion",
-      "flat": 0.15,
+      "flat": 0.27,
+      "percent": 0
+    },
+    {
+      "stat": "DamagePerRange",
+      "flat": 0.07,
       "percent": 0
     }
   ]

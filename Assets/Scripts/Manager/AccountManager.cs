@@ -68,14 +68,16 @@ namespace IdleDefenseSurvival.Manager
         #endregion
 
         #region Events (UI hook)
-
         public event Action OnExpChanged;
         public event Action<int> OnLevelUp;
-
+        /// <summary>Fired when any attribute changes (UI hook).</summary>
+        public event Action OnAttributeChanged;
+        public event Action OnDataLoaded;
         #endregion
 
-        #region EXP Management
+        public void NotifyDataLoaded() => OnDataLoaded?.Invoke();
 
+        #region EXP Management
         /// <summary>
         /// Add permanent account EXP. Handles multi‑level‑ups in a single call.
         /// The method persists the updated data immediately via <see cref="SaveManager"/>.
@@ -161,14 +163,12 @@ namespace IdleDefenseSurvival.Manager
             }
 
             Data.unspentStatPoints--;
-            SaveManager.Instance.SaveAll();
-            // AttributeModifierManager re-applies automatically via OnAttributeChanged.
+            // Notify systems immediately.
             OnAttributeChanged?.Invoke();
+            // Persist after runtime state is updated.
+            SaveManager.Instance.SaveAll();
             return true;
         }
-
-        /// <summary>Fired when any attribute changes (UI hook).</summary>
-        public event Action OnAttributeChanged;
 
         #endregion
 

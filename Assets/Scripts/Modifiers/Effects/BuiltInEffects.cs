@@ -129,8 +129,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
             var enemy = data?.Enemy ?? context.LastEnemyHit;
             if (enemy != null)
             {
-                var controller = enemy.GetComponent<EnemyStatusEffectController>();
-                if (controller != null)
+                if (enemy.TryGetComponent<EnemyStatusEffectController>(out var controller))
                 {
                     float dps = GetCurrentValue(context) * 0.01f * enemy.CurrentHealth; // Percent of current health per second
                     controller.AddEffect(new BurnStatus(dps, 5f, true));
@@ -163,8 +162,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
             var enemy = data?.Enemy ?? context.LastEnemyHit;
             if (enemy != null)
             {
-                var controller = enemy.GetComponent<EnemyStatusEffectController>();
-                if (controller != null)
+                if (enemy.TryGetComponent<EnemyStatusEffectController>(out var controller))
                 {
                     controller.AddEffect(new FreezeStatus(GetCurrentValue(context)));
                     SetLastTriggerTime(context.CurrentTime);
@@ -196,8 +194,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
             var enemy = data?.Enemy ?? context.LastEnemyHit;
             if (enemy != null)
             {
-                var controller = enemy.GetComponent<EnemyStatusEffectController>();
-                if (controller != null)
+                if (enemy.TryGetComponent<EnemyStatusEffectController>(out var controller))
                 {
                     float dps = GetCurrentValue(context) * 0.01f * enemy.CurrentHealth;
                     controller.AddEffect(new PoisonStatus(dps, 10f));

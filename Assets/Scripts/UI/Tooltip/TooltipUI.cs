@@ -3,32 +3,41 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using System.Linq;
 using IdleDefenseSurvival.Stats;
 
-namespace IdleDefenseSurvival.UI
+namespace IdleDefenseSurvival.UI.Tooltip
 {
     /// <summary>
     /// Unified tooltip system for items, equipment, and comparisons.
     /// </summary>
     public class TooltipUI : MonoBehaviour
     {
-        #region Singleton
-        private static TooltipUI _instance;
-        public static TooltipUI Instance => _instance;
-
+        #region Singleton scene-local
+        public static TooltipUI Instance { get; private set; }
         private void Awake()
         {
-            if (_instance != null && _instance != this)
+            if (Instance != null && Instance != this)
             {
-                Destroy(gameObject);
-                return;
+                if (Instance.gameObject.scene == gameObject.scene)
+                {
+                    // Duplicate TooltipUI in the same scene.
+                    Destroy(gameObject);
+                    return;
+                }
+                // TooltipUI from previous scene. Replace it with this scene's instance.
+                Instance = this;
             }
-            _instance = this;
-            // Don't DontDestroyOnLoad - tooltip is scene-specific
+            else
+            {
+                Instance = this;
+            }
+            if (_tooltipRoot != null)
+                _tooltipRect = _tooltipRoot.GetComponent<RectTransform>();
         }
         #endregion
 
@@ -71,7 +80,7 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private GameObject _comparisonStatPrefab;
 
         [Header("Positioning")]
-        [SerializeField] private Vector2 _offset = new(10, -10);
+        [SerializeField] private Vector2 _offset = new(10, -80);
         [SerializeField] private bool _followMouse = true;
 
         // State
@@ -82,16 +91,13 @@ namespace IdleDefenseSurvival.UI
 
         private void Start()
         {
-            _tooltipRect = _tooltipRoot.GetComponent<RectTransform>();
             Hide();
         }
 
         private void Update()
         {
             if (_isVisible && _followMouse)
-            {
                 UpdatePosition();
-            }
         }
 
         #region Public API
@@ -106,6 +112,35 @@ namespace IdleDefenseSurvival.UI
             _comparisonItem = comparisonItem;
 
             BuildEquipmentTooltip(item, comparisonItem);
+            ShowAtPosition(screenPosition);
+        }
+
+        /// <summary>
+        /// Shows a plain-text tooltip (no item sections). Used for generic help/hover info.
+        /// </summary>
+        public void ShowText(string text, Vector3 screenPosition)
+        {
+            _currentItem = null;
+            _comparisonItem = null;
+
+            if (_equipmentSection != null) _equipmentSection.SetActive(false);
+            if (_consumableSection != null) _consumableSection.SetActive(false);
+            if (_comparisonSection != null) _comparisonSection.SetActive(false);
+            if (_iconImage != null)
+            {
+                _iconImage.sprite = null;
+                _iconImage.enabled = false;
+            }
+            if (_nameText != null) _nameText.text = "";
+            if (_rarityText != null) _rarityText.text = "";
+            if (_rarityBorder != null) _rarityBorder.enabled = false;
+            if (_flavorText != null)
+            {
+                _flavorText.text = "";
+                _flavorText.gameObject.SetActive(false);
+            }
+            if (_descriptionText != null) _descriptionText.text = text;
+
             ShowAtPosition(screenPosition);
         }
 
@@ -138,7 +173,7 @@ namespace IdleDefenseSurvival.UI
         /// </summary>
         public void Hide()
         {
-            _tooltipRoot.SetActive(false);
+            if (_tooltipRoot != null) _tooltipRoot.SetActive(false);
             _isVisible = false;
             _currentItem = null;
             _comparisonItem = null;
@@ -151,9 +186,12 @@ namespace IdleDefenseSurvival.UI
             if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return;
 
             // Show/hide sections
-            _equipmentSection?.SetActive(true);
-            _consumableSection?.SetActive(false);
-            _comparisonSection?.SetActive(comparisonItem != null);
+            if (_equipmentSection != null)
+                _equipmentSection.SetActive(true);
+            if (_consumableSection != null)
+                _consumableSection.SetActive(false);
+            if (_comparisonSection != null)
+                _comparisonSection.SetActive(comparisonItem != null);
 
             // Basic info
             SetBasicInfo(item, itemData);
@@ -175,9 +213,7 @@ namespace IdleDefenseSurvival.UI
 
             // Comparison
             if (comparisonItem != null)
-            {
                 SetComparison(item, comparisonItem);
-            }
         }
 
         private void BuildItemTooltip(InventoryItem item)
@@ -218,14 +254,10 @@ namespace IdleDefenseSurvival.UI
             }
 
             if (_rarityBorder != null)
-            {
                 _rarityBorder.color = itemData.ItemRarity.GetDefaultColor();
-            }
 
             if (_descriptionText != null)
-            {
                 _descriptionText.text = itemData.Description;
-            }
 
             if (_flavorText != null)
             {
@@ -237,14 +269,10 @@ namespace IdleDefenseSurvival.UI
         private void SetEquipmentInfo(InventoryItem item, EquipmentData itemData)
         {
             if (_equipTypeText != null)
-            {
                 _equipTypeText.text = itemData.EquipmentType.GetDisplayName();
-            }
 
             if (_levelText != null)
-            {
                 _levelText.text = $"Level {item.Level}/{itemData.MaxLevel}";
-            }
 
             if (_enhanceText != null)
             {
@@ -261,9 +289,7 @@ namespace IdleDefenseSurvival.UI
             }
 
             if (_durabilityText != null)
-            {
                 _durabilityText.text = $"{item.CurrentDurability}/{item.MaxDurability}";
-            }
         }
 
         private void SetCombatStats(InventoryItem item, EquipmentData itemData, InventoryItem comparisonItem)
@@ -284,8 +310,7 @@ namespace IdleDefenseSurvival.UI
             foreach (var kvp in attrBonuses.OrderByDescending(k => Math.Abs(k.Value)))
             {
                 var entryObj = Instantiate(_statEntryPrefab, _mainStatsContainer);
-                var entryUI = entryObj.GetComponent<TooltipStatEntryUI>();
-                if (entryUI != null)
+                if (entryObj.TryGetComponent<TooltipStatEntryUI>(out var entryUI))
                 {
                     float compareValue = comparisonAttr?.GetValueOrDefault(kvp.Key, 0) ?? 0;
                     entryUI.Initialize(kvp.Key.GetDisplayName(), kvp.Value, compareValue);
@@ -295,8 +320,7 @@ namespace IdleDefenseSurvival.UI
             foreach (var kvp in bonuses.OrderByDescending(k => Math.Abs(k.Value)))
             {
                 var entryObj = Instantiate(_statEntryPrefab, _mainStatsContainer);
-                var entryUI = entryObj.GetComponent<TooltipStatEntryUI>();
-                if (entryUI != null)
+                if (entryObj.TryGetComponent<TooltipStatEntryUI>(out var entryUI))
                 {
                     float compareValue = comparisonBonuses?.GetValueOrDefault(kvp.Key, 0) ?? 0;
                     entryUI.Initialize(kvp.Key, kvp.Value, compareValue);
@@ -402,198 +426,78 @@ namespace IdleDefenseSurvival.UI
         #region Positioning
         private void ShowAtPosition(Vector3 screenPosition)
         {
+            if (_tooltipRoot == null)
+            {
+                Debug.LogError("[TooltipUI] Tooltip Root is NULL!");
+                return;
+            }
+
             _tooltipRoot.SetActive(true);
+            
+            // Force ContentSizeFitter / LayoutGroup to calculate final size
+            Canvas.ForceUpdateCanvases();
+            if (_tooltipRect != null)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(_tooltipRect);
+
             _isVisible = true;
             UpdatePosition(screenPosition);
         }
 
         private void UpdatePosition(Vector3? screenPosition = null)
         {
-            Vector3 pos = screenPosition ?? Input.mousePosition;
-            pos += (Vector3)_offset;
+            if (_tooltipRect == null || _tooltipCanvas == null) return;
+            Vector2 screenPos = screenPosition.HasValue
+                ? (Vector2)screenPosition.Value
+                : Mouse.current != null
+                    ? Mouse.current.position.ReadValue()
+                    : Vector2.zero;
 
-            // Keep on screen
-            Vector2 size = _tooltipRect.sizeDelta;
-            float canvasWidth = _tooltipCanvas.pixelRect.width;
-            float canvasHeight = _tooltipCanvas.pixelRect.height;
+            RectTransform canvasRect = _tooltipCanvas.transform as RectTransform;
+            if (canvasRect == null) return;
 
-            if (pos.x + size.x > canvasWidth) pos.x = canvasWidth - size.x;
-            if (pos.y - size.y < 0) pos.y = size.y;
+            UnityEngine.Camera uiCamera = _tooltipCanvas.renderMode == RenderMode.ScreenSpaceOverlay
+                ? null
+                : _tooltipCanvas.worldCamera;
 
-            _tooltipRect.position = pos;
+            // Convert mouse screen position -> canvas local position
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvasRect,
+                screenPos,
+                uiCamera,
+                out Vector2 localPos
+            );
+
+            // Mouse offset
+            localPos += _offset;
+            // Actual tooltip size after ContentSizeFitter/LayoutGroup
+            Vector2 size = _tooltipRect.rect.size;
+            // Canvas boundaries
+            Rect canvasBounds = canvasRect.rect;
+
+            float halfWidth = size.x * _tooltipRect.pivot.x;
+            float halfHeight = size.y * _tooltipRect.pivot.y;
+
+            // Keep right side inside canvas
+            if (localPos.x + (size.x * (1f - _tooltipRect.pivot.x)) > canvasBounds.xMax)
+                localPos.x = canvasBounds.xMax - size.x * (1f - _tooltipRect.pivot.x);
+            // Keep left side inside canvas
+            if (localPos.x - halfWidth < canvasBounds.xMin)
+                localPos.x = canvasBounds.xMin + halfWidth;
+            // Keep top side inside canvas
+            if (localPos.y + (size.y * (1f - _tooltipRect.pivot.y)) > canvasBounds.yMax)
+                localPos.y = canvasBounds.yMax - size.y * (1f - _tooltipRect.pivot.y);
+            // Keep bottom side inside canvas
+            if (localPos.y - halfHeight < canvasBounds.yMin)
+                localPos.y = canvasBounds.yMin + halfHeight;
+
+            _tooltipRect.localPosition = localPos;
         }
         #endregion
-    }
 
-    // ============ Tooltip Sub-Components ============
-
-    public class TooltipStatEntryUI : MonoBehaviour
-    {
-        [SerializeField] private TextMeshProUGUI _statNameText;
-        [SerializeField] private TextMeshProUGUI _statValueText;
-        [SerializeField] private TextMeshProUGUI _comparisonText;
-
-        public void Initialize(SecondaryStat stat, float value, float comparisonValue = 0)
-            => Initialize(stat.GetDisplayName(), value, comparisonValue);
-
-        public void Initialize(string statName, float value, float comparisonValue = 0)
+        private void OnDestroy()
         {
-            if (_statNameText != null)
-                _statNameText.text = statName;
-
-            if (_statValueText != null)
-            {
-                string sign = value >= 0 ? "+" : "";
-                _statValueText.text = $"{sign}{value:F1}";
-                _statValueText.color = value >= 0 ? Color.green : Color.red;
-            }
-
-            if (_comparisonText != null && comparisonValue != 0)
-            {
-                float diff = comparisonValue - value;
-                string sign = diff >= 0 ? "+" : "";
-                _comparisonText.text = $"({sign}{diff:F1})";
-                _comparisonText.color = diff >= 0 ? Color.green : Color.red;
-            }
-            else if (_comparisonText != null)
-            {
-                _comparisonText.text = "";
-            }
+            if (Instance == this) Instance = null;
         }
     }
 
-    public class TooltipEffectEntryUI : MonoBehaviour
-    {
-        [SerializeField] private TextMeshProUGUI _effectNameText;
-        [SerializeField] private TextMeshProUGUI _effectValueText;
-        [SerializeField] private TextMeshProUGUI _effectChanceText;
-
-        public void Initialize(SpecialEffectEntry effect)
-        {
-            if (_effectNameText != null)
-                _effectNameText.text = effect.EffectType.GetDisplayName();
-
-            if (_effectValueText != null)
-            {
-                _effectValueText.text = $"{effect.Value:F1}";
-            }
-
-            if (_effectChanceText != null && effect.Chance < 100)
-            {
-                _effectChanceText.text = $"{effect.Chance:F0}% chance";
-            }
-            else if (_effectChanceText != null)
-            {
-                _effectChanceText.text = "";
-            }
-        }
-    }
-
-    public class TooltipSetBonusEntryUI : MonoBehaviour
-    {
-        [SerializeField] private TextMeshProUGUI _setNameText;
-        [SerializeField] private TextMeshProUGUI _tierText;
-        [SerializeField] private TextMeshProUGUI _descriptionText;
-        [SerializeField] private Image _progressBar;
-        [SerializeField] private TextMeshProUGUI _progressText;
-
-        public void Initialize(SetBonusData setData, SetBonusTier tier, int currentPieces)
-        {
-            if (_setNameText != null)
-                _setNameText.text = setData.SetName;
-
-            if (_tierText != null)
-                _tierText.text = tier.TierName;
-
-            if (_descriptionText != null)
-                _descriptionText.text = tier.Description;
-
-            if (_progressBar != null)
-            {
-                _progressBar.fillAmount = (float)currentPieces / tier.RequiredPieces;
-            }
-
-            if (_progressText != null)
-            {
-                _progressText.text = $"{currentPieces}/{tier.RequiredPieces}";
-            }
-        }
-    }
-
-    public class TooltipGemSocketUI : MonoBehaviour
-    {
-        [SerializeField] private Image _socketBackground;
-        [SerializeField] private Image _gemIcon;
-        [SerializeField] private Image _gemTypeColor;
-        [SerializeField] private TextMeshProUGUI _gemLevelText;
-        [SerializeField] private GameObject _lockedOverlay;
-
-        public void Initialize(SocketData socket, InventoryItem parentItem)
-        {
-            if (socket.IsUnlocked)
-            {
-                if (_lockedOverlay != null) _lockedOverlay.SetActive(false);
-            }
-            else
-            {
-                if (_lockedOverlay != null) _lockedOverlay.SetActive(true);
-            }
-
-            if (socket.IsEmpty)
-            {
-                if (_gemIcon != null) _gemIcon.enabled = false;
-                if (_gemTypeColor != null) _gemTypeColor.enabled = false;
-                if (_gemLevelText != null) _gemLevelText.enabled = false;
-            }
-            else
-            {
-                var gemData = ItemDatabase.Instance?.GetGem(socket.GemId);
-                if (gemData != null)
-                {
-                    if (_gemIcon != null && gemData.Icon != null)
-                    {
-                        _gemIcon.sprite = gemData.Icon;
-                        _gemIcon.enabled = true;
-                    }
-                    if (_gemTypeColor != null)
-                    {
-                        _gemTypeColor.color = gemData.GemColor;
-                        _gemTypeColor.enabled = true;
-                    }
-                    if (_gemLevelText != null)
-                    {
-                        _gemLevelText.text = $"Lv.{socket.GemLevel}";
-                        _gemLevelText.enabled = true;
-                    }
-                }
-            }
-        }
-    }
-
-    public class TooltipComparisonStatUI : MonoBehaviour
-    {
-        [SerializeField] private TextMeshProUGUI _statNameText;
-        [SerializeField] private TextMeshProUGUI _currentValueText;
-        [SerializeField] private TextMeshProUGUI _newValueText;
-        [SerializeField] private TextMeshProUGUI _differenceText;
-
-        public void Initialize(StatComparison comp)
-        {
-            if (_statNameText != null)
-                _statNameText.text = comp.Stat.GetShortName();
-
-            if (_currentValueText != null)
-                _currentValueText.text = comp.CurrentValue.ToString("F1");
-
-            if (_newValueText != null)
-                _newValueText.text = comp.NewValue.ToString("F1");
-
-            if (_differenceText != null)
-            {
-                string sign = comp.Difference >= 0 ? "+" : "";
-                _differenceText.text = $"{sign}{comp.Difference:F1} ({comp.PercentChange:+0.0;-0.0}%)";
-                _differenceText.color = comp.Difference >= 0 ? Color.green : Color.red;
-            }
-        }
-    }
 }

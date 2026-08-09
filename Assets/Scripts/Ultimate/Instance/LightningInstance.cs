@@ -47,10 +47,6 @@ namespace IdleDefenseSurvival.Ultimate
         [Tooltip("Climax strike stun duration multiplier")]
         [SerializeField] private float _climaxStunMultiplier = 2f;
 
-        [Header("Damage")]
-        [Tooltip("Radius of the lightning effect for initial detection")]
-        [SerializeField] private float _lightningRadius = 5f;
-
         [Header("Visual/Audio")]
         [Tooltip("Rotation speed of the lightning effect (degrees per second)")]
         [SerializeField] private float _rotationSpeed = 350f;
@@ -373,7 +369,7 @@ namespace IdleDefenseSurvival.Ultimate
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = GameColors.debugLightningPurple.WithAlpha(0.3f);
-            Gizmos.DrawWireSphere(transform.position, _lightningRadius);
+            Gizmos.DrawWireSphere(transform.position, _chainSearchRadius);
 
             if (_lastTarget != null)
             {

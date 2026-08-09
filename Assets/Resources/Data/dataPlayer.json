@@ -8,7 +8,7 @@
   "skills": {
     "attack": {
       "attackDamage": {
-        "baseValue": 7,
+        "baseValue": 5.7,
         "description": "The damage that character's attack power and ultimate weapons can cause to enemies.",
         "displayName": "Attack Damage"
       },
@@ -28,7 +28,7 @@
         "displayName": "Bounce Chance"
       },
       "bounceCount": {
-        "baseValue": 3,
+        "baseValue": 4,
         "description": "Number of times a projectile can bounce from enemy to enemy",
         "displayName": "Bounce Count"
       },

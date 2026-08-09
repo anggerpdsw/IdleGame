@@ -5,6 +5,7 @@ using IdleDefenseSurvival.Player;
 using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Manager;
+using System.Collections;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -21,58 +22,70 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private TextMeshProUGUI _requiredExp;
         [SerializeField] private Slider _progressExp;
         [SerializeField] private TextMeshProUGUI _progressPercent;
+                
+        private Coroutine _bindRoutine; 
+        
+        private void OnEnable() 
+        { 
+            _bindRoutine = StartCoroutine(BindAccount()); 
+        }
+        
+        private void OnDisable() 
+        { 
+            if (_bindRoutine != null) 
+            { 
+                StopCoroutine(_bindRoutine); 
+                _bindRoutine = null; 
+                } 
+                UnbindAccount(); 
+        } 
 
-        private void Start()
-        {
-            RefreshUI();
+        private IEnumerator BindAccount() { 
+            // Wait until AccountManager has been initialized. 
+            while (AccountManager.Instance == null) yield return null; 
+            var account = AccountManager.Instance; 
+            account.OnDataLoaded += RefreshUI; 
+            account.OnExpChanged += RefreshUI; 
+            account.OnLevelUp += OnLevelUp; 
+            // Important: 
+            // The save may already have finished loading before 
+            // this UI became enabled. 
+            RefreshUI(); 
+            _bindRoutine = null; 
+        } 
+        
+        private void UnbindAccount() 
+        { 
+            var account = AccountManager.Instance; 
+            if (account == null) return; 
+            account.OnDataLoaded -= RefreshUI; 
+            account.OnExpChanged -= RefreshUI; 
+            account.OnLevelUp -= OnLevelUp; 
         }
 
         private void RefreshUI()
         {
             var account = AccountManager.Instance;
             if (account == null) return;
-
-            _level.text         = account.Level.ToString();
+            
+            if (_level != null)
+                _level.text = account.Level.ToString();
             if (_currentExp != null) 
-                _currentExp.text    = account.CurrentExp.ToString();
+                _currentExp.text = account.CurrentExp.ToString();
             if (_totalExp != null) 
-                _totalExp.text      = account.TotalExp.ToString();
+                _totalExp.text = account.TotalExp.ToString();
             if (_requiredExp != null) 
-                _requiredExp.text   = account.RequiredExp.ToString();
-            _progressExp.value      = account.Progress;
+                _requiredExp.text = account.RequiredExp.ToString();
+            if (_progressExp != null)
+                _progressExp.value = account.Progress;
 
-            float percent = Mathf.Min(account.Progress * 100f, 99.9f);
-            _progressPercent.text = $"{percent:F1}%";
+            if (_progressPercent != null) {
+                float percent = Mathf.Min(account.Progress * 100f, 99.9f);
+                _progressPercent.text = $"{percent:F1}%";
+            }
         }
         
-        private void OnEnable()
-        {
-            // Subscribe to save loaded event
-            SaveManager.OnSaveLoaded += OnSaveLoaded;
-
-            AccountManager.Instance.OnExpChanged += RefreshUI;
-            AccountManager.Instance.OnLevelUp += OnLevelUp;
-
-            RefreshUI();
-        }
-
-        private void OnDisable()
-        {
-            SaveManager.OnSaveLoaded -= OnSaveLoaded;
-            
-            AccountManager.Instance.OnExpChanged -= RefreshUI;
-            AccountManager.Instance.OnLevelUp -= OnLevelUp;
-        }
-
-        private void OnSaveLoaded()
-        {
-            RefreshUI();
-        }
-
-        private void OnLevelUp(int level)
-        {
-            RefreshUI();
-        }
+        private void OnLevelUp(int level) => RefreshUI();
 
     }
 }

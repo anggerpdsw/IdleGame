@@ -263,6 +263,8 @@ namespace IdleDefenseSurvival.Enemy
             foreach (EnemyData enemy in _enemyDatabase.enemies)
             {
                 if (enemy == null) continue;
+                if (WaveManager.Instance.CurrentWave <= 15)
+                    if (enemy.role == Role.Caster || enemy.role == Role.Ranger || enemy.role == Role.BOSS)  continue;
                 cumulativeWeight += enemy.spawnWeight;
                 if (randomValue <= cumulativeWeight)
                     return enemy;
