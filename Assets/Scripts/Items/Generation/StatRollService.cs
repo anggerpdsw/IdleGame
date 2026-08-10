@@ -155,6 +155,7 @@ namespace IdleDefenseSurvival.Items.Generation
             { SecondaryStat.InterestWave, 1f },
             { SecondaryStat.HitRate, 1f },
             { SecondaryStat.Penetration, 1f },
+            { SecondaryStat.DefenseBreak, 1f },
             { SecondaryStat.MetalDamageBonus, 1f },
             { SecondaryStat.WoodDamageBonus, 1f },
             { SecondaryStat.FireDamageBonus, 1f },
@@ -181,9 +182,7 @@ namespace IdleDefenseSurvival.Items.Generation
             SecondaryStat.GoldGain,
             SecondaryStat.DropRate,
             SecondaryStat.InterestWave,
-            SecondaryStat.HitRate,
-            SecondaryStat.Penetration
-        };
+            SecondaryStat.HitRate        };
 
         public static StatRollConfig Default => new();
     }

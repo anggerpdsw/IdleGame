@@ -2,6 +2,7 @@ using UnityEngine;
 using IdleDefenseSurvival.Economy;
 using System.Collections;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Item
 {
@@ -15,7 +16,13 @@ namespace IdleDefenseSurvival.Item
     /// </summary>
     public class CurrencyPickup : MonoBehaviour
     {
+        [Header("Visual")]
+        [SerializeField] private Transform _visual;
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private CircleCollider2D _collider;
+
         [Header("Spawn Spread Animation")]
+        [SerializeField] private float _targetVisualWorldSize = 0.27f;
         [SerializeField] private float _spreadRadius = 1.5f;
         [SerializeField] private float _spreadDuration = 0.6f;
         [SerializeField] private AnimationCurve _spreadCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -41,18 +48,20 @@ namespace IdleDefenseSurvival.Item
         private CurrencyType _currencyType = CurrencyType.Gem;
         private Transform _player;
         private ItemState _state = ItemState.Spawning;
-        private SpriteRenderer _spriteRenderer;
-        private CircleCollider2D _collider;
         private Vector3 _originalPosition;
         private Vector3 _spawnCenterPosition;
         private float _spawnTime;
         private float _collectStartTime;
+        private Vector3 _baseVisualScale = Vector3.one;
 
         private void Awake()
-        {
-            _spriteRenderer = GetComponent<SpriteRenderer>();
-            _collider = GetComponent<CircleCollider2D>();
-            _collider.radius = _clickRadius;
+        { 
+            if (_collider != null)
+            {
+                _collider.radius = _clickRadius;
+                _collider.enabled = true;
+            }
+            transform.localScale = Vector3.one;
 
             _spawnTime = Time.unscaledTime;
             _spawnCenterPosition = transform.position;
@@ -60,12 +69,11 @@ namespace IdleDefenseSurvival.Item
 
             var playerObj = GameObject.FindWithTag("Player");
             if (playerObj != null)
-            {
                 _player = playerObj.transform;
-            }
 
             LoadSprite();
-            transform.localScale = Vector3.zero;
+            if (_visual != null)
+                _visual.localScale = Vector3.zero;
         }
 
         private void Start()
@@ -153,18 +161,13 @@ namespace IdleDefenseSurvival.Item
         private void UpdateMovingToPlayer()
         {
             if (_player == null) return;
-
             transform.position = Vector3.MoveTowards(
-                transform.position,
-                _player.position,
-                _moveToPlayerSpeed * Time.unscaledDeltaTime
-            );
-
+                transform.position, _player.position, _moveToPlayerSpeed * Time.unscaledDeltaTime);
             float elapsed = Time.unscaledTime - _collectStartTime;
             float t = Mathf.Clamp01(elapsed / _shrinkDuration);
             float scaleValue = _shrinkCurve.Evaluate(t);
-            transform.localScale = Vector3.one * Mathf.Max(scaleValue, 0.05f);
-
+            if (_visual != null)
+                _visual.localScale = _baseVisualScale * scaleValue;
             if (Vector2.Distance(transform.position, _player.position) < 0.03f) Collect();
         }
 
@@ -197,13 +200,15 @@ namespace IdleDefenseSurvival.Item
                 transform.position = Vector3.Lerp(_spawnCenterPosition, _originalPosition, curveValue);
 
                 float scaleValue = _spawnScaleCurve.Evaluate(t);
-                transform.localScale = Vector3.one * scaleValue;
+                if (_visual != null)
+                    _visual.localScale = _baseVisualScale * scaleValue;
 
                 yield return null;
             }
 
             transform.position = _originalPosition;
-            transform.localScale = Vector3.one;
+            if (_visual != null)
+                _visual.localScale = _baseVisualScale;
 
             // Update original position to final spread position so hover is correct
             _originalPosition = transform.position;
@@ -252,9 +257,7 @@ namespace IdleDefenseSurvival.Item
         private IEnumerator SpawnItemWithDelay(Vector3 spreadPos, float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
-
             if (this == null) yield break;
-            
             GameObject itemObj = Instantiate(gameObject, _spawnCenterPosition, Quaternion.identity, UIManager.Instance.DropRoot);
             if (itemObj.TryGetComponent<CurrencyPickup>(out var item))
             {
@@ -262,9 +265,11 @@ namespace IdleDefenseSurvival.Item
                 item._spawnTime = Time.unscaledTime;
                 item._spawnCenterPosition = _spawnCenterPosition;
                 item._originalPosition = spreadPos;
-                item.transform.localScale = Vector3.zero;
                 item._currencyType = _currencyType;
                 item.transform.position = _spawnCenterPosition;
+                item.transform.localScale = Vector3.one;
+                if (item._visual != null)
+                    item._visual.localScale = Vector3.zero;
                 item.LoadSprite();
                 item.UpdateName();
             }
@@ -314,17 +319,25 @@ namespace IdleDefenseSurvival.Item
         private void LoadSprite()
         {
             if (_spriteRenderer == null) return;
+            Sprite sprite = ItemResources.GetItemSource(_currencyType.ToString());
+            if (sprite == null)
+                Debug.LogWarning($"[Items] Sprite not found at Resources/{sprite}");
+            _spriteRenderer.sprite = sprite;
+            CalculateBaseVisualScale();
+        }
 
-            string spritePath = GameConstants.ITEM_SPRITE_BASE_PATH + _currencyType.ToString();
-            Sprite sprite = Resources.Load<Sprite>(spritePath);
-            if (sprite != null)
+        private void CalculateBaseVisualScale()
+        {
+            if (_spriteRenderer == null || _spriteRenderer.sprite == null) return;
+            Vector2 spriteSize = _spriteRenderer.sprite.bounds.size;
+            float maxDimension = Mathf.Max(spriteSize.x, spriteSize.y);
+            if (maxDimension <= 0f)
             {
-                _spriteRenderer.sprite = sprite;
+                _baseVisualScale = Vector3.one;
+                return;
             }
-            else
-            {
-                Debug.LogWarning($"[Items] Sprite not found at Resources/{spritePath}");
-            }
+            float scale = _targetVisualWorldSize / maxDimension;
+            _baseVisualScale = Vector3.one * scale;
         }
 
 #if UNITY_EDITOR

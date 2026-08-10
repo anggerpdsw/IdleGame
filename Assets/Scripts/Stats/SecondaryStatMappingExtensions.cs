@@ -24,6 +24,7 @@ namespace IdleDefenseSurvival.Stats
         SecondaryStat.KnockbackChance => SkillType.KnockbackChance,
         SecondaryStat.StuntChance => SkillType.StuntChance,
         SecondaryStat.StuntDuration => SkillType.StuntDuration,
+        SecondaryStat.DefenseBreak => SkillType.DefenseBreak,
 
         // Sustain
         SecondaryStat.LifeSteal => SkillType.LifeSteal,

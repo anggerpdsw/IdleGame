@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Items.Random;
 
@@ -192,7 +191,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
         public Dictionary<SecondaryStat, float> BaseValues = new()
         {
-            { SecondaryStat.AttackRange, 5f },
+            { SecondaryStat.AttackRange, 1f },
             { SecondaryStat.BounceChance, 5f },
             { SecondaryStat.BounceCount, 1f },
             { SecondaryStat.MultiShootChance, 5f },
@@ -203,7 +202,8 @@ namespace IdleDefenseSurvival.Items.Generation
             { SecondaryStat.BossDamage, 1f },
             { SecondaryStat.EliteDamage, 1f },
             { SecondaryStat.HitRate, 1f },
-            { SecondaryStat.Penetration, 1f }
+            { SecondaryStat.Penetration, 1f },
+            { SecondaryStat.DefenseBreak, 1f }
         };
 
         // Derived combat stats (CriticalChance, AttackSpeed, ...) come from Main Attribute.
@@ -217,8 +217,7 @@ namespace IdleDefenseSurvival.Items.Generation
             SecondaryStat.CooldownReduction,
             SecondaryStat.BossDamage,
             SecondaryStat.EliteDamage,
-            SecondaryStat.HitRate,
-            SecondaryStat.Penetration
+            SecondaryStat.HitRate
         };
 
         public float SpecialEffectChance = 0.1f;

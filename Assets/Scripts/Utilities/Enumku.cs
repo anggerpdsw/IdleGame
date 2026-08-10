@@ -26,7 +26,7 @@ namespace IdleDefenseSurvival
     public enum ModifierMode { Flat, Percent }
     public enum ModifierSource { AccountLevel, Buff, Card, Equipment, Event, Pet, Quest, Skin, Upgrade, Ultimate }
 
-    public enum DefenseBreakSource { None, Lightning }
+    public enum DefenseBreakSource { None, Lightning, PlayerProjectile, TankProjectile }
     public enum DefenseBreakType { None, Aura, Permanent, Temporary}
 
     public enum SlowSource { Card, Cloud, Void, Lightning }
@@ -69,6 +69,7 @@ namespace IdleDefenseSurvival
         KnockbackForce = 13,
         StuntChance = 14,
         StuntDuration = 15,
+        DefenseBreak = 34,
 
         // Survival
         HealthPoint = 16,
@@ -110,6 +111,7 @@ namespace IdleDefenseSurvival
         // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
         HitRate = 32,
         Penetration = 33,
+
     }
 
     /// <summary>
@@ -132,6 +134,7 @@ namespace IdleDefenseSurvival
             SkillType.CooldownReduction => "Cooldown Reduction",
             SkillType.DamagePerRange => "Damage per Range",
             SkillType.DeathDefy => "Death Defy",
+            SkillType.DefenseBreak => "Defense Break",
             SkillType.DropRate => "Drop Rate",
             SkillType.ElementMastery => "Element Mastery",
             SkillType.EliteDamage => "Elite Damage",
@@ -224,6 +227,7 @@ namespace IdleDefenseSurvival
         AttackRange = 1,
         BounceChance = 2,
         BounceCount = 3,
+        DefenseBreak = 29,
 
         // Multi Shot
         MultiShootChance = 4,

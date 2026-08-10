@@ -31,7 +31,7 @@ namespace IdleDefenseSurvival.Reward
 
             // Set rarity frame color
             if (rarityFrame != null)
-                rarityFrame.sprite = CardResources.GetFrame(cardReward.CardRarity.ToString());
+                rarityFrame.sprite = CardResources.GetFrame($"{cardReward.CardRarity}");
 
             // Show duplicate badge
             if (duplicateBadge != null)
@@ -39,9 +39,7 @@ namespace IdleDefenseSurvival.Reward
                 bool isDuplicate = cardReward.IsDuplicate || rollResult.Cards.FindIndex(c => c.CardId == cardReward.CardId) != rollResult.Cards.FindLastIndex(c => c.CardId == cardReward.CardId);
                 duplicateBadge.SetActive(isDuplicate);
                 if (isDuplicate && duplicateCountText != null)
-                {
                     duplicateCountText.text = "x" + cardReward.Quantity;
-                }
             }
 
             // Show new card badge

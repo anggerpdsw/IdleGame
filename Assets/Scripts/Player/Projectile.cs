@@ -50,6 +50,11 @@ namespace IdleDefenseSurvival.Player
         private float _knockbackChance;
         private float _lifeSteal;
         private float _stuntChance;
+        private DefenseBreakSource _defenseBreakSource;
+        private DefenseBreakType _defenseBreakType;
+        private float _defenseBreak;
+        private float _defenseBreakDuration;
+        private float _healthBreak;
         private Vector3 _startPosition;
         private Rigidbody2D _rb;
         private bool _hasHit = false;
@@ -83,6 +88,11 @@ namespace IdleDefenseSurvival.Player
             _knockbackChance = 0f;
             _lifeSteal = 0f;
             _stuntChance = 0f;
+            _defenseBreakSource = DefenseBreakSource.None;
+            _defenseBreakType = DefenseBreakType.None;
+            _defenseBreak = 0f;
+            _defenseBreakDuration = 0f;
+            _healthBreak = 0f;
 
             if (_rb != null)
             {
@@ -143,6 +153,10 @@ namespace IdleDefenseSurvival.Player
             _knockbackChance = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackChance);
             _lifeSteal = PlayerStatsManager.Instance.GetStat(SkillType.LifeSteal);
             _stuntChance = PlayerStatsManager.Instance.GetStat(SkillType.StuntChance);
+            _defenseBreakSource = DefenseBreakSource.PlayerProjectile;
+            _defenseBreakType = DefenseBreakType.Permanent;
+            _defenseBreak = PlayerStatsManager.Instance.GetStat(SkillType.DefenseBreak);
+            _defenseBreakDuration = 0f;
         }
 
         public void InitializeFromTank(Transform target, TankInstance tank)
@@ -151,10 +165,14 @@ namespace IdleDefenseSurvival.Player
             SetProjectileSprite(_tankBulletSprite);
 
             _target = target;
+            _tank = tank;
             _startPosition = transform.position;
             _baseDamage = tank.TankAttackDamage;
             _basePerRange = tank.TankDamagePerRange;
-            _tank = tank;
+            _defenseBreakSource = DefenseBreakSource.TankProjectile;
+            _defenseBreakType = DefenseBreakType.Temporary;
+            _defenseBreak = PlayerStatsManager.Instance.GetStat(SkillType.DefenseBreak) * 0.5f;
+            _defenseBreakDuration = 7f;
         }
 
         public void InitializeFromEnemy(Transform target, EnemyAi enemy)
@@ -260,7 +278,7 @@ namespace IdleDefenseSurvival.Player
                 damage: _baseDamage,
                 type: DamageType.Normal,
                 crit: CriticalType.None,
-                source: "enemy"
+                source: ProjectileOwner.Enemy.ToString()
             );
 
             player.TakeDamage(damageData);
@@ -299,9 +317,14 @@ namespace IdleDefenseSurvival.Player
                             damage: currentDamage,
                             type: DamageType.Normal,
                             crit: CriticalType.None,
-                            source: UltimateDMG.Tank.ToString()
+                            source: ProjectileOwner.Tank.ToString()
                         ) {
-                            Element = Element.Metal
+                            Element = Element.Metal,
+                            // Defense Break
+                            DefenseBreakSource = _defenseBreakSource,
+                            DefenseBreakType = _defenseBreakType,
+                            DefenseBreak = _defenseBreak,
+                            DefenseBreakDuration = _defenseBreakDuration
                         };
                         float tankDamage = enemy.TakeDamage(damageData);
                         if (tankDamage <= 0f) 
@@ -344,7 +367,7 @@ namespace IdleDefenseSurvival.Player
                             damage: currentDamage,
                             type: DamageType.Normal,
                             crit: critTier,
-                            source: UltimateDMG.Player.ToString()
+                            source: ProjectileOwner.Player.ToString()
                         )
                         {
                             DamageMultiplier = _damageMultiplier,
@@ -352,7 +375,13 @@ namespace IdleDefenseSurvival.Player
                             HasKnockback = Utilityku.Chance(_knockbackChance),
                             KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.5f, _bounceIndex),
                             HasStunt = Utilityku.Chance(_stuntChance),
-                            HasBounce = Utilityku.Chance(_bounceChance)
+                            HasBounce = Utilityku.Chance(_bounceChance),
+
+                            // Defense Break
+                            DefenseBreakSource = _defenseBreakSource,
+                            DefenseBreakType = _defenseBreakType,
+                            DefenseBreak = _defenseBreak,
+                            DefenseBreakDuration = _defenseBreakDuration
                         };
 
                         float actualDamage = enemy.TakeDamage(damageData);

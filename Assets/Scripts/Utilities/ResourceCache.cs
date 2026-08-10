@@ -16,29 +16,18 @@ namespace IdleDefenseSurvival.Core
         {
             if (Cache.TryGetValue(path, out var asset))
                 return asset as T;
-
             T loaded = Resources.Load<T>(path);
-
-            if (loaded != null)
-                Cache[path] = loaded;
-
+            if (loaded != null) Cache[path] = loaded;
             return loaded;
         }
 
         public static Sprite LoadSpriteFromSheet(string sheetPath, string spriteName)
         {
             string key = $"{sheetPath}:{spriteName}";
-
-            if (SpriteCache.TryGetValue(key, out var sprite))
-                return sprite;
-
+            if (SpriteCache.TryGetValue(key, out var sprite)) return sprite;
             Sprite[] sprites = Resources.LoadAll<Sprite>(sheetPath);
-
             foreach (var s in sprites)
-            {
                 SpriteCache[$"{sheetPath}:{s.name}"] = s;
-            }
-
             SpriteCache.TryGetValue(key, out sprite);
             return sprite;
         }

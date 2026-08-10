@@ -16,22 +16,23 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.AttackRange => "Attack Range",
             SecondaryStat.BounceChance => "Bounce Chance",
             SecondaryStat.BounceCount => "Bounce Count",
-            SecondaryStat.MultiShootChance => "Multi-Shot Chance",
-            SecondaryStat.MultiShootCount => "Multi-Shot Count",
-            SecondaryStat.KnockbackChance => "Knockback Chance",
-            SecondaryStat.StuntChance => "Stun Chance",
-            SecondaryStat.StuntDuration => "Stun Duration",
-            SecondaryStat.LifeSteal => "Life Steal",
-            SecondaryStat.DamagePerRange => "Damage per Range",
-            SecondaryStat.CooldownReduction => "Cooldown Reduction",
-            SecondaryStat.MoveSpeed => "Move Speed",
             SecondaryStat.BossDamage => "Boss Damage",
+            SecondaryStat.CooldownReduction => "Cooldown Reduction",
+            SecondaryStat.DamagePerRange => "Damage per Range",
+            SecondaryStat.DefenseBreak => "Defense Break",
+            SecondaryStat.DropRate => "Drop Rate",
             SecondaryStat.EliteDamage => "Elite Damage",
             SecondaryStat.GoldGain => "Gold Gain",
-            SecondaryStat.DropRate => "Drop Rate",
-            SecondaryStat.InterestWave => "Interest Wave",
             SecondaryStat.HitRate => "Hit Rate",
+            SecondaryStat.InterestWave => "Interest Wave",
+            SecondaryStat.KnockbackChance => "Knockback Chance",
+            SecondaryStat.LifeSteal => "Life Steal",
+            SecondaryStat.MoveSpeed => "Move Speed",
+            SecondaryStat.MultiShootChance => "Multi-Shot Chance",
+            SecondaryStat.MultiShootCount => "Multi-Shot Count",
             SecondaryStat.Penetration => "Penetration",
+            SecondaryStat.StuntChance => "Stun Chance",
+            SecondaryStat.StuntDuration => "Stun Duration",
             SecondaryStat.MetalDamageBonus => "Metal Damage",
             SecondaryStat.WoodDamageBonus => "Wood Damage",
             SecondaryStat.FireDamageBonus => "Fire Damage",
@@ -47,32 +48,33 @@ namespace IdleDefenseSurvival.Stats
         /// </summary>
         public static string GetShortName(this SecondaryStat stat) => stat switch
         {
-            SecondaryStat.AttackRange => "ARNG",
+            SecondaryStat.AttackRange => "ARG",
             SecondaryStat.BounceChance => "BCH",
-            SecondaryStat.BounceCount => "BCNT",
-            SecondaryStat.MultiShootChance => "MSCH",
-            SecondaryStat.MultiShootCount => "MCNT",
-            SecondaryStat.KnockbackChance => "KBCH",
-            SecondaryStat.StuntChance => "STCH",
-            SecondaryStat.StuntDuration => "STDUR",
-            SecondaryStat.LifeSteal => "LS",
+            SecondaryStat.BounceCount => "BCT",
+            SecondaryStat.DefenseBreak => "DBK",
+            SecondaryStat.MultiShootChance => "MCH",
+            SecondaryStat.MultiShootCount => "MCT",
+            SecondaryStat.KnockbackChance => "KCH",
+            SecondaryStat.StuntChance => "SCH",
+            SecondaryStat.StuntDuration => "SDR",
+            SecondaryStat.LifeSteal => "LFS",
             SecondaryStat.DamagePerRange => "DPR",
             SecondaryStat.CooldownReduction => "CDR",
             SecondaryStat.MoveSpeed => "SPD",
             SecondaryStat.BossDamage => "BDMG",
             SecondaryStat.EliteDamage => "EDMG",
             SecondaryStat.GoldGain => "GOLD",
-            SecondaryStat.DropRate => "DR",
-            SecondaryStat.InterestWave => "INTW",
+            SecondaryStat.DropRate => "DRT",
+            SecondaryStat.InterestWave => "INW",
             SecondaryStat.HitRate => "HIT",
             SecondaryStat.Penetration => "PEN",
-            SecondaryStat.MetalDamageBonus => "MET",
-            SecondaryStat.WoodDamageBonus => "WOD",
-            SecondaryStat.FireDamageBonus => "FIR",
-            SecondaryStat.WaterDamageBonus => "WAT",
-            SecondaryStat.EarthDamageBonus => "ERT",
-            SecondaryStat.LightningDamageBonus => "LTN",
-            SecondaryStat.WindDamageBonus => "WND",
+            SecondaryStat.EarthDamageBonus      => "EDB",
+            SecondaryStat.FireDamageBonus       => "FDB",
+            SecondaryStat.LightningDamageBonus  => "LDB",
+            SecondaryStat.MetalDamageBonus      => "MDB",
+            SecondaryStat.WaterDamageBonus      => "WADB",
+            SecondaryStat.WindDamageBonus       => "WIDB",
+            SecondaryStat.WoodDamageBonus       => "WDDB",
             _ => "??"
         };
 
@@ -87,6 +89,7 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.BossDamage => GameColors.statBossDamage,
             SecondaryStat.EliteDamage => GameColors.statEliteDamage,
             SecondaryStat.DamagePerRange => GameColors.statDamagePerRange,
+            SecondaryStat.DefenseBreak => GameColors.blue,
 
             // Utility stats - Yellow/Gold
             SecondaryStat.MoveSpeed => GameColors.statMoveSpeed,
@@ -138,13 +141,13 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.StuntChance => true,
             SecondaryStat.InterestWave => true,
             SecondaryStat.HitRate => true,
-            SecondaryStat.MetalDamageBonus => true,
-            SecondaryStat.WoodDamageBonus => true,
-            SecondaryStat.FireDamageBonus => true,
-            SecondaryStat.WaterDamageBonus => true,
-            SecondaryStat.EarthDamageBonus => true,
+            SecondaryStat.MetalDamageBonus  => true,
+            SecondaryStat.WoodDamageBonus   => true,
+            SecondaryStat.FireDamageBonus   => true,
+            SecondaryStat.WaterDamageBonus  => true,
+            SecondaryStat.EarthDamageBonus  => true,
+            SecondaryStat.WindDamageBonus   => true,
             SecondaryStat.LightningDamageBonus => true,
-            SecondaryStat.WindDamageBonus => true,
             _ => false
         };
 
@@ -165,15 +168,31 @@ namespace IdleDefenseSurvival.Stats
         public static StatCategory GetCategory(this SecondaryStat stat) => stat switch
         {
             SecondaryStat.LifeSteal => StatCategory.Health,
-            SecondaryStat.EliteDamage or SecondaryStat.BossDamage or SecondaryStat.DamagePerRange or SecondaryStat.Penetration => StatCategory.Offense,
-            SecondaryStat.MoveSpeed or SecondaryStat.CooldownReduction or SecondaryStat.HitRate => StatCategory.Utility,
-            SecondaryStat.GoldGain or SecondaryStat.DropRate or SecondaryStat.InterestWave => StatCategory.Economy,
-            SecondaryStat.AttackRange or SecondaryStat.BounceChance or SecondaryStat.BounceCount or
-            SecondaryStat.MultiShootChance or SecondaryStat.MultiShootCount or
-            SecondaryStat.KnockbackChance or SecondaryStat.StuntChance or SecondaryStat.StuntDuration => StatCategory.Special,
-            SecondaryStat.MetalDamageBonus or SecondaryStat.WoodDamageBonus or SecondaryStat.FireDamageBonus or
-            SecondaryStat.WaterDamageBonus or SecondaryStat.EarthDamageBonus or
-            SecondaryStat.LightningDamageBonus or SecondaryStat.WindDamageBonus => StatCategory.Magic,
+            SecondaryStat.EliteDamage or 
+            SecondaryStat.BossDamage or 
+            SecondaryStat.DamagePerRange or 
+            SecondaryStat.Penetration => StatCategory.Offense,
+            SecondaryStat.MoveSpeed or 
+            SecondaryStat.CooldownReduction or 
+            SecondaryStat.HitRate => StatCategory.Utility,
+            SecondaryStat.GoldGain or 
+            SecondaryStat.DropRate or 
+            SecondaryStat.InterestWave => StatCategory.Economy,
+            SecondaryStat.AttackRange or 
+            SecondaryStat.BounceChance or SecondaryStat.BounceCount or
+            SecondaryStat.MultiShootChance or 
+            SecondaryStat.MultiShootCount or
+            SecondaryStat.KnockbackChance or 
+            SecondaryStat.StuntChance or 
+            SecondaryStat.StuntDuration or
+            SecondaryStat.DefenseBreak => StatCategory.Special,
+            SecondaryStat.MetalDamageBonus or 
+            SecondaryStat.WoodDamageBonus or 
+            SecondaryStat.FireDamageBonus or
+            SecondaryStat.WaterDamageBonus or 
+            SecondaryStat.EarthDamageBonus or
+            SecondaryStat.LightningDamageBonus or 
+            SecondaryStat.WindDamageBonus => StatCategory.Magic,
             _ => StatCategory.Other
         };
     }

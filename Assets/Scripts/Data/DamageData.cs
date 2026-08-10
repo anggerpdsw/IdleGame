@@ -34,6 +34,7 @@ namespace IdleDefenseSurvival.Data
         public DefenseBreakSource DefenseBreakSource;
         public DefenseBreakType DefenseBreakType;
         public float DefenseBreak;
+        public float DefenseBreakDuration;
         public float HealthBreak;
 
         public DamageData(float damage, DamageType type = DamageType.Normal, CriticalType crit = CriticalType.None, string source = "Unknown")
@@ -53,6 +54,7 @@ namespace IdleDefenseSurvival.Data
             DefenseBreakSource = DefenseBreakSource.None;
             DefenseBreakType = DefenseBreakType.None;
             DefenseBreak = 0f;
+            DefenseBreakDuration = 0f;
             HealthBreak = 0f;
         }
 

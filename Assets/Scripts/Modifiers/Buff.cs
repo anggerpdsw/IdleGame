@@ -341,6 +341,8 @@ namespace IdleDefenseSurvival.Modifiers
                 SkillType.GoldGain => SecondaryStat.GoldGain,
                 SkillType.DropRate => SecondaryStat.DropRate,
                 SkillType.InterestWave => SecondaryStat.InterestWave,
+                SkillType.HitRate => SecondaryStat.HitRate,
+                SkillType.Penetration => SecondaryStat.Penetration,
 
                 // Derived from Main Attribute / no secondary equivalent
                 _ => SecondaryStat.None

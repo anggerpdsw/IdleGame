@@ -7,7 +7,6 @@ namespace IdleDefenseSurvival
         public const int BASE_LEVEL = 9753;
         public const int STARTING_STAT_POINTS = 5;  // Level 1 start
         public const int POINTS_PER_LEVEL = 5;      // Bonus per level-up
-        public const string ITEM_SPRITE_BASE_PATH = "Art/Item/";
         public const string DATE_FORMAT = "yyyy-MM-dd";
         public const int CARD_START_SLOT = 1;
         public const int CARD_MAX_LEVEL = 10;

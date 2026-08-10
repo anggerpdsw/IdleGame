@@ -81,10 +81,6 @@ namespace IdleDefenseSurvival.Enemy
         // Slow effect tracking
         private readonly Dictionary<SlowSource, SlowEffect> _slowEffects = new();
         private float _originalMoveSpeed;
-        // Defense Break effect tracking
-        private readonly Dictionary<int, DefenseBreakEffect> _defenseBreakEffects = new();
-        private int _nextDefenseBreakId = 0;
-        private float _originalDefenseAmount;
 
         // Optimasi: Buffer dan Contact Filter untuk menghindari GC Alloc setiap frame
         private Collider2D[] _neighborBuffer = new Collider2D[16];
@@ -358,7 +354,7 @@ namespace IdleDefenseSurvival.Enemy
 
             // Apply Defense Break after hit enemy if damage data has it
             if (damageData.DefenseBreak > 0f)
-                ApplyDefenseBreak(damageData.DefenseBreakSource, damageData.DefenseBreakType, damageData.DefenseBreak);
+                ApplyDefenseBreak(damageData.DefenseBreakSource, damageData.DefenseBreakType, damageData.DefenseBreak, damageData.DefenseBreakDuration);
 
             // Record damage taken
             RecordDamage(_lastDamageSource, finalDamage);
@@ -492,42 +488,61 @@ namespace IdleDefenseSurvival.Enemy
             EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
+        // Defense Break effect tracking
+        private const int MAX_DEFENSE_BREAK_STACKS = 5;
+        private readonly Dictionary<DefenseBreakSource, DefenseBreakEffect> _defenseBreakEffects = new();
+        private float _originalDefenseAmount;
+
         public void ApplyDefenseBreak(
             DefenseBreakSource source, DefenseBreakType type, float percent, float duration = 0f)
         {
             percent = Mathf.Clamp01(percent);
             if (type == DefenseBreakType.Temporary && duration <= 0f)
             {
-                Debug.LogWarning($"[EnemyAi] Temporary Defense Break requires duration > 0.");
+                Debug.LogWarning(
+                    $"[EnemyAi] Temporary Defense Break from {source} " +
+                    $"requires duration > 0."
+                );
                 return;
             }
-
-            int id = ++_nextDefenseBreakId;
-            var effect = new DefenseBreakEffect
+            if (!_defenseBreakEffects.TryGetValue(source, out var effect))
             {
-                Id = id,
-                Source = source,
-                Type = type,
-                Percent = percent,
-                ExpireTime = type == DefenseBreakType.Temporary ? Time.time + duration : 0f
-            };
-            _defenseBreakEffects[id] = effect;
-
+                effect = new DefenseBreakEffect
+                {
+                    Source = source,
+                    Type = type,
+                    Percent = percent,
+                    StackCount = 1,
+                    ExpireTime = type == DefenseBreakType.Temporary ? Time.time + duration : 0f
+                };
+                _defenseBreakEffects[source] = effect;
+            }
+            else
+            {
+                if (effect.Type != type)
+                {
+                    Debug.LogWarning(
+                        $"[EnemyAi] Defense Break source {source} " +
+                        $"already has type {effect.Type}, cannot apply {type}."
+                    );
+                    return;
+                }
+                // Source sama → stack sampai maksimum 5.
+                effect.StackCount = Mathf.Min(effect.StackCount + 1, MAX_DEFENSE_BREAK_STACKS);
+                // Gunakan nilai effect pertama sebagai nilai per-stack.
+                effect.Percent = percent;
+                // Temporary → refresh duration setiap kali terkena lagi.
+                if (effect.Type == DefenseBreakType.Temporary)
+                    effect.ExpireTime = Time.time + duration;
+            }
             RecalculateDefense();
         }
 
         public void RemoveDefenseBreak(DefenseBreakSource source, DefenseBreakType type)
         {
-            var removeIds = ListPool<int>.Get();
-            foreach (var pair in _defenseBreakEffects)
-            {
-                var effect = pair.Value;
-                if (effect.Source == source && effect.Type == type)
-                    removeIds.Add(pair.Key);
-            }
-            foreach (int id in removeIds)
-                _defenseBreakEffects.Remove(id);
-            ListPool<int>.Release(removeIds);
+            if (!_defenseBreakEffects.TryGetValue(source, out var effect)) return;
+            if (effect.Type != type) return;
+            _defenseBreakEffects.Remove(source);
             RecalculateDefense();
         }
 
@@ -535,7 +550,7 @@ namespace IdleDefenseSurvival.Enemy
         {
             float totalBreak = 0f;
             foreach (var effect in _defenseBreakEffects.Values)
-                totalBreak += effect.Percent;
+                totalBreak += effect.Percent * effect.StackCount;
             float calculatedDefense = _originalDefenseAmount * (1f - totalBreak);
             _defenseAmount = Mathf.Max(-_originalDefenseAmount, calculatedDefense);
             EnemyStatisticsManager.Instance?.MarkDirty();
@@ -544,23 +559,17 @@ namespace IdleDefenseSurvival.Enemy
         private void UpdateDefenseBreaks()
         {
             if (_defenseBreakEffects.Count == 0) return;
-            bool changed = false;
-            var expiredIds = ListPool<int>.Get();
+            var expiredSources = ListPool<DefenseBreakSource>.Get();
             foreach (var pair in _defenseBreakEffects)
             {
                 var effect = pair.Value;
                 if (effect.Type == DefenseBreakType.Temporary && Time.time >= effect.ExpireTime)
-                    expiredIds.Add(pair.Key);
+                    expiredSources.Add(pair.Key);
             }
-
-            foreach (int id in expiredIds)
-            {
-                _defenseBreakEffects.Remove(id);
-                changed = true;
-            }
-
-            ListPool<int>.Release(expiredIds);
-
+            bool changed = expiredSources.Count > 0;
+            foreach (var source in expiredSources)
+                _defenseBreakEffects.Remove(source);
+            ListPool<DefenseBreakSource>.Release(expiredSources);
             if (changed) RecalculateDefense();
         }
 

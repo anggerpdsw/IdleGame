@@ -11,7 +11,7 @@ namespace IdleDefenseSurvival.Item
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class ItemClickManager : MonoBehaviour
     {
-        private bool _debug;
+        [SerializeField] private bool _debug;
         [Header("Layer Filter")]
         [Tooltip("Only items on the 'Items' layer will be clickable. Default set to Items layer.")]
         [SerializeField] private LayerMask _itemLayerMask;
@@ -52,26 +52,59 @@ namespace IdleDefenseSurvival.Item
         private void HandleClick()
         {
             Vector2 screenPos = Pointer.current.position.ReadValue();
-            Vector2 worldPos = _mainCamera.ScreenToWorldPoint(screenPos);
+            Vector3 world3D = _mainCamera.ScreenToWorldPoint(
+                new Vector3(screenPos.x, screenPos.y, Mathf.Abs(_mainCamera.transform.position.z))
+            );
+            Vector2 worldPos = world3D;
 
             // Check ALL colliders at click point (no layer filter)
-            if (_debug) {
-                Collider2D[] allColliders = Physics2D.OverlapPointAll(worldPos);
-                foreach (var col in allColliders)
+            if (_debug) 
+            {
+                Debug.Log(
+                    $"[ItemClickManager] " +
+                    $"Screen={screenPos} | " +
+                    $"World={worldPos} | " +
+                    $"Mask={_itemLayerMask.value}"
+                );
+
+                // TEST 1: tanpa layer mask
+                Collider2D[] allHits = Physics2D.OverlapPointAll(worldPos);
+                Debug.Log($"[ItemClickManager] ALL HITS = {allHits.Length}");
+
+                foreach (var hit in allHits) 
                 {
-                    Debug.Log($"  - {col.gameObject.name} on layer {LayerMask.LayerToName(col.gameObject.layer)}");
+                    Debug.Log(
+                        $"[ItemClickManager] ALL HIT: " +
+                        $"{hit.name} | " +
+                        $"Layer={LayerMask.LayerToName(hit.gameObject.layer)} | " +
+                        $"LayerIndex={hit.gameObject.layer} | " +
+                        $"Enabled={hit.enabled}"
+                    );
                 }
             }
 
             // Use Physics2D.OverlapPointAll to get all colliders at the click point
             Collider2D[] hits = Physics2D.OverlapPointAll(worldPos, _itemLayerMask);
+            // TEST 2: dengan layer mask
+            if (_debug) Debug.Log($"[ItemClickManager] ITEM HITS = {hits.Length}");
             foreach (var hit in hits)
             {
-                if (hit.TryGetComponent<CurrencyPickup>(out var item))
+                if (_debug) Debug.Log($"[ItemClickManager] ITEM HIT = {hit.name}"); 
+                if (!hit.TryGetComponent<CurrencyPickup>(out var item)) 
+                    item = hit.GetComponentInParent<CurrencyPickup>();
+                if (item == null)
                 {
-                    item.StartCollection();
-                    return; // Only collect one item per click
+                    if (_debug) Debug.LogWarning(
+                        $"[ItemClickManager] Collider {hit.name} " +
+                        $"tidak memiliki CurrencyPickup di parent."
+                    );
+                    continue;
                 }
+
+                if (_debug) Debug.Log($"[ItemClickManager] COLLECT: {item.name}");
+                
+                item.StartCollection();
+                return;
             }
         }
 
