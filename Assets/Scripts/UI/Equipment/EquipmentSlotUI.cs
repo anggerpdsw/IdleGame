@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival.UI.Equipment
     /// Pure view for one equipment slot (paper-doll).
     /// Only ApplyViewData from the parent UI; never queries any service or database.
     /// </summary>
-    public class EquipmentSlotUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IDropHandler
+    public class EquipmentSlotUI : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler, IDropHandler
     {
         [Header("Slot Config")]
         public EquipmentType Slot;
@@ -43,6 +43,7 @@ namespace IdleDefenseSurvival.UI.Equipment
         private EquipmentUI _parentUI;
         private InventoryItem _currentItem;
         private bool _isInitialized;
+        private Vector3 _lastPointerPosition;
 
         public InventoryItem CurrentItem => _currentItem;
         public EquipmentType SlotType => Slot;
@@ -127,6 +128,7 @@ namespace IdleDefenseSurvival.UI.Equipment
         #region Event Handlers
         public void OnPointerClick(PointerEventData eventData)
         {
+            _lastPointerPosition = eventData.position;
             if (eventData.button == PointerEventData.InputButton.Right)
             {
                 _parentUI?.OnSlotRightClick(this);
@@ -143,10 +145,16 @@ namespace IdleDefenseSurvival.UI.Equipment
             _parentUI?.OnSlotClick(this);
         }
 
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            _lastPointerPosition = eventData.position;
+        }
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (_parentUI != null) _parentUI._hoveredSlot = this;
-            ShowEquipmentInfo();
+            _lastPointerPosition = eventData.position;
+            ShowEquipmentInfo(_lastPointerPosition);
         }
 
         public void OnPointerExit(PointerEventData eventData)
@@ -172,12 +180,12 @@ namespace IdleDefenseSurvival.UI.Equipment
         #endregion
 
         #region Tooltip
-        private void ShowEquipmentInfo()
+        private void ShowEquipmentInfo(Vector3 screenPosition)
         {
             if (_currentItem == null) return;
             var tooltip = TooltipUI.Instance;
             if (tooltip == null) return;
-            tooltip.ShowEquipment(_currentItem, transform.position);
+            tooltip.ShowEquipment(_currentItem, screenPosition != Vector3.zero ? screenPosition : _lastPointerPosition);
         }
         private void HideEquipmentInfo() => TooltipUI.Instance?.Hide();
         #endregion

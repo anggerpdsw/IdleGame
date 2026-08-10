@@ -448,9 +448,11 @@ namespace IdleDefenseSurvival.UI.Tooltip
             if (_tooltipRect == null || _tooltipCanvas == null) return;
             Vector2 screenPos = screenPosition.HasValue
                 ? (Vector2)screenPosition.Value
-                : Mouse.current != null
-                    ? Mouse.current.position.ReadValue()
-                    : Vector2.zero;
+                : Pointer.current != null
+                    ? Pointer.current.position.ReadValue()
+                    : Mouse.current != null
+                        ? Mouse.current.position.ReadValue()
+                        : Vector2.zero;
 
             RectTransform canvasRect = _tooltipCanvas.transform as RectTransform;
             if (canvasRect == null) return;

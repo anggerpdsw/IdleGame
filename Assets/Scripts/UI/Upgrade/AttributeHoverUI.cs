@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (_attributePanel == null) return;
-            _attributePanel.ShowAttributeInfo(_attribute);
+            _attributePanel.ShowAttributeInfo(_attribute, eventData.position);
         }
 
         public void OnPointerExit(PointerEventData eventData)

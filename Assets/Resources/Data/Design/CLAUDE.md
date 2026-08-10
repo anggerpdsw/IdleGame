@@ -1,477 +1,1709 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Overview
-
-**IdleDefenseSurvival** — a 2D auto-shooter idle defense game built in **Unity 6000.3.18f1 (Unity 6)**. Inspired by "Wild Survival - Idle Defense" on Android.
-
-**Core Mechanic:** Player stays at the center of the screen, auto-attacks enemies. Enemies spawn outside the player's attack range and move toward the player, stopping when they reach their own attack range. Player attacks can knock enemies back, restarting their approach.
-
-**Tech Stack:**
-- **2D Render Pipeline** (com.unity.feature.2d)
-- **Input System** (com.unity.inputsystem 1.19.0)
-- **UGUI** for UI (com.unity.ugui 2.0.0)
-- **Physics2D** for movement and collisions
-- **Test Framework** (com.unity.test-framework 1.6.0)
-- **DOTween** (Demigiant) for animations
-- **Newtonsoft.Json** for JSON serialization
-
-## Unity Editor
-
-- Open in Unity Hub by selecting the repository root folder.
-- Target platform: **Standalone** (Windows), configurable in Project Settings.
-- Main gameplay scene: `Assets/Scenes/MainGame.unity`
-- Other scenes: `Bootstrap.unity`, `MainMenu.unity`, `CardCollection.unity`, `Inventory.unity`
-
-## Commands
-
-### Building the project
-
-- **Unity Editor**: File → Build Settings → Build (or Build And Run)
-- **Command-line**: `Unity.exe -quit -batchmode -buildTarget StandaloneWindows64 -projectPath .`
-
-### Running tests
-
-- **All tests**: Window → General → Test Runner → Run All (`Ctrl+Shift+R`)
-- **Single test**: Open Test Runner, select test, click "Run"
-- **CLI**: `Unity.exe -runTests -testPlatform EditMode -projectPath .`
-
-## Code Conventions
-
-Unity's C# conventions:
-- **PascalCase** for public fields, methods, properties, types
-- **camelCase with `_` prefix** for private fields
-- `[SerializeField]` for Inspector-exposed private fields (never make them public)
-- **One MonoBehaviour per file**, filename = class name exactly
-- **Namespace**: `IdleDefenseSurvival.*` for runtime, `IdleDefenseSurvival.Editor.*` for editor scripts
-- `[Tooltip("...")]` on all serialized fields
-
-## Development Philosophy: Ponytail (YAGNI)
-
-Before writing ANY code, apply the **6-rung ladder** of efficiency. Stop at the first rung that holds:
-
-1. **Based on "Wild Survival - Idle Defense"** — check if the reference game solves this already
-2. **Does this need to exist?** Apply YAGNI rigorously. Can the feature be avoided entirely?
-3. **Stdlib does it?** Use .NET/C# built-ins first (System.*, Unity built-ins)
-4. **Native Unity feature?** Unity provides 80% of what games need out-of-the-box
-5. **Installed dependency?** Use existing packages (check Packages/manifest.json)
-6. **Only then:** Build the minimum that works
-
-**Why this matters:** Idle defense games are simple. Resist over-engineering. Write the shortest working code first; refactor only when profiling shows a bottleneck.
-
-**Examples:**
-- ❌ Don't build custom object pools until GC profiling shows pressure (Unity 6 is efficient)
-- ✅ Use `Physics2D.OverlapCircle()` for attack range checks (not custom distance loops)
-- ✅ Use `LineRenderer` for attack range visualization (not custom mesh generation)
-- ✅ Use `ScriptableObject` for game data (not custom JSON parsers)
-- ✅ Use `Vector2.MoveTowards()` for enemy movement (not custom lerping)
-
-## Current Architecture
-
-### Folder Structure
-
-```
-Assets/
-  Art/
-    Enemy/        — Enemy sprites (Thorn Golem, etc.)
-    Player/       — Player sprite (BasePlayer.png)
-    UI/           — UI sprites, fonts, icons
-  Prefabs/
-    Enemy.prefab  — Enemy prefab with EnemyAi component
-    Bullet.prefab — Player projectile
-    Tank.prefab   — Tank ultimate instance
-    Bomb.prefab   — Bomb ultimate
-    Root.prefab   — Root ultimate
-    Fountain.prefab — Fountain ultimate
-    Cloud.prefab  — Cloud ultimate
-    Shockwave.prefab — Shockwave ultimate
-    DamagePopup.prefab — Damage number popup
-    HealthBar.prefab — Enemy health bar
-  Resources/
-    Data/         — JSON data files (dataPlayer, dataEnemy, dataWave, dataUltimate, dataCard, dataItems, dataAttribute, dataConfigSocket)
-    Art/
-      Card/       — Card sprites
-      Enemy/      — Enemy sprites (including Monsterpack)
-    Enemies/      — Enemy prefabs (Basic)
-    Reward/       — Reward UI prefabs
-  Scenes/
-    Bootstrap.unity   — Bootstrap scene (initializes services)
-    MainMenu.unity    — Main menu scene
-    MainGame.unity    — Main gameplay scene
-    CardCollection.unity — Card collection UI scene
-    Inventory.unity   — Inventory UI scene
-  Scripts/
-    Camera/         — CameraFollow, BackgroundScaler
-    Card/           — Card system (CardDatabase, CardRollService, CardUpgradeService, CardEquipmentService, CardManager, CardCollectionController, CardInventory, CardModifierService, VirtualCardInventorySnapshot)
-    Controller/     — UI Controllers (MainMenuController, SettingsController, VictoryController, CardCollectionController, GameSpeedController, BootstrapController, InventoryController, GameController)
-    Core/           — Bootstrap, ServiceLocator, SceneLoader, SceneCleanupHandler, interfaces, CanvasRoot, Colorku, Constantku, Enumku, InventorySampleSeeder, ResourceCache
-    Daily/          — DailyRewardData, DailyRewardManager, DailyRewardSaveData, DailyRewardService, DailyRewardSlot, DailyRewardUI
-    Data/           — All data classes (PlayerData, EnemyData, UpgradeData, CardData, DamageData, DamagePopupData, GameStateData, ModifierData, SaveData, SpendingData, UltimateData, VictoryData, VIPData, WaveData, WaveProgressData, AccountData)
-    Economy/        — EconomyManager, CurrencyData, CurrencyPickup
-    Enemy/          — EnemyAi, EnemySpawner, EnemyHealthBarManager, EnemyStatusEffectController, StatusEffects (BaseStatusEffect, ConcreteStatusEffects, IStatusEffect)
-    Equipment/      — Full equipment system (EquipmentService, EquipmentSlotService, EquipmentEffectService, EquipmentModifierService, EquipmentSetBonusService, EquipmentDurabilityService, EquipmentComparisonService, EquipmentPersistenceService, EquipmentAutoEquipService, EquipmentVisualService, EquipmentType, EquipmentEventDispatcher, AttributeWeightsConfig, RarityMechanicConfig, SlotIdentityService, IEquipmentRepository, IEquipmentService, Tests)
-    IdleReward/     — IdleRewardManager, IdleRewardUI, IdleRewardData
-    Inventory/      — InventoryService, InventoryManager, InventoryItem, InventoryItemExtensions, IInventoryService
-    Item/           — ItemCategory, ItemClickManager, ItemRarity, Items, ItemState
-    Items/          — AutoRepairService, CraftCompletionService, CraftContextBuilder, CraftJob, CraftModifiers, CraftService, GemService, ItemDatabase, RecipeData
-    Manager/        — All managers (GameManager, WaveManager, SaveManager, UpgradeManager, EconomyManager, UltimateManager, ProjectilePool, DamagePopupManager, EnemyHealthBarManager, EnemySpawner, EnemyStatisticsManager, PlayerStatsManager, ModifierManager, CardManager, RewardManager, UIManager)
-    Modifier/       — ModifierCalculator, ModifierManager, StatModifier, ModifierSource, ModifierMode
-    Player/         — Player, PlayerStats, Projectile, StatLoader, TankInstance
-    Reward/         — RewardData, RewardManager, RewardPopup, RewardSlot, CardRewardSlot
-    UI/             — UI components (CardCollection, CurrencyDisplay, DamagePopup, EnemyHealthBar, Settings, Status, Upgrade, UpgradeButton, GameSpeedDisplay)
-    Ultimate/       — Ultimate system (UltimateManager, UltimateFactory, handlers for each ultimate: Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave)
-    VisualScripting/ — Visual scripting graphs (if any)
-  Settings/         — Input Action assets, Render Pipeline assets
-  InputSystem_Actions.inputactions — Input mappings (currently unused, game is idle)
-```
-
-### Core Systems
-
-**Player (`Scripts/Player/Player.cs`)**
-- Fixed at screen center (0, 0)
-- Attributes: attack range, attack damage, attack speed, knockback force, health, regen, evasion, critical chance, multi-shoot, bounce, life steal, mana, mana regen, etc.
-- Visual: dashed circle showing attack range (via `LineRenderer` or Gizmos)
-- Auto-attacks enemies within range using `Physics2D.OverlapCircleAll`
-- Handles player health, regeneration, death defy (immunity), shield system
-- Spawns tanks at attack range boundary
-- Triggers ultimates (Void, Root, Fountain, Shockwave, Tank, Bomb, Cloud, Lightning)
-- Supports Heal-over-Time and Mana-over-Time effects from potions
-
-**Enemy (`Scripts/Enemy/EnemyAi.cs`)**
-- Spawns outside player's attack range
-- Moves toward player using `Vector2.MoveTowards()` with steering (seek + separation)
-- Stops when within its own attack range to player
-- Gets knocked back by player attacks → resumes movement after knockback ends
-- Attributes: move speed, attack range, health, damage, evasion, element, role
-- Separation behavior to avoid stacking (uses `Physics2D.OverlapCircle` with ContactFilter2D)
-- Damage system with elemental multipliers, critical hits, knockback, stun
-- Slow effects (Permanent, Aura, Temporary) and Defense Break effects
-- Max health reduction (HeartBreak)
-- Rewards: gold, gems (daily limit), meat, EXP
-- Health bar managed by `EnemyHealthBarManager`
-- Drops physical pickups for gems and meat; gold/EXP instant
-
-**EnemySpawner (`Scripts/Enemy/EnemySpawner.cs`)**
-- Spawns enemies at random positions outside player's attack range
-- Spawn position: random angle, distance > player attack range + buffer
-- Uses timed spawning (interval decreases per wave)
-- Loads enemy data from `Resources/Data/dataEnemy.json`
-- Scales enemy stats by wave/tier difficulty
-- Calculates rewards based on enemy stats and wave/tier
-- Uses weighted spawn selection by role and spawnWeight
-
-**WaveManager (`Scripts/Manager/WaveManager.cs`)**
-- Central brain for wave-based gameplay
-- Reads config from `dataWave.json`
-- Flow: InterWave (10s) → ActiveWave (30s) → InterWave → ...
-- Each wave increases difficulty up to maxWave (350)
-- After wave 350, tier increases and wave resets to 1 (infinite progression)
-- Difficulty multipliers: Health, Speed, Damage, SpawnInterval
-- Tier multiplier adds additional scaling for infinite progression
-- Tracks damage stats per wave per enemy
-- Handles victory (tier complete) and defeat
-- Interest wave bonus (gold/meat based on accumulated resources)
-
-**Projectile (`Scripts/Player/Projectile.cs`)**
-- Pooled via `ProjectilePool` (pre-instantiated, reusable)
-- Moves toward target using `Rigidbody2D`
-- Supports: bounce (chain to nearby enemies), knockback, stun, critical hits (Critical, SuperCritical, UltraCritical), life steal, damage per range
-- Geometric damage reduction on bounce (50% per bounce)
-- Hits player or enemies based on owner
-- Enemy projectiles can apply slow, defense break
-
-**Enemy Health Bar (`Scripts/UI/EnemyHealthBarManager.cs`)**
-- Manages health bar pooling and display for enemies
-- Updates health in real-time
-- Shows above enemy with offset
-- Displays DefenseBreak and HeartBreak indicators
-
-**Equipment System (`Scripts/Equipment/`)**
-- Full equipment system with slots: Hat, Gloves, Armor, Pants, Belt, Boots, Ring, Necklace, Bracelet, Artifact
-- Items have: Level (1-50/60), Enhance level, Durability, Sockets (0-2), Prefix/Suffix affixes
-- Set bonuses (2/4 piece)
-- Special effects (on-hit procs, passive effects)
-- Gem socketing system (gems level up with experience)
-- Auto-equip best items
-- Comparison tooltips
-- Visual equipment models on player
-
-**Inventory System (`Scripts/Inventory/` & `Scripts/Items/`)**
-- Grid-based inventory with categories
-- Items: Consumables (potions, tickets), Materials (crafting), Equipment, Gems
-- Crafting system with recipes and queue
-- Gem service: leveling, socketing, random stats
-- Auto-repair service
-- Item comparison and tooltips
-
-**Card System (`Scripts/Card/`)**
-- Cards provide stat bonuses (flat or percent) or special effects
-- Rarities: Common, Rare, Epic, Legendary, Mythic
-- Pity system for Epic/Legendary/Mythic (thresholds: 30/70/200)
-- Cards can be equipped (max 5 slots)
-- Duplicates upgrade card level (max level 10)
-- Card collection UI in separate scene
-- Card effects: stat modifiers (via ModifierManager) + special effects (FrostAura, Shield, TimeFast, Gold, Meat)
-
-**Ultimate System (`Scripts/Ultimate/`)**
-- **Void**: Black hole that pulls enemies, slows, stuns
-- **Tank**: Stationary turrets at attack range boundary (max 4)
-- **Root**: Immobilizes enemies in area
-- **Bomb**: Explosion on enemy death (chain reaction)
-- **Fountain**: Healing fountain for player
-- **Cloud**: Toxic cloud damaging enemies over time + slow
-- **Lightning**: Chain lightning triggered by kill count (5 kills)
-- **Shockwave**: Expanding wave damaging enemies + knockback
-- Managed by `UltimateManager` + `UltimateFactory` + individual handlers
-- Each has cooldown, chance, active toggle, element type
-- Data from `dataUltimate.json`
-
-**Economy (`Scripts/Economy/`)**
-- **Gold**: Main currency, earned from kills, used for upgrades
-- **Gem**: Premium currency, daily limit (20/day), used for card rolls
-- **Meat**: Special resource, dropped by enemies
-- **EXP**: Permanent account EXP from enemy kills
-- `EconomyManager` singleton handles all currency operations
-- `SaveManager` handles persistence (JSON at `Application.persistentDataPath`)
-
-**Daily Rewards (`Scripts/Daily/`)**
-- 7-day login rewards
-- Tracks claimed days, streak
-- Resets daily at UTC midnight
-
-**Idle Rewards (`Scripts/IdleReward/`)**
-- Offline progress calculation
-- Gold, meat, EXP accumulation while offline
-- Claimable on game start
-
-**Save System (`Scripts/Manager/SaveManager.cs`)**
-- Single JSON file: `SaveData.json` at `Application.persistentDataPath`
-- Saves: Account, Currency, Spending, VIP, GameState, WaveProgress, IdleReward, DailyReward, CardInventory, Inventory, Equipment, CraftQueue
-- Auto-save interval (60s) + on pause/quit
-- Migration/repair for old save versions
-- Daily gem limit tracking (20/day)
-
-### Game Mechanics
-
-1. **Attack Range Visualization**
-   - Draw dashed circle around player using `LineRenderer` (material set to dashed)
-   - Radius = player's attack range
-   - Updates if attack range increases via upgrades/cards/equipment
-
-2. **Enemy Spawning**
-   - Spawn position: `player.position + Random.insideUnitCircle.normalized * (playerAttackRange + spawnBuffer)`
-   - Ensure enemies spawn outside camera view or outside attack range
-   - Instantiate from `enemyPrefab` (Basic prefab with EnemyAi)
-   - Weighted by role and spawnWeight from dataEnemy.json
-
-3. **Enemy AI States**
-   - **Approaching**: `Vector2.MoveTowards(transform.position, player.position, moveSpeed * Time.deltaTime)` with steering (seek + separation)
-   - **Attacking**: Stop movement when `Vector2.Distance(transform.position, player.position) <= attackRange`, attack with cooldown
-   - **Knockback**: Apply force via `Rigidbody2D.AddForce()`, resume approaching after knockback ends
-   - **Stun**: Frozen in place, cannot move or attack
-
-4. **Player Auto-Attack**
-   - Every `attackSpeed` seconds, find all enemies in attack range
-   - Use `Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayer)`
-   - Deal damage + apply knockback to enemies
-   - Multi-shoot: chance to fire additional projectiles at nearby enemies
-   - No manual aiming (idle game)
-
-5. **Ultimate Abilities**
-   - **Void**: Black hole pulls enemies, slows 77%, stuns ×4.3, cooldown 61s
-   - **Tank**: 4 turrets at attack range boundary, 1.7× damage, Metal element, 11% chance, 15.7s duration
-   - **Root**: Immobilizes enemies in area, Wood element, cooldown 17s, 8.5s duration
-   - **Bomb**: Explosion on death, 2.3× damage, 1.2× knockback, Fire element, 73% chance, 13.5s duration
-   - **Fountain**: Heals player, Water element, cooldown 39.63s, 8.1s duration
-   - **Cloud**: Toxic cloud DPS + 69% slow, Earth element, 81% chance, 6.3s duration
-   - **Lightning**: Chain lightning (7 targets), 2.3× damage, 2.1× stun, 22% defense break, Lightning element, triggers at 5 kills
-   - **Shockwave**: Expanding wave, 3.3× damage, 2.2× knockback, Wind element, cooldown 110s
-   - Managed by `UltimateManager` + `UltimateFactory` + individual handlers
-   - Each has cooldown, chance, active toggle, element
-
-6. **Card System**
-   - Cards provide stat bonuses (flat or percent) or special effects
-   - Rarities: Common, Rare, Epic, Legendary, Mythic
-   - Pity system: Epic at 30 rolls, Legendary at 70, Mythic at 200
-   - Cards can be equipped (max 5 slots)
-   - Duplicates upgrade card level (max level 10)
-   - Card effects applied via `CardModifierService`:
-     - Stat modifiers → `ModifierManager` (e.g., AttackDamage +3%, AttackRange +0.2)
-     - Special effects → dictionary (FrostAura slow%, Shield%, TimeFast%)
-   - Roll costs: 1x = 50 gems, 10x = 450 gems, 100x = 4000 gems
-
-7. **Wave System**
-   - Wave difficulty = f(waveTier, waveNumber)
-   - Max wave: 350 (after that, only spawn count increases)
-   - Tier progression: complete wave 350 → Victory UI → return to Main Menu → select next tier
-   - Difficulty formulas:
-     - Health: `Lerp(1, 2.37, progress^1.2) * (1 + (tier-1) * 0.15)`
-     - Speed: `Lerp(1, 1.413, progress)`
-     - Damage: `Lerp(1, 1.15, progress^1.2) * (1 + (tier-1) * 0.15)`
-     - SpawnInterval: `base * decay^wave` (decay until min)
-
-8. **Economy**
-   - **Gold**: Main currency, earned from kills, used for upgrades/repairs
-   - **Gem**: Premium currency, daily limit (20/day), used for card rolls
-   - **Meat**: Special resource, dropped by enemies, used for crafting
-   - **EXP**: Permanent account EXP from enemy kills
-   - `EconomyManager` singleton handles all currency operations
-   - `SaveManager` handles persistence (JSON at `Application.persistentDataPath`)
-
-9. **Damage System**
-   - `DamageData` struct carries: Damage, Source, Element, Type (Normal/Critical/SuperCritical/UltraCritical/Heal/Mana/Miss), CriticalType, DefenseBreak
-   - Element matching: 1.5× counter / 0.75× same-or-unrelated / 0.5× weak
-   - ElementMastery (from Intelligence): universal multiplier (1 + Mastery/1000)
-   - Per-element bonus from equipment: (1 + Bonus/100)
-   - Final damage: `Utilityku.FinalDamage(rawDamage, targetDefense)`
-
-10. **Status Effects**
-    - Slow: Permanent, Aura, Temporary (multiplicative stack)
-    - Defense Break: Permanent, Aura, Temporary (multiplicative stack)
-    - Stun: Complete immobilization
-    - Max Health Reduction (HeartBreak): permanent reduction
-    - Applied via `EnemyStatusEffectController` or directly on EnemyAi
-
-### Data-Driven Design
-
-- **JSON** for game balance data (enemy stats, upgrade costs, wave definitions, ultimate data, cards, items, equipment, gems, affixes)
-- **MonoBehaviour** only for runtime behavior tied to GameObjects
-- **Pure C# classes** for backend systems (economy calculations, wave generators, damage formulas) — test these in EditMode tests without a scene
-- **ScriptableObject** not used; JSON loaded at runtime via Resources
-
-### Testing Strategy
-
-- **EditMode tests** for pure logic: economy calculations, wave formulas, upgrade cost curves, damage formulas
-- **PlayMode tests** for interactions between systems: spawning + defense placement, input → player action
-- Test files go in `Assets/Scripts/<Domain>/Tests/` or root `Tests/` folder
-
-### Input System
-
-The project uses the **Unity Input System** package (not the legacy Input Manager). An Input Action Asset exists at `Assets/InputSystem_Actions.inputactions`. Wire up player actions via `PlayerInput` component or by generating a C# wrapper from the `.inputactions` asset. Currently unused as game is idle.
-
-### Scene Management
-
-- Menu/main menu scene: `Scenes/MainMenu`
-- Gameplay scene: `Scenes/MainGame`
-- Card collection: `Scenes/CardCollection`
-- Inventory: `Scenes/Inventory`
-- Bootstrap: `Scenes/Bootstrap`
-- Keep scene loading additive (load scenes on top of a persistent manager scene)
-- `SceneLoader` handles additive loading/unloading
-- `SceneCleanupHandler` cleans up non-persistent objects on scene unload
-
-### Common Patterns for This Project Type
-
-- **Object pooling**: Use for bullets, enemies, particle effects (avoid instantiate/destroy churn) — `ProjectilePool`, `DamagePopupPool`, `EnemyHealthBarManager`
-- **Wave system**: Difficulty increases with wave tier level and wave number, max wave 350. After wave 350, only spawn count increases.
-- **Economy**: `EconomyManager` singleton handles currency; use JSON data for upgrade/cost tables.
-- **Equipment**: Slot-based system with level, enhance, durability, sockets, affixes, set bonuses.
-- **Save system**: Single JSON file for all persistent data; auto-save + manual save on quit/pause.
-- **Service Locator**: `ServiceLocator` provides interface access to managers.
-
-## Physics2D Usage
-
-```csharp
-// Attack range check (preferred over manual distance loops)
-Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayerMask);
-
-// Knockback
-Rigidbody2D enemyRb = enemy.GetComponent<Rigidbody2D>();
-Vector2 knockbackDir = (enemy.position - transform.position).normalized;
-enemyRb.AddForce(knockbackDir * knockbackForce, ForceMode2D.Impulse);
-
-// Separation (avoid stacking)
-int count = Physics2D.OverlapCircle(transform.position, separationRadius, enemyContactFilter, neighborBuffer);
-```
-
-## Enemy Movement
-
-```csharp
-// Simple approach with steering (no pathfinding needed)
-Vector2 seekForce = (playerPos - (Vector2)transform.position).normalized * moveSpeed;
-Vector2 separationForce = CalculateSeparation(); // from nearby enemies
-Vector2 finalVelocity = CalculateFinalVelocity(seekForce, separationForce);
-rb.linearVelocity = Vector2.Lerp(rb.linearVelocity, finalVelocity, velocityDamping);
-```
-
-## Spawn Position
-
-```csharp
-// Random position outside attack range
-Vector2 randomDir = Random.insideUnitCircle.normalized;
-Vector2 spawnPos = (Vector2)player.position + randomDir * (playerAttackRange + spawnBuffer);
-```
-
-## Performance Notes
-
-- **Object pooling**: Only add if profiling shows GC pressure (Unity 6 is efficient, YAGNI applies)
-- **Physics layers**: Use layers to avoid unnecessary collision checks
-- **Fixed spawn rate**: Don't spawn every frame; use timer-based spawning
-- **ContactFilter2D**: Reuse for overlap queries to avoid GC allocation
-
-## Reference Game
-
-**Wild Survival - Idle Defense (Android)** — reference for game feel, progression, UI patterns. Check gameplay videos when unsure about mechanics.
-
-## Key Files for Common Tasks
-
-| Task | File(s) |
-|------|---------|
-| Player stats/upgrades | `Scripts/Player/Player.cs`, `Scripts/Manager/UpgradeManager.cs`, `Scripts/Data/PlayerData.cs`, `Scripts/Player/StatLoader.cs`, `Scripts/Manager/PlayerStatsManager.cs` |
-| Enemy behavior | `Scripts/Enemy/EnemyAi.cs`, `Scripts/Enemy/EnemySpawner.cs`, `Scripts/Data/EnemyData.cs` |
-| Wave management | `Scripts/Manager/WaveManager.cs`, `Scripts/Data/WaveProgressData.cs`, `Resources/Data/dataWave.json` |
-| Currency/Economy | `Scripts/Economy/EconomyManager.cs`, `Scripts/Manager/SaveManager.cs` |
-| Ultimate abilities | `Scripts/Ultimate/UltimateManager.cs`, `Scripts/Ultimate/UltimateFactory.cs`, handlers in `Scripts/Ultimate/`, `Resources/Data/dataUltimate.json` |
-| Projectiles | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
-| Card system | `Scripts/Card/*`, `Scripts/Data/CardData.cs`, `Resources/Data/dataCard.json` |
-| Save/Load | `Scripts/Manager/SaveManager.cs`, `Scripts/Data/SaveData.cs` |
-| Damage/Combat | `Scripts/Data/DamageData.cs`, `Scripts/Manager/DamagePopupManager.cs`, `Scripts/Enemy/EnemyStatusEffectController.cs` |
-| UI | `Scripts/UI/*`, `Scripts/Controller/*` |
-| Equipment | `Scripts/Equipment/*`, `Resources/Data/dataItems.json` (Equipment section) |
-| Inventory/Crafting | `Scripts/Inventory/*`, `Scripts/Items/*`, `Resources/Data/dataItems.json` |
-| Gems | `Scripts/Items/GemService.cs`, `Resources/Data/dataItems.json` (Gems section) |
-| Daily/Idle Rewards | `Scripts/Daily/*`, `Scripts/IdleReward/*` |
-| Status Effects | `Scripts/Enemy/StatusEffects/*` |
-
-## JSON Data Files (Resources/Data/)
+This file provides guidance to Claude Code (claude.ai/code) and other coding agents when working with this repository.
+
+---
+
+# 1. PROJECT MANDATE
+
+## Project
+
+**IdleDefenseSurvival** is a 2D auto-shooter / idle defense survival game built with **Unity 6000.3.18f1 (Unity 6)**.
+
+The project is designed around:
+
+- automatic combat;
+- long-term progression;
+- wave/tier progression;
+- cards;
+- equipment;
+- inventory;
+- crafting;
+- gems/sockets;
+- attributes and modifiers;
+- ultimates;
+- idle/offline rewards;
+- daily rewards;
+- persistent save data;
+- data-driven balancing.
+
+The reference game is **Wild Survival - Idle Defense**. It is a reference for game feel, progression, presentation, and broad gameplay patterns — **not a source to blindly copy architecture or numbers**.
+
+## Non-negotiable development rule
+
+Before changing code:
+
+1. Understand the existing architecture.
+2. Search for the existing implementation of the behavior.
+3. Check the relevant design/data documentation under:
+   `Assets/Resources/Data/Design`
+4. Check related JSON data under:
+   `Assets/Resources/Data`
+5. Preserve existing save compatibility unless the task explicitly requires a migration.
+6. Make the smallest correct change that fits the existing architecture.
+7. Update the relevant design documentation when the behavior, formula, data schema, or architecture changes.
+8. If no suitable design document exists, create one.
+9. Do not leave the repository documentation describing behavior that the code no longer implements.
+
+**Documentation is part of the implementation.**
+
+Every significant change to a system must leave behind enough design information for a future developer/agent to understand:
+
+- what changed;
+- why it changed;
+- the intended behavior;
+- relevant formulas;
+- data schema;
+- dependencies;
+- save implications;
+- edge cases;
+- known constraints.
+
+Design documentation location:
+
+`Assets/Resources/Data/Design`
+
+---
+
+# 2. PROJECT TRUTH HIERARCHY
+
+When sources disagree, use this order:
+
+1. **Current compiled/runtime code**
+2. **Current JSON data actually loaded by the game**
+3. **Current design documentation**
+4. **This CLAUDE.md**
+5. Historical chat notes / assumptions
+6. Generic Unity or game-development assumptions
+
+If code and documentation disagree, **do not silently assume the documentation is correct**.
+
+Instead:
+
+- inspect the implementation;
+- determine the intended behavior;
+- fix the source of truth;
+- update the documentation.
+
+Never preserve an obsolete value merely because it appears in this file.
+
+Examples of values that must always be verified from the current project before changing them:
+
+- card roll costs;
+- pity thresholds;
+- maximum card slots;
+- equipment slot count;
+- wave limits;
+- daily reward timers;
+- currency limits;
+- enhancement costs;
+- socket rules;
+- stat formulas.
+
+---
+
+# 3. DEVELOPMENT PHILOSOPHY
+
+## 3.1 Correctness before cleverness
+
+Prefer:
+
+> simple + explicit + testable + maintainable
+
+over:
+
+> clever + abstract + generic + difficult to debug
+
+Do not introduce abstraction merely because an abstraction is technically possible.
+
+## 3.2 YAGNI, but do not oversimplify the domain
+
+The original project philosophy used a strict YAGNI ladder. Keep that principle, but apply it correctly:
+
+1. Is the behavior already implemented somewhere?
+2. Can an existing service/system own this responsibility?
+3. Can existing C#/Unity functionality solve it?
+4. Can an existing project dependency solve it?
+5. Only then introduce new architecture.
+
+However:
+
+**Do not use YAGNI as an excuse to put business logic into UI classes, duplicate systems, or create fragile shortcuts.**
+
+The goal is minimum necessary architecture, not minimum number of files.
+
+## 3.3 One source of truth
+
+A gameplay rule should have one authoritative owner.
+
+Avoid:
+
+- duplicated formulas;
+- duplicated item lookup;
+- duplicated stat aggregation;
+- duplicated save logic;
+- duplicated currency mutation;
+- duplicated equipment validation;
+- duplicated card effect application.
+
+If two systems need the same rule, extract or reuse the authoritative service/calculator.
+
+---
+
+# 4. TECH STACK
+
+- Unity **6000.3.18f1**
+- 2D Render Pipeline
+- Unity Input System
+- UGUI
+- Physics2D
+- Unity Test Framework
+- DOTween
+- Newtonsoft.Json
+- JSON runtime data under `Assets/Resources/Data`
+
+Target platform may currently be Windows during development, but gameplay architecture should remain suitable for the intended 2D Android game.
+
+---
+
+# 5. DATA-DRIVEN ARCHITECTURE
+
+## 5.1 JSON is the balance/configuration source
+
+Game balance and definitions are primarily stored in JSON:
+
+- attribute data;
+- card data;
+- socket configuration;
+- enemy data;
+- item data;
+- player data;
+- ultimate data;
+- wave data;
+- recipes and related definitions.
+
+Runtime systems consume these definitions.
+
+Do not hardcode balance values in gameplay classes unless the value is genuinely an implementation constant.
+
+## 5.2 Resources/Data
+
+Main location:
+
+`Assets/Resources/Data`
+
+Important files:
 
 | File | Purpose |
-|------|---------|
+|---|---|
 | `dataPlayer.json` | Player base stats, main attributes, skill base values |
 | `dataEnemy.json` | Enemy types, stats, spawn weights, rewards, roles, elements |
-| `dataWave.json` | Wave config: duration, multipliers, spawn intervals, max wave |
-| `dataUltimate.json` | Ultimate abilities: cooldown, chance, active state, parameters |
-| `dataCard.json` | Card definitions: rarity, stats, scaling, effects |
-| `dataItems.json` | Items (consumables, materials), Equipment, Gems, Affixes, Sets |
-| `dataAttribute.json` | Main attribute (CON/STR/INT/DEX) per-point bonuses to skills |
-| `dataConfigSocket.json` | Gem socket configuration |
+| `dataWave.json` | Wave duration, difficulty, spawn configuration, progression |
+| `dataUltimate.json` | Ultimate definitions |
+| `dataCard.json` | Card definitions, rarity, scaling, effects |
+| `dataItems.json` | Items, equipment, gems, affixes, sets, materials |
+| `dataAttribute.json` | CON/STR/INT/DEX attribute bonuses |
+| `dataConfigSocket.json` | Socket/gem rules |
 
-## Utility Classes
+## 5.3 Design documentation
 
-- `Utilityku.cs`: Chance, FinalDamage, FinalDefense, ElementMultiplier, ElementBonus, WaveMultiplier, WaveDecayCalculate, WaveBonusInterest, WaveBonusVictory
-- `Colorku.cs`: Color constants for UI
-- `Constantku.cs`: String constants
-- `Enumku.cs`: Enum definitions (SkillType, CurrencyType, Element, Role, ItemRarity, EquipmentType, etc.)
-- `ModifierManager.cs`: Stacks stat modifiers from multiple sources (cards, equipment, attributes)
-- `PlayerStatsManager.cs`: Computes final player stats from base + modifiers
+Location:
 
-## Service Locator
+`Assets/Resources/Data/Design`
+
+Design files should explain **intent and rules**, while JSON should contain the actual balance/configuration values.
+
+Do not duplicate hundreds of balance values into design documents unless needed for explanation.
+
+---
+
+# 6. IDENTIFIERS AND PERSISTENCE
+
+This is a critical architectural rule.
+
+## 6.1 Definition ID vs Instance ID
+
+Definitions and runtime instances are different concepts.
+
+Example:
+
+- `ItemId = "potion_hp"` identifies the item definition.
+- `InstanceId = GUID` identifies one persistent item instance.
+
+### ItemId
+
+Used for:
+
+- lookup;
+- loading definition data;
+- item type/category;
+- icon resolution;
+- static configuration.
+
+Do not use display names as persistent identifiers.
+
+### InstanceId
+
+Used when the player owns a specific persistent instance.
+
+It is especially important for:
+
+- equipment;
+- individually tracked items;
+- durability;
+- enhancement;
+- sockets;
+- affixes;
+- enchantment;
+- unique state.
+
+**Never use item display names as save keys or logic keys.**
+
+Changing:
+
+- `Name`
+- localized display text
+- description
+
+must not invalidate persistent data.
+
+Changing an `Id` is a data migration problem.
+
+---
+
+# 7. ICONS AND RESOURCE LOOKUP
+
+Item/card/equipment icons must be resolved through stable identifiers.
+
+Do not make gameplay logic depend on human-readable names.
+
+If an icon path/key is changed:
+
+1. update the definition;
+2. update the resolver if required;
+3. verify all affected assets;
+4. do not silently introduce fallback paths that hide broken data.
+
+If a resolver accepts hierarchical paths, preserve the expected path convention consistently.
+
+Example:
+
+`potion/hp`
+
+is preferable to accidentally duplicating path segments such as:
+
+`potion/potion/hp`
+
+unless the project explicitly defines that structure.
+
+---
+
+# 8. SAVE SYSTEM
+
+## 8.1 SaveData
+
+Persistent data is stored in:
+
+`SaveData.json`
+
+at:
+
+`Application.persistentDataPath`
+
+The save system is centralized in:
+
+`Scripts/Manager/SaveManager.cs`
+
+Current persistent domains include:
+
+- account data;
+- VIP data;
+- game state;
+- wave progress;
+- idle rewards;
+- daily rewards;
+- card inventory;
+- inventory;
+- equipment;
+- crafting queue;
+- other persistent progression data.
+
+## 8.2 Save ownership
+
+Gameplay systems should not independently write arbitrary JSON files unless explicitly designed to do so.
+
+Prefer:
+
+`System Service -> SaveManager -> SaveData`
+
+rather than:
+
+`UI -> JSON`
+
+or:
+
+`Gameplay object -> JSON`
+
+## 8.3 Save compatibility
+
+Before changing a persistent data structure:
+
+1. identify existing fields;
+2. identify old saves that may exist;
+3. determine whether the change is backward compatible;
+4. add migration/default handling when necessary;
+5. test loading an old save;
+6. test loading a new save;
+7. test missing/null collections.
+
+Never assume a fresh save is the only save that matters.
+
+## 8.4 Dirty-state saving
+
+When a system changes persistent state, it should correctly mark that state dirty or notify the persistence layer.
+
+Do not add save calls everywhere.
+
+The save architecture should remain centralized and predictable.
+
+---
+
+# 9. INVENTORY ARCHITECTURE
+
+Inventory is a persistent domain, not a UI feature.
+
+Primary systems:
+
+`Scripts/Inventory/`
+
+and:
+
+`Scripts/Items/`
+
+Responsibilities include:
+
+- item ownership;
+- slot/capacity management;
+- item quantities;
+- instance identity;
+- consumables;
+- materials;
+- equipment;
+- gems;
+- item state;
+- inventory persistence.
+
+## 9.1 Inventory events
+
+The inventory has multiple kinds of changes, for example:
+
+- structural inventory changes;
+- quantity changes;
+- item addition/removal.
+
+Do not blindly trigger every event for every mutation.
+
+A single operation such as consuming one potion must not accidentally cause duplicate UI refreshes or duplicate gameplay effects because multiple overlapping events fire.
+
+When changing inventory events:
+
+1. identify which event represents the semantic change;
+2. identify which consumers subscribe to it;
+3. ensure one logical mutation produces one logical reaction.
+
+## 9.2 Consumables
+
+Consumable use should:
+
+1. validate the item;
+2. validate the quantity;
+3. apply the gameplay effect;
+4. remove the consumed quantity;
+5. trigger the correct inventory/save events;
+6. update UI through existing event flow.
+
+Do not put the entire consumable system inside a UI click handler.
+
+---
+
+# 10. EQUIPMENT SYSTEM
+
+Equipment is a major progression system.
+
+Primary location:
+
+`Scripts/Equipment/`
+
+Equipment supports:
+
+- equipment slots;
+- level;
+- enhancement;
+- durability;
+- sockets;
+- gems;
+- affixes;
+- enchantments;
+- set bonuses;
+- special effects;
+- comparison;
+- auto-equip;
+- persistence;
+- visual representation.
+
+## 10.1 Current conceptual equipment slots
+
+The intended equipment model uses these slot identities:
+
+- Hat
+- Gloves
+- Cape
+- Armor
+- Belt
+- Pants
+- Pendant
+- Ring
+- Earring
+- Bracelet
+- Shoes
+
+Do not introduce alternate slot names such as:
+
+- Boots vs Shoes
+- Necklace vs Pendant
+- Artifact vs Bracelet
+
+unless the actual project data has intentionally changed.
+
+Slot identity must be stable for save data.
+
+## 10.2 Equipment service responsibilities
+
+The equipment service owns operations such as:
+
+- equip;
+- unequip;
+- swap;
+- equip by `InstanceId`;
+- auto-equip;
+- persistence;
+- slot validation.
+
+UI must request equipment operations from the equipment domain instead of directly mutating equipment state.
+
+## 10.3 Stat aggregation
+
+Final equipment stats should be calculated from the authoritative equipment aggregation pipeline.
+
+Relevant sources may include:
+
+- main stats;
+- enhancement;
+- enchantment;
+- gems;
+- affixes;
+- set bonuses;
+- special effects.
+
+Do not manually reconstruct equipment bonuses inside Player UI, tooltips, or individual gameplay classes.
+
+---
+
+# 11. SOCKET AND GEM SYSTEM
+
+Primary systems:
+
+- `GemService`
+- `SocketConfigData`
+
+Current design concepts include:
+
+- maximum sockets per item;
+- socket unlock requirements;
+- allowed gem types;
+- adding sockets;
+- removing gems;
+- destroying gems;
+- gem experience;
+- gem upgrading.
+
+The current configuration must be read from:
+
+`dataConfigSocket.json`
+
+Do not hardcode socket rules into UI.
+
+Gem operations must produce the appropriate domain events:
+
+- gem socketed;
+- gem removed;
+- gem destroyed;
+- gem upgraded;
+- gem experience changed.
+
+---
+
+# 12. ATTRIBUTE SYSTEM
+
+Main attributes:
+
+- **CONSTITUTION**
+- **STRENGTH**
+- **INTELLIGENCE**
+- **DEXTERITY**
+
+Default starting attributes are defined by the attribute system/data.
+
+Conceptually:
+
+### Constitution
+
+Contributes to:
+
+- HealthPoint
+- DefenseAmount
+- HealthRegen
+- DeathDefy
+
+### Strength
+
+Contributes to:
+
+- AttackDamage
+- KnockbackChance
+- Penetration
+- UltimateAttack
+
+### Intelligence
+
+Contributes to:
+
+- ManaPoint
+- ManaRegen
+- ElementMastery where defined by the combat system
+- AttackRange
+
+### Dexterity
+
+Contributes to:
+
+- AttackSpeed
+- CriticalChance
+- Evasion
+- DamagePerRange
+
+The exact values must come from:
+
+`dataAttribute.json`
+
+Do not duplicate attribute-to-stat conversion tables in multiple scripts.
+
+---
+
+# 13. MODIFIER ARCHITECTURE
+
+The modifier pipeline is central to player progression.
+
+Sources can include:
+
+- base player stats;
+- attributes;
+- cards;
+- equipment;
+- gems;
+- set bonuses;
+- upgrades;
+- temporary effects;
+- other explicitly supported systems.
+
+Primary systems:
+
+- `ModifierManager`
+- `CardModifierService`
+- equipment modifier services
+- `PlayerStatsManager`
+
+## 13.1 Flat vs Percent
+
+Modifiers must clearly distinguish:
+
+- Flat
+- Percent
+
+Do not mix them accidentally.
+
+A stat calculation should follow one defined order.
+
+When changing modifier order:
+
+1. document the order;
+2. test the result;
+3. update all affected systems.
+
+## 13.2 Do not cache stale final stats
+
+If a source of modifiers changes, the authoritative stat pipeline must be refreshed.
+
+Examples:
+
+- equip item;
+- unequip item;
+- card equipped;
+- card removed;
+- attribute changed;
+- gem changed;
+- set bonus changed;
+- enhancement changed.
+
+---
+
+# 14. CARD SYSTEM
+
+Primary location:
+
+`Scripts/Card/`
+
+Core components include:
+
+- `CardManager`
+- `CardDatabase`
+- `CardInventory`
+- `CardUpgradeService`
+- `CardRollService`
+- `CardEquipmentService`
+- `CardModifierService`
+
+## 14.1 Rarities
+
+Current rarity model:
+
+- Common
+- Rare
+- Epic
+- Legendary
+- Mythic
+
+## 14.2 Card leveling
+
+Duplicate cards increase card level.
+
+Current progression is designed around duplicate requirements:
+
+`1, 2, 4, 7, 11, 19, 31, 47, 69, 99`
+
+Cumulative duplicates required through level 10:
+
+`290`
+
+Do not change this progression without updating the relevant design/balance document.
+
+## 14.3 Card slots
+
+Card equipment has a defined maximum slot count.
+
+The actual authoritative value must be taken from the current `CardEquipmentService` / project data rather than copied from stale documentation.
+
+## 14.4 Card effects
+
+Card effects may be:
+
+- flat stat modifiers;
+- percentage modifiers;
+- special effects.
+
+Examples include:
+
+- FrostAura;
+- Shield;
+- TimeFast;
+- Gold;
+- Meat.
+
+Special effects must have an explicit owner.
+
+Do not implement special card behavior inside generic UI classes.
+
+## 14.5 Card roll costs
+
+The roll cost is a balance value and must come from the current implementation/data.
+
+Known design target from previous development:
+
+- 1x = 20 gems
+- 10x = 190 gems
+- 100x = 1800 gems
+
+If the current code/data differs, verify which is authoritative before changing anything.
+
+Roll calculation should preserve the intended bundled-discount behavior rather than naïvely doing:
+
+`amount * singleCost`.
+
+## 14.6 CardRoll item
+
+The project supports a free card-roll item.
+
+If the player uses a `CardRoll` inventory item:
+
+- consume the item only when the roll succeeds;
+- if the operation is invalid because card capacity is full, refund/preserve the item;
+- do not substitute a gem refund for an item refund;
+- keep item-based rolls separate from gem-based rolls.
+
+---
+
+# 15. PLAYER COMBAT
+
+Primary systems:
+
+- `Player`
+- `PlayerStats`
+- `PlayerStatsManager`
+- `Projectile`
+
+The player is centered in the gameplay arena and auto-attacks.
+
+Player stats include concepts such as:
+
+- AttackDamage
+- AttackSpeed
+- AttackRange
+- CriticalChance
+- Critical/SuperCritical/UltraCritical
+- MultiShoot
+- Bounce
+- Knockback
+- LifeSteal
+- Health
+- HealthRegen
+- Defense
+- Evasion
+- Mana
+- ManaRegen
+- UltimateWeaponAttack
+
+The exact final values must be calculated by the authoritative stat pipeline.
+
+---
+
+# 16. PROJECTILE SYSTEM
+
+`Scripts/Player/Projectile.cs`
+
+Projectiles are pooled and reused.
+
+Projectile responsibilities include:
+
+- movement;
+- target handling;
+- collision;
+- damage;
+- critical states;
+- bounce;
+- knockback;
+- stun;
+- life steal;
+- range-based effects;
+- status effects where explicitly configured.
+
+## 16.1 Defense Break
+
+Defense Break is a combat status/effect, not merely a visual indicator.
+
+When a projectile applies Defense Break:
+
+1. determine the source and effect value;
+2. apply it through the authoritative enemy status/effect system;
+3. let the target's defense calculation consume the active effect;
+4. preserve duration/type/stacking rules;
+5. display the effect through UI separately.
+
+Do not make `Projectile` directly manipulate UI state.
+
+---
+
+# 17. ENEMY SYSTEM
+
+Primary systems:
+
+- `EnemyAi`
+- `EnemySpawner`
+- `EnemyStatusEffectController`
+- health bar management.
+
+Enemy behavior:
+
+1. spawn outside the player's attack range;
+2. approach the player;
+3. stop at its attack range;
+4. attack according to cooldown;
+5. respond to knockback;
+6. respond to slow/stun/defense break/HeartBreak;
+7. die and distribute rewards.
+
+Movement should use the current steering implementation rather than introducing pathfinding unless the game design actually requires pathfinding.
+
+---
+
+# 18. STATUS EFFECTS
+
+Current status concepts include:
+
+- Slow
+- Defense Break
+- Stun
+- HeartBreak / Max Health Reduction
+
+Slow and Defense Break support different effect types such as:
+
+- Permanent
+- Aura
+- Temporary
+
+Stacking behavior must follow the existing status controller rules.
+
+Do not create a second status-effect implementation in another system.
+
+UI indicators should observe status state; they should not become the source of truth.
+
+---
+
+# 19. WAVE SYSTEM
+
+Primary system:
+
+`Scripts/Manager/WaveManager.cs`
+
+Wave flow:
+
+- InterWave
+- ActiveWave
+- InterWave
+- repeat
+
+The current design uses:
+
+- wave progression;
+- tier progression;
+- difficulty scaling;
+- spawn scaling;
+- reward scaling;
+- victory/defeat handling.
+
+Known design target:
+
+- wave duration: 30 seconds
+- inter-wave duration: 10 seconds
+- maximum wave: 350
+
+After the maximum wave:
+
+- the tier progresses;
+- wave numbering resets according to the current progression design;
+- difficulty continues through tier progression.
+
+Do not modify formulas without documenting the reason and expected progression impact.
+
+---
+
+# 20. ULTIMATE SYSTEM
+
+Primary architecture:
+
+- `UltimateManager`
+- `UltimateFactory`
+- individual ultimate handlers.
+
+Current ultimate families include:
+
+- Void
+- Tank
+- Root
+- Bomb
+- Fountain
+- Cloud
+- Lightning
+- Shockwave
+
+Each ultimate may define:
+
+- cooldown;
+- activation chance;
+- active duration;
+- damage;
+- element;
+- crowd control;
+- special effects.
+
+New ultimates should follow the existing handler architecture.
+
+Do not create one giant `UltimateManager` switch containing all gameplay logic.
+
+---
+
+# 21. ECONOMY
+
+Main currencies/resources:
+
+- Gold
+- Gem
+- Meat
+- EXP
+
+Economy mutation should be centralized.
+
+Do not directly mutate currency values from UI.
+
+For example, avoid:
 
 ```csharp
-ServiceLocator.SaveService      // ISaveService -> SaveManager
-ServiceLocator.EconomyService   // IEconomyService -> EconomyManager
-ServiceLocator.AudioService     // IAudioService -> AudioManager
-ServiceLocator.AdsService       // IAdsService -> AdvertisingManager
-ServiceLocator.AnalyticsService // IAnalyticsService -> AnalyticsManager
-ServiceLocator.Manager          // GameManager
+playerGold += amount;
 ```
 
-## Key Patterns for New Features
+inside UI code.
 
-1. **New Ultimate**: Create handler inheriting `BaseUltimateHandler`, register in `UltimateManager.RegisterHandlers()`, add data to `dataUltimate.json`
-2. **New Card**: Add to `dataCard.json`, CardEffectType if special effect, update `CardModifierService.ParseEffectType()`
-3. **New Enemy**: Add to `dataEnemy.json`, uses Basic prefab with EnemyAi
-4. **New Equipment**: Add to `dataItems.json` Equipment section, supports affixes, sockets, set bonuses
-5. **New Status Effect**: Implement `IStatusEffect`, add to `ConcreteStatusEffects`, register in `EnemyStatusEffectController`
-6. **New Consumable**: Add to `dataItems.json` Items section, implement use logic in `ItemClickManager` or `InventoryController`
+Prefer the authoritative economy service/manager.
+
+Every currency mutation must consider:
+
+- validation;
+- balance;
+- save state;
+- relevant events;
+- UI refresh.
+
+---
+
+# 22. DAILY REWARD
+
+Daily Reward is a **7-reward sequence within one day**, not merely a conventional 7-day login streak.
+
+Current intended behavior:
+
+- all 7 rewards can be claimed on the same day;
+- claims are sequential;
+- a 5-minute cooldown exists between claims;
+- cooldown persistence uses `DateTime.UtcNow`;
+- after reward 7 is claimed, the system enters `Completed Today`;
+- buttons remain disabled until the next daily reset.
+
+Reward concepts:
+
+1. Gold
+2. Gem
+3. Meat
+4. Free Card Roll item
+5. EXP
+6. Ultimate Stone
+7. Skin Shard
+
+Important reward scaling rules previously established:
+
+- Gold uses `HighestGoldEarned` from passed tiers, minimum 100,000.
+- Meat uses `HighestMeatEarned` from passed tiers, minimum 1,000.
+- EXP uses half of `HighestExpEarned` from passed tiers, minimum 3,000.
+- Free Card Roll must be added to Inventory as an accumulatable item.
+- Skin Shard contributes toward the permanent skin exchange target.
+
+## Persistence requirement
+
+The current reward index, claim timestamps, completion state, and required reset state must survive:
+
+- scene changes;
+- application close;
+- application restart.
+
+Never calculate claim eligibility solely from UI state.
+
+---
+
+# 23. IDLE REWARD
+
+Idle rewards calculate offline progression.
+
+The system may accumulate:
+
+- Gold
+- Meat
+- EXP
+
+Offline calculations must use persisted timestamps and authoritative progression data.
+
+Do not rely on the scene remaining alive to preserve idle state.
+
+---
+
+# 24. SCENE AND PERSISTENCE ARCHITECTURE
+
+Important scenes include:
+
+- `Bootstrap.unity`
+- `MainMenu.unity`
+- `MainGame.unity`
+- `CardCollection.unity`
+- `Inventory.unity`
+
+Persistent services/managers must not accidentally duplicate when changing scenes.
+
+## UI persistence rule
+
+A UI component that exists in multiple scenes must not assume that it is globally unique unless the architecture explicitly guarantees it.
+
+Example:
+
+If `TooltipUI` exists in both Main Menu and Inventory:
+
+- do not blindly mark every copy `DontDestroyOnLoad`;
+- do not destroy the new scene's instance because an old instance still exists;
+- decide whether TooltipUI is:
+  - scene-local, or
+  - a single persistent service/view.
+
+The architecture must have one clear ownership model.
+
+---
+
+# 25. UI ARCHITECTURE
+
+UI is a presentation layer.
+
+UI should:
+
+- display state;
+- send user intent;
+- subscribe to domain events;
+- request operations from services.
+
+UI should not own:
+
+- save logic;
+- item definitions;
+- currency mutation;
+- equipment state;
+- card progression;
+- combat formulas.
+
+## Tooltips
+
+Tooltip positioning must account for:
+
+- canvas size;
+- tooltip size;
+- mouse/screen position;
+- offset;
+- screen boundaries.
+
+Do not hardcode offsets that only work at one resolution.
+
+When a tooltip is required across scenes, decide persistence ownership explicitly.
+
+---
+
+# 26. ITEM DATA AND MATERIALS
+
+Items are divided conceptually into:
+
+- Consumables
+- Materials
+- Equipment
+- Gems
+- Tickets / special items
+
+Material naming and item definitions should remain stable.
+
+Do not change IDs merely to make names prettier.
+
+If a material needs a new display name:
+
+- preserve the `Id`;
+- change the display `Name`;
+- update localization/data as required.
+
+---
+
+# 27. CRAFTING
+
+Crafting is a domain system, not a UI timer.
+
+Relevant systems include:
+
+- `CraftService`
+- `CraftJob`
+- `CraftContextBuilder`
+- `CraftCompletionService`
+- `CraftModifiers`
+- `RecipeData`
+
+Craft queue state must be persisted.
+
+When changing crafting:
+
+- preserve queued jobs;
+- define behavior for completed jobs after restart;
+- avoid duplicating completion logic between UI and service.
+
+---
+
+# 28. DESIGN OF NEW FEATURES
+
+When adding a new feature, use this workflow.
+
+## Step 1 — Identify the domain
+
+Determine whether the feature belongs to:
+
+- Player
+- Enemy
+- Combat
+- Card
+- Equipment
+- Inventory
+- Item
+- Crafting
+- Economy
+- Reward
+- Daily
+- Idle
+- Wave
+- Ultimate
+- UI
+- Save/Persistence
+- Core
+
+## Step 2 — Find the owner
+
+Ask:
+
+> Which existing service should own this state and behavior?
+
+Do not immediately create a new manager.
+
+## Step 3 — Define data
+
+If the feature has balance/configuration:
+
+- add it to the correct JSON;
+- create/update the data class;
+- document the schema.
+
+## Step 4 — Implement domain behavior
+
+Put rules in the domain service/system.
+
+## Step 5 — Connect persistence
+
+If the state survives restart:
+
+- add it to SaveData;
+- add load logic;
+- add save logic;
+- add migration/default behavior where needed.
+
+## Step 6 — Connect events
+
+Only publish events that represent meaningful domain changes.
+
+## Step 7 — Connect UI
+
+UI consumes the domain state/events.
+
+## Step 8 — Test edge cases
+
+At minimum test:
+
+- fresh save;
+- existing save;
+- null/empty data;
+- maximum capacity;
+- minimum value;
+- invalid operation;
+- repeated operation;
+- scene transition;
+- application restart;
+- save/load;
+- duplicate events.
+
+## Step 9 — Update design documentation
+
+Document the feature before considering it complete.
+
+---
+
+# 29. REFACTORING RULES
+
+When refactoring:
+
+1. Preserve behavior first.
+2. Do not mix unrelated feature changes into the same refactor.
+3. Identify duplicated responsibilities.
+4. Move logic toward the correct domain owner.
+5. Keep public APIs stable where practical.
+6. If an API must change, update all consumers in the same change.
+7. Remove dead code only when you can verify it is unused.
+8. Do not leave compatibility wrappers indefinitely without a reason.
+9. Test save/load after refactoring persistent systems.
+
+A refactor is not successful merely because the code is shorter.
+
+It is successful when:
+
+- responsibilities are clearer;
+- dependencies are reduced;
+- behavior is preserved;
+- future changes become safer.
+
+---
+
+# 30. TESTING STRATEGY
+
+## EditMode
+
+Use EditMode tests for pure logic:
+
+- damage formulas;
+- modifier calculations;
+- economy calculations;
+- wave formulas;
+- roll cost calculations;
+- upgrade curves;
+- reward calculations;
+- inventory calculations;
+- equipment stat aggregation;
+- socket rules;
+- save migration logic where practical.
+
+## PlayMode
+
+Use PlayMode tests for:
+
+- scene/system interaction;
+- projectile collision;
+- enemy spawning;
+- player/enemy interaction;
+- UI-domain integration where necessary;
+- persistent service initialization.
+
+## Regression testing
+
+When fixing a bug, add a regression test if the behavior is deterministic and testable.
+
+Do not fix a bug only at the visual/UI level when the underlying domain state is wrong.
+
+---
+
+# 31. PERFORMANCE
+
+Do not optimize blindly.
+
+Use profiling to justify significant performance work.
+
+However, some patterns are already established:
+
+- projectile pooling;
+- damage popup pooling;
+- enemy health bar pooling;
+- reuse `ContactFilter2D` where practical;
+- avoid per-frame allocations;
+- avoid unnecessary `Instantiate/Destroy`;
+- use physics layers correctly;
+- use timer-driven spawning rather than per-frame spawning.
+
+## Important correction to YAGNI
+
+Object pooling is already part of the project for high-frequency objects.
+
+Do not remove established pooling merely because profiling is not currently showing a problem.
+
+Likewise, do not add five new pooling systems without evidence.
+
+---
+
+# 32. PHYSICS2D
+
+Use Physics2D consistently.
+
+Typical attack range query:
+
+```csharp
+Collider2D[] enemies =
+    Physics2D.OverlapCircleAll(
+        transform.position,
+        attackRange,
+        enemyLayerMask);
+```
+
+For high-frequency queries, prefer allocation-conscious APIs where appropriate.
+
+Knockback:
+
+```csharp
+Vector2 direction =
+    (enemy.position - transform.position).normalized;
+
+enemyRb.AddForce(
+    direction * knockbackForce,
+    ForceMode2D.Impulse);
+```
+
+Enemy separation should use the existing physics-based approach rather than introducing a separate spatial system unless profiling/design requires it.
+
+---
+
+# 33. CODE STYLE
+
+Use project conventions:
+
+- `PascalCase` for public members, methods, properties, types.
+- `_camelCase` for private fields.
+- `[SerializeField]` for Inspector-exposed private fields.
+- One primary MonoBehaviour per file.
+- Filename matches the primary class.
+- Runtime namespaces begin with `IdleDefenseSurvival`.
+- Editor namespaces use `IdleDefenseSurvival.Editor`.
+- Use `[Tooltip]` on serialized Inspector fields where useful.
+
+Do not make fields public merely to make Inspector assignment easier.
+
+Prefer:
+
+```csharp
+[SerializeField]
+private SomeType _someReference;
+```
+
+---
+
+# 34. SINGLETONS AND SERVICES
+
+The project contains existing singleton/service patterns.
+
+Do not introduce a new singleton automatically.
+
+Before adding one:
+
+1. check whether the system already has a service;
+2. check `ServiceLocator`;
+3. check whether the state should actually be persistent;
+4. determine whether dependency injection or an existing manager is sufficient.
+
+A singleton is acceptable when the domain genuinely represents one global runtime authority.
+
+A singleton is not a substitute for architecture.
+
+---
+
+# 35. SERVICE LOCATOR
+
+Existing service concepts include:
+
+- Save service;
+- Economy service;
+- Audio service;
+- Ads service;
+- Analytics service;
+- game manager access.
+
+When adding a new globally consumed service, first evaluate whether it belongs in the existing service architecture.
+
+Do not register duplicate services under different access paths.
+
+---
+
+# 36. COMMON BUG CLASSES TO GUARD AGAINST
+
+## Duplicate event execution
+
+One action should not produce the same logical effect twice because multiple overlapping events fire.
+
+## UI state mistaken for domain state
+
+A disabled button is not proof that an action is invalid.
+
+The domain must validate the action.
+
+## Scene lifetime bugs
+
+Do not assume objects survive scene transitions unless explicitly persistent.
+
+## Save/load desynchronization
+
+Never assume in-memory state and SaveData are automatically synchronized.
+
+## ID/name coupling
+
+Never use display names as persistent identifiers.
+
+## Duplicate data sources
+
+Do not have:
+
+- one formula in JSON;
+- another formula in a manager;
+- another formula in UI.
+
+## Stale cached stats
+
+When modifiers change, refresh the authoritative stat pipeline.
+
+## Partial operations
+
+An operation must be atomic from the player's perspective.
+
+Example:
+
+If an item is consumed but its effect fails, the item must not silently disappear unless that failure is explicitly designed.
+
+---
+
+# 37. KEY FILES
+
+| Domain | Main files |
+|---|---|
+| Player | `Scripts/Player/Player.cs`, `PlayerStats.cs`, `StatLoader.cs` |
+| Player stats | `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Modifier/` |
+| Attributes | `dataAttribute.json`, attribute services/modifier pipeline |
+| Enemy | `Scripts/Enemy/EnemyAi.cs`, `EnemySpawner.cs` |
+| Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/` |
+| Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
+| Wave | `Scripts/Manager/WaveManager.cs`, `dataWave.json` |
+| Cards | `Scripts/Card/`, `dataCard.json` |
+| Equipment | `Scripts/Equipment/`, `dataItems.json` |
+| Inventory | `Scripts/Inventory/`, `Scripts/Items/`, `dataItems.json` |
+| Gems | `Scripts/Items/GemService.cs`, `dataConfigSocket.json` |
+| Crafting | `Scripts/Items/CraftService.cs`, `CraftJob.cs`, recipe data |
+| Economy | `Scripts/Economy/EconomyManager.cs` |
+| Save | `Scripts/Manager/SaveManager.cs`, `Scripts/Data/SaveData.cs` |
+| Daily | `Scripts/Daily/` |
+| Idle | `Scripts/IdleReward/` |
+| Ultimates | `Scripts/Ultimate/`, `dataUltimate.json` |
+| UI | `Scripts/UI/`, `Scripts/Controller/` |
+| Core | `Scripts/Core/` |
+
+---
+
+# 38. CURRENT FOLDER STRUCTURE
+
+```text
+Assets/
+├── Art/
+│   ├── Enemy/
+│   ├── Player/
+│   └── UI/
+├── Prefabs/
+├── Resources/
+│   ├── Data/
+│   │   └── Design/
+│   └── Art/
+├── Scenes/
+├── Scripts/
+│   ├── Camera/
+│   ├── Card/
+│   ├── Controller/
+│   ├── Core/
+│   ├── Daily/
+│   ├── Data/
+│   ├── Economy/
+│   ├── Enemy/
+│   ├── Equipment/
+│   ├── IdleReward/
+│   ├── Inventory/
+│   ├── Item/
+│   ├── Items/
+│   ├── Manager/
+│   ├── Modifier/
+│   ├── Player/
+│   ├── Reward/
+│   ├── UI/
+│   ├── Ultimate/
+│   └── VisualScripting/
+├── Settings/
+└── InputSystem_Actions.inputactions
+```
+
+The actual repository structure is authoritative. Update this section if folders are intentionally reorganized.
+
+---
+
+# 39. NEW ULTIMATE
+
+Workflow:
+
+1. Create a dedicated handler following the existing ultimate handler architecture.
+2. Add its definition to `dataUltimate.json`.
+3. Register it through the existing ultimate factory/manager mechanism.
+4. Do not put all special behavior in `UltimateManager`.
+5. Add tests for deterministic formulas/rules.
+6. Update the ultimate design document.
+
+---
+
+# 40. NEW CARD
+
+Workflow:
+
+1. Add card definition to `dataCard.json`.
+2. Determine whether it is:
+   - stat modifier;
+   - percentage modifier;
+   - special effect.
+3. For special effects, implement the effect in the correct domain.
+4. Register/parse the effect through `CardModifierService` where appropriate.
+5. Test level scaling.
+6. Test equipping/unequipping.
+7. Test save/load.
+8. Update card design documentation.
+
+---
+
+# 41. NEW ENEMY
+
+Workflow:
+
+1. Add enemy definition to `dataEnemy.json`.
+2. Reuse the standard enemy prefab/architecture where possible.
+3. Add unique behavior only when the design requires it.
+4. Ensure rewards, role, element, stats, and spawn weight are data-driven.
+5. Test spawning and wave scaling.
+6. Update enemy design documentation.
+
+---
+
+# 42. NEW EQUIPMENT
+
+Workflow:
+
+1. Add definition to `dataItems.json`.
+2. Assign a stable `ItemId`.
+3. Define equipment type/slot.
+4. Define base stats.
+5. Define rarity/affixes if applicable.
+6. Define sockets according to socket configuration.
+7. Ensure persistence uses `InstanceId`.
+8. Test equip/unequip/swap.
+9. Test stat aggregation.
+10. Test save/load.
+11. Update equipment design documentation.
+
+---
+
+# 43. NEW STATUS EFFECT
+
+Workflow:
+
+1. Determine whether the existing status system already supports the behavior.
+2. If not, implement the smallest extension.
+3. Follow `IStatusEffect` and existing concrete status conventions.
+4. Register through `EnemyStatusEffectController`.
+5. Define:
+   - stacking;
+   - duration;
+   - source;
+   - refresh behavior;
+   - removal behavior.
+6. Add regression tests.
+7. Update status-effect design documentation.
+
+---
+
+# 44. NEW CONSUMABLE
+
+Workflow:
+
+1. Add item definition to `dataItems.json`.
+2. Give it a stable `ItemId`.
+3. Define stack size and use rules.
+4. Implement gameplay behavior in the item/domain system.
+5. Let `ItemClickManager` / UI invoke the domain operation.
+6. Remove quantity only after successful validation/application.
+7. Trigger the correct inventory/save events.
+8. Test repeated use and insufficient quantity.
+9. Update item documentation.
+
+---
+
+# 45. DEFINITION OF DONE
+
+A feature is **not done** when the code compiles.
+
+A feature is done when:
+
+- [ ] domain ownership is clear;
+- [ ] existing architecture was reused where appropriate;
+- [ ] no duplicated source of truth was introduced;
+- [ ] data is in the correct JSON when appropriate;
+- [ ] save/load is handled if persistent;
+- [ ] scene transitions are safe;
+- [ ] events are correct and non-duplicated;
+- [ ] UI does not own domain logic;
+- [ ] edge cases are handled;
+- [ ] relevant tests exist;
+- [ ] design documentation is updated;
+- [ ] obsolete documentation is corrected;
+- [ ] no debug-only workaround remains;
+- [ ] no unexplained hardcoded balance value was introduced.
+
+---
+
+# 46. AGENT CHECKLIST BEFORE MODIFYING CODE
+
+Before editing:
+
+```text
+[ ] What system owns this behavior?
+[ ] Does an existing service already solve it?
+[ ] Which JSON data controls it?
+[ ] Which design document describes it?
+[ ] Does this affect persistent save data?
+[ ] Does this affect InstanceId/ItemId?
+[ ] Does this affect modifier/stat calculation?
+[ ] Does this affect events?
+[ ] Does this affect scene lifetime?
+[ ] What existing consumers depend on this API?
+```
+
+After editing:
+
+```text
+[ ] Compile errors checked
+[ ] Existing consumers checked
+[ ] Save/load checked if applicable
+[ ] Duplicate events checked
+[ ] Edge cases checked
+[ ] Regression test considered/added
+[ ] Design documentation updated
+[ ] CLAUDE.md updated if architecture/rules changed
+```
+
+---
+
+# 47. FINAL PRINCIPLE
+
+The goal is not to produce the most code.
+
+The goal is to build a game that can continue growing without becoming a collection of:
+
+- duplicated managers;
+- hidden state;
+- hardcoded balance;
+- fragile save data;
+- UI-driven business logic;
+- inconsistent identifiers;
+- stale documentation;
+- event chains that execute twice;
+- systems that do not know who owns their state.
+
+When uncertain:
+
+> **Find the existing source of truth.**
+>
+> **Put the rule in the correct domain.**
+>
+> **Keep data separate from behavior.**
+>
+> **Keep UI separate from domain logic.**
+>
+> **Preserve persistent data.**
+>
+> **Test the edge case.**
+>
+> **Document the decision.**

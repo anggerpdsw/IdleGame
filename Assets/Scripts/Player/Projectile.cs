@@ -34,7 +34,7 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Sprite _tankBulletSprite;
         [SerializeField] private Sprite _enemyBulletSprite;
         [Tooltip("Target visual diameter in world units.")]
-        [SerializeField] private float _visualSize = 0.47f;
+        [SerializeField] private float _visualSize = 0.53f;
 
         private Transform _target;
         private ProjectileOwner _owner;

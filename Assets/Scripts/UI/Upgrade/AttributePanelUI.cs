@@ -113,7 +113,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
         }
 
         /// <summary>Shows a hover tooltip listing what this attribute boosts per point.</summary>
-        public void ShowAttributeInfo(MainAttribute attr)
+        public void ShowAttributeInfo(MainAttribute attr, Vector3 screenPosition)
         {
             var tooltip = TooltipUI.Instance;
             if (tooltip == null) return;
@@ -141,9 +141,9 @@ namespace IdleDefenseSurvival.UI.Upgrade
             sb.AppendLine("<b>Per Point:</b>");
             foreach (var bonus in bonuses)
                 sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {valueStat(bonus)}");
-            var mouse = Mouse.current != null 
-                ? (Vector3)Mouse.current.position.ReadValue() 
-                : Vector3.zero;
+            var mouse = Pointer.current != null
+                ? (Vector3)Pointer.current.position.ReadValue()
+                : screenPosition;
             tooltip.ShowText(sb.ToString(), mouse);
         }
         private string valueStat(AttributeBonusData bonus)

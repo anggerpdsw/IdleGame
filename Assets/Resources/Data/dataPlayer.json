@@ -18,7 +18,7 @@
         "displayName": "Attack Speed"
       },
       "attackRange": {
-        "baseValue": 2.43,
+        "baseValue": 2.67,
         "description": "Maximum range of player",
         "displayName": "Attack Range"
       },
@@ -28,12 +28,12 @@
         "displayName": "Bounce Chance"
       },
       "bounceCount": {
-        "baseValue": 4,
+        "baseValue": 3,
         "description": "Number of times a projectile can bounce from enemy to enemy",
         "displayName": "Bounce Count"
       },
       "criticalChance": {
-        "baseValue": 5,
+        "baseValue": 3,
         "description": "Chance of each projectile to deal critical damage",
         "displayName": "Critical Chance"
       },
@@ -43,12 +43,12 @@
         "displayName": "Critical Damage"
       },
       "damagePerRange": {
-        "baseValue": 10,
+        "baseValue": 5,
         "description": "Damage increased the further the enemy is from the player",
         "displayName": "Damage Per Range"
       },
       "knockbackChance": {
-        "baseValue": 5,
+        "baseValue": 2.5,
         "description": "Chance to knockback enemies",
         "displayName": "Knockback Chance"
       },
@@ -73,7 +73,7 @@
         "displayName": "Penetration"
       },
       "stuntChance": {
-        "baseValue": 1,
+        "baseValue": 0.5,
         "description": "Probability of triggering stunt effect when attacking",
         "displayName": "Stun Chance"
       },
@@ -105,7 +105,7 @@
         "displayName": "Evasion"
       },
       "hitRate": {
-        "baseValue": 95,
+        "baseValue": 93,
         "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
         "displayName": "Hit Rate"
       },
@@ -115,7 +115,7 @@
         "displayName": "Health Points"
       },
       "healthRegen": {
-        "baseValue": 0,
+        "baseValue": 0.1,
         "description": "Amount of player health regenerated per second",
         "displayName": "Health Regeneration"
       },
@@ -125,12 +125,12 @@
         "displayName": "Life Steal"
       },
       "manaPoint": {
-        "baseValue": 100,
+        "baseValue": 70,
         "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
         "displayName": "Mana Points"
       },
       "manaRegen": {
-        "baseValue": 2,
+        "baseValue": 0.2,
         "description": "Mana regenerated per second",
         "displayName": "Mana Regeneration"
       }
