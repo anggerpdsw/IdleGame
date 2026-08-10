@@ -24,7 +24,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls secondary stats for an equipment item.
         /// </summary>
-        public CombatStatEntry[] RollSecondaryStats(EquipmentData baseEquipment, ItemRarity rarity, ItemGenerationContext context)
+        public CombatStatEntry[] RollSecondaryStats(EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
         {
             if (baseEquipment.SecondaryStats == null || baseEquipment.SecondaryStats.Length == 0)
                 return Array.Empty<CombatStatEntry>();
@@ -52,7 +52,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return results.ToArray();
         }
 
-        private int GetStatCount(ItemRarity rarity, ItemGenerationContext context)
+        private int GetStatCount(Rarity rarity, ItemGenerationContext context)
         {
             int baseCount = RarityMechanicConfig.GetSecondaryCount(rarity);
 
@@ -84,7 +84,7 @@ namespace IdleDefenseSurvival.Items.Generation
                 .ToArray();
         }
 
-        private SecondaryStat PickStat(SecondaryStat[] available, HashSet<SecondaryStat> used, ItemRarity rarity)
+        private SecondaryStat PickStat(SecondaryStat[] available, HashSet<SecondaryStat> used, Rarity rarity)
         {
             var candidates = available.Where(s => !used.Contains(s)).ToArray();
             if (candidates.Length == 0) return SecondaryStat.None;
@@ -93,7 +93,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return _rng.Choice(candidates);
         }
 
-        private CombatStatEntry CreateStatEntry(SecondaryStat stat, ItemRarity rarity, ItemGenerationContext context)
+        private CombatStatEntry CreateStatEntry(SecondaryStat stat, Rarity rarity, ItemGenerationContext context)
         {
             float rarityMult = rarity.GetDefaultStatMultiplier();
             float tierMult = 1f + context.Tier * 0.02f;
@@ -154,6 +154,7 @@ namespace IdleDefenseSurvival.Items.Generation
             { SecondaryStat.DropRate, 1f },
             { SecondaryStat.InterestWave, 1f },
             { SecondaryStat.HitRate, 1f },
+            { SecondaryStat.Penetration, 1f },
             { SecondaryStat.MetalDamageBonus, 1f },
             { SecondaryStat.WoodDamageBonus, 1f },
             { SecondaryStat.FireDamageBonus, 1f },
@@ -180,7 +181,8 @@ namespace IdleDefenseSurvival.Items.Generation
             SecondaryStat.GoldGain,
             SecondaryStat.DropRate,
             SecondaryStat.InterestWave,
-            SecondaryStat.HitRate
+            SecondaryStat.HitRate,
+            SecondaryStat.Penetration
         };
 
         public static StatRollConfig Default => new();

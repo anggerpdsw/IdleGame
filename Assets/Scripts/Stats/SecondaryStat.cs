@@ -31,6 +31,7 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.DropRate => "Drop Rate",
             SecondaryStat.InterestWave => "Interest Wave",
             SecondaryStat.HitRate => "Hit Rate",
+            SecondaryStat.Penetration => "Penetration",
             SecondaryStat.MetalDamageBonus => "Metal Damage",
             SecondaryStat.WoodDamageBonus => "Wood Damage",
             SecondaryStat.FireDamageBonus => "Fire Damage",
@@ -64,6 +65,7 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.DropRate => "DR",
             SecondaryStat.InterestWave => "INTW",
             SecondaryStat.HitRate => "HIT",
+            SecondaryStat.Penetration => "PEN",
             SecondaryStat.MetalDamageBonus => "MET",
             SecondaryStat.WoodDamageBonus => "WOD",
             SecondaryStat.FireDamageBonus => "FIR",
@@ -95,6 +97,7 @@ namespace IdleDefenseSurvival.Stats
 
             // Accuracy - Cyan/Blue white
             SecondaryStat.HitRate => GameColors.statHitRate,
+            SecondaryStat.Penetration => GameColors.purple,
 
             // Element damage bonus - Arcane purple/teal family, one hue per element
             SecondaryStat.MetalDamageBonus => GameColors.statMetal,
@@ -162,7 +165,7 @@ namespace IdleDefenseSurvival.Stats
         public static StatCategory GetCategory(this SecondaryStat stat) => stat switch
         {
             SecondaryStat.LifeSteal => StatCategory.Health,
-            SecondaryStat.EliteDamage or SecondaryStat.BossDamage or SecondaryStat.DamagePerRange => StatCategory.Offense,
+            SecondaryStat.EliteDamage or SecondaryStat.BossDamage or SecondaryStat.DamagePerRange or SecondaryStat.Penetration => StatCategory.Offense,
             SecondaryStat.MoveSpeed or SecondaryStat.CooldownReduction or SecondaryStat.HitRate => StatCategory.Utility,
             SecondaryStat.GoldGain or SecondaryStat.DropRate or SecondaryStat.InterestWave => StatCategory.Economy,
             SecondaryStat.AttackRange or SecondaryStat.BounceChance or SecondaryStat.BounceCount or

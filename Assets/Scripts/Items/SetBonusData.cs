@@ -15,7 +15,7 @@ namespace IdleDefenseSurvival.Items
         [TextArea] public string Description;
         public EquipmentType[] EquipmentTypes; // Which equipment types belong to this set
         public SetBonusTier[] Tiers; // Bonuses at 2/3/4/5/6/8/11 pieces
-        public ItemRarity SetRarity = ItemRarity.Common; // Visual rarity of the set
+        public Rarity SetRarity = Rarity.Common; // Visual rarity of the set
         public Sprite SetIcon; // Icon for the set
         public GameObject SetEffectPrefab; // Visual effect when full set equipped
 
@@ -61,7 +61,7 @@ namespace IdleDefenseSurvival.Items
         public string Name;
         [TextArea] public string Description;
         public GemType GemType = GemType.None;
-        public ItemRarity ItemRarity = ItemRarity.Common;
+        public Rarity ItemRarity = Rarity.Common;
         public Sprite Icon;
         public string IconKey; // Sprite filename in Resources/Art/Item/
         public int MaxLevel = 10;

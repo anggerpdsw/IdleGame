@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Player;
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 /// <summary>
 /// Handles basic enemy AI for the auto‑shooter game.
@@ -81,7 +82,8 @@ namespace IdleDefenseSurvival.Enemy
         private readonly Dictionary<SlowSource, SlowEffect> _slowEffects = new();
         private float _originalMoveSpeed;
         // Defense Break effect tracking
-        private readonly Dictionary<DefenseBreakSource, DefenseBreakEffect> _defenseBreakEffects = new();
+        private readonly Dictionary<int, DefenseBreakEffect> _defenseBreakEffects = new();
+        private int _nextDefenseBreakId = 0;
         private float _originalDefenseAmount;
 
         // Optimasi: Buffer dan Contact Filter untuk menghindari GC Alloc setiap frame
@@ -160,6 +162,8 @@ namespace IdleDefenseSurvival.Enemy
                 // Reset timer ketika keluar dari attack range
                 _attackTimer = 0f;
             }
+
+            UpdateDefenseBreaks();
         }
 
         private void FixedUpdate()
@@ -316,9 +320,6 @@ namespace IdleDefenseSurvival.Enemy
 
             // Register dengan global health bar manager
             _enemyHealthBarManager.RegisterEnemy(this, _maxHealth);
-
-            // Register with statistics service
-            EnemyStatisticsManager.Instance?.Register(this);
         }
 
         public float TakeDamage(DamageData damageData, bool canEvade = true)
@@ -349,16 +350,15 @@ namespace IdleDefenseSurvival.Enemy
                     * Utilityku.ElementBonus(damageData.Element)
                     * Utilityku.ElementMultiplier(damageData.Element, _element);
 
+            float penetration = PlayerStatsManager.Instance.GetStat(SkillType.Penetration);
             float rawDamage = damageData.GetFinalDamage(elementMultiplier);
-            float finalDamage = Utilityku.FinalDamage(rawDamage, _defenseAmount);
+            float finalDamage = Utilityku.FinalDamage(rawDamage, _defenseAmount, penetration);
             finalDamage = Mathf.Min(_currentHealth, finalDamage);
             _currentHealth -= finalDamage;
 
-            // Apply Defense Break if damage data has it
+            // Apply Defense Break after hit enemy if damage data has it
             if (damageData.DefenseBreak > 0f)
-            {
-                ApplyDefenseBreak(DefenseBreakSource.Lightning, DefenseBreakType.Temporary, damageData.DefenseBreak);
-            }
+                ApplyDefenseBreak(damageData.DefenseBreakSource, damageData.DefenseBreakType, damageData.DefenseBreak);
 
             // Record damage taken
             RecordDamage(_lastDamageSource, finalDamage);
@@ -458,7 +458,6 @@ namespace IdleDefenseSurvival.Enemy
             effect.Type = type;
             effect.Percent = 1f - percent;
             RecalculateMoveSpeed();
-            EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
         /// <summary>
@@ -468,13 +467,11 @@ namespace IdleDefenseSurvival.Enemy
         {
             _slowEffects.Remove(source);
             RecalculateMoveSpeed();
-            EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
         private void RecalculateMoveSpeed()
         {
             float multiplier = 1f;
-
             foreach (var effect in _slowEffects.Values) {
                 switch (effect.Type)
                 {
@@ -492,49 +489,79 @@ namespace IdleDefenseSurvival.Enemy
                 }
             }
             _moveSpeed = _originalMoveSpeed * multiplier;
+            EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
-        public void ApplyDefenseBreak(DefenseBreakSource source, DefenseBreakType type, float percent)
+        public void ApplyDefenseBreak(
+            DefenseBreakSource source, DefenseBreakType type, float percent, float duration = 0f)
         {
             percent = Mathf.Clamp01(percent);
-            if (!_defenseBreakEffects.TryGetValue(source, out var effect))
+            if (type == DefenseBreakType.Temporary && duration <= 0f)
             {
-                effect = new DefenseBreakEffect { Source = source };
-                _defenseBreakEffects[source] = effect;
+                Debug.LogWarning($"[EnemyAi] Temporary Defense Break requires duration > 0.");
+                return;
             }
-            effect.Type = type;
-            effect.Percent = percent;
+
+            int id = ++_nextDefenseBreakId;
+            var effect = new DefenseBreakEffect
+            {
+                Id = id,
+                Source = source,
+                Type = type,
+                Percent = percent,
+                ExpireTime = type == DefenseBreakType.Temporary ? Time.time + duration : 0f
+            };
+            _defenseBreakEffects[id] = effect;
+
             RecalculateDefense();
-            EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
-        public void RemoveDefenseBreak(DefenseBreakSource source)
+        public void RemoveDefenseBreak(DefenseBreakSource source, DefenseBreakType type)
         {
-            _defenseBreakEffects.Remove(source);
+            var removeIds = ListPool<int>.Get();
+            foreach (var pair in _defenseBreakEffects)
+            {
+                var effect = pair.Value;
+                if (effect.Source == source && effect.Type == type)
+                    removeIds.Add(pair.Key);
+            }
+            foreach (int id in removeIds)
+                _defenseBreakEffects.Remove(id);
+            ListPool<int>.Release(removeIds);
             RecalculateDefense();
-            EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
         private void RecalculateDefense()
         {
-            float multiplier = 1f;
-            foreach (var effect in _defenseBreakEffects.Values) {
-                switch (effect.Type)
-                {
-                    case DefenseBreakType.Permanent:
-                        multiplier *= 1f - effect.Percent;
-                        break;
+            float totalBreak = 0f;
+            foreach (var effect in _defenseBreakEffects.Values)
+                totalBreak += effect.Percent;
+            float calculatedDefense = _originalDefenseAmount * (1f - totalBreak);
+            _defenseAmount = Mathf.Max(-_originalDefenseAmount, calculatedDefense);
+            EnemyStatisticsManager.Instance?.MarkDirty();
+        }
 
-                    case DefenseBreakType.Aura:
-                        multiplier *= 1f - effect.Percent;
-                        break;
-
-                    case DefenseBreakType.Temporary:
-                        multiplier *= 1f - effect.Percent;
-                        break;
-                }
+        private void UpdateDefenseBreaks()
+        {
+            if (_defenseBreakEffects.Count == 0) return;
+            bool changed = false;
+            var expiredIds = ListPool<int>.Get();
+            foreach (var pair in _defenseBreakEffects)
+            {
+                var effect = pair.Value;
+                if (effect.Type == DefenseBreakType.Temporary && Time.time >= effect.ExpireTime)
+                    expiredIds.Add(pair.Key);
             }
-            _defenseAmount = _originalDefenseAmount * multiplier;
+
+            foreach (int id in expiredIds)
+            {
+                _defenseBreakEffects.Remove(id);
+                changed = true;
+            }
+
+            ListPool<int>.Release(expiredIds);
+
+            if (changed) RecalculateDefense();
         }
 
         /// <summary>
@@ -545,8 +572,7 @@ namespace IdleDefenseSurvival.Enemy
         {
             percent = Mathf.Clamp01(percent);
             _maxHealth *= 1f - percent;
-            if (_currentHealth > _maxHealth)
-                _currentHealth = _maxHealth;
+            if (_currentHealth > _maxHealth) _currentHealth = _maxHealth;
             _enemyHealthBarManager.UpdateEnemyHealth(this, _currentHealth);
             EnemyStatisticsManager.Instance?.MarkDirty();
         }
@@ -687,16 +713,13 @@ namespace IdleDefenseSurvival.Enemy
         /// Clear all aura effects when enemy is disabled (for object pooling).
         /// Ensures effects don't carry over to the next reuse.
         /// </summary>
-        private void OnDisable()
-        {
-            ClearAllAuraEffects();
-        }
+        private void OnDisable() => ClearAllEffects();
 
         /// <summary>
         /// Clears all slow and defense break effects from this enemy.
         /// Called on disable to prevent pooling carry-over.
         /// </summary>
-        public void ClearAllAuraEffects()
+        public void ClearAllEffects()
         {
             _slowEffects.Clear();
             RecalculateMoveSpeed();

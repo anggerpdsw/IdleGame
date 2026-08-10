@@ -23,12 +23,12 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls rarity based on context.
         /// </summary>
-        public ItemRarity RollRarity(ItemGenerationContext context)
+        public Rarity RollRarity(ItemGenerationContext context)
         {
             // If forced quality, use that
             if (context.ForcedQuality.HasValue)
             {
-                return (ItemRarity)Math.Clamp(context.ForcedQuality.Value, 1, 8);
+                return (Rarity)Math.Clamp(context.ForcedQuality.Value, 1, 8);
             }
 
             // Get base weights for this tier/wave
@@ -44,7 +44,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls rarity for equipment type.
         /// </summary>
-        public ItemRarity RollRarityForEquipment(EquipmentType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public Rarity RollRarityForEquipment(EquipmentType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
         {
             var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
                 .With(equipmentType: type, category: ItemCategory.Equipment);
@@ -54,7 +54,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls rarity for gem.
         /// </summary>
-        public ItemRarity RollRarityForGem(GemType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public Rarity RollRarityForGem(GemType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
         {
             var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
                 .With(gemType: type, category: ItemCategory.Gem);
@@ -102,7 +102,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return new RarityWeightArray { Weights = modified };
         }
 
-        private ItemRarity RollFromWeights(RarityWeightArray weights)
+        private Rarity RollFromWeights(RarityWeightArray weights)
         {
             float total = 0f;
             foreach (var w in weights.Weights) total += w;
@@ -114,10 +114,10 @@ namespace IdleDefenseSurvival.Items.Generation
             {
                 accum += weights.Weights[i];
                 if (roll <= accum)
-                    return (ItemRarity)i;
+                    return (Rarity)i;
             }
 
-            return ItemRarity.Common;
+            return Rarity.Common;
         }
     }
 

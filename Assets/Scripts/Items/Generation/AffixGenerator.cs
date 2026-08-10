@@ -37,7 +37,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Generates affixes for an equipment item.
         /// </summary>
-        public AffixInstanceData[] GenerateAffixes(EquipmentData baseEquipment, ItemRarity rarity, ItemGenerationContext context)
+        public AffixInstanceData[] GenerateAffixes(EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
         {
             int affixCount = GetAffixCount(rarity, context);
             if (affixCount <= 0) return Array.Empty<AffixInstanceData>();
@@ -89,7 +89,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return candidates[candidates.Count - 1];
         }
 
-        private int GetAffixCount(ItemRarity rarity, ItemGenerationContext context)
+        private int GetAffixCount(Rarity rarity, ItemGenerationContext context)
         {
             int baseCount = _config.AffixCountPerRarity.TryGetValue(rarity, out var c) ? c : 0;
 
@@ -111,7 +111,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Max(0, baseCount);
         }
 
-        private List<AffixData> GetAvailableAffixes(EquipmentData baseEquipment, ItemRarity rarity)
+        private List<AffixData> GetAvailableAffixes(EquipmentData baseEquipment, Rarity rarity)
         {
             var result = new List<AffixData>();
 
@@ -133,7 +133,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return result;
         }
 
-        private AffixInstanceData CreateAffixInstance(AffixData affix, ItemRarity rarity, ItemGenerationContext context)
+        private AffixInstanceData CreateAffixInstance(AffixData affix, Rarity rarity, ItemGenerationContext context)
         {
             return new AffixInstanceData
             {
@@ -148,14 +148,14 @@ namespace IdleDefenseSurvival.Items.Generation
             };
         }
 
-        private int DetermineAffixTier(ItemRarity rarity, ItemGenerationContext context)
+        private int DetermineAffixTier(Rarity rarity, ItemGenerationContext context)
         {
             int baseTier = (int)rarity;
             int maxTier = _config.MaxTierPerRarity.TryGetValue(rarity, out var m) ? m : baseTier;
             return Math.Min(baseTier + context.Tier / 10, maxTier);
         }
 
-        private Dictionary<SecondaryStat, float> GenerateStatValues(AffixData affix, ItemRarity rarity, ItemGenerationContext context)
+        private Dictionary<SecondaryStat, float> GenerateStatValues(AffixData affix, Rarity rarity, ItemGenerationContext context)
         {
             var values = new Dictionary<SecondaryStat, float>();
 
@@ -175,7 +175,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return values;
         }
 
-        private Dictionary<MainAttribute, float> GenerateAttributeValues(AffixData affix, ItemRarity rarity, ItemGenerationContext context)
+        private Dictionary<MainAttribute, float> GenerateAttributeValues(AffixData affix, Rarity rarity, ItemGenerationContext context)
         {
             var values = new Dictionary<MainAttribute, float>();
 
@@ -202,24 +202,24 @@ namespace IdleDefenseSurvival.Items.Generation
     [Serializable]
     public class AffixGeneratorConfig
     {
-        public Dictionary<ItemRarity, int> AffixCountPerRarity = new()
+        public Dictionary<Rarity, int> AffixCountPerRarity = new()
         {
-            { ItemRarity.Common, 0 },
-            { ItemRarity.Rare, 1 },
-            { ItemRarity.Epic, 2 },
-            { ItemRarity.Legendary, 2 },
-            { ItemRarity.Mythic, 3 },
-            { ItemRarity.Divine, 4 }
+            { Rarity.Common, 0 },
+            { Rarity.Rare, 1 },
+            { Rarity.Epic, 2 },
+            { Rarity.Legendary, 2 },
+            { Rarity.Mythic, 3 },
+            { Rarity.Divine, 4 }
         };
 
-        public Dictionary<ItemRarity, int> MaxTierPerRarity = new()
+        public Dictionary<Rarity, int> MaxTierPerRarity = new()
         {
-            { ItemRarity.Common, 1 },
-            { ItemRarity.Rare, 3 },
-            { ItemRarity.Epic, 4 },
-            { ItemRarity.Legendary, 5 },
-            { ItemRarity.Mythic, 6 },
-            { ItemRarity.Divine, 8 }
+            { Rarity.Common, 1 },
+            { Rarity.Rare, 3 },
+            { Rarity.Epic, 4 },
+            { Rarity.Legendary, 5 },
+            { Rarity.Mythic, 6 },
+            { Rarity.Divine, 8 }
         };
 
         public static AffixGeneratorConfig Default => new();
@@ -234,8 +234,8 @@ namespace IdleDefenseSurvival.Items.Generation
         public string AffixId;
         public string Name;
         public AffixType Type; // Prefix or Suffix
-        public ItemRarity MinRarity;
-        public ItemRarity MaxRarity;
+        public Rarity MinRarity;
+        public Rarity MaxRarity;
         public EquipmentType[] ApplicableTypes;
         public CombatStatEntry[] Stats;            // SecondaryStat bonuses (combat stats)
         public AttributeStatEntry[] AttributeStats; // MainAttribute bonuses (CON/STR/INT/DEX)

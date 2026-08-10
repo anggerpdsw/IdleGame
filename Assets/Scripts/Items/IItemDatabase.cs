@@ -37,7 +37,7 @@ namespace IdleDefenseSurvival.Items
 
         // ============ Queries ============
         IReadOnlyList<ItemData> GetItemsByCategory(ItemCategory category);
-        IReadOnlyList<ItemData> GetItemsByRarity(ItemRarity rarity);
+        IReadOnlyList<ItemData> GetItemsByRarity(Rarity rarity);
         IReadOnlyList<EquipmentData> GetEquipmentByType(EquipmentType type);
         IReadOnlyList<EquipmentData> GetEquipmentBySlot(EquipmentType slot);
         IReadOnlyList<EquipmentData> GetEquipmentBySet(string setId);
@@ -70,7 +70,7 @@ namespace IdleDefenseSurvival.Items
         void UnregisterItem(string itemId);
 
         // ============ Runtime Generation ============
-        EquipmentData GenerateEquipment(string baseId, ItemRarity rarity, int level, EquipmentType type);
-        GemData GenerateGem(GemType type, ItemRarity rarity, int level);
+        EquipmentData GenerateEquipment(string baseId, Rarity rarity, int level, EquipmentType type);
+        GemData GenerateGem(GemType type, Rarity rarity, int level);
     }
 }

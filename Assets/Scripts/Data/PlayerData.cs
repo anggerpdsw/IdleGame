@@ -68,15 +68,10 @@ namespace IdleDefenseSurvival.Data
         public SkillData knockbackForce;
         public SkillData multiShootChance;
         public SkillData multiShootCount;
+        public SkillData penetration;
         public SkillData stuntChance;
         public SkillData stuntDuration;
-        public SkillData superCriticalChance;
-        public SkillData superCriticalFactor;
         public SkillData ultimateAttack;
-        public SkillData manaPoint;
-        public SkillData manaRegen;
-        public SkillData ultraCriticalChance;
-        public SkillData ultraCriticalFactor;
     }
 
     [Serializable]
@@ -89,6 +84,8 @@ namespace IdleDefenseSurvival.Data
         public SkillData healthPoint;
         public SkillData healthRegen;
         public SkillData lifeSteal;
+        public SkillData manaPoint;
+        public SkillData manaRegen;
     }
 
     [Serializable]

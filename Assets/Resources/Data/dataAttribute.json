@@ -31,8 +31,8 @@
       "percent": 0
     },
     {
-      "stat": "BounceChance",
-      "flat": 0.27,
+      "stat": "Penetration",
+      "flat": 0.1,
       "percent": 0
     },
     {

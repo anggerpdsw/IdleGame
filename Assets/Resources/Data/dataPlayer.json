@@ -67,6 +67,11 @@
         "description": "Number of projetiles shot when multishot activates",
         "displayName": "Multi-Shot Count"
       },
+      "penetration": {
+        "baseValue": 0,
+        "description": "Base penetration on enemy defense",
+        "displayName": "Penetration"
+      },
       "stuntChance": {
         "baseValue": 1,
         "description": "Probability of triggering stunt effect when attacking",
@@ -81,29 +86,9 @@
         "baseValue": 1,
         "description": "Extra Attack Power from Ultimate Weapon",
         "displayName": "Ultimate Weapon Attack"
-      },
-      "manaPoint": {
-        "baseValue": 100,
-        "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
-        "displayName": "Mana Points"
-      },
-      "manaRegen": {
-        "baseValue": 2,
-        "description": "Mana regenerated per second",
-        "displayName": "Mana Regeneration"
       }
     },
     "defense": {
-      "healthPoint": {
-        "baseValue": 140,
-        "description": "Maximum health of player",
-        "displayName": "Health Points"
-      },
-      "healthRegen": {
-        "baseValue": 0,
-        "description": "Amount of player health regenerated per second",
-        "displayName": "Health Regeneration"
-      },
       "deathDefy": {
         "baseValue": 0,
         "description": "When suffering fatal damage, there's a chance to retain 5% max health",
@@ -124,10 +109,30 @@
         "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
         "displayName": "Hit Rate"
       },
+      "healthPoint": {
+        "baseValue": 140,
+        "description": "Maximum health of player",
+        "displayName": "Health Points"
+      },
+      "healthRegen": {
+        "baseValue": 0,
+        "description": "Amount of player health regenerated per second",
+        "displayName": "Health Regeneration"
+      },
       "lifeSteal": {
         "baseValue": 0,
         "description": "Can heal health player, percentage amount from attack damage player to enemies",
         "displayName": "Life Steal"
+      },
+      "manaPoint": {
+        "baseValue": 100,
+        "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
+        "displayName": "Mana Points"
+      },
+      "manaRegen": {
+        "baseValue": 2,
+        "description": "Mana regenerated per second",
+        "displayName": "Mana Regeneration"
       }
     },
     "currency": {

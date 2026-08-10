@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Enemy;
+using System;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -28,11 +29,14 @@ namespace IdleDefenseSurvival.Manager
             DontDestroyOnLoad(gameObject);
         }
 
+        public event Action OnStatisticsChanged;
+
         // -------------------------------------------------------------------
         // Active enemy registry
         // -------------------------------------------------------------------
         private readonly HashSet<EnemyAi> _activeEnemies = new();
         private bool _isDirty = true;
+        private bool _notificationPending;
 
         // -------------------------------------------------------------------
         // Cached statistics
@@ -82,7 +86,18 @@ namespace IdleDefenseSurvival.Manager
         // Call this from EnemyAi when its stats are modified at runtime
         // (e.g., after slow, defense break, max health reduction, heal, buff)
         // -------------------------------------------------------------------
-        public void MarkDirty() => _isDirty = true;
+        public void MarkDirty()
+        {
+            _isDirty = true;
+            _notificationPending = true;
+        }
+
+        private void LateUpdate()
+        {
+            if (!_notificationPending) return;
+            _notificationPending = false;
+            OnStatisticsChanged?.Invoke();
+        }
 
         // -------------------------------------------------------------------
         // Internal: calculation

@@ -33,6 +33,8 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Sprite _playerBulletSprite;
         [SerializeField] private Sprite _tankBulletSprite;
         [SerializeField] private Sprite _enemyBulletSprite;
+        [Tooltip("Target visual diameter in world units.")]
+        [SerializeField] private float _visualSize = 0.47f;
 
         private Transform _target;
         private ProjectileOwner _owner;
@@ -125,7 +127,7 @@ namespace IdleDefenseSurvival.Player
         public void Initialize(Transform target, Player player, float damageMultiplier)
         {    
             _owner = ProjectileOwner.Player;
-            _spriteRenderer.sprite = _playerBulletSprite;
+            SetProjectileSprite(_playerBulletSprite);
 
             _target = target;
             _player = player;
@@ -146,7 +148,7 @@ namespace IdleDefenseSurvival.Player
         public void InitializeFromTank(Transform target, TankInstance tank)
         {
             _owner = ProjectileOwner.Tank;
-            _spriteRenderer.sprite = _tankBulletSprite;
+            SetProjectileSprite(_tankBulletSprite);
 
             _target = target;
             _startPosition = transform.position;
@@ -158,7 +160,7 @@ namespace IdleDefenseSurvival.Player
         public void InitializeFromEnemy(Transform target, EnemyAi enemy)
         {
             _owner = ProjectileOwner.Enemy;
-            _spriteRenderer.sprite = _enemyBulletSprite;
+            SetProjectileSprite(_enemyBulletSprite);
 
             _target = target;
             _startPosition = transform.position;
@@ -442,6 +444,25 @@ namespace IdleDefenseSurvival.Player
             }
 
             return nearest;
+        }
+
+        private void SetProjectileSprite(Sprite sprite)
+        {
+            if (_spriteRenderer == null || sprite == null) return;
+            _spriteRenderer.sprite = sprite;
+            NormalizeVisualSize();
+        }
+
+        private void NormalizeVisualSize()
+        {
+            if (_spriteRenderer == null || _spriteRenderer.sprite == null) return;
+            Sprite sprite = _spriteRenderer.sprite;
+            // Sprite size in world units before local scale.
+            Vector2 spriteSize = sprite.bounds.size;
+            float currentSize = Mathf.Max(spriteSize.x, spriteSize.y);
+            if (currentSize <= 0f) return;
+            float normalizedScale = _visualSize / currentSize;
+            _spriteRenderer.transform.localScale = Vector3.one * normalizedScale;
         }
 
 #if UNITY_EDITOR

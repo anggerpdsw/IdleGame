@@ -22,7 +22,7 @@ namespace IdleDefenseSurvival.Items
 
         // ============ Classification ============
         public ItemCategory Category = ItemCategory.None;
-        public ItemRarity ItemRarity = ItemRarity.Common;
+        public Rarity ItemRarity = Rarity.Common;
         public EquipmentType EquipmentType = EquipmentType.None; // Only for equipment
 
         // ============ Visual ============
@@ -79,7 +79,7 @@ namespace IdleDefenseSurvival.Items
             !string.IsNullOrEmpty(Id) &&
             !string.IsNullOrEmpty(Name) &&
             Category != ItemCategory.None &&
-            ItemRarity != ItemRarity.None;
+            ItemRarity != Rarity.None;
 
         public bool IsEquipment => Category == ItemCategory.Equipment && EquipmentType != EquipmentType.None;
         public bool IsStackable => StackSize > 1;
@@ -323,7 +323,7 @@ namespace IdleDefenseSurvival.Items
             if (itemData == null) return null;
 
             int level = UnityEngine.Random.Range(entry.MinLevel, entry.MaxLevel + 1);
-            ItemRarity rarity = DetermineRarity(entry.MinRarity, entry.MaxRarity, qualityMod);
+            Rarity rarity = DetermineRarity(entry.MinRarity, entry.MaxRarity, qualityMod);
 
             return itemData.Category switch
             {
@@ -343,13 +343,13 @@ namespace IdleDefenseSurvival.Items
             };
         }
 
-        private ItemRarity DetermineRarity(ItemRarity minRarity, ItemRarity maxRarity, float qualityMod)
+        private Rarity DetermineRarity(Rarity minRarity, Rarity maxRarity, float qualityMod)
         {
             int min = (int)minRarity;
             int max = (int)maxRarity;
             max = Mathf.Min(8, max + Mathf.RoundToInt(qualityMod * 2));
             int roll = UnityEngine.Random.Range(min, max + 1);
-            return (ItemRarity)Math.Clamp(roll, min, max);
+            return (Rarity)Math.Clamp(roll, min, max);
         }
     }
 
@@ -403,8 +403,8 @@ namespace IdleDefenseSurvival.Items
         public float Weight = 1f;
         public int MinLevel = 1;
         public int MaxLevel = 1;
-        public ItemRarity MinRarity = ItemRarity.Common;
-        public ItemRarity MaxRarity = ItemRarity.Common;
+        public Rarity MinRarity = Rarity.Common;
+        public Rarity MaxRarity = Rarity.Common;
         public string Condition; // JSON condition for conditional drops
     }
 

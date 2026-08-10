@@ -74,6 +74,7 @@ namespace IdleDefenseSurvival.Ultimate
                 Element = voidData.GetElement(),
                 SlowPercent = voidData.GetSlowPercent(),
                 StuntMultiplier = voidData.GetStuntMultiplier(),
+                HealthBreak = voidData.GetHealthBreak(),
             };
 
             SpawnVoidEffects();
@@ -166,7 +167,7 @@ namespace IdleDefenseSurvival.Ultimate
                 {
                     enemy.ApplyStunt(damageData.StuntMultiplier);
                     enemy.ApplySlow(SlowSource.Void, SlowType.Permanent, damageData.SlowPercent);
-                    enemy.ReduceMaxHealth(0.1f);
+                    enemy.ReduceMaxHealth(damageData.HealthBreak);
                     _tetheredEnemies.Add(enemy);
                 }
 

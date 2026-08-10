@@ -40,6 +40,7 @@ namespace IdleDefenseSurvival.Stats
 
         // Accuracy (specialization-only, counters enemy Evasion)
         SecondaryStat.HitRate => SkillType.HitRate,
+        SecondaryStat.Penetration => SkillType.Penetration,
 
         // Element damage bonus — per-element percent from equipment rolls
         SecondaryStat.MetalDamageBonus    => SkillType.MetalDamageBonus,

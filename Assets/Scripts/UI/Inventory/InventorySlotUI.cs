@@ -73,7 +73,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             }
 
             // ItemRarity border
-            if (_rarityBorder != null && itemData.ItemRarity != ItemRarity.None)
+            if (_rarityBorder != null && itemData.ItemRarity != Rarity.None)
             {
                 _rarityBorder.color = itemData.ItemRarity.GetDefaultColor();
                 _rarityBorder.enabled = true;

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2337f2b482efb4c4da490e76cb5ffbd0
+guid: 53de9b299f96ee049b9e16d4a2a63227
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8303968428360318273
-    second: BaseBullet_0
+      213: 40735755952194678
+    second: Tank Bullet_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 360
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: BaseBullet_0
+      name: Tank Bullet_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 637
-        height: 392
+        y: 88
+        width: 225
+        height: 49
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fb24681f5b062cc80800000000000000
-      internalID: -8303968428360318273
+      spriteID: 674003744f8b09000800000000000000
+      internalID: 40735755952194678
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      BaseBullet_0: -8303968428360318273
+      Tank Bullet_0: 40735755952194678
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

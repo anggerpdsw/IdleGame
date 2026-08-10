@@ -22,44 +22,73 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private TextMeshProUGUI _avgDefenseEnemy;
         [SerializeField] private TextMeshProUGUI _avgEvasionEnemy;
 
+        private Player.Player _player;
+        private PlayerStatsManager _playerStats;
+        private EnemyStatisticsManager _enemyStats;
+
         private void Start()
         {
+            Bind();
             RefreshPlayer();
+            RefreshEnemy();
         }
 
-        private void OnEnable()
+        private void OnDisable() => Unbind();
+
+        private void Bind()
         {
-            PlayerStatsManager.Instance.OnStatsChanged += RefreshPlayer;
+            _player = Player.Player.Instance;
+            _playerStats = PlayerStatsManager.Instance;
+            _enemyStats = EnemyStatisticsManager.Instance;
+
+            if (_playerStats != null) _playerStats.OnStatsChanged += RefreshPlayer;
+            if (_enemyStats != null) _enemyStats.OnStatisticsChanged += RefreshEnemy;
+
+            if (_player != null)
+            {
+                _player.OnHealthChanged += RefreshPlayerHealth;
+                _player.OnManaChanged += RefreshPlayerMana;
+            }
         }
 
-        private void OnDisable()
+        private void Unbind()
         {
-            PlayerStatsManager.Instance.OnStatsChanged -= RefreshPlayer;
+            if (_playerStats != null) _playerStats.OnStatsChanged -= RefreshPlayer;
+            if (_enemyStats != null) _enemyStats.OnStatisticsChanged -= RefreshEnemy;
+            if (_player != null)
+            {
+                _player.OnHealthChanged -= RefreshPlayerHealth;
+                _player.OnManaChanged -= RefreshPlayerMana;
+            }
         }
 
         private void RefreshPlayer()
         {
-            var stats = PlayerStatsManager.Instance;
-
             _coinMultiplier.text = "x1";
-            _healthPlayer.text = "HP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentHealth) + " / " + Utilityku.FormatNumber((long)stats.GetStat(SkillType.HealthPoint));
-            _manaPlayer.text = "MP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentMana) + " / " + Utilityku.FormatNumber((long)stats.GetStat(SkillType.ManaPoint));
-            _attackPlayer.text = FormatValue(stats.GetStat(SkillType.AttackDamage));
-            _defensePlayer.text = FormatValue(stats.GetStat(SkillType.DefenseAmount));
-            _regenPlayer.text = FormatValue(stats.GetStat(SkillType.HealthRegen)) + "/s";
+            RefreshPlayerHealth();
+            RefreshPlayerMana();
+            _attackPlayer.text = FormatValue(_playerStats.GetStat(SkillType.AttackDamage));
+            _defensePlayer.text = FormatValue(_playerStats.GetStat(SkillType.DefenseAmount));
+            _regenPlayer.text = FormatValue(_playerStats.GetStat(SkillType.HealthRegen)) + "/s";
         }
-        
+        private void RefreshPlayerHealth()
+        {
+            _healthPlayer.text = "HP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentHealth) + " / " + Utilityku.FormatNumber((long)PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
+        }
+        private void RefreshPlayerMana()
+        {
+            _manaPlayer.text = "MP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentMana) + " / " + Utilityku.FormatNumber((long)PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint));
+        }
         private void RefreshEnemy()
         {
             // Use EnemyStatisticsService for real-time enemy stats
-            var stats = EnemyStatisticsManager.Instance;
-            if (stats != null)
+            if (_enemyStats != null)
             {
-                _countEnemy.text      = stats.GetAliveCount().ToString();
-                _avgHealthEnemy.text  = FormatValue(stats.GetAverageHealth());
-                _avgAttackEnemy.text  = FormatValue(stats.GetAverageAttack());
-                _avgDefenseEnemy.text = FormatValue(stats.GetAverageDefense());
-                _avgEvasionEnemy.text = FormatValue(stats.GetAverageEvasion());
+                _countEnemy.text      = _enemyStats.GetAliveCount().ToString();
+                _avgHealthEnemy.text  = FormatValue(_enemyStats.GetAverageHealth());
+                _avgAttackEnemy.text  = FormatValue(_enemyStats.GetAverageAttack());
+                _avgDefenseEnemy.text = FormatValue(_enemyStats.GetAverageDefense());
+                _avgEvasionEnemy.text = FormatValue(_enemyStats.GetAverageEvasion());
             }
             else
             {
@@ -71,17 +100,11 @@ namespace IdleDefenseSurvival.Controller
             }
         }
 
-        private void Update()
-        {
-            RefreshEnemy();
-        }
-        
         private static string FormatValue(float value)
         {
             // Percentage-based stats display as whole numbers
             if (Mathf.Approximately(value, Mathf.Floor(value)))
                 return value.ToString("0");
-
             return value.ToString("F1");
         }
     }

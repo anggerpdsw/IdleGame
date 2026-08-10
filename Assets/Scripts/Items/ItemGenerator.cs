@@ -91,7 +91,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Generates a random equipment item.
         /// </summary>
-        public InventoryItem GenerateEquipment(EquipmentType type, ItemRarity rarity, int level, int playerTier = 1)
+        public InventoryItem GenerateEquipment(EquipmentType type, Rarity rarity, int level, int playerTier = 1)
         {
             var baseEquipments = ItemDatabase.Instance?.GetEquipmentByType(type)?.ToList();
             if (baseEquipments == null || baseEquipments.Count == 0) return null;
@@ -104,7 +104,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Generates equipment from a specific base template.
         /// </summary>
-        public InventoryItem GenerateEquipmentFromBase(EquipmentData baseEquipment, ItemRarity rarity, int level, int playerTier = 1)
+        public InventoryItem GenerateEquipmentFromBase(EquipmentData baseEquipment, Rarity rarity, int level, int playerTier = 1)
         {
             if (baseEquipment == null) return null;
 
@@ -124,7 +124,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Generates a random gem.
         /// </summary>
-        public InventoryItem GenerateGem(GemType type, ItemRarity rarity, int level)
+        public InventoryItem GenerateGem(GemType type, Rarity rarity, int level)
         {
             var baseGems = ItemDatabase.Instance?.GetGemsByType(type)?.ToList();
             if (baseGems == null || baseGems.Count == 0) return null;
@@ -134,7 +134,7 @@ namespace IdleDefenseSurvival.Items
             return _gemGen.Generate(baseGem, context);
         }
 
-        public InventoryItem GenerateGemFromBase(GemData baseGem, ItemRarity rarity, int level)
+        public InventoryItem GenerateGemFromBase(GemData baseGem, Rarity rarity, int level)
         {
             if (baseGem == null) return null;
 
@@ -151,7 +151,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Generates a random consumable item.
         /// </summary>
-        public InventoryItem GenerateConsumable(ItemCategory category, ItemRarity rarity, int quantity = 1)
+        public InventoryItem GenerateConsumable(ItemCategory category, Rarity rarity, int quantity = 1)
         {
             var items = ItemDatabase.Instance?.GetItemsByCategory(category)?
                 .Where(i => i.ItemRarity == rarity)

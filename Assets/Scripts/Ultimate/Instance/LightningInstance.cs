@@ -264,9 +264,7 @@ namespace IdleDefenseSurvival.Ultimate
 
             // Brief pause on climax for impact feel
             if (isClimaxStrike)
-            {
                 yield return new WaitForSeconds(0.1f);
-            }
         }
 
         private void SpawnLightningBolt(Vector3 from, Vector3 to, bool isClimax)

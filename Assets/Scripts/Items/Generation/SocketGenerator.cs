@@ -25,7 +25,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Generates sockets for an equipment item.
         /// </summary>
-        public SocketData[] GenerateSockets(EquipmentData baseEquipment, ItemRarity rarity, ItemGenerationContext context)
+        public SocketData[] GenerateSockets(EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
         {
             if (baseEquipment.MaxSockets <= 0) return Array.Empty<SocketData>();
 
@@ -55,7 +55,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return sockets;
         }
 
-        private bool IsSocketUnlocked(int index, EquipmentData baseEquipment, ItemRarity rarity, ItemGenerationContext context)
+        private bool IsSocketUnlocked(int index, EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
         {
             // First socket always unlocked
             if (index == 0) return true;

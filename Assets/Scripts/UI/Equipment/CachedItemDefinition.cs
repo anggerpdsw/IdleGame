@@ -11,12 +11,12 @@ namespace IdleDefenseSurvival.UI.Equipment
     public sealed class CachedItemDefinition
     {
         public readonly Sprite Icon;
-        public readonly ItemRarity Rarity;
+        public readonly Rarity Rarity;
 
         private CachedItemDefinition(ItemData data)
         {
             Icon = data?.Icon;
-            Rarity = data?.ItemRarity ?? ItemRarity.None;
+            Rarity = data?.ItemRarity ?? Rarity.None;
         }
 
         private static readonly Dictionary<string, CachedItemDefinition> Cache = new();

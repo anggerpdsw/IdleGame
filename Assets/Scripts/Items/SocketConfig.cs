@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Items
         public int SocketIndex;
         public int UnlockEnhanceLevel;
         public int UnlockPlayerLevel = 1;
-        public ItemRarity MinimumRarity = ItemRarity.Common;
+        public Rarity MinimumRarity = Rarity.Common;
         public bool AllowAnyGem = true;
         public GemType[] AllowedGemTypes = Array.Empty<GemType>();
         public bool IsLocked;

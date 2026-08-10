@@ -425,7 +425,7 @@ namespace IdleDefenseSurvival.Inventory
             return _slots.Where(s => !s.IsEmpty && s.Item.GetItemCategory() == category).Select(s => s.Item).ToList();
         }
 
-        public IReadOnlyList<InventoryItem> GetItemsByRarity(ItemRarity rarity)
+        public IReadOnlyList<InventoryItem> GetItemsByRarity(Rarity rarity)
         {
             return _slots.Where(s => !s.IsEmpty && s.Item.GetRarity() == rarity).Select(s => s.Item).ToList();
         }
@@ -599,7 +599,7 @@ namespace IdleDefenseSurvival.Inventory
         {
             var filter = new InventoryFilter
             {
-                Rarities = new[] { ItemRarity.Common },
+                Rarities = new[] { Rarity.Common },
                 HideEquipped = true,
                 HideMaxStack = false
             };

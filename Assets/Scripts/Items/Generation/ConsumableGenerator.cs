@@ -32,9 +32,9 @@ namespace IdleDefenseSurvival.Items.Generation
             if (baseItem == null) return null;
 
             // 1. Determine rarity (for consumables, usually fixed or Common)
-            ItemRarity rarity = context.ForcedQuality.HasValue
-                ? (ItemRarity)Math.Clamp(context.ForcedQuality.Value, 1, 8)
-                : (baseItem.ItemRarity != ItemRarity.None ? baseItem.ItemRarity : _rarityRoll.RollRarity(context));
+            Rarity rarity = context.ForcedQuality.HasValue
+                ? (Rarity)Math.Clamp(context.ForcedQuality.Value, 1, 8)
+                : (baseItem.ItemRarity != Rarity.None ? baseItem.ItemRarity : _rarityRoll.RollRarity(context));
 
             // 2. Determine quantity
             int quantity = CalculateQuantity(baseItem, context);

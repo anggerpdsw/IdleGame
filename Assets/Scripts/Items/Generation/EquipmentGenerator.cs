@@ -47,8 +47,8 @@ namespace IdleDefenseSurvival.Items.Generation
             if (baseEquipment == null) return null;
 
             // 1. Determine rarity
-            ItemRarity rarity = context.ForcedQuality.HasValue
-                ? (ItemRarity)Math.Clamp(context.ForcedQuality.Value, 1, 8)
+            Rarity rarity = context.ForcedQuality.HasValue
+                ? (Rarity)Math.Clamp(context.ForcedQuality.Value, 1, 8)
                 : _rarityRoll.RollRarity(context.With(category: ItemCategory.Equipment));
 
             // 2. Determine level
@@ -106,7 +106,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return Generate(baseEquipment, context);
         }
 
-        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, ItemRarity rarity, int level)
+        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level)
         {
             return new InventoryItem
             {
@@ -148,7 +148,7 @@ namespace IdleDefenseSurvival.Items.Generation
             item.CustomData["Affixes"] = affixes;
         }
 
-        private void ApplyEventModifiers(InventoryItem item, EquipmentData baseEquipment, ItemRarity rarity, int level, ItemGenerationContext context)
+        private void ApplyEventModifiers(InventoryItem item, EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context)
         {
             if (context.EventModifiers == null) return;
 
@@ -164,6 +164,6 @@ namespace IdleDefenseSurvival.Items.Generation
 
     public interface IEquipmentModifier
     {
-        void ModifyEquipment(InventoryItem item, EquipmentData baseEquipment, ItemRarity rarity, int level, ItemGenerationContext context);
+        void ModifyEquipment(InventoryItem item, EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context);
     }
 }

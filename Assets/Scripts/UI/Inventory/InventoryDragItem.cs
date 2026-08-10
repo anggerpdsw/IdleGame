@@ -39,7 +39,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                 _quantityText.text = item.Quantity > 1 ? item.Quantity.ToString() : "";
             }
 
-            if (_rarityBorder != null && itemData.ItemRarity != ItemRarity.None)
+            if (_rarityBorder != null && itemData.ItemRarity != Rarity.None)
             {
                 _rarityBorder.color = itemData.ItemRarity.GetDefaultColor();
             }

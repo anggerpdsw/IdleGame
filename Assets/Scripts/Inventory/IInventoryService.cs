@@ -87,7 +87,7 @@ namespace IdleDefenseSurvival.Inventory
         IReadOnlyList<InventoryItem> GetItemsByCategory(ItemCategory category);
 
         /// <summary>Gets all items matching rarity.</summary>
-        IReadOnlyList<InventoryItem> GetItemsByRarity(ItemRarity rarity);
+        IReadOnlyList<InventoryItem> GetItemsByRarity(Rarity rarity);
 
         /// <summary>Gets all equipment items.</summary>
         IReadOnlyList<InventoryItem> GetEquipments();
@@ -207,7 +207,7 @@ namespace IdleDefenseSurvival.Inventory
     {
         public string SearchText;
         public ItemCategory[] Categories;
-        public ItemRarity[] Rarities;
+        public Rarity[] Rarities;
         public EquipmentType[] EquipmentTypes;
         public int MinLevel;
         public int MaxLevel;
@@ -258,7 +258,7 @@ namespace IdleDefenseSurvival.Inventory
         {
             SearchText = SearchText,
             Categories = Categories != null ? (ItemCategory[])Categories.Clone() : null,
-            Rarities = Rarities != null ? (ItemRarity[])Rarities.Clone() : null,
+            Rarities = Rarities != null ? (Rarity[])Rarities.Clone() : null,
             EquipmentTypes = EquipmentTypes != null ? (EquipmentType[])EquipmentTypes.Clone() : null,
             MinLevel = MinLevel,
             MaxLevel = MaxLevel,

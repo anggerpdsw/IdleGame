@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
+using System;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -25,6 +26,9 @@ namespace IdleDefenseSurvival.Player
         {
             _instance = null;
         }
+                
+        public event Action OnHealthChanged;
+        public event Action OnManaChanged;
 
         [Header("Visualization")]
         [SerializeField] private Transform _visual;
@@ -592,6 +596,7 @@ namespace IdleDefenseSurvival.Player
             
             float percent = Mathf.Clamp01(_currentMana / maxMana);
             fillMana.color = Color.Lerp(GameColors.empty, GameColors.blue, percent);
+            OnManaChanged?.Invoke();
         }
 
         public void Heal(float heal)
@@ -635,6 +640,7 @@ namespace IdleDefenseSurvival.Player
             }
 
             fillHealth.color = color;
+            OnHealthChanged?.Invoke();
         }
 
         /// <summary>

@@ -26,7 +26,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// Attempts to generate an enchantment for equipment.
         /// Returns null if no enchantment is generated.
         /// </summary>
-        public EnchantmentInstanceData GenerateEnchantment(EquipmentData baseEquipment, ItemRarity rarity, int level, ItemGenerationContext context)
+        public EnchantmentInstanceData GenerateEnchantment(EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context)
         {
             // Check chance
             float chance = GetEnchantmentChance(rarity, context);
@@ -75,7 +75,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return enchantment;
         }
 
-        private float GetEnchantmentChance(ItemRarity rarity, ItemGenerationContext context)
+        private float GetEnchantmentChance(Rarity rarity, ItemGenerationContext context)
         {
             float baseChance = _config.BaseChancePerRarity.TryGetValue(rarity, out var c) ? c : 0f;
 
@@ -100,7 +100,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Clamp(baseChance, 0f, 1f);
         }
 
-        private int DetermineEnchantLevel(ItemRarity rarity, int itemLevel, ItemGenerationContext context)
+        private int DetermineEnchantLevel(Rarity rarity, int itemLevel, ItemGenerationContext context)
         {
             int maxLevel = _config.MaxLevelPerRarity.TryGetValue(rarity, out var m) ? m : 1;
             int baseLevel = Math.Min(maxLevel, 1 + itemLevel / 20);
@@ -120,7 +120,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Clamp(baseLevel, 1, maxLevel);
         }
 
-        private int GetEnchantmentStatCount(ItemRarity rarity, ItemGenerationContext context)
+        private int GetEnchantmentStatCount(Rarity rarity, ItemGenerationContext context)
         {
             int baseCount = _config.StatCountPerRarity.TryGetValue(rarity, out var c) ? c : 1;
 
@@ -130,12 +130,12 @@ namespace IdleDefenseSurvival.Items.Generation
             return Math.Clamp(baseCount, 1, 5);
         }
 
-        private string GenerateEnchantmentId(ItemRarity rarity)
+        private string GenerateEnchantmentId(Rarity rarity)
         {
             return $"Enchant_{rarity}_{Guid.NewGuid().ToString("N")[..8]}";
         }
 
-        private float GetRandomStatValue(SecondaryStat stat, ItemRarity rarity, int enchantLevel)
+        private float GetRandomStatValue(SecondaryStat stat, Rarity rarity, int enchantLevel)
         {
             float rarityMult = rarity.GetDefaultStatMultiplier();
             float levelMult = 1f + enchantLevel * 0.1f;
@@ -146,7 +146,7 @@ namespace IdleDefenseSurvival.Items.Generation
             return baseValue * rarityMult * levelMult * variance;
         }
 
-        private SpecialEffectEntry[] GenerateSpecialEffects(ItemRarity rarity, int level)
+        private SpecialEffectEntry[] GenerateSpecialEffects(Rarity rarity, int level)
         {
             // Could generate special effects based on rarity/level
             // For now return empty
@@ -160,34 +160,34 @@ namespace IdleDefenseSurvival.Items.Generation
     [Serializable]
     public class EnchantmentGeneratorConfig
     {
-        public Dictionary<ItemRarity, float> BaseChancePerRarity = new()
+        public Dictionary<Rarity, float> BaseChancePerRarity = new()
         {
-            { ItemRarity.Common, 0f },
-            { ItemRarity.Rare, 0.1f },
-            { ItemRarity.Epic, 0.2f },
-            { ItemRarity.Legendary, 0.35f },
-            { ItemRarity.Mythic, 0.5f },
-            { ItemRarity.Divine, 0.9f }
+            { Rarity.Common, 0f },
+            { Rarity.Rare, 0.1f },
+            { Rarity.Epic, 0.2f },
+            { Rarity.Legendary, 0.35f },
+            { Rarity.Mythic, 0.5f },
+            { Rarity.Divine, 0.9f }
         };
 
-        public Dictionary<ItemRarity, int> MaxLevelPerRarity = new()
+        public Dictionary<Rarity, int> MaxLevelPerRarity = new()
         {
-            { ItemRarity.Common, 1 },
-            { ItemRarity.Rare, 3 },
-            { ItemRarity.Epic, 4 },
-            { ItemRarity.Legendary, 5 },
-            { ItemRarity.Mythic, 5 },
-            { ItemRarity.Divine, 5 }
+            { Rarity.Common, 1 },
+            { Rarity.Rare, 3 },
+            { Rarity.Epic, 4 },
+            { Rarity.Legendary, 5 },
+            { Rarity.Mythic, 5 },
+            { Rarity.Divine, 5 }
         };
 
-        public Dictionary<ItemRarity, int> StatCountPerRarity = new()
+        public Dictionary<Rarity, int> StatCountPerRarity = new()
         {
-            { ItemRarity.Common, 1 },
-            { ItemRarity.Rare, 2 },
-            { ItemRarity.Epic, 2 },
-            { ItemRarity.Legendary, 3 },
-            { ItemRarity.Mythic, 3 },
-            { ItemRarity.Divine, 4 }
+            { Rarity.Common, 1 },
+            { Rarity.Rare, 2 },
+            { Rarity.Epic, 2 },
+            { Rarity.Legendary, 3 },
+            { Rarity.Mythic, 3 },
+            { Rarity.Divine, 4 }
         };
 
         public Dictionary<SecondaryStat, float> BaseValues = new()
@@ -202,7 +202,8 @@ namespace IdleDefenseSurvival.Items.Generation
             { SecondaryStat.CooldownReduction, 1f },
             { SecondaryStat.BossDamage, 1f },
             { SecondaryStat.EliteDamage, 1f },
-            { SecondaryStat.HitRate, 1f }
+            { SecondaryStat.HitRate, 1f },
+            { SecondaryStat.Penetration, 1f }
         };
 
         // Derived combat stats (CriticalChance, AttackSpeed, ...) come from Main Attribute.
@@ -216,7 +217,8 @@ namespace IdleDefenseSurvival.Items.Generation
             SecondaryStat.CooldownReduction,
             SecondaryStat.BossDamage,
             SecondaryStat.EliteDamage,
-            SecondaryStat.HitRate
+            SecondaryStat.HitRate,
+            SecondaryStat.Penetration
         };
 
         public float SpecialEffectChance = 0.1f;

@@ -1,13 +1,7 @@
 using TMPro;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
-using System.Linq;
 using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.UI.Tooltip

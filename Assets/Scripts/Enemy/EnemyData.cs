@@ -71,13 +71,16 @@ namespace IdleDefenseSurvival.Data
         public SlowSource Source;
         public SlowType Type;
         public float Percent;
+        public float ExpireTime;
     }
 
     [Serializable]
     public class DefenseBreakEffect
     {
+        public int Id;
         public DefenseBreakSource Source;
         public DefenseBreakType Type;
         public float Percent;
+        public float ExpireTime;
     }
 }

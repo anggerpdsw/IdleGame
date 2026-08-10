@@ -299,7 +299,7 @@ namespace IdleDefenseSurvival.UI
         private void RefreshFrame()
         {
             if (_cardFrame == null) return;
-            _cardFrame.sprite = CardResources.GetFrame(_cardData.ItemRarity.ToString());
+            _cardFrame.sprite = CardResources.GetFrame(_cardData.CardRarity.ToString());
         }
 
         private void RefreshName()

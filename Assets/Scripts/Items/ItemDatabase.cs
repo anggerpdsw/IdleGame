@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items.Generation;
 
 namespace IdleDefenseSurvival.Items
@@ -131,7 +130,7 @@ namespace IdleDefenseSurvival.Items
             return _items.Values.Where(i => i.Category == category).ToList();
         }
 
-        public IReadOnlyList<ItemData> GetItemsByRarity(ItemRarity rarity)
+        public IReadOnlyList<ItemData> GetItemsByRarity(Rarity rarity)
         {
             return _items.Values.Where(i => i.ItemRarity == rarity).ToList();
         }
@@ -295,7 +294,7 @@ namespace IdleDefenseSurvival.Items
         #endregion
 
         #region Runtime Generation
-        public EquipmentData GenerateEquipment(string baseId, ItemRarity rarity, int level, EquipmentType type)
+        public EquipmentData GenerateEquipment(string baseId, Rarity rarity, int level, EquipmentType type)
         {
             var baseItem = GetEquipment(baseId);
             if (baseItem == null) return null;
@@ -327,7 +326,7 @@ namespace IdleDefenseSurvival.Items
             return generated;
         }
 
-        public GemData GenerateGem(GemType type, ItemRarity rarity, int level)
+        public GemData GenerateGem(GemType type, Rarity rarity, int level)
         {
             var baseGem = _gems.Values.FirstOrDefault(g => g.GemType == type);
             if (baseGem == null) return null;
@@ -351,7 +350,7 @@ namespace IdleDefenseSurvival.Items
             return generated;
         }
 
-        private CombatStatEntry[] GenerateScaledStats(CombatStatEntry[] baseStats, ItemRarity rarity, int level)
+        private CombatStatEntry[] GenerateScaledStats(CombatStatEntry[] baseStats, Rarity rarity, int level)
         {
             if (baseStats == null) return Array.Empty<CombatStatEntry>();
 

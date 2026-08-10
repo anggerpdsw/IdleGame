@@ -31,7 +31,10 @@ namespace IdleDefenseSurvival.Data
         public bool HasBounce;
         public float SlowPercent;
         public float StuntMultiplier;
+        public DefenseBreakSource DefenseBreakSource;
+        public DefenseBreakType DefenseBreakType;
         public float DefenseBreak;
+        public float HealthBreak;
 
         public DamageData(float damage, DamageType type = DamageType.Normal, CriticalType crit = CriticalType.None, string source = "Unknown")
         {
@@ -47,7 +50,10 @@ namespace IdleDefenseSurvival.Data
             HasBounce = false;
             SlowPercent = 0f;
             StuntMultiplier = 1f;
+            DefenseBreakSource = DefenseBreakSource.None;
+            DefenseBreakType = DefenseBreakType.None;
             DefenseBreak = 0f;
+            HealthBreak = 0f;
         }
 
         /// <summary>Calculate final damage after applying multipliers.</summary>

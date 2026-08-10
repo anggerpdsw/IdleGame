@@ -26,8 +26,8 @@ namespace IdleDefenseSurvival
     public enum ModifierMode { Flat, Percent }
     public enum ModifierSource { AccountLevel, Buff, Card, Equipment, Event, Pet, Quest, Skin, Upgrade, Ultimate }
 
-    public enum DefenseBreakSource { Card, Void, Lightning }
-    public enum DefenseBreakType { Permanent, Temporary, Aura }
+    public enum DefenseBreakSource { None, Lightning }
+    public enum DefenseBreakType { None, Aura, Permanent, Temporary}
 
     public enum SlowSource { Card, Cloud, Void, Lightning }
     public enum SlowType { Permanent, Temporary, Aura }
@@ -109,6 +109,7 @@ namespace IdleDefenseSurvival
 
         // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
         HitRate = 32,
+        Penetration = 33,
     }
 
     /// <summary>
@@ -121,44 +122,43 @@ namespace IdleDefenseSurvival
         public static string GetDisplayName(this SkillType stat) => stat switch
         {
             SkillType.AttackDamage => "Attack Damage",
-            SkillType.AttackSpeed => "Attack Speed",
             SkillType.AttackRange => "Attack Range",
-            SkillType.CriticalChance => "Critical Chance",
-            SkillType.CriticalDamage => "Critical Damage",
-            SkillType.DamagePerRange => "Damage per Range",
+            SkillType.AttackSpeed => "Attack Speed",
+            SkillType.BossDamage => "Boss Damage",
             SkillType.BounceChance => "Bounce Chance",
             SkillType.BounceCount => "Bounce Count",
-            SkillType.MultiShootChance => "Multi-Shot Chance",
-            SkillType.MultiShootCount => "Multi-Shot Count",
-            SkillType.KnockbackChance => "Knockback Chance",
-            SkillType.KnockbackForce => "Knockback Force",
-            SkillType.StuntChance => "Stun Chance",
-            SkillType.StuntDuration => "Stun Duration",
+            SkillType.CriticalChance => "Critical Chance",
+            SkillType.CriticalDamage => "Critical Damage",
+            SkillType.CooldownReduction => "Cooldown Reduction",
+            SkillType.DamagePerRange => "Damage per Range",
+            SkillType.DeathDefy => "Death Defy",
+            SkillType.DropRate => "Drop Rate",
+            SkillType.ElementMastery => "Element Mastery",
+            SkillType.EliteDamage => "Elite Damage",
+            SkillType.GoldGain => "Gold Gain",
             SkillType.HealthPoint => "Health Points",
             SkillType.HealthRegen => "Health Regen",
-            SkillType.DefenseAmount => "Defense",
+            SkillType.HitRate => "Hit Rate",
+            SkillType.InterestWave => "Interest Wave",
+            SkillType.KnockbackChance => "Knockback Chance",
+            SkillType.KnockbackForce => "Knockback Force",
             SkillType.LifeSteal => "Life Steal",
-            SkillType.DeathDefy => "Death Defy",
-            SkillType.Evasion => "Evasion",
-            SkillType.ElementMastery => "Element Mastery",
-            SkillType.UltimateAttack => "Ultimate Attack",
             SkillType.ManaPoint => "Mana Points",
             SkillType.ManaRegen => "Mana Regen",
-            SkillType.MetalDamageBonus => "Metal Damage",
-            SkillType.WoodDamageBonus => "Wood Damage",
-            SkillType.FireDamageBonus => "Fire Damage",
-            SkillType.WaterDamageBonus => "Water Damage",
-            SkillType.EarthDamageBonus => "Earth Damage",
-            SkillType.LightningDamageBonus => "Lightning Damage",
-            SkillType.WindDamageBonus => "Wind Damage",
-            SkillType.InterestWave => "Interest Wave",
-            SkillType.GoldGain => "Gold Gain",
-            SkillType.DropRate => "Drop Rate",
             SkillType.MoveSpeed => "Move Speed",
-            SkillType.CooldownReduction => "Cooldown Reduction",
-            SkillType.BossDamage => "Boss Damage",
-            SkillType.EliteDamage => "Elite Damage",
-            SkillType.HitRate => "Hit Rate",
+            SkillType.MultiShootChance => "Multi-Shot Chance",
+            SkillType.MultiShootCount => "Multi-Shot Count",
+            SkillType.StuntChance => "Stun Chance",
+            SkillType.StuntDuration => "Stun Duration",
+            SkillType.DefenseAmount => "Defense",
+            SkillType.UltimateAttack => "Ultimate Attack",
+            SkillType.EarthDamageBonus => "Earth Damage",
+            SkillType.FireDamageBonus => "Fire Damage",
+            SkillType.LightningDamageBonus => "Lightning Damage",
+            SkillType.MetalDamageBonus => "Metal Damage",
+            SkillType.WaterDamageBonus => "Water Damage",
+            SkillType.WindDamageBonus => "Wind Damage",
+            SkillType.WoodDamageBonus => "Wood Damage",
             _ => stat.ToString(),
         };
     }
@@ -167,7 +167,7 @@ namespace IdleDefenseSurvival
     /// <summary>
     /// Universal rarity tier shared by Cards and Equipment.
     /// </summary>
-    public enum ItemRarity
+    public enum Rarity
     {
         None = 0,
         Common = 1,
@@ -255,6 +255,7 @@ namespace IdleDefenseSurvival
 
         // Accuracy — counters enemy Evasion. Specialization-only (equipment/passive/buff/card).
         HitRate = 20,
+        Penetration = 28,
 
         // Element damage bonus (Layer 3) — per-element percent from equipment (Roll → ModifierSource.Equipment → SkillType).
         MetalDamageBonus = 21,

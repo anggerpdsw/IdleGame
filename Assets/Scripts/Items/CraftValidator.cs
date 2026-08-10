@@ -184,7 +184,7 @@ namespace IdleDefenseSurvival.Items
             int count = 0;
             foreach (var item in items)
             {
-                bool qualityOk = minQuality <= 0 || item.GetRarity() >= (ItemRarity)minQuality;
+                bool qualityOk = minQuality <= 0 || item.GetRarity() >= (Rarity)minQuality;
                 bool levelOk = minLevel <= 0 || item.Level >= minLevel;
                 bool enhanceOk = minEnhance <= 0 || item.EnhanceLevel >= minEnhance;
                 if (qualityOk && levelOk && enhanceOk)

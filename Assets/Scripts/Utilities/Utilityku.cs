@@ -6,16 +6,11 @@ using UnityEngine;
 
 public static class Utilityku
 {
-    public static bool Chance(float chancePercent)
+    public static bool Chance(float chancePercent) => Random.Range(0f, 100f) < chancePercent;
+    public static float FinalDamage(float damage, float defense, float armorPenetration = 0f)
     {
-        return Random.Range(0f, 100f) < chancePercent;
-    }
-
-    public static float FinalDamage(float attack, float defense, float armorPenetration = 0f)
-    {
-        float effectiveDefense = Mathf.Max(0, defense - armorPenetration);
-
-        return attack * (100f / (100f + effectiveDefense));
+        float effectiveDefense = defense - armorPenetration;
+        return damage * (100f / (100f + effectiveDefense));
     }
 
     public static int FinalDefense(Role role, float health)

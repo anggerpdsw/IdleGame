@@ -29,6 +29,7 @@ namespace IdleDefenseSurvival.Data
         public float slowPercent;
         public float stuntMultiplier;
         public float defenseBreak;
+        public float healthBreak;
         public Element element;
 
         // ---- Safe accessors (with defaults) ----
@@ -47,6 +48,7 @@ namespace IdleDefenseSurvival.Data
         public float GetSlowPercent(float fallback = 0f) => slowPercent > 0f ? slowPercent * 0.01f : fallback;
         public float GetStuntMultiplier(float fallback = 1f) => stuntMultiplier > 1f ? stuntMultiplier : fallback;
         public float GetDefenseBreak(float fallback = 0f) => defenseBreak > 0f ? defenseBreak : fallback;
+        public float GetHealthBreak(float fallback = 0f) => healthBreak > 0f ? healthBreak : fallback;
         public Element GetElement(Element fallback = Element.None) => element == Element.None ? fallback : element;
         
     }

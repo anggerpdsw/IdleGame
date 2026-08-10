@@ -78,10 +78,10 @@ namespace IdleDefenseSurvival.Inventory
         /// <summary>
         /// Gets the item rarity.
         /// </summary>
-        public static ItemRarity GetRarity(this InventoryItem item)
+        public static Rarity GetRarity(this InventoryItem item)
         {
             var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId);
-            return itemData?.ItemRarity ?? ItemRarity.Common;
+            return itemData?.ItemRarity ?? Rarity.Common;
         }
 
         /// <summary>

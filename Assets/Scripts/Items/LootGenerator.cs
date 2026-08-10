@@ -246,7 +246,7 @@ namespace IdleDefenseSurvival.Items
             int level = UnityEngine.Random.Range(entry.MinLevel, entry.MaxLevel + 1);
 
             // Determine rarity
-            ItemRarity rarity = DetermineRarity(entry.MinRarity, entry.MaxRarity, qualityMod);
+            Rarity rarity = DetermineRarity(entry.MinRarity, entry.MaxRarity, qualityMod);
 
             // Generate based on category
             InventoryItem result = null;
@@ -282,7 +282,7 @@ namespace IdleDefenseSurvival.Items
             return result;
         }
 
-        private ItemRarity DetermineRarity(ItemRarity minRarity, ItemRarity maxRarity, float qualityMod)
+        private Rarity DetermineRarity(Rarity minRarity, Rarity maxRarity, float qualityMod)
         {
             int min = (int)minRarity;
             int max = (int)maxRarity;
@@ -291,7 +291,7 @@ namespace IdleDefenseSurvival.Items
             max = Mathf.Min(8, max + Mathf.RoundToInt(qualityMod * 2));
 
             int roll = UnityEngine.Random.Range(min, max + 1);
-            return (ItemRarity)Math.Clamp(roll, min, max);
+            return (Rarity)Math.Clamp(roll, min, max);
         }
 
         private void ApplyLuckToLoot(List<InventoryItem> loot, float luckBonus)

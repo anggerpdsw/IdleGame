@@ -110,7 +110,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// </summary>
         public static ItemGenerationContext Equipment(
             EquipmentType equipmentType,
-            ItemRarity rarity,
+            Rarity rarity,
             int level,
             int tier = 1,
             int? seed = null)
@@ -133,7 +133,7 @@ namespace IdleDefenseSurvival.Items.Generation
         /// </summary>
         public static ItemGenerationContext Gem(
             GemType gemType,
-            ItemRarity rarity,
+            Rarity rarity,
             int level,
             int? seed = null)
         {

@@ -12,7 +12,7 @@ namespace IdleDefenseSurvival.Data
 
     [Serializable] public class RarityConfig
     {
-        public ItemRarity Id;
+        public Rarity Id;
         public float Multiplier;
     }
 
@@ -26,7 +26,7 @@ namespace IdleDefenseSurvival.Data
         public string Mode; // "Percent" or "Flat"
         public float BaseValue;
         public float ValuePerLevel;
-        public ItemRarity ItemRarity;
+        public Rarity CardRarity;
         
         public float CalculateValue(int level) => BaseValue + ValuePerLevel * (level - 1);
     }
@@ -51,8 +51,8 @@ namespace IdleDefenseSurvival.Data
         // Unique identifier for this card definition
         public string CardId;
 
-        // ItemRarity of the rolled card
-        public ItemRarity ItemRarity;
+        // CardRarity of the rolled card
+        public Rarity CardRarity;
 
         // Number of copies rolled (e.g., from a multi-roll)
         public int Quantity = 1;

@@ -286,7 +286,7 @@ namespace IdleDefenseSurvival.Items.Generation
     {
         public string ModifierId => "GuaranteedRarity";
         public string DisplayName => "Guaranteed ItemRarity";
-        public ItemRarity MinimumRarity { get; set; } = ItemRarity.Rare;
+        public Rarity MinimumRarity { get; set; } = Rarity.Rare;
         public string[] ApplicableRecipeIds { get; set; }
         public string[] ApplicableCategories { get; set; }
 
