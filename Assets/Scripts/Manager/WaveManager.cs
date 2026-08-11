@@ -156,6 +156,14 @@ namespace IdleDefenseSurvival.Manager
         {
             IsRunActive = true;
             CurrentTier = Mathf.Max(1, selectedTier);
+
+            // Drop Bag: clear ONLY on new run start (never on wave start/end, victory, or defeat).
+            if (DropBagManager.Instance != null)
+            {
+                DropBagManager.Instance.Clear();
+                DropBagManager.Instance.IsRunActive = true;
+            }
+
             SaveManager.Instance.RecordRun(CurrentTier);
             ResetWave();
         }
@@ -243,6 +251,9 @@ namespace IdleDefenseSurvival.Manager
         {
             _enemySpawner.enabled = false;
             IsRunActive = false;
+            // Drop Bag: stop collecting after game end (Victory/Defeat).
+            // Snapshot stays visible — cleared only on the next run start.
+            if (DropBagManager.Instance != null) DropBagManager.Instance.IsRunActive = false;
             SaveManager.Instance.RecordHighestGoldMeatExp(CurrentTier, _waveGoldEarned, _waveMeatEarned, _waveExpEarned);
             SceneLoader.Instance.ResetGlobalState();
         }

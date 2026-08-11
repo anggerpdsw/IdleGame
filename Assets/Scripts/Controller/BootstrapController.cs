@@ -49,6 +49,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<ItemDatabase>();
             ItemDatabase.Instance?.Initialize(); // Load item JSONs synchronously before any scene uses them
             EnsureSingleton<InventoryService>();
+            EnsureSingleton<DropBagManager>();
             EnsureSingleton<EquipmentService>();
             EnsureSingleton<CraftService>();
             EnsureSingleton<SaveManager>();

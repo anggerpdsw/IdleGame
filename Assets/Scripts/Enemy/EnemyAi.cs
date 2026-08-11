@@ -706,6 +706,11 @@ namespace IdleDefenseSurvival.Enemy
                 }
 
                 inventory.AddItem(entry.ItemId, quantity);
+
+                // Drop Bag: record ONLY after the drop truly succeeded (Chance + MinTier passed,
+                // AddItem executed). Single authoritative point — no duplicate events.
+                if (DropBagManager.Instance != null)
+                    DropBagManager.Instance.AddDrop(entry.ItemId, quantity);
             }
         }
 

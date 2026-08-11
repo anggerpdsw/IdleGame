@@ -919,6 +919,7 @@ GameObject:
   - component: {fileID: 121111063}
   - component: {fileID: 121111062}
   - component: {fileID: 121111061}
+  - component: {fileID: 121111064}
   m_Layer: 5
   m_Name: ViewInventory
   m_TagString: Untagged
@@ -944,7 +945,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 30, y: 205}
-  m_SizeDelta: {x: 1001, y: 525}
+  m_SizeDelta: {x: 600, y: 525}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &121111061
 MonoBehaviour:
@@ -1014,6 +1015,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 121111059}
   m_CullTransparentMesh: 1
+--- !u!114 &121111064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 121111059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9f38b2de0be17c4a8c506b93d5f878d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.DropBagUI
+  _content: {fileID: 604881969}
+  _slotPrefab: {fileID: 2240576893781145801, guid: ebd07c403a21f9945a3f9e060990415d, type: 3}
+  _fallbackSprite: {fileID: 8984754096541894249, guid: 9ed71c0155790cc4c8962c5e42638a1a, type: 3}
 --- !u!1 &133945102
 GameObject:
   m_ObjectHideFlags: 0
@@ -13979,7 +13995,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1030, y: 728}
+  m_SizeDelta: {x: 630, y: 728}
   m_Pivot: {x: 0, y: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
