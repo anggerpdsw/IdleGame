@@ -1,6 +1,7 @@
 // Updated EnemyData to include EXP reward
 using System;
 using UnityEngine;
+using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Data
 {
@@ -54,6 +55,9 @@ namespace IdleDefenseSurvival.Data
 
         [Tooltip("Drop table ID for loot generation. If empty, uses default drops.")]
         public string DropTableId;
+
+        [Tooltip("Per-enemy drop entries (materials/items). Each entry rolls independently; Weight is a percent (0-100).")]
+        public DropEntry[] dropItems;
     }
 
     /// <summary>

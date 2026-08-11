@@ -66,7 +66,7 @@ namespace IdleDefenseSurvival.Manager
         public int CurrentWave { get; private set; } = 1;
         public float TimeRemaining { get; private set; }
         public WaveState State { get; private set; }
-        public bool IsRunActive { get; private set; }
+        public bool IsRunActive { get; set; }
         public float ProgressionSpeed => 1f - CardModifierService.GetEffectResult(CardEffectType.TimeFast);
             
         // Damage stats tracking per wave

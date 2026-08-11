@@ -89,7 +89,6 @@ namespace IdleDefenseSurvival.Player
             _instance = this;
             // Removed DontDestroyOnLoad - Player will be in Game scene
 
-            ReloadStats();
             _enemyLayerMask = LayerMask.GetMask("Enemy");
             _activeTanks = new List<TankInstance>();
 
@@ -124,41 +123,30 @@ namespace IdleDefenseSurvival.Player
 
         private void Start()
         {
-            // Re-apply base stats once save data (and any modifier sources) are loaded
-            if (SaveManager.Instance != null && SaveManager.Instance.IsSaveLoaded)
-            {
-                // Save already loaded (e.g., scene reload)
-                ReloadStats();
-            }
-            else if (SaveManager.Instance != null)
-            {
-                // Subscribe to load event
-                SaveManager.OnSaveLoaded += OnSaveLoaded_ReloadStats;
-            }
-            else
-            {
-                // Fallback - no SaveManager
-                ReloadStats();
-            }
+            // Use a coroutine to wait until essential singletons are initialized.
+            StartCoroutine(InitializePlayer());
+        }
+
+        private IEnumerator InitializePlayer()
+        {
+            yield return new WaitUntil(() => BootstrapController.IsInitialized);
+            yield return new WaitUntil(() =>
+                PlayerStatsManager.Instance != null &&
+                BaseStatLoader.Instance != null
+            );
+
+            if (SaveManager.Instance != null)
+                yield return new WaitUntil(() => SaveManager.Instance.IsSaveLoaded);
+
+            ReloadStats();
 
             UpdateHealthUI();
             UpdateShieldVisual();
-            UpdateShieldCooldownUI(); // Initialize cooldown UI
+            UpdateShieldCooldownUI();
 
             DrawAttackRange();
+
             _ultimateManager = UltimateManager.Instance;
-        }
-
-        private void OnSaveLoaded_ReloadStats()
-        {
-            SaveManager.OnSaveLoaded -= OnSaveLoaded_ReloadStats;
-            ReloadStats();
-        }
-
-        private void OnDisable()
-        {
-            // Clean up event subscription
-            SaveManager.OnSaveLoaded -= OnSaveLoaded_ReloadStats;
         }
 
         private void Update()
@@ -705,12 +693,6 @@ namespace IdleDefenseSurvival.Player
         }
 
 #if UNITY_EDITOR
-        private void OnValidate()
-        {
-            // Update the visualization when attack range changes in the Inspector
-            if (Application.isPlaying) DrawAttackRange();
-        }
-
         private void OnDrawGizmosSelected()
         {
             // Draw attack range as subtle cyan dashed circle in Scene view

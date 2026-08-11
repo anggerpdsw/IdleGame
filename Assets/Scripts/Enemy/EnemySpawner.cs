@@ -87,7 +87,8 @@ namespace IdleDefenseSurvival.Enemy
                 knockback   = rawData.knockback,
                 evasion     = rawData.evasion,
                 element     = rawData.element,
-                exp         = rawData.exp
+                exp         = rawData.exp,
+                dropItems   = rawData.dropItems
             };
 
             // Calculate rewards based on enemy stats and wave

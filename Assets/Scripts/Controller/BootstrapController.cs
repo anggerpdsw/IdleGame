@@ -17,6 +17,7 @@ namespace IdleDefenseSurvival.Core
     /// </summary>
     public class BootstrapController : MonoBehaviour
     {
+        public static bool IsInitialized { get; private set; }
         private const string MainMenuSceneName = "MainMenu";
         private void Awake()
         {
@@ -34,11 +35,11 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<AccountManager>();
             EnsureSingleton<ModifierManager>();
             EnsureSingleton<PlayerStatsManager>();
+            EnsureSingleton<BaseStatLoader>();
             EnsureSingleton<EnemyStatisticsManager>();
             EnsureSingleton<AudioManager>();
             EnsureSingleton<AdvertisingManager>();
             EnsureSingleton<AnalyticsManager>();
-            EnsureSingleton<GameManager>();
             EnsureSingleton<WaveManager>();
             EnsureSingleton<CardDatabase>();
             EnsureSingleton<CardInventory>();
@@ -50,11 +51,11 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<InventoryService>();
             EnsureSingleton<EquipmentService>();
             EnsureSingleton<CraftService>();
-            EnsureSingleton<BaseStatLoader>();
             EnsureSingleton<SaveManager>();
             // Attribute stat modifiers need SaveManager (AccountData) to exist; it is created above.
             // If the save has not loaded yet, AttributeModifierManager re-applies on OnSaveLoaded.
             EnsureSingleton<AttributeModifierManager>();
+            EnsureSingleton<GameManager>();
 
             if (SaveManager.Instance?.IsSaveLoaded == true) {
                 // Dev: fill inventory once when the save is truly fresh (no save file yet)
@@ -64,6 +65,7 @@ namespace IdleDefenseSurvival.Core
             }
 
             // Load save data AFTER all managers exist (SaveManager.Start() will handle loading via coroutine)
+            IsInitialized = true;
             StartCoroutine(LoadMainMenu());
         }
 

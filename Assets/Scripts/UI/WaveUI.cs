@@ -32,6 +32,7 @@ namespace IdleDefenseSurvival.UI
         private Image _fillImage;
         private Coroutine _hideRoutine;
         private static WaitForSeconds _waitForSeconds3 = new(3f);
+        private bool isReady = false;
 
         private void Awake()
         {
@@ -42,10 +43,27 @@ namespace IdleDefenseSurvival.UI
         {
             _rewardGroup.alpha = 0f;
             _rewardPanel.SetActive(false);
+            // Use a coroutine to wait until essential singletons are initialized.
+            StartCoroutine(InitializeWave());
+        }
+
+        private IEnumerator InitializeWave()
+        {
+            yield return new WaitUntil(() => 
+                WaveManager.Instance != null && 
+                GameManager.Instance != null && 
+                SaveManager.Instance != null);
+            WaveManager.OnWaveBonusReward += ShowReward;
+            WaveManager.Instance.IsRunActive = true;
         }
 
         private void Update()
         {
+            if (!isReady)
+            {
+                isReady = true;
+                return;
+            }
             UpdateWaveDisplay();
         }
 
@@ -98,11 +116,6 @@ namespace IdleDefenseSurvival.UI
             _rewardPanel.SetActive(false);
         }
 
-        private void OnEnable()
-        {    
-            WaveManager.OnWaveBonusReward += ShowReward;
-        }
-
         private void OnDisable()
         {
             WaveManager.OnWaveBonusReward -= ShowReward;
@@ -112,10 +125,8 @@ namespace IdleDefenseSurvival.UI
         private void OnValidate()
         {
             // Set default colors if not set
-            if (_activeColor == Color.black)
-                _activeColor = GameColors.green;
-            if (_interWaveColor == Color.black)
-                _interWaveColor = GameColors.waveInterYellow;
+            if (_activeColor == Color.black) _activeColor = GameColors.green;
+            if (_interWaveColor == Color.black) _interWaveColor = GameColors.waveInterYellow;
         }
 #endif
     }

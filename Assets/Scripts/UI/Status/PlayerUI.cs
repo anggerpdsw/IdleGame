@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Player;
 using UnityEngine.UI;
 using IdleDefenseSurvival.Manager;
+using System.Collections;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -36,6 +37,14 @@ namespace IdleDefenseSurvival.UI
         private void Start()
         {
             _player = Player.Player.Instance;
+            // Use a coroutine to wait until essential singletons are initialized.
+            StartCoroutine(InitializeUI());
+        }
+
+        private IEnumerator InitializeUI()
+        {
+            yield return new WaitUntil(() => PlayerStatsManager.Instance != null);
+            PlayerStatsManager.Instance.OnStatsChanged += RefreshValues;
         }
 
         // ================================================================
@@ -111,9 +120,6 @@ namespace IdleDefenseSurvival.UI
                 kvp.Value.SetValue(kvp.Key.ToString(), value);
             }
         }
-
-        private void OnEnable()
-            => PlayerStatsManager.Instance.OnStatsChanged += RefreshValues;
 
         private void OnDisable()
             => PlayerStatsManager.Instance.OnStatsChanged -= RefreshValues;

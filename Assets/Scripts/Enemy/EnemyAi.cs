@@ -6,6 +6,8 @@ using IdleDefenseSurvival.Item;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Player;
+using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Items;
 using System.Collections.Generic;
 using UnityEngine.Pool;
 
@@ -468,22 +470,9 @@ namespace IdleDefenseSurvival.Enemy
         private void RecalculateMoveSpeed()
         {
             float multiplier = 1f;
-            foreach (var effect in _slowEffects.Values) {
-                switch (effect.Type)
-                {
-                    case SlowType.Permanent:
-                        multiplier *= effect.Percent;
-                        break;
+            foreach (var effect in _slowEffects.Values)
+                multiplier *= effect.Percent; // Perm/Aura/Temporary all multiply identically
 
-                    case SlowType.Aura:
-                        multiplier *= effect.Percent;
-                        break;
-
-                    case SlowType.Temporary:
-                        multiplier *= effect.Percent;
-                        break;
-                }
-            }
             _moveSpeed = _originalMoveSpeed * multiplier;
             EnemyStatisticsManager.Instance?.MarkDirty();
         }
@@ -637,6 +626,7 @@ namespace IdleDefenseSurvival.Enemy
             EnemyStatisticsManager.Instance?.Unregister(this);
 
             DropRewards();
+            DropItemDrops();
 
             // Try to spawn ultimate at enemy death position ONLY if killed by player
             // (not by bomb explosion, to prevent chain explosions)
@@ -683,6 +673,40 @@ namespace IdleDefenseSurvival.Enemy
             // Meat: Spawn physical pickup
             if (_meatReward > 0) SpawnItem(CurrencyType.Meat, _meatReward);
             
+        }
+
+        /// <summary>
+        /// Roll material drops defined in dataEnemy.json (dropItems) and grant them to inventory.
+        /// Each entry rolls independently; Weight is a percent (0-100), consistent with
+        /// Utilityku.Chance and DropEntry.Weight semantics elsewhere. Uses InventoryService.AddItem
+        /// so stacking, capacity, events, and save-dirty flow stay centralized.
+        /// </summary>
+        private void DropItemDrops()
+        {
+            if (EnemyData?.dropItems == null || EnemyData.dropItems.Length == 0) return;
+            var inventory = InventoryService.Instance;
+            if (inventory == null) return;
+
+            int currentTier = WaveManager.Instance?.CurrentTier ?? 1;
+            foreach (var entry in EnemyData.dropItems)
+            {
+                if (entry == null || string.IsNullOrEmpty(entry.ItemId)) continue;
+                // Tier gate: material rarity tier must already be reachable (T1=rare1, T2=rare2, ...)
+                if (entry.MinTier > currentTier) continue;
+                if (!Utilityku.Chance(entry.Weight)) continue;
+
+                int min = Mathf.Max(1, entry.MinCount);
+                int max = Mathf.Max(min, entry.MaxCount);
+                int quantity = Random.Range(min, max + 1);
+
+                if (ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(entry.ItemId) == null)
+                {
+                    Debug.LogWarning($"[EnemyAi] Drop item not found in dataItems.json: {entry.ItemId}");
+                    continue;
+                }
+
+                inventory.AddItem(entry.ItemId, quantity);
+            }
         }
 
         /// <summary>

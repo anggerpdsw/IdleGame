@@ -400,6 +400,8 @@ namespace IdleDefenseSurvival.Items
         public string ItemId;
         public int MinCount = 1;
         public int MaxCount = 1;
+        [Tooltip("Game tier required for this drop (1=Common, 2=Rare, 3=Epic, 4=Legendary, 5=Mythic, 6=Divine). Entry is skipped while CurrentTier < MinTier.")]
+        public int MinTier = 1;
         public float Weight = 1f;
         public int MinLevel = 1;
         public int MaxLevel = 1;

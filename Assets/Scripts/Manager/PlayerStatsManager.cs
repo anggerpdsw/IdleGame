@@ -19,7 +19,6 @@ namespace IdleDefenseSurvival.Manager
                 Destroy(gameObject);
                 return;
             }
-
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
@@ -29,10 +28,8 @@ namespace IdleDefenseSurvival.Manager
 
         private readonly PlayerStats _stats = new();
 
-        public float GetStat(SkillType stat)
-        {
-            return ModifierManager.Instance.ApplyModifiers(stat, GetBaseStat(stat));
-        }
+        public float GetStat(SkillType stat) =>
+            ModifierManager.Instance.ApplyModifiers(stat, GetBaseStat(stat));
 
         public int GetStatInt(SkillType stat) => Mathf.RoundToInt(GetStat(stat));
 

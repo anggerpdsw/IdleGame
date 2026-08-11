@@ -11,7 +11,7 @@ namespace IdleDefenseSurvival.Manager
     {
         private static GameManager _instance;
         public static GameManager Instance => _instance;
-        private int _pendingTier;
+        private int _pendingTier = 1;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatic()
@@ -36,7 +36,7 @@ namespace IdleDefenseSurvival.Manager
             SceneLoader.Instance.LoadGame();
         }
 
-        private void HandleGameLoaded() => WaveManager.Instance.InitializeRun(_pendingTier);
+        public void HandleGameLoaded() => WaveManager.Instance.InitializeRun(_pendingTier);
 
         private void OnEnable() => SceneLoader.OnGameSceneLoaded += HandleGameLoaded;
 

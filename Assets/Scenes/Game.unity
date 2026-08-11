@@ -4387,6 +4387,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43d6645deb6cb8d4eb386c76d58a3270, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Item.ItemClickManager
+  _debug: 0
   _itemLayerMask:
     serializedVersion: 2
     m_Bits: 8
@@ -13532,11 +13533,11 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
-  - {fileID: 207830572}
   - {fileID: 2142075741}
   - {fileID: 899243498}
   - {fileID: 890400225}
   - {fileID: 2120107670}
   - {fileID: 296059130}
+  - {fileID: 207830572}
   - {fileID: 1419669610}
   - {fileID: 1528020360}

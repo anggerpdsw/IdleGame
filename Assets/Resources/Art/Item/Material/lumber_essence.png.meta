@@ -1,0 +1,936 @@
+fileFormatVersion: 2
+guid: e865f6bda0a3320488085efef5503d0b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4801337570075954853
+    second: lumber_essence_0
+  - first:
+      213: -3336376396830357965
+    second: lumber_essence_1
+  - first:
+      213: -853097764164188095
+    second: lumber_essence_2
+  - first:
+      213: -4563611646084704358
+    second: lumber_essence_3
+  - first:
+      213: 8322927051308253146
+    second: lumber_essence_4
+  - first:
+      213: 6974698003270006766
+    second: lumber_essence_5
+  - first:
+      213: -4752104242893708375
+    second: lumber_essence_6
+  - first:
+      213: -3967203399041456293
+    second: lumber_essence_7
+  - first:
+      213: 1825524226368449287
+    second: lumber_essence_8
+  - first:
+      213: 4414988866373213710
+    second: lumber_essence_9
+  - first:
+      213: 9077761281533622037
+    second: lumber_essence_10
+  - first:
+      213: -7956556583961287212
+    second: lumber_essence_11
+  - first:
+      213: -611220576009801242
+    second: lumber_essence_12
+  - first:
+      213: 7764318472358290512
+    second: lumber_essence_13
+  - first:
+      213: -1460942035548110107
+    second: lumber_essence_14
+  - first:
+      213: 8978072302344548424
+    second: lumber_essence_15
+  - first:
+      213: -1968826192923047950
+    second: lumber_essence_16
+  - first:
+      213: -8925111240294047583
+    second: lumber_essence_17
+  - first:
+      213: -7087742990811897791
+    second: lumber_essence_18
+  - first:
+      213: -7788141207865205715
+    second: lumber_essence_19
+  - first:
+      213: -4579784081649373391
+    second: lumber_essence_20
+  - first:
+      213: 6896956795575276791
+    second: lumber_essence_21
+  - first:
+      213: -3461319907651645589
+    second: lumber_essence_22
+  - first:
+      213: -8144883515036548030
+    second: lumber_essence_23
+  - first:
+      213: 8219922687494650078
+    second: lumber_essence_24
+  - first:
+      213: -1230627415869300764
+    second: lumber_essence_25
+  - first:
+      213: 502502379538506018
+    second: lumber_essence_26
+  - first:
+      213: 2423839584545877239
+    second: lumber_essence_27
+  - first:
+      213: 4178835019685608233
+    second: lumber_essence_28
+  - first:
+      213: -9076614582510371349
+    second: lumber_essence_29
+  - first:
+      213: -6693678706203062430
+    second: lumber_essence_30
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: lumber_essence_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 354
+        width: 18
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b51b2e82be83e5db0800000000000000
+      internalID: -4801337570075954853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_1
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 353
+        width: 12
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 336cded085fc2b1d0800000000000000
+      internalID: -3336376396830357965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_2
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 340
+        width: 36
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14840587a103924f0800000000000000
+      internalID: -853097764164188095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_3
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 314
+        width: 37
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a97194e036bcaa0c0800000000000000
+      internalID: -4563611646084704358
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_4
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 327
+        width: 11
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adfb7b07e0af08370800000000000000
+      internalID: 8322927051308253146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_5
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 318
+        width: 54
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee7f88461ea1bc060800000000000000
+      internalID: 6974698003270006766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_6
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 342
+        width: 35
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a3a1ba6e522d0eb0800000000000000
+      internalID: -4752104242893708375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_7
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 334
+        width: 43
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5769681789a1f8c0800000000000000
+      internalID: -3967203399041456293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_8
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 342
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70baf81ac90955910800000000000000
+      internalID: 1825524226368449287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_9
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 339
+        width: 10
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0eda7b7bf0354d30800000000000000
+      internalID: 4414988866373213710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_10
+      rect:
+        serializedVersion: 2
+        x: 24
+        y: 301
+        width: 23
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5173b9d1acfaafd70800000000000000
+      internalID: 9077761281533622037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_11
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 289
+        width: 42
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d521b941f1a49190800000000000000
+      internalID: -7956556583961287212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_12
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 319
+        width: 18
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e1b68fdf128487f0800000000000000
+      internalID: -611220576009801242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_13
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 315
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0546be3738660cb60800000000000000
+      internalID: 7764318472358290512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_14
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 301
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e208b585f0b9bbe0800000000000000
+      internalID: -1460942035548110107
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_15
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 303
+        width: 18
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 840350de035889c70800000000000000
+      internalID: 8978072302344548424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_16
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 311
+        width: 12
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f7465242035da4e0800000000000000
+      internalID: -1968826192923047950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_17
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 309
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a06d6d3d92a32480800000000000000
+      internalID: -8925111240294047583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_18
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 318
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14064656d4743ad90800000000000000
+      internalID: -7087742990811897791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_19
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 297
+        width: 14
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2cdc94b5d6fae390800000000000000
+      internalID: -7788141207865205715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_20
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 314
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13fec4974a65170c0800000000000000
+      internalID: -4579784081649373391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_21
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 301
+        width: 32
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f41b77f9a9e6bf50800000000000000
+      internalID: 6896956795575276791
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_22
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 315
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6f8f6202ebe6ffc0800000000000000
+      internalID: -3461319907651645589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_23
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 315
+        width: 18
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 244cf45b89f87fe80800000000000000
+      internalID: -8144883515036548030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_24
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 298
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed8fa4d1228031270800000000000000
+      internalID: 8219922687494650078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_25
+      rect:
+        serializedVersion: 2
+        x: 334
+        y: 289
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4efd04aa2eeebeee0800000000000000
+      internalID: -1230627415869300764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_26
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 302
+        width: 8
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2216e27704f39f600800000000000000
+      internalID: 502502379538506018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_27
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 360
+        height: 300
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fc2365924533a120800000000000000
+      internalID: 2423839584545877239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_28
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 293
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92bb25b5f443ef930800000000000000
+      internalID: 4178835019685608233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_29
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 142
+        width: 20
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bedb65e8023690280800000000000000
+      internalID: -9076614582510371349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lumber_essence_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 21
+        width: 5
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26f8b2c6ea64b13a0800000000000000
+      internalID: -6693678706203062430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      lumber_essence_0: -4801337570075954853
+      lumber_essence_1: -3336376396830357965
+      lumber_essence_10: 9077761281533622037
+      lumber_essence_11: -7956556583961287212
+      lumber_essence_12: -611220576009801242
+      lumber_essence_13: 7764318472358290512
+      lumber_essence_14: -1460942035548110107
+      lumber_essence_15: 8978072302344548424
+      lumber_essence_16: -1968826192923047950
+      lumber_essence_17: -8925111240294047583
+      lumber_essence_18: -7087742990811897791
+      lumber_essence_19: -7788141207865205715
+      lumber_essence_2: -853097764164188095
+      lumber_essence_20: -4579784081649373391
+      lumber_essence_21: 6896956795575276791
+      lumber_essence_22: -3461319907651645589
+      lumber_essence_23: -8144883515036548030
+      lumber_essence_24: 8219922687494650078
+      lumber_essence_25: -1230627415869300764
+      lumber_essence_26: 502502379538506018
+      lumber_essence_27: 2423839584545877239
+      lumber_essence_28: 4178835019685608233
+      lumber_essence_29: -9076614582510371349
+      lumber_essence_3: -4563611646084704358
+      lumber_essence_30: -6693678706203062430
+      lumber_essence_4: 8322927051308253146
+      lumber_essence_5: 6974698003270006766
+      lumber_essence_6: -4752104242893708375
+      lumber_essence_7: -3967203399041456293
+      lumber_essence_8: 1825524226368449287
+      lumber_essence_9: 4414988866373213710
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
