@@ -17,8 +17,8 @@ const itemDb = JSON.parse(fs.readFileSync('Assets/Resources/Data/dataItems.json'
 const rarityOf = {};
 for (const i of itemDb.Items) rarityOf[i.Id] = i.ItemRarity || 1;
 
-// Global rate multiplier — 0.25 = drop chances quartered (balance pass, 2026-08-11)
-const RATE_MULT = 0.25;
+// Global rate multiplier — 0.0625 = quartered twice (balance passes, 2026-08-11)
+const RATE_MULT = 0.0625;
 
 // [item, chance, min, max] — chance = percent 0-100
 const D = {

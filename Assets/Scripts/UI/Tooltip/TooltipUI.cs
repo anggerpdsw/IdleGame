@@ -80,7 +80,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
         [SerializeField] private GameObject _comparisonStatPrefab;
 
         [Header("Positioning")]
-        [SerializeField] private Vector2 _offset = new(10, -80);
+        [SerializeField] private Vector2 _offset = new(10, -240);
         [SerializeField] private bool _followMouse = true;
 
         // State

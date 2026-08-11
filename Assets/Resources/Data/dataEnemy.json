@@ -18,28 +18,28 @@
                     "ItemId": "coal",
                     "MinCount": 2,
                     "MaxCount": 3,
-                    "Weight": 6.25,
+                    "Weight": 1.563,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "charcoal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "extruded_charcoal",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 3
                 },
                 {
                     "ItemId": "elemental_essence",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.25,
+                    "Weight": 0.063,
                     "MinTier": 4
                 }
             ]
@@ -62,28 +62,28 @@
                     "ItemId": "rock",
                     "MinCount": 2,
                     "MaxCount": 3,
-                    "Weight": 6.25,
+                    "Weight": 1.563,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "corundum_powder",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 3
                 },
                 {
                     "ItemId": "elemental_essence",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.25,
+                    "Weight": 0.063,
                     "MinTier": 4
                 }
             ]
@@ -106,28 +106,28 @@
                     "ItemId": "iron_dust",
                     "MinCount": 2,
                     "MaxCount": 3,
-                    "Weight": 6.25,
+                    "Weight": 1.563,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "pig_iron",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2.5,
+                    "Weight": 0.625,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "high_alloy_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.25,
+                    "Weight": 0.063,
                     "MinTier": 4
                 }
             ]
@@ -150,21 +150,21 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "anthracite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "extruded_charcoal",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.75,
+                    "Weight": 0.188,
                     "MinTier": 3
                 }
             ]
@@ -187,21 +187,21 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "dream_of_reminiscence",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.5,
+                    "Weight": 0.125,
                     "MinTier": 4
                 }
             ]
@@ -224,21 +224,21 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "azureworm_silk",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.75,
+                    "Weight": 0.188,
                     "MinTier": 3
                 }
             ]
@@ -261,21 +261,21 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "corundum_powder",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1,
+                    "Weight": 0.25,
                     "MinTier": 3
                 }
             ]
@@ -298,21 +298,21 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "fine_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "high_grade_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1,
+                    "Weight": 0.25,
                     "MinTier": 3
                 }
             ]
@@ -335,21 +335,21 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 },
                 {
                     "ItemId": "corundum_powder",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.75,
+                    "Weight": 0.188,
                     "MinTier": 3
                 }
             ]
@@ -372,14 +372,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "fine_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -402,14 +402,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "anthracite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -432,14 +432,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -462,14 +462,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "sandstone",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -492,14 +492,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -522,14 +522,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "thick_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -552,14 +552,14 @@
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "strong_glue",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -582,14 +582,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -612,14 +612,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -642,14 +642,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "anthracite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -672,14 +672,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "sandstone",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -702,14 +702,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "fine_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -732,14 +732,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -762,14 +762,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -792,14 +792,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -822,14 +822,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -852,14 +852,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "anthracite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -882,21 +882,21 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 3.75,
+                    "Weight": 0.938,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "dream_of_reminiscence",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 0.375,
+                    "Weight": 0.094,
                     "MinTier": 4
                 }
             ]
@@ -919,14 +919,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "rough_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -949,14 +949,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 1
                 }
             ]
@@ -979,14 +979,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "logs",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1009,14 +1009,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "thick_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -1039,7 +1039,7 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 }
             ]
@@ -1062,14 +1062,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "coal_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1092,7 +1092,7 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 }
             ]
@@ -1115,7 +1115,7 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 }
             ]
@@ -1138,7 +1138,7 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 }
             ]
@@ -1161,14 +1161,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1191,14 +1191,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "coal_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1221,7 +1221,7 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 }
             ]
@@ -1244,7 +1244,7 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 }
             ]
@@ -1267,14 +1267,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -1297,7 +1297,7 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 }
             ]
@@ -1320,14 +1320,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1350,7 +1350,7 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 }
             ]
@@ -1373,14 +1373,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1403,14 +1403,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 1
                 }
             ]
@@ -1433,14 +1433,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1463,14 +1463,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 1
                 }
             ]
@@ -1493,14 +1493,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1523,14 +1523,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "rough_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1553,14 +1553,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.25,
+                    "Weight": 0.313,
                     "MinTier": 2
                 }
             ]
@@ -1583,7 +1583,7 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 }
             ]
@@ -1606,14 +1606,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 1
                 }
             ]
@@ -1636,7 +1636,7 @@
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5.5,
+                    "Weight": 1.375,
                     "MinTier": 1
                 }
             ]
@@ -1659,14 +1659,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "charcoal",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1689,14 +1689,14 @@
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1719,14 +1719,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1749,14 +1749,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -1779,14 +1779,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1809,14 +1809,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "logs",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1839,14 +1839,14 @@
                     "ItemId": "coal",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "charcoal",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -1869,14 +1869,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "thick_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -1899,14 +1899,14 @@
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "concentrated_glue",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -1929,14 +1929,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -1959,14 +1959,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -1989,14 +1989,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -2019,14 +2019,14 @@
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "concentrated_glue",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.25,
+                    "Weight": 0.313,
                     "MinTier": 2
                 }
             ]
@@ -2049,14 +2049,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -2079,14 +2079,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "pig_iron",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -2109,14 +2109,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -2139,14 +2139,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -2169,14 +2169,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "fine_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2199,14 +2199,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "high_carbon_steel",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 2
                 }
             ]
@@ -2229,14 +2229,14 @@
                     "ItemId": "disposed_logs",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "fine_lumber",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2259,14 +2259,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "stone_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -2289,14 +2289,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2319,14 +2319,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2349,14 +2349,14 @@
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4.5,
+                    "Weight": 1.125,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "pig_iron",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 1
                 }
             ]
@@ -2379,14 +2379,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2409,14 +2409,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.75,
+                    "Weight": 0.438,
                     "MinTier": 1
                 }
             ]
@@ -2439,14 +2439,14 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 5,
+                    "Weight": 1.25,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "granite",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2469,14 +2469,14 @@
                     "ItemId": "cotton_thread",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "silk_thread",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2499,14 +2499,14 @@
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "strong_glue",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 2,
+                    "Weight": 0.5,
                     "MinTier": 2
                 }
             ]
@@ -2529,21 +2529,21 @@
                     "ItemId": "rock",
                     "MinCount": 1,
                     "MaxCount": 2,
-                    "Weight": 4,
+                    "Weight": 1,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "organic_glue",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 1
                 },
                 {
                     "ItemId": "iron_dust",
                     "MinCount": 1,
                     "MaxCount": 1,
-                    "Weight": 1.5,
+                    "Weight": 0.375,
                     "MinTier": 1
                 }
             ]

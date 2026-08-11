@@ -18,7 +18,7 @@
         "displayName": "Attack Speed"
       },
       "attackRange": {
-        "baseValue": 2.67,
+        "baseValue": 3.37,
         "description": "Maximum range of player",
         "displayName": "Attack Range"
       },

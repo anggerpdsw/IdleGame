@@ -585,6 +585,16 @@
       "IconKey": "Material/essence_of_hope",
       "SellPrice": 1500,
       "StackSize": 999
+    },
+    {
+      "Id": "water",
+      "Name": "Water",
+      "Description": "A liquid to drink.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/water",
+      "SellPrice": 10,
+      "StackSize": 999
     }
   ],
   "Equipment": [{
