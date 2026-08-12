@@ -10,13 +10,43 @@
       "StackSize": 999
     },
     {
-      "Id": "SkinShard",
-      "Name": "Skin Shard",
-      "Description": "Fragment of a skin.",
-      "Category": 12,
-      "ItemRarity": 3,
-      "IconKey": "SkinShard",
-      "SellPrice": 20,
+      "Id": "potion_ap",
+      "Name": "Antidote Potion",
+      "Description": "Clean debuf when used.",
+      "Category": 2,
+      "ItemRarity": 1,
+      "IconKey": "potion/ap",
+      "SellPrice": 10,
+      "StackSize": 999
+    },
+    {
+      "Id": "potion_hp",
+      "Name": "Health Potion",
+      "Description": "Restores 500 Health Points over 10s when used. Cooldown in 5s.",
+      "Category": 2,
+      "ItemRarity": 1,
+      "IconKey": "Potion/potion/hp",
+      "SellPrice": 10,
+      "StackSize": 999
+    },
+    {
+      "Id": "potion_mp",
+      "Name": "Mana Potion",
+      "Description": "Restores 500 Mana Points over 10s when used. Cooldown in 5s.",
+      "Category": 2,
+      "ItemRarity": 1,
+      "IconKey": "potion/mp",
+      "SellPrice": 10,
+      "StackSize": 999
+    },
+    {
+      "Id": "potion_sp",
+      "Name": "Stamina Potion",
+      "Description": "Restores 500 Stamina Points over 10s when used. Cooldown in 5s.",
+      "Category": 2,
+      "ItemRarity": 1,
+      "IconKey": "potion/sp",
+      "SellPrice": 10,
       "StackSize": 999
     },
     {
@@ -100,43 +130,733 @@
       "StackSize": 999
     },
     {
-      "Id": "potion_ap",
-      "Name": "Antidote Potion",
-      "Description": "Clean debuf when used.",
-      "Category": 2,
+      "Id": "anthracite",
+      "Name": "Anthracite",
+      "Description": "A dense, high-carbon material used in advanced metalworking.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/anthracite",
+      "SellPrice": 20,
+      "StackSize": 999
+    },
+    {
+      "Id": "azureworm_silk",
+      "Name": "Azureworm Silk",
+      "Description": "Rare silk harvested from Azureworms and used in advanced crafting.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/azureworm_silk",
+      "SellPrice": 50,
+      "StackSize": 999
+    },
+    {
+      "Id": "charcoal",
+      "Name": "Charcoal",
+      "Description": "Processed carbon material used as fuel and in metalworking.",
+      "Category": 3,
       "ItemRarity": 1,
-      "IconKey": "potion/ap",
+      "IconKey": "Material/charcoal",
+      "SellPrice": 5,
+      "StackSize": 999
+    },
+    {
+      "Id": "coal",
+      "Name": "Coal",
+      "Description": "A common carbon-rich material used as fuel and in metalworking.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/coal",
+      "SellPrice": 3,
+      "StackSize": 999
+    },
+    {
+      "Id": "coal_dust",
+      "Name": "Coal Dust",
+      "Description": "Fine coal particles used in specialized crafting and processing.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/coal_dust",
+      "SellPrice": 4,
+      "StackSize": 999
+    },
+    {
+      "Id": "colored_glue",
+      "Name": "Colored Glue",
+      "Description": "Specialized adhesive used in decorative and specialized crafting.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/colored_glue",
+      "SellPrice": 15,
+      "StackSize": 999
+    },
+    {
+      "Id": "compound_glue",
+      "Name": "Compound Glue",
+      "Description": "A specialized multi-component adhesive used in advanced crafting.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/compound_glue",
+      "SellPrice": 60,
+      "StackSize": 999
+    },
+    {
+      "Id": "compound_thread",
+      "Name": "Compound Thread",
+      "Description": "Specially combined thread used in advanced equipment crafting.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/compound_thread",
+      "SellPrice": 35,
+      "StackSize": 999
+    },
+    {
+      "Id": "concentrated_glue",
+      "Name": "Concentrated Glue",
+      "Description": "A stronger adhesive produced by concentrating organic glue.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/concentrated_glue",
       "SellPrice": 10,
       "StackSize": 999
     },
     {
-      "Id": "potion_hp",
-      "Name": "Health Potion",
-      "Description": "Restores 500 Health Points over 10s when used. Cooldown in 5s.",
-      "Category": 2,
+      "Id": "corundum_powder",
+      "Name": "Corundum Powder",
+      "Description": "A fine mineral powder used in advanced metalworking and refining.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/corundum_powder",
+      "SellPrice": 40,
+      "StackSize": 999
+    },
+    {
+      "Id": "cotton_thread",
+      "Name": "Cotton Thread",
+      "Description": "Basic thread used in crafting cloth and equipment components.",
+      "Category": 3,
       "ItemRarity": 1,
-      "IconKey": "Potion/potion/hp",
+      "IconKey": "Material/cotton_thread",
+      "SellPrice": 3,
+      "StackSize": 999
+    },
+    {
+      "Id": "disposed_logs",
+      "Name": "Disposed Logs",
+      "Description": "Discarded timber that can still be used in basic crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/disposed_logs",
+      "SellPrice": 1,
+      "StackSize": 999
+    },
+    {
+      "Id": "dream_of_reminiscence",
+      "Name": "Dream of Reminiscence",
+      "Description": "A mysterious material containing echoes of forgotten memories.",
+      "Category": 3,
+      "ItemRarity": 4,
+      "IconKey": "Material/dream_of_reminiscence",
+      "SellPrice": 500,
+      "StackSize": 999
+    },
+    {
+      "Id": "elemental_essence",
+      "Name": "Elemental Essence",
+      "Description": "A concentrated essence of energy yin and yang used in powerful crafting.",
+      "Category": 3,
+      "ItemRarity": 4,
+      "IconKey": "Material/elemental_essence",
+      "SellPrice": 300,
+      "StackSize": 999
+    },
+    {
+      "Id": "essence_of_hope",
+      "Name": "Essence of Hope",
+      "Description": "A mysterious material containing hope of forgotten land.",
+      "Category": 3,
+      "ItemRarity": 4,
+      "IconKey": "Material/essence_of_hope",
+      "SellPrice": 1500,
+      "StackSize": 999
+    },
+    {
+      "Id": "extruded_charcoal",
+      "Name": "Extruded Charcoal",
+      "Description": "Highly processed charcoal used in advanced crafting and metallurgy.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/extruded_charcoal",
+      "SellPrice": 50,
+      "StackSize": 999
+    },
+    {
+      "Id": "fine_lumber",
+      "Name": "Fine Lumber",
+      "Description": "Carefully processed lumber used in higher-quality crafting.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/fine_lumber",
+      "SellPrice": 20,
+      "StackSize": 999
+    },
+    {
+      "Id": "granite",
+      "Name": "Granite",
+      "Description": "A dense and durable stone used in sturdy crafting recipes.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/granite",
+      "SellPrice": 8,
+      "StackSize": 999
+    },
+    {
+      "Id": "high_alloy_steel",
+      "Name": "High Alloy Steel",
+      "Description": "Exceptional alloy steel used in the highest levels of metalworking.",
+      "Category": 3,
+      "ItemRarity": 4,
+      "IconKey": "Material/high_alloy_steel",
+      "SellPrice": 250,
+      "StackSize": 999
+    },
+    {
+      "Id": "high_carbon_steel",
+      "Name": "High-carbon Steel",
+      "Description": "Strong steel with a high carbon content used in durable equipment crafting.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/high_carbon_steel",
+      "SellPrice": 25,
+      "StackSize": 999
+    },
+    {
+      "Id": "high_grade_lumber",
+      "Name": "High-grade Lumber",
+      "Description": "High-quality lumber used in advanced equipment crafting.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/high_grade_lumber",
+      "SellPrice": 60,
+      "StackSize": 999
+    },
+    {
+      "Id": "iron_dust",
+      "Name": "Iron Dust",
+      "Description": "Fine iron particles used in metalworking and specialized crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/iron_dust",
+      "SellPrice": 5,
+      "StackSize": 999
+    },
+    {
+      "Id": "leather",
+      "Name": "Leather",
+      "Description": "Tanned animal hide that is durable, flexible, and widely used for crafting armor, equipment, and sturdy accessories.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/leather",
+      "SellPrice": 35,
+      "StackSize": 999
+    },
+    {
+      "Id": "logs",
+      "Name": "Logs",
+      "Description": "Raw timber used as a basic woodworking material.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/logs",
+      "SellPrice": 3,
+      "StackSize": 999
+    },
+    {
+      "Id": "lumber_essence",
+      "Name": "Lumber Essence",
+      "Description": "A concentrated essence of refined wood used in high-tier crafting.",
+      "Category": 3,
+      "ItemRarity": 4,
+      "IconKey": "Material/lumber_essence",
+      "SellPrice": 200,
+      "StackSize": 999
+    },
+    {
+      "Id": "organic_glue",
+      "Name": "Organic Glue",
+      "Description": "A basic adhesive used in general crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/organic_glue",
+      "SellPrice": 3,
+      "StackSize": 999
+    },
+    {
+      "Id": "pig_iron",
+      "Name": "Pig Iron",
+      "Description": "Crude iron used as a base material for steel production.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/pig_iron",
+      "SellPrice": 8,
+      "StackSize": 999
+    },
+    {
+      "Id": "refined_steel",
+      "Name": "Refined Steel",
+      "Description": "Carefully processed steel used in advanced equipment crafting.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/refined_steel",
+      "SellPrice": 60,
+      "StackSize": 999
+    },
+    {
+      "Id": "rock",
+      "Name": "Rock",
+      "Description": "A common stone used as a basic crafting material.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/rock",
+      "SellPrice": 2,
+      "StackSize": 999
+    },
+    {
+      "Id": "rough_lumber",
+      "Name": "Rough Lumber",
+      "Description": "Processed timber used in basic equipment and structure crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/rough_lumber",
+      "SellPrice": 6,
+      "StackSize": 999
+    },
+    {
+      "Id": "rubstone_powder",
+      "Name": "Rubstone Powder",
+      "Description": "A rare mineral powder used in advanced crafting and material refinement.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/rubstone_powder",
+      "SellPrice": 50,
+      "StackSize": 999
+    },
+    {
+      "Id": "sandstone",
+      "Name": "Sandstone",
+      "Description": "A coarse stone commonly used in construction and crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/sandstone",
+      "SellPrice": 4,
+      "StackSize": 999
+    },
+    {
+      "Id": "silk_thread",
+      "Name": "Silk Thread",
+      "Description": "Fine silk thread used in high-quality crafting.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/silk_thread",
+      "SellPrice": 15,
+      "StackSize": 999
+    },
+    {
+      "Id": "steel_alloy",
+      "Name": "Steel Alloy",
+      "Description": "A specialized steel alloy used in high-tier equipment crafting.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/steel_alloy",
+      "SellPrice": 100,
+      "StackSize": 999
+    },
+    {
+      "Id": "stone_dust",
+      "Name": "Stone Dust",
+      "Description": "Fine stone dust used in basic crafting and material processing.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Material/stone_dust",
+      "SellPrice": 3,
+      "StackSize": 999
+    },
+    {
+      "Id": "strong_glue",
+      "Name": "Strong Glue",
+      "Description": "A durable adhesive used in equipment and advanced crafting.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/strong_glue",
+      "SellPrice": 20,
+      "StackSize": 999
+    },
+    {
+      "Id": "super_glue",
+      "Name": "Super Glue",
+      "Description": "A powerful adhesive capable of forming exceptionally strong bonds.",
+      "Category": 3,
+      "ItemRarity": 3,
+      "IconKey": "Material/super_glue",
+      "SellPrice": 50,
+      "StackSize": 999
+    },
+    {
+      "Id": "thick_thread",
+      "Name": "Thick Thread",
+      "Description": "Strong thread used in durable equipment and crafting materials.",
+      "Category": 3,
+      "ItemRarity": 2,
+      "IconKey": "Material/thick_thread",
       "SellPrice": 10,
       "StackSize": 999
     },
     {
-      "Id": "potion_mp",
-      "Name": "Mana Potion",
-      "Description": "Restores 500 Mana Points over 10s when used. Cooldown in 5s.",
-      "Category": 2,
+      "Id": "vega_string",
+      "Name": "Vega String",
+      "Description": "A rare and resilient string used in specialized equipment crafting.",
+      "Category": 3,
+      "ItemRarity": 4,
+      "IconKey": "Material/vega_string",
+      "SellPrice": 150,
+      "StackSize": 999
+    },
+    {
+      "Id": "water",
+      "Name": "Water",
+      "Description": "A liquid to drink.",
+      "Category": 3,
       "ItemRarity": 1,
-      "IconKey": "potion/mp",
+      "IconKey": "Material/water",
       "SellPrice": 10,
       "StackSize": 999
     },
     {
-      "Id": "potion_sp",
-      "Name": "Stamina Potion",
-      "Description": "Restores 500 Stamina Points over 10s when used. Cooldown in 5s.",
-      "Category": 2,
+      "Id": "ageratum",
+      "Name": "Ageratum",
+      "Description": "A small flowering herb with soft leaves and a mild herbal fragrance.",
+      "Category": 3,
       "ItemRarity": 1,
-      "IconKey": "potion/sp",
-      "SellPrice": 10,
+      "IconKey": "Herb/ageratum",
+      "SellPrice": 18,
+      "StackSize": 999
+    },
+    {
+      "Id": "black_henbane",
+      "Name": "Black Henbane",
+      "Description": "A dark-leaved herb known for its potent and dangerous properties.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/black_henbane",
+      "SellPrice": 35,
+      "StackSize": 999
+    },
+    {
+      "Id": "butterfly_herb",
+      "Name": "Butterfly Herb",
+      "Description": "A delicate herb with colorful blossoms that attract butterflies and other small creatures.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/butterfly_herb",
+      "SellPrice": 22,
+      "StackSize": 999
+    },
+    {
+      "Id": "calathea",
+      "Name": "Calathea",
+      "Description": "A broad-leaved plant prized for its striking patterns and resilient natural fibers.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/calathea",
+      "SellPrice": 20,
+      "StackSize": 999
+    },
+    {
+      "Id": "chocolate_additive",
+      "Name": "Chocolate Additive",
+      "Description": "A crafting ingredient used to enhance chocolate-based recipes.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/chocolate_additive",
+      "SellPrice": 5,
+      "StackSize": 999
+    },
+    {
+      "Id": "chocolate_syrup",
+      "Name": "Chocolate Syrup",
+      "Description": "A sweet ingredient used in specialized culinary crafting.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/chocolate_syrup",
+      "SellPrice": 5,
+      "StackSize": 999
+    },
+    {
+      "Id": "crane_herb",
+      "Name": "Crane Herb",
+      "Description": "A slender medicinal herb with leaves shaped like the wings of a crane.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/crane_herb",
+      "SellPrice": 24,
+      "StackSize": 999
+    },
+    {
+      "Id": "devilwood",
+      "Name": "Devilwood",
+      "Description": "A dense and dark wood with a bitter scent, often used for durable tools and arcane preparations.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/devilwood",
+      "SellPrice": 40,
+      "StackSize": 999
+    },
+    {
+      "Id": "edible_pigment",
+      "Name": "Edible Pigment",
+      "Description": "A food-safe pigment used to add color to culinary creations.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/edible_pigment",
+      "SellPrice": 5,
+      "StackSize": 999
+    },
+    {
+      "Id": "elderwood",
+      "Name": "Elderwood",
+      "Description": "A seasoned magical wood believed to retain traces of the energy absorbed during its long growth.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/elderwood",
+      "SellPrice": 55,
+      "StackSize": 999
+    },
+    {
+      "Id": "elecampane",
+      "Name": "Elecampane",
+      "Description": "A hardy medicinal plant with a bitter root valued for restorative preparations.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/elecampane",
+      "SellPrice": 28,
+      "StackSize": 999
+    },
+    {
+      "Id": "fleece_flower",
+      "Name": "Fleece Flower",
+      "Description": "A soft-stemmed medicinal plant whose roots are prized by herbalists.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/fleece_flower",
+      "SellPrice": 32,
+      "StackSize": 999
+    },
+    {
+      "Id": "ginger",
+      "Name": "Ginger",
+      "Description": "A pungent root with a warming flavor, commonly used in food, medicine, and tonics.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/ginger",
+      "SellPrice": 16,
+      "StackSize": 999
+    },
+    {
+      "Id": "golden_herb",
+      "Name": "Golden Herb",
+      "Description": "A rare golden-leaved herb that retains a faint warm glow when freshly harvested.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/golden_herb",
+      "SellPrice": 70,
+      "StackSize": 999
+    },
+    {
+      "Id": "hibiscus",
+      "Name": "Hibiscus",
+      "Description": "A vivid flowering plant used in teas, dyes, and restorative herbal mixtures.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/hibiscus",
+      "SellPrice": 18,
+      "StackSize": 999
+    },
+    {
+      "Id": "ligumaloes_wood",
+      "Name": "Ligumaloes Wood",
+      "Description": "A fragrant and resilient wood valued for its unusual aroma and alchemical properties.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/ligumaloes_wood",
+      "SellPrice": 65,
+      "StackSize": 999
+    },
+    {
+      "Id": "longen_herb",
+      "Name": "Longen Herb",
+      "Description": "A slender herb with elongated leaves, commonly gathered for medicinal and restorative recipes.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/longen_herb",
+      "SellPrice": 26,
+      "StackSize": 999
+    },
+    {
+      "Id": "nectar",
+      "Name": "Nectar",
+      "Description": "A sweet natural essence collected from flowers and valued as an ingredient in potions and tonics.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/nectar",
+      "SellPrice": 45,
+      "StackSize": 999
+    },
+    {
+      "Id": "ox_bezoar",
+      "Name": "Ox Bezoar",
+      "Description": "A hardened mineral-like mass formed inside an ox, traditionally valued as a powerful medicinal ingredient.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/ox_bezoar",
+      "SellPrice": 90,
+      "StackSize": 999
+    },
+    {
+      "Id": "palo_herb",
+      "Name": "Palo Herb",
+      "Description": "A woody herb with a strong natural scent, often burned or processed for medicinal preparations.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/palo_herb",
+      "SellPrice": 38,
+      "StackSize": 999
+    },
+    {
+      "Id": "perfumedew_herb",
+      "Name": "Perfumedew Herb",
+      "Description": "A fragrant herb covered in tiny droplets of aromatic moisture that are prized by alchemists.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/perfumedew_herb",
+      "SellPrice": 48,
+      "StackSize": 999
+    },
+    {
+      "Id": "realgar",
+      "Name": "Realgar",
+      "Description": "A bright red mineral with potent alchemical properties, handled carefully due to its toxic nature.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/realgar",
+      "SellPrice": 60,
+      "StackSize": 999
+    },
+    {
+      "Id": "red_berry",
+      "Name": "Red Berry",
+      "Description": "A bright red wild berry with a sweet and slightly tart flavor, useful in food and simple remedies.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/red_berry",
+      "SellPrice": 14,
+      "StackSize": 999
+    },
+    {
+      "Id": "salvia_root",
+      "Name": "Salvia Root",
+      "Description": "A fragrant medicinal root with cleansing properties, commonly used in herbal preparations.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/salvia_root",
+      "SellPrice": 34,
+      "StackSize": 999
+    },
+    {
+      "Id": "scented_fungus",
+      "Name": "Scented Fungus",
+      "Description": "A rare fungus that releases a distinctive aroma and is valued as an alchemical ingredient.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/scented_fungus",
+      "SellPrice": 52,
+      "StackSize": 999
+    },
+    {
+      "Id": "serpentine_herb",
+      "Name": "Serpentine Herb",
+      "Description": "A twisting herb with winding stems, traditionally associated with antidotes and protective mixtures.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/serpentine_herb",
+      "SellPrice": 42,
+      "StackSize": 999
+    },
+    {
+      "Id": "tiery_herb",
+      "Name": "Tiery Herb",
+      "Description": "A resilient wild herb with a sharp aroma, commonly harvested for basic medicinal recipes.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/tiery_herb",
+      "SellPrice": 25,
+      "StackSize": 999
+    },
+    {
+      "Id": "tiger_ear_herb",
+      "Name": "Tiger Ear Herb",
+      "Description": "A broad-leaved herb whose markings resemble the ears of a tiger, prized for its restorative qualities.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/tiger_ear_herb",
+      "SellPrice": 36,
+      "StackSize": 999
+    },
+    {
+      "Id": "tulip",
+      "Name": "Tulip",
+      "Description": "A colorful flowering plant valued for its beauty and occasionally used in fragrant mixtures.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/tulip",
+      "SellPrice": 15,
+      "StackSize": 999
+    },
+    {
+      "Id": "tumeric_root",
+      "Name": "Tumeric Root",
+      "Description": "A bright yellow root with a warm earthy flavor, widely used in food, dyes, and herbal remedies.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/tumeric_root",
+      "SellPrice": 20,
+      "StackSize": 999
+    },
+    {
+      "Id": "white_berry",
+      "Name": "White Berry",
+      "Description": "A pale wild berry with a mild flavor, valued as a simple ingredient for food and herbal mixtures.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/white_berry",
+      "SellPrice": 17,
+      "StackSize": 999
+    },
+    {
+      "Id": "worm_sprouts",
+      "Name": "Worm Sprouts",
+      "Description": "Strange root-like sprouts that resemble tiny worms and are sought after for unusual alchemical recipes.",
+      "Category": 3,
+      "ItemRarity": 1,
+      "IconKey": "Herb/worm_sprouts",
+      "SellPrice": 58,
+      "StackSize": 999
+    },
+    {
+      "Id": "SkinShard",
+      "Name": "Skin Shard",
+      "Description": "Fragment of a skin.",
+      "Category": 5,
+      "ItemRarity": 3,
+      "IconKey": "SkinShard",
+      "SellPrice": 20,
       "StackSize": 999
     },
     {
@@ -167,433 +887,6 @@
       "ItemRarity": 2,
       "IconKey": "Meat",
       "SellPrice": 100,
-      "StackSize": 999
-    },
-    {
-      "Id": "rock",
-      "Name": "Rock",
-      "Description": "A common stone used as a basic crafting material.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/rock",
-      "SellPrice": 2,
-      "StackSize": 999
-    },
-    {
-      "Id": "stone_dust",
-      "Name": "Stone Dust",
-      "Description": "Fine stone dust used in basic crafting and material processing.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/stone_dust",
-      "SellPrice": 3,
-      "StackSize": 999
-    },
-    {
-      "Id": "granite",
-      "Name": "Granite",
-      "Description": "A dense and durable stone used in sturdy crafting recipes.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/granite",
-      "SellPrice": 8,
-      "StackSize": 999
-    },
-    {
-      "Id": "sandstone",
-      "Name": "Sandstone",
-      "Description": "A coarse stone commonly used in construction and crafting.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/sandstone",
-      "SellPrice": 4,
-      "StackSize": 999
-    },
-    {
-      "Id": "corundum_powder",
-      "Name": "Corundum Powder",
-      "Description": "A fine mineral powder used in advanced metalworking and refining.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/corundum_powder",
-      "SellPrice": 40,
-      "StackSize": 999
-    },
-    {
-      "Id": "rubstone_powder",
-      "Name": "Rubstone Powder",
-      "Description": "A rare mineral powder used in advanced crafting and material refinement.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/rubstone_powder",
-      "SellPrice": 50,
-      "StackSize": 999
-    },
-    {
-      "Id": "iron_dust",
-      "Name": "Iron Dust",
-      "Description": "Fine iron particles used in metalworking and specialized crafting.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/iron_dust",
-      "SellPrice": 5,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "logs",
-      "Name": "Logs",
-      "Description": "Raw timber used as a basic woodworking material.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/logs",
-      "SellPrice": 3,
-      "StackSize": 999
-    },
-    {
-      "Id": "disposed_logs",
-      "Name": "Disposed Logs",
-      "Description": "Discarded timber that can still be used in basic crafting.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/disposed_logs",
-      "SellPrice": 1,
-      "StackSize": 999
-    },
-    {
-      "Id": "rough_lumber",
-      "Name": "Rough Lumber",
-      "Description": "Processed timber used in basic equipment and structure crafting.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/rough_lumber",
-      "SellPrice": 6,
-      "StackSize": 999
-    },
-    {
-      "Id": "fine_lumber",
-      "Name": "Fine Lumber",
-      "Description": "Carefully processed lumber used in higher-quality crafting.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/fine_lumber",
-      "SellPrice": 20,
-      "StackSize": 999
-    },
-    {
-      "Id": "high_grade_lumber",
-      "Name": "High-grade Lumber",
-      "Description": "High-quality lumber used in advanced equipment crafting.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/high_grade_lumber",
-      "SellPrice": 60,
-      "StackSize": 999
-    },
-    {
-      "Id": "lumber_essence",
-      "Name": "Lumber Essence",
-      "Description": "A concentrated essence of refined wood used in high-tier crafting.",
-      "Category": 3,
-      "ItemRarity": 4,
-      "IconKey": "Material/lumber_essence",
-      "SellPrice": 200,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "cotton_thread",
-      "Name": "Cotton Thread",
-      "Description": "Basic thread used in crafting cloth and equipment components.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/cotton_thread",
-      "SellPrice": 3,
-      "StackSize": 999
-    },
-    {
-      "Id": "thick_thread",
-      "Name": "Thick Thread",
-      "Description": "Strong thread used in durable equipment and crafting materials.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/thick_thread",
-      "SellPrice": 10,
-      "StackSize": 999
-    },
-    {
-      "Id": "silk_thread",
-      "Name": "Silk Thread",
-      "Description": "Fine silk thread used in high-quality crafting.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/silk_thread",
-      "SellPrice": 15,
-      "StackSize": 999
-    },
-    {
-      "Id": "compound_thread",
-      "Name": "Compound Thread",
-      "Description": "Specially combined thread used in advanced equipment crafting.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/compound_thread",
-      "SellPrice": 35,
-      "StackSize": 999
-    },
-    {
-      "Id": "azureworm_silk",
-      "Name": "Azureworm Silk",
-      "Description": "Rare silk harvested from Azureworms and used in advanced crafting.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/azureworm_silk",
-      "SellPrice": 50,
-      "StackSize": 999
-    },
-    {
-      "Id": "vega_string",
-      "Name": "Vega String",
-      "Description": "A rare and resilient string used in specialized equipment crafting.",
-      "Category": 3,
-      "ItemRarity": 4,
-      "IconKey": "Material/vega_string",
-      "SellPrice": 150,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "coal",
-      "Name": "Coal",
-      "Description": "A common carbon-rich material used as fuel and in metalworking.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/coal",
-      "SellPrice": 3,
-      "StackSize": 999
-    },
-    {
-      "Id": "coal_dust",
-      "Name": "Coal Dust",
-      "Description": "Fine coal particles used in specialized crafting and processing.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/coal_dust",
-      "SellPrice": 4,
-      "StackSize": 999
-    },
-    {
-      "Id": "charcoal",
-      "Name": "Charcoal",
-      "Description": "Processed carbon material used as fuel and in metalworking.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/charcoal",
-      "SellPrice": 5,
-      "StackSize": 999
-    },
-    {
-      "Id": "anthracite",
-      "Name": "Anthracite",
-      "Description": "A dense, high-carbon material used in advanced metalworking.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/anthracite",
-      "SellPrice": 20,
-      "StackSize": 999
-    },
-    {
-      "Id": "extruded_charcoal",
-      "Name": "Extruded Charcoal",
-      "Description": "Highly processed charcoal used in advanced crafting and metallurgy.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/extruded_charcoal",
-      "SellPrice": 50,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "pig_iron",
-      "Name": "Pig Iron",
-      "Description": "Crude iron used as a base material for steel production.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/pig_iron",
-      "SellPrice": 8,
-      "StackSize": 999
-    },
-    {
-      "Id": "high_carbon_steel",
-      "Name": "High-carbon Steel",
-      "Description": "Strong steel with a high carbon content used in durable equipment crafting.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/high_carbon_steel",
-      "SellPrice": 25,
-      "StackSize": 999
-    },
-    {
-      "Id": "refined_steel",
-      "Name": "Refined Steel",
-      "Description": "Carefully processed steel used in advanced equipment crafting.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/refined_steel",
-      "SellPrice": 60,
-      "StackSize": 999
-    },
-    {
-      "Id": "steel_alloy",
-      "Name": "Steel Alloy",
-      "Description": "A specialized steel alloy used in high-tier equipment crafting.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/steel_alloy",
-      "SellPrice": 100,
-      "StackSize": 999
-    },
-    {
-      "Id": "high_alloy_steel",
-      "Name": "High Alloy Steel",
-      "Description": "Exceptional alloy steel used in the highest levels of metalworking.",
-      "Category": 3,
-      "ItemRarity": 4,
-      "IconKey": "Material/high_alloy_steel",
-      "SellPrice": 250,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "organic_glue",
-      "Name": "Organic Glue",
-      "Description": "A basic adhesive used in general crafting.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/organic_glue",
-      "SellPrice": 3,
-      "StackSize": 999
-    },
-    {
-      "Id": "concentrated_glue",
-      "Name": "Concentrated Glue",
-      "Description": "A stronger adhesive produced by concentrating organic glue.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/concentrated_glue",
-      "SellPrice": 10,
-      "StackSize": 999
-    },
-    {
-      "Id": "strong_glue",
-      "Name": "Strong Glue",
-      "Description": "A durable adhesive used in equipment and advanced crafting.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/strong_glue",
-      "SellPrice": 20,
-      "StackSize": 999
-    },
-    {
-      "Id": "colored_glue",
-      "Name": "Colored Glue",
-      "Description": "Specialized adhesive used in decorative and specialized crafting.",
-      "Category": 3,
-      "ItemRarity": 2,
-      "IconKey": "Material/colored_glue",
-      "SellPrice": 15,
-      "StackSize": 999
-    },
-    {
-      "Id": "super_glue",
-      "Name": "Super Glue",
-      "Description": "A powerful adhesive capable of forming exceptionally strong bonds.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/super_glue",
-      "SellPrice": 50,
-      "StackSize": 999
-    },
-    {
-      "Id": "compound_glue",
-      "Name": "Compound Glue",
-      "Description": "A specialized multi-component adhesive used in advanced crafting.",
-      "Category": 3,
-      "ItemRarity": 3,
-      "IconKey": "Material/compound_glue",
-      "SellPrice": 60,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "chocolate_additive",
-      "Name": "Chocolate Additive",
-      "Description": "A crafting ingredient used to enhance chocolate-based recipes.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/chocolate_additive",
-      "SellPrice": 5,
-      "StackSize": 999
-    },
-    {
-      "Id": "chocolate_syrup",
-      "Name": "Chocolate Syrup",
-      "Description": "A sweet ingredient used in specialized culinary crafting.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/chocolate_syrup",
-      "SellPrice": 5,
-      "StackSize": 999
-    },
-    {
-      "Id": "edible_pigment",
-      "Name": "Edible Pigment",
-      "Description": "A food-safe pigment used to add color to culinary creations.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/edible_pigment",
-      "SellPrice": 5,
-      "StackSize": 999
-    },
-
-    {
-      "Id": "elemental_essence",
-      "Name": "Elemental Essence",
-      "Description": "A concentrated essence of energy yin and yang used in powerful crafting.",
-      "Category": 3,
-      "ItemRarity": 4,
-      "IconKey": "Material/elemental_essence",
-      "SellPrice": 300,
-      "StackSize": 999
-    },
-    {
-      "Id": "dream_of_reminiscence",
-      "Name": "Dream of Reminiscence",
-      "Description": "A mysterious material containing echoes of forgotten memories.",
-      "Category": 3,
-      "ItemRarity": 4,
-      "IconKey": "Material/dream_of_reminiscence",
-      "SellPrice": 500,
-      "StackSize": 999
-    },
-    {
-      "Id": "essence_of_hope",
-      "Name": "Essence of Hope",
-      "Description": "A mysterious material containing hope of forgotten land.",
-      "Category": 3,
-      "ItemRarity": 4,
-      "IconKey": "Material/essence_of_hope",
-      "SellPrice": 1500,
-      "StackSize": 999
-    },
-    {
-      "Id": "water",
-      "Name": "Water",
-      "Description": "A liquid to drink.",
-      "Category": 3,
-      "ItemRarity": 1,
-      "IconKey": "Material/water",
-      "SellPrice": 10,
       "StackSize": 999
     }
   ],

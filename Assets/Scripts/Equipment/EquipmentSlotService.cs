@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival.Equipment
     /// </summary>
     public sealed class EquipmentSlotService
     {
-        public static readonly long[] SlotUnlockCosts = { 0, 100, 250, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000 };
+        public static readonly long[] SlotUnlockCosts = { 0, 20, 50, 80, 110, 140, 170, 200, 230, 260, 300 };
 
         private readonly IEquipmentRepository _repo;
         private readonly Dictionary<EquipmentType, EquipmentSlotData> _slotData = new();
