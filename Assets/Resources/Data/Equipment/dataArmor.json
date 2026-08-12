@@ -1,0 +1,30 @@
+[{
+    "Id": "equip_armor_iron",
+    "Name": "Iron Armor",
+    "Description": "Solid iron plating. +20 CON, +5% Life Steal",
+    "Category": 1,
+    "ItemRarity": 3,
+    "EquipmentType": 4,
+    "SellPrice": 80,
+    "StackSize": 1,
+    "BaseLevel": 1,
+    "MaxLevel": 50,
+    "MaxDurability": 120,
+    "DurabilityLossPerUse": 1,
+    "RepairCostPerDurability": 7,
+    "MaxSockets": 2,
+    "IconKey": "Equipment/Armor/iron",
+    "AttributeStats": [{
+        "Attribute": "Constitution",
+        "BaseValue": 20,
+        "ValuePerLevel": 1.5,
+        "ValuePerEnhance": 2.5
+    }],
+    "CombatStats": [{
+        "Stat": 10,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8,
+        "Mode": 2
+    }]
+}]

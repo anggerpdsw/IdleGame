@@ -1,0 +1,46 @@
+[{
+    "Id": "CardRoll",
+    "Name": "Card Roll Ticket",
+    "Description": "Used to roll a card.",
+    "Category": 2,
+    "ItemRarity": 2,
+    "IconKey": "CardRoll",
+    "SellPrice": 50,
+    "StackSize": 999
+}, {
+    "Id": "potion_ap",
+    "Name": "Antidote Potion",
+    "Description": "Clean debuf when used.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion/ap",
+    "SellPrice": 10,
+    "StackSize": 999
+}, {
+    "Id": "potion_hp",
+    "Name": "Health Potion",
+    "Description": "Restores 500 Health Points over 10s when used. Cooldown in 5s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion/hp",
+    "SellPrice": 10,
+    "StackSize": 999
+}, {
+    "Id": "potion_mp",
+    "Name": "Mana Potion",
+    "Description": "Restores 500 Mana Points over 10s when used. Cooldown in 5s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion/mp",
+    "SellPrice": 10,
+    "StackSize": 999
+}, {
+    "Id": "potion_sp",
+    "Name": "Stamina Potion",
+    "Description": "Restores 500 Stamina Points over 10s when used. Cooldown in 5s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion/sp",
+    "SellPrice": 10,
+    "StackSize": 999
+}]

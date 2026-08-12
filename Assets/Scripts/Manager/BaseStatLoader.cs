@@ -42,7 +42,7 @@ namespace IdleDefenseSurvival.Manager
         /// </summary>
         public void LoadBaseStats()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/dataPlayer");
+            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/Player/dataPlayer");
             if (jsonAsset == null)
             {
                 Debug.LogError("[BaseStatLoader] dataPlayer.json not found!");

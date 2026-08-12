@@ -1,0 +1,30 @@
+[{
+    "Id": "equip_gloves_fighter",
+    "Name": "Fighter Gloves",
+    "Description": "Reinforced knuckles. +10 STR, +5% Knockback",
+    "Category": 1,
+    "ItemRarity": 3,
+    "EquipmentType": 2,
+    "SellPrice": 60,
+    "StackSize": 1,
+    "BaseLevel": 1,
+    "MaxLevel": 50,
+    "MaxDurability": 100,
+    "DurabilityLossPerUse": 1,
+    "RepairCostPerDurability": 6,
+    "MaxSockets": 1,
+    "IconKey": "Equipment/Gloves/fighter",
+    "AttributeStats": [{
+        "Attribute": "Strength",
+        "BaseValue": 10,
+        "ValuePerLevel": 0.8,
+        "ValuePerEnhance": 1.2
+    }],
+    "CombatStats": [{
+        "Stat": 6,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.5,
+        "Mode": 2
+    }]
+}]

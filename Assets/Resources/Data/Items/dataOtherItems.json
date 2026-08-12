@@ -1,0 +1,37 @@
+[{
+    "Id": "SkinShard",
+    "Name": "Skin Shard",
+    "Description": "Fragment of a skin.",
+    "Category": 5,
+    "ItemRarity": 3,
+    "IconKey": "SkinShard",
+    "SellPrice": 20,
+    "StackSize": 999
+}, {
+    "Id": "gold_pouch",
+    "Name": "Gold Pouch",
+    "Description": "A pouch of gold coins. Sell for a tidy sum.",
+    "Category": 5,
+    "ItemRarity": 2,
+    "IconKey": "Gold",
+    "SellPrice": 100,
+    "StackSize": 999
+}, {
+    "Id": "gem_pouch",
+    "Name": "Gem Pouch",
+    "Description": "A pouch of gems. Sell for a tidy sum.",
+    "Category": 5,
+    "ItemRarity": 2,
+    "IconKey": "Gem",
+    "SellPrice": 100,
+    "StackSize": 999
+}, {
+    "Id": "meat_pouch",
+    "Name": "Meat Pouch",
+    "Description": "A pouch of meats. Sell for a tidy sum.",
+    "Category": 5,
+    "ItemRarity": 2,
+    "IconKey": "Meat",
+    "SellPrice": 100,
+    "StackSize": 999
+}]

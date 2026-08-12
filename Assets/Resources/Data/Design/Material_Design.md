@@ -2,11 +2,17 @@ data semua item ada di @Assets/Resources/Data/dataItems.json
 
 Struktur materialmu sekarang menjadi :
 
-2 Core Craft
-├── Water
-└── 1x Decomposed Equipment From Rarity Below
-
-39 MATERIALS
+45 MATERIALS
+│
+├── Core
+│   └── Water
+│
+├── Decomposed Equipment
+│   ├── Decomposed Common
+│   ├── Decomposed Rare
+│   ├── Decomposed Epic
+│   ├── Decomposed Legendary
+│   └── Decomposed Mythic
 │
 ├── Stone / Mineral
 │   ├── Rock

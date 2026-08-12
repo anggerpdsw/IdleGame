@@ -47,7 +47,7 @@ namespace IdleDefenseSurvival.Player
 
         private static void LoadBonuses()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/dataAttribute");
+            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/Player/dataAttribute");
             if (jsonAsset == null)
             {
                 Debug.LogWarning("[AttributeService] dataAttribute.json not found.");

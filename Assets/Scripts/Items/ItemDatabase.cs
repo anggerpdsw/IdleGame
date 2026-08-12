@@ -71,43 +71,101 @@ namespace IdleDefenseSurvival.Items
 
         public void LoadFromResources()
         {
-            // Single file: all item types (items, equipment, gems, sets) live in dataItems.json
-            var jsonAsset = Resources.Load<TextAsset>("Data/dataItems");
+            if (_isLoaded) return;
+            try
+            {
+                LoadItems();
+                LoadEquipment();
+                LoadGems();
+                LoadSets();
+                LoadAffixes();
+
+                _isLoaded = true;
+
+                OnDatabaseLoaded?.Invoke();
+
+                Debug.Log(
+                    $"[ItemDatabase] Loaded " +
+                    $"{_items.Count} items, " +
+                    $"{_equipment.Count} equipment, " +
+                    $"{_gems.Count} gems, " +
+                    $"{_sets.Count} sets, " +
+                    $"{_affixes.Count} affixes"
+                );
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[ItemDatabase] Failed to load item database: {e}");
+                _isLoaded = false;
+            }
+        }
+        #endregion
+
+        #region Loaders
+        private void LoadItems()
+        {
+            LoadJsonList<ItemData>("Data/Items/Material/dataMinerals", RegisterItem);
+            LoadJsonList<ItemData>("Data/Items/Material/dataHerbs", RegisterItem);
+            LoadJsonList<ItemData>("Data/Items/Material/dataOtherMaterials", RegisterItem);
+            LoadJsonList<ItemData>("Data/Items/dataConsumables", RegisterItem);
+            LoadJsonList<ItemData>("Data/Items/dataOtherItems", RegisterItem);
+        }
+        private void LoadEquipment()
+        {
+            LoadJsonList<EquipmentData>("Data/Equipment/dataHat", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataGloves", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataCape", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataArmor", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataBelt", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataPants", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataPendant", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataRing", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataEarring", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataBracelet", RegisterEquipment);
+            LoadJsonList<EquipmentData>("Data/Equipment/dataShoes", RegisterEquipment);
+        }
+        private void LoadGems()
+        {
+            LoadJsonList<GemData>("Data/Gems/dataGems", RegisterGem);
+        }
+        private void LoadSets()
+        {
+            LoadJsonList<SetBonusData>("Data/Equipment/dataSets", RegisterSet);
+        }
+        private void LoadAffixes()
+        {
+            LoadJsonList<AffixData>("Data/Equipment/dataAffixes", RegisterAffix);
+        }
+        #endregion
+
+        private void LoadJsonList<T>(string resourcePath, Action<T> registerAction)
+        {
+            var jsonAsset = Resources.Load<TextAsset>(resourcePath);
             if (jsonAsset == null)
             {
-                Debug.LogWarning("[ItemDatabase] No item data found at Data/dataItems");
+                Debug.LogWarning($"[ItemDatabase] Data file not found: Resources/{resourcePath}.json");
                 return;
             }
 
             try
             {
-                var container = JsonConvert.DeserializeObject<AllItemDataContainer>(jsonAsset.text);
+                var data = JsonConvert.DeserializeObject<List<T>>(jsonAsset.text);
+                if (data == null)
+                {
+                    Debug.LogWarning($"[ItemDatabase] Empty or invalid data: {resourcePath}.json");
+                    return;
+                }
 
-                if (container?.Items != null)
-                    foreach (var item in container.Items) RegisterItem(item);
+                foreach (var entry in data) registerAction(entry);
 
-                if (container?.Equipment != null)
-                    foreach (var equip in container.Equipment) RegisterItem(equip);
-
-                if (container?.Gems != null)
-                    foreach (var gem in container.Gems) RegisterGem(gem);
-
-                if (container?.Sets != null)
-                    foreach (var set in container.Sets) RegisterSet(set);
-
-                if (container?.Affixes != null)
-                    foreach (var affix in container.Affixes) RegisterAffix(affix);
+                Debug.Log($"[ItemDatabase] Loaded {data.Count} entries from {resourcePath}.json");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[ItemDatabase] Failed to load items: {e.Message}");
+                Debug.LogError($"[ItemDatabase] Failed to load {resourcePath}.json: {e.Message}");
+                throw;
             }
-
-            _isLoaded = true;
-            OnDatabaseLoaded?.Invoke();
-            Debug.Log($"[ItemDatabase] Loaded {_items.Count} items, {_equipment.Count} equipment, {_gems.Count} gems, {_sets.Count} sets, {_affixes.Count} affixes");
         }
-        #endregion
 
         #region Lookup
         public ItemData GetItem(string itemId) => _items.TryGetValue(itemId, out var item) ? item : null;
@@ -367,18 +425,4 @@ namespace IdleDefenseSurvival.Items
         #endregion
     }
 
-    // ============ JSON Container Classes ============
-
-    /// <summary>
-    /// Single-file container: all item types live in dataItems.json.
-    /// </summary>
-    [Serializable]
-    public class AllItemDataContainer
-    {
-        public List<ItemData> Items;
-        public List<EquipmentData> Equipment;
-        public List<GemData> Gems;
-        public List<SetBonusData> Sets;
-        public List<AffixData> Affixes;
-    }
 }

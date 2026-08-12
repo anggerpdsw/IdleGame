@@ -1,0 +1,225 @@
+[{
+    "AffixId": "prefix_strong",
+    "Name": "Strong",
+    "Type": 0,
+    "MinRarity": 2,
+    "MaxRarity": 6,
+    "ApplicableTypes": [2, 5, 6],
+    "Stats": [{
+        "Stat": 6,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "prefix_wise",
+    "Name": "Wise",
+    "Type": 0,
+    "MinRarity": 2,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 8, 9],
+    "Stats": [{
+        "Stat": 12,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.2,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "prefix_swift",
+    "Name": "Swift",
+    "Type": 0,
+    "MinRarity": 2,
+    "MaxRarity": 6,
+    "ApplicableTypes": [3, 11, 7],
+    "Stats": [{
+        "Stat": 13,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "prefix_hardy",
+    "Name": "Hardy",
+    "Type": 0,
+    "MinRarity": 2,
+    "MaxRarity": 6,
+    "ApplicableTypes": [4, 5, 6],
+    "Stats": [{
+        "Stat": 20,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "prefix_ancient",
+    "Name": "Ancient",
+    "Type": 0,
+    "MinRarity": 6,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 2, 4, 8],
+    "Stats": [{
+        "Stat": 16,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3,
+        "Mode": 2
+    }],
+    "Weight": 0.7
+}, {
+    "AffixId": "prefix_runic",
+    "Name": "Runic",
+    "Type": 0,
+    "MinRarity": 6,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 7, 9],
+    "Stats": [{
+        "Stat": 23,
+        "BaseValue": 4,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4,
+        "Mode": 2
+    }],
+    "Weight": 0.7
+}, {
+    "AffixId": "suffix_of_frost",
+    "Name": "of Frost",
+    "Type": 1,
+    "MinRarity": 3,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 2, 8],
+    "Stats": [{
+        "Stat": 23,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.2,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "suffix_of_speed",
+    "Name": "of Speed",
+    "Type": 1,
+    "MinRarity": 3,
+    "MaxRarity": 6,
+    "ApplicableTypes": [3, 11, 7],
+    "Stats": [{
+        "Stat": 13,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "suffix_of_vitality",
+    "Name": "of Vitality",
+    "Type": 1,
+    "MinRarity": 3,
+    "MaxRarity": 6,
+    "ApplicableTypes": [4, 5, 6],
+    "Stats": [{
+        "Stat": 10,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.2,
+        "Mode": 2
+    }],
+    "Weight": 1.0
+}, {
+    "AffixId": "suffix_of_destruction",
+    "Name": "of Destruction",
+    "Type": 1,
+    "MinRarity": 5,
+    "MaxRarity": 6,
+    "ApplicableTypes": [2, 8],
+    "Stats": [{
+        "Stat": 15,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3,
+        "Mode": 2
+    }],
+    "Weight": 0.8
+}, {
+    "AffixId": "suffix_of_the_hunter",
+    "Name": "of the Hunter",
+    "Type": 1,
+    "MinRarity": 5,
+    "MaxRarity": 6,
+    "ApplicableTypes": [3, 7, 11],
+    "Stats": [{
+        "Stat": 2,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3,
+        "Mode": 2
+    }],
+    "Weight": 0.8
+}, {
+    "AffixId": "suffix_of_the_collector",
+    "Name": "of the Collector",
+    "Type": 1,
+    "MinRarity": 4,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 5, 6, 7],
+    "Stats": [{
+        "Stat": 17,
+        "BaseValue": 5,
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5,
+        "Mode": 2
+    }],
+    "Weight": 0.8
+}, {
+    "AffixId": "prefix_of_wisdom",
+    "Name": "of Wisdom",
+    "Type": 0,
+    "MinRarity": 3,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 8, 9],
+    "AttributeStats": [{
+        "Attribute": 2,
+        "BaseValue": 3,
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.2
+    }],
+    "Weight": 0.9
+}, {
+    "AffixId": "suffix_of_ember",
+    "Name": "of Ember",
+    "Type": 1,
+    "MinRarity": 3,
+    "MaxRarity": 6,
+    "ApplicableTypes": [2, 5, 6],
+    "PassiveEffect": {
+        "EffectType": 10,
+        "Value": 20,
+        "Chance": 15,
+        "Cooldown": 2,
+        "IsActive": true
+    },
+    "Weight": 0.9
+}, {
+    "AffixId": "suffix_of_glacier",
+    "Name": "of Glacier",
+    "Type": 1,
+    "MinRarity": 4,
+    "MaxRarity": 6,
+    "ApplicableTypes": [1, 2, 8],
+    "PassiveEffect": {
+        "EffectType": 11,
+        "Value": 1.2,
+        "Chance": 12,
+        "Cooldown": 3,
+        "IsActive": true
+    },
+    "Weight": 0.7
+}]

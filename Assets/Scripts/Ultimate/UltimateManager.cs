@@ -71,7 +71,7 @@ namespace IdleDefenseSurvival.Ultimate
 
         private void LoadUltimateDatabase()
         {
-            TextAsset ultimateJson = Resources.Load<TextAsset>("Data/dataUltimate");
+            TextAsset ultimateJson = Resources.Load<TextAsset>("Data/Player/dataUltimate");
             if (ultimateJson == null)
             {
                 Debug.LogError("[UltimateManager] Ultimate data file not found at Resources/Data/dataUltimate.json!");

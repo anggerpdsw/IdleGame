@@ -1,0 +1,35 @@
+[{
+    "Id": "equip_bracelet_lifesteal",
+    "Name": "Vampire Bracelet",
+    "Description": "Leeches life from foes. +6 STR, +6 DEX, +2% Life Steal",
+    "Category": 1,
+    "ItemRarity": 4,
+    "EquipmentType": 10,
+    "SellPrice": 130,
+    "StackSize": 1,
+    "BaseLevel": 1,
+    "MaxLevel": 50,
+    "MaxDurability": 90,
+    "DurabilityLossPerUse": 1,
+    "RepairCostPerDurability": 8,
+    "MaxSockets": 1,
+    "IconKey": "Equipment/Bracelet/lifesteal",
+    "AttributeStats": [{
+        "Attribute": "Strength",
+        "BaseValue": 6,
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8
+    }, {
+        "Attribute": "Dexterity",
+        "BaseValue": 6,
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8
+    }],
+    "CombatStats": [{
+        "Stat": 10,
+        "BaseValue": 2,
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.2,
+        "Mode": 2
+    }]
+}]

@@ -1,0 +1,35 @@
+[{
+    "Id": "equip_belt_warrior",
+    "Name": "Warrior Belt",
+    "Description": "Belt of a seasoned warrior. +10 CON, +6 STR, +1% Gold Gain",
+    "Category": 1,
+    "ItemRarity": 2,
+    "EquipmentType": 5,
+    "SellPrice": 45,
+    "StackSize": 1,
+    "BaseLevel": 1,
+    "MaxLevel": 50,
+    "MaxDurability": 100,
+    "DurabilityLossPerUse": 1,
+    "RepairCostPerDurability": 5,
+    "MaxSockets": 1,
+    "IconKey": "Equipment/Belt/warrior",
+    "AttributeStats": [{
+        "Attribute": "Constitution",
+        "BaseValue": 10,
+        "ValuePerLevel": 0.8,
+        "ValuePerEnhance": 1.3
+    }, {
+        "Attribute": "Strength",
+        "BaseValue": 6,
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8
+    }],
+    "CombatStats": [{
+        "Stat": 17,
+        "BaseValue": 1,
+        "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.1,
+        "Mode": 2
+    }]
+}]

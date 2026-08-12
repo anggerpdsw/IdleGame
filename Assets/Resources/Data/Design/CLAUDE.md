@@ -201,9 +201,10 @@ Important files:
 | `dataWave.json` | Wave duration, difficulty, spawn configuration, progression |
 | `dataUltimate.json` | Ultimate definitions |
 | `dataCard.json` | Card definitions, rarity, scaling, effects |
-| `dataItems.json` | Items, equipment, gems, affixes, sets, materials |
+| `dataConsumables.json` | consumables |
 | `dataAttribute.json` | CON/STR/INT/DEX attribute bonuses |
 | `dataConfigSocket.json` | Socket/gem rules |
+| `other json file` | like the file name purpose |
 
 ## 5.3 Design documentation
 
@@ -1467,8 +1468,8 @@ If an item is consumed but its effect fails, the item must not silently disappea
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
 | Wave | `Scripts/Manager/WaveManager.cs`, `dataWave.json` |
 | Cards | `Scripts/Card/`, `dataCard.json` |
-| Equipment | `Scripts/Equipment/`, `dataItems.json` |
-| Inventory | `Scripts/Inventory/`, `Scripts/Items/`, `dataItems.json` |
+| Equipment | `Scripts/Equipment/`, `Data/Equipment` |
+| Inventory | `Scripts/Inventory/`, `Scripts/Items/`, `Data/Items` |
 | Gems | `Scripts/Items/GemService.cs`, `dataConfigSocket.json` |
 | Crafting | `Scripts/Items/CraftService.cs`, `CraftJob.cs`, recipe data |
 | Economy | `Scripts/Economy/EconomyManager.cs` |
@@ -1572,7 +1573,7 @@ Workflow:
 
 Workflow:
 
-1. Add definition to `dataItems.json`.
+1. Add relate definition to script `Data/Equipment`.
 2. Assign a stable `ItemId`.
 3. Define equipment type/slot.
 4. Define base stats.
@@ -1609,7 +1610,7 @@ Workflow:
 
 Workflow:
 
-1. Add item definition to `dataItems.json`.
+1. Add relate definition to script `dataConsumables.json`.
 2. Give it a stable `ItemId`.
 3. Define stack size and use rules.
 4. Implement gameplay behavior in the item/domain system.

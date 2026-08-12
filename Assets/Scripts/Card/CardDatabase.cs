@@ -50,7 +50,7 @@ namespace IdleDefenseSurvival.Manager
 
         private void LoadFromResources()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/dataCard");
+            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/Card/dataCard");
             if (jsonAsset == null)
             {
                 if (_debug) Debug.LogError("[CardDatabase] dataCard.json not found in Resources/Data/");

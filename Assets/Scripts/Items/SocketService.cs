@@ -51,7 +51,7 @@ namespace IdleDefenseSurvival.Items
         #region Initialization
         private void LoadConfig()
         {
-            TextAsset json = Resources.Load<TextAsset>("Data/dataConfigSocket");
+            TextAsset json = Resources.Load<TextAsset>("Data/Gems/dataConfigSocket");
             if (json != null)
             {
                 _config = JsonConvert.DeserializeObject<SocketConfigData>(json.text);
