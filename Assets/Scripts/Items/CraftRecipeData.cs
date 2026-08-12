@@ -16,6 +16,8 @@ namespace IdleDefenseSurvival.Items
         public string DisplayName;
         [TextArea] public string Description;
         public ItemCategory Category = ItemCategory.None;
+        public EquipmentType EquipmentType = EquipmentType.None; // Which equipment slot this recipe crafts
+        public int Rarity = 1; // 1=Common, 2=Rare, 3=Epic, 4=Legendary, 5=Mythic, 6=Divine
 
         // ============ Requirements ============
         public int RequiredCraftingLevel = 1;

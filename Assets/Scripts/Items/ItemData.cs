@@ -8,9 +8,40 @@ using UnityEngine;
 namespace IdleDefenseSurvival.Items
 {
     /// <summary>
+    /// Crafting role classification. Determines item behavior in crafting pipeline.
+    ///</summary>
+    public enum ItemRole
+    {
+        None = 0,
+        Material = 1,      // Equipment crafting ingredient
+        Catalyst = 2,      // Water — mandatory, no family validation
+        Progression = 3,   // Decomposed — no family validation
+        Consumable = 4,
+        Equipment = 5,
+        Other = 6          // Herbs, UltimateStones, miscellaneous
+    }
+
+    /// <summary>
+    /// Material family for equipment crafting identity rules (§7 Crafting_Design).
+    ///</summary>
+    public enum CraftingFamily
+    {
+        None = 0,
+        Stone = 1,
+        Wood = 2,
+        Thread = 3,
+        Leather = 4,
+        Coal = 5,
+        Metal = 6,
+        Adhesive = 7,
+        Special = 8,
+        Water = 9
+    }
+
+    /// <summary>
     /// Base data class for all items in the game.
     /// Used for both equipment and non-equipment items.
-    /// </summary>
+    ///</summary>
     [Serializable]
     public class ItemData
     {
@@ -24,6 +55,9 @@ namespace IdleDefenseSurvival.Items
         public ItemCategory Category = ItemCategory.None;
         public Rarity ItemRarity = Rarity.Common;
         public EquipmentType EquipmentType = EquipmentType.None; // Only for equipment
+        public ItemRole Role = ItemRole.None;
+        public int CraftingTier = 0;
+        public CraftingFamily CraftingFamily = CraftingFamily.None;
 
         // ============ Visual ============
         public Sprite Icon;

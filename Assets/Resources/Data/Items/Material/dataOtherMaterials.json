@@ -1,118 +1,15 @@
-[{
-    "Id": "decomposed_common",
-    "Name": "Decomposed Common",
-    "Description": "Material decomposed from common equipment.",
-    "Category": 3,
-    "ItemRarity": 2,
-    "IconKey": "Material/decomposed_common",
-    "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "decomposed_rare",
-    "Name": "Decomposed Rare",
-    "Description": "Material decomposed from rare equipment.",
-    "Category": 3,
-    "ItemRarity": 3,
-    "IconKey": "Material/decomposed_rare",
-    "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "decomposed_epic",
-    "Name": "Decomposed Epic",
-    "Description": "Material decomposed from epic equipment.",
-    "Category": 3,
-    "ItemRarity": 4,
-    "IconKey": "Material/decomposed_epic",
-    "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "decomposed_legendary",
-    "Name": "Decomposed Legendary",
-    "Description": "Material decomposed from legendary equipment.",
-    "Category": 3,
-    "ItemRarity": 5,
-    "IconKey": "Material/decomposed_legendary",
-    "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "decomposed_mythic",
-    "Name": "Decomposed Mythic",
-    "Description": "Material decomposed from mythic equipment.",
-    "Category": 3,
-    "ItemRarity": 5,
-    "IconKey": "Material/decomposed_mythic",
-    "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_None",
-    "Name": "Neutral Ultimate Stone",
-    "Description": "Upgrades any ultimate.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_None",
-    "SellPrice": 25,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Metal",
-    "Name": "Metal Ultimate Stone",
-    "Description": "Upgrades Metal ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Metal",
-    "SellPrice": 30,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Wood",
-    "Name": "Wood Ultimate Stone",
-    "Description": "Upgrades Wood ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Wood",
-    "SellPrice": 30,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Fire",
-    "Name": "Fire Ultimate Stone",
-    "Description": "Upgrades Fire ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Fire",
-    "SellPrice": 30,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Water",
-    "Name": "Water Ultimate Stone",
-    "Description": "Upgrades Water ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Water",
-    "SellPrice": 30,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Earth",
-    "Name": "Earth Ultimate Stone",
-    "Description": "Upgrades Earth ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Earth",
-    "SellPrice": 30,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Lightning",
-    "Name": "Lightning Ultimate Stone",
-    "Description": "Upgrades Lightning ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Lightning",
-    "SellPrice": 30,
-    "StackSize": 999
-}, {
-    "Id": "UltimateStone_Wind",
-    "Name": "Wind Ultimate Stone",
-    "Description": "Upgrades Wind ultimates.",
-    "Category": 3,
-    "ItemRarity": 1,
-    "IconKey": "UltimateStone/UltimateStone_Wind",
-    "SellPrice": 30,
-    "StackSize": 999
-}]
+[
+{"Id":"decomposed_common","Name":"Decomposed Common","Description":"Material decomposed from common equipment.","Category":3,"ItemRarity":2,"IconKey":"Material/decomposed_common","SellPrice":10,"StackSize":999,"Role":3,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"decomposed_rare","Name":"Decomposed Rare","Description":"Material decomposed from rare equipment.","Category":3,"ItemRarity":3,"IconKey":"Material/decomposed_rare","SellPrice":10,"StackSize":999,"Role":3,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"decomposed_epic","Name":"Decomposed Epic","Description":"Material decomposed from epic equipment.","Category":3,"ItemRarity":4,"IconKey":"Material/decomposed_epic","SellPrice":10,"StackSize":999,"Role":3,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"decomposed_legendary","Name":"Decomposed Legendary","Description":"Material decomposed from legendary equipment.","Category":3,"ItemRarity":5,"IconKey":"Material/decomposed_legendary","SellPrice":10,"StackSize":999,"Role":3,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"decomposed_mythic","Name":"Decomposed Mythic","Description":"Material decomposed from mythic equipment.","Category":3,"ItemRarity":5,"IconKey":"Material/decomposed_mythic","SellPrice":10,"StackSize":999,"Role":3,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_None","Name":"Neutral Ultimate Stone","Description":"Upgrades any ultimate.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_None","SellPrice":25,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Metal","Name":"Metal Ultimate Stone","Description":"Upgrades Metal ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Metal","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Wood","Name":"Wood Ultimate Stone","Description":"Upgrades Wood ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Wood","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Fire","Name":"Fire Ultimate Stone","Description":"Upgrades Fire ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Fire","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Water","Name":"Water Ultimate Stone","Description":"Upgrades Water ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Water","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Earth","Name":"Earth Ultimate Stone","Description":"Upgrades Earth ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Earth","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Lightning","Name":"Lightning Ultimate Stone","Description":"Upgrades Lightning ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Lightning","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0},
+{"Id":"UltimateStone_Wind","Name":"Wind Ultimate Stone","Description":"Upgrades Wind ultimates.","Category":3,"ItemRarity":1,"IconKey":"UltimateStone/UltimateStone_Wind","SellPrice":30,"StackSize":999,"Role":6,"CraftingTier":0,"CraftingFamily":0}
+]

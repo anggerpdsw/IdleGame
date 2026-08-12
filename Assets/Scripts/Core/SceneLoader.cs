@@ -21,6 +21,7 @@ namespace IdleDefenseSurvival.Core
         private string _isGame = SceneState.Game.ToString();
         private string _isCardCollection = SceneState.CardCollection.ToString();
         private string _isInventory = SceneState.Inventory.ToString();
+        private string _isCrafting = SceneState.Crafting.ToString();
 
         private void Awake()
         {
@@ -87,6 +88,7 @@ namespace IdleDefenseSurvival.Core
         public void ReturnToMainMenuFromGame() => SwitchScene(_isGame, _isMainMenu);
         public void ReturnToMainMenuFromCardCollection() => SwitchScene(_isCardCollection, _isMainMenu);
         public void ReturnToMainMenuFromInventory() => SwitchScene(_isInventory, _isMainMenu);
+        public void ReturnToMainMenuFromCrafting() => SwitchScene(_isCrafting, _isMainMenu);
 
         private bool IsSceneLoaded(string sceneName)
         {

@@ -1,0 +1,119 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_belt_r1",
+      "DisplayName": "Leather Belt",
+      "Description": "A basic leather belt with a pig iron buckle.",
+      "Category": 2,
+      "EquipmentType": 5,
+      "Rarity": 1,
+      "RequiredCraftingLevel": 1,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 5 },
+        { "ItemId": "pig_iron", "Count": 3 },
+        { "ItemId": "organic_glue", "Count": 1 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 20.0,
+      "TimePerAdditionalUnit": 20.0
+    },
+    {
+      "RecipeId": "craft_belt_r2",
+      "DisplayName": "Reinforced Leather Belt",
+      "Description": "A leather belt with high-carbon steel buckle and thick thread stitching.",
+      "Category": 2,
+      "EquipmentType": 5,
+      "Rarity": 2,
+      "RequiredCraftingLevel": 5,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 8 },
+        { "ItemId": "high_carbon_steel", "Count": 5 },
+        { "ItemId": "thick_thread", "Count": 3 },
+        { "ItemId": "concentrated_glue", "Count": 2 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 30.0,
+      "TimePerAdditionalUnit": 30.0
+    },
+    {
+      "RecipeId": "craft_belt_r3",
+      "DisplayName": "Iron Buckle Belt",
+      "Description": "A belt with refined steel buckle and silk thread embroidery.",
+      "Category": 2,
+      "EquipmentType": 5,
+      "Rarity": 3,
+      "RequiredCraftingLevel": 10,
+      "RequiredTier": 2,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 12 },
+        { "ItemId": "refined_steel", "Count": 8 },
+        { "ItemId": "silk_thread", "Count": 5 },
+        { "ItemId": "strong_glue", "Count": 3 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 45.0,
+      "TimePerAdditionalUnit": 45.0
+    },
+    {
+      "RecipeId": "craft_belt_r4",
+      "DisplayName": "Steel Buckle Belt",
+      "Description": "A legendary belt with steel alloy buckle and compound thread weaving.",
+      "Category": 2,
+      "EquipmentType": 5,
+      "Rarity": 4,
+      "RequiredCraftingLevel": 15,
+      "RequiredTier": 3,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 16 },
+        { "ItemId": "steel_alloy", "Count": 10 },
+        { "ItemId": "compound_thread", "Count": 7 },
+        { "ItemId": "colored_glue", "Count": 4 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 60.0,
+      "TimePerAdditionalUnit": 60.0
+    },
+    {
+      "RecipeId": "craft_belt_r5",
+      "DisplayName": "Alloy Belt",
+      "Description": "A mythic belt forged from high alloy steel with azureworm silk lining.",
+      "Category": 2,
+      "EquipmentType": 5,
+      "Rarity": 5,
+      "RequiredCraftingLevel": 20,
+      "RequiredTier": 4,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 20 },
+        { "ItemId": "high_alloy_steel", "Count": 12 },
+        { "ItemId": "azureworm_silk", "Count": 9 },
+        { "ItemId": "super_glue", "Count": 5 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 90.0,
+      "TimePerAdditionalUnit": 90.0
+    },
+    {
+      "RecipeId": "craft_belt_r6",
+      "DisplayName": "High Alloy Belt",
+      "Description": "A divine belt with high alloy steel buckle and dream of reminiscence inlay.",
+      "Category": 2,
+      "EquipmentType": 5,
+      "Rarity": 6,
+      "RequiredCraftingLevel": 25,
+      "RequiredTier": 5,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 26 },
+        { "ItemId": "high_alloy_steel", "Count": 15 },
+        { "ItemId": "vega_string", "Count": 10 },
+        { "ItemId": "compound_glue", "Count": 6 },
+        { "ItemId": "dream_of_reminiscence", "Count": 1 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 120.0,
+      "TimePerAdditionalUnit": 120.0
+    }
+  ]
+}

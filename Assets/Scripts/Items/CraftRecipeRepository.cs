@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Items
@@ -59,9 +60,61 @@ namespace IdleDefenseSurvival.Items
                 }
             }
 
-            // TODO: Load from dedicated recipe JSON if needed
-            // LoadRecipesFromJson("Data/dataCraftRecipes");
+            // Load dedicated recipe JSON files (one per equipment slot)
+            LoadRecipesFromJson();
+        }
 
+        private void LoadRecipesFromJson()
+        {
+            string[] recipeFiles = {
+                "Data/Crafting/Equipment/dataRecipeHat",
+                "Data/Crafting/Equipment/dataRecipeGloves",
+                "Data/Crafting/Equipment/dataRecipeCape",
+                "Data/Crafting/Equipment/dataRecipeArmor",
+                "Data/Crafting/Equipment/dataRecipeBelt",
+                "Data/Crafting/Equipment/dataRecipePants",
+                "Data/Crafting/Equipment/dataRecipePendant",
+                "Data/Crafting/Equipment/dataRecipeRing",
+                "Data/Crafting/Equipment/dataRecipeEarring",
+                "Data/Crafting/Equipment/dataRecipeBracelet",
+                "Data/Crafting/Equipment/dataRecipeShoes"
+            };
+
+            int totalLoaded = 0;
+            foreach (string path in recipeFiles)
+            {
+                var asset = Resources.Load<TextAsset>(path);
+                if (asset == null)
+                {
+                    Debug.LogWarning($"[CraftRecipeRepository] Recipe file not found: {path}.json");
+                    continue;
+                }
+
+                try
+                {
+                    var wrapper = JsonConvert.DeserializeObject<RecipeFile>(asset.text);
+                    var recipes = wrapper?.Recipes;
+                    if (recipes == null) continue;
+
+                    foreach (var recipe in recipes)
+                    {
+                        if (string.IsNullOrEmpty(recipe.RecipeId)) continue;
+                        _allRecipes[recipe.RecipeId] = recipe;
+                        totalLoaded++;
+
+                        if (recipe.AutoUnlock)
+                            UnlockRecipe(recipe.RecipeId, notify: false);
+                        if (recipe.UnlockSource == UnlockSource.Default)
+                            _knownRecipeIds.Add(recipe.RecipeId);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[CraftRecipeRepository] Failed to parse {path}.json: {e.Message}");
+                }
+            }
+
+            Debug.Log($"[CraftRecipeRepository] Loaded {totalLoaded} recipes from JSON files");
             Debug.Log($"[CraftRecipeRepository] Loaded {_allRecipes.Count} recipes, {_unlockedRecipeIds.Count} unlocked, {_knownRecipeIds.Count} known");
         }
 
@@ -207,5 +260,16 @@ namespace IdleDefenseSurvival.Items
     {
         public List<string> UnlockedRecipeIds = new();
         public List<string> KnownRecipeIds = new();
+    }
+
+    /// <summary>
+    /// JSON wrapper for recipe files (root object with SchemaVersion + Recipes array).
+    /// Matches the shape of Assets/Resources/Data/Crafting/dataRecipe*.json files.
+    ///</summary>
+    [Serializable]
+    public class RecipeFile
+    {
+        public int SchemaVersion = 1;
+        public List<CraftRecipeData> Recipes = new();
     }
 }

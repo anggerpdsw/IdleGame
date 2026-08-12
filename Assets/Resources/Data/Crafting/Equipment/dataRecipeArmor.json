@@ -1,0 +1,124 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_armor_r1",
+      "DisplayName": "Leather Armor",
+      "Description": "Basic leather armor reinforced with pig iron and cotton thread.",
+      "Category": 2,
+      "EquipmentType": 4,
+      "Rarity": 1,
+      "RequiredCraftingLevel": 1,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 12 },
+        { "ItemId": "pig_iron", "Count": 6 },
+        { "ItemId": "cotton_thread", "Count": 4 },
+        { "ItemId": "organic_glue", "Count": 3 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 45.0,
+      "TimePerAdditionalUnit": 45.0
+    },
+    {
+      "RecipeId": "craft_armor_r2",
+      "DisplayName": "Reinforced Leather Armor",
+      "Description": "Leather armor with high-carbon steel plates and thick thread binding.",
+      "Category": 2,
+      "EquipmentType": 4,
+      "Rarity": 2,
+      "RequiredCraftingLevel": 5,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 18 },
+        { "ItemId": "high_carbon_steel", "Count": 10 },
+        { "ItemId": "thick_thread", "Count": 7 },
+        { "ItemId": "concentrated_glue", "Count": 4 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 60.0,
+      "TimePerAdditionalUnit": 60.0
+    },
+    {
+      "RecipeId": "craft_armor_r3",
+      "DisplayName": "Iron-Plated Armor",
+      "Description": "Heavy armor with refined steel plates, silk thread, and coal-forged edges.",
+      "Category": 2,
+      "EquipmentType": 4,
+      "Rarity": 3,
+      "RequiredCraftingLevel": 10,
+      "RequiredTier": 2,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 24 },
+        { "ItemId": "refined_steel", "Count": 16 },
+        { "ItemId": "silk_thread", "Count": 10 },
+        { "ItemId": "strong_glue", "Count": 6 },
+        { "ItemId": "coal", "Count": 4 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 90.0,
+      "TimePerAdditionalUnit": 90.0
+    },
+    {
+      "RecipeId": "craft_armor_r4",
+      "DisplayName": "Steel Armor",
+      "Description": "Legendary steel armor with compound thread and anthracite-forged plates.",
+      "Category": 2,
+      "EquipmentType": 4,
+      "Rarity": 4,
+      "RequiredCraftingLevel": 15,
+      "RequiredTier": 3,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 32 },
+        { "ItemId": "steel_alloy", "Count": 20 },
+        { "ItemId": "compound_thread", "Count": 14 },
+        { "ItemId": "colored_glue", "Count": 8 },
+        { "ItemId": "anthracite", "Count": 6 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 120.0,
+      "TimePerAdditionalUnit": 120.0
+    },
+    {
+      "RecipeId": "craft_armor_r5",
+      "DisplayName": "Steel Alloy Armor",
+      "Description": "Mythic armor forged from high alloy steel and azureworm silk lining.",
+      "Category": 2,
+      "EquipmentType": 4,
+      "Rarity": 5,
+      "RequiredCraftingLevel": 20,
+      "RequiredTier": 4,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 42 },
+        { "ItemId": "high_alloy_steel", "Count": 24 },
+        { "ItemId": "azureworm_silk", "Count": 18 },
+        { "ItemId": "super_glue", "Count": 10 },
+        { "ItemId": "extruded_charcoal", "Count": 8 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 180.0,
+      "TimePerAdditionalUnit": 180.0
+    },
+    {
+      "RecipeId": "craft_armor_r6",
+      "DisplayName": "High Alloy Armor",
+      "Description": "Divine armor infused with elemental essence, vega string weave, and compound glue.",
+      "Category": 2,
+      "EquipmentType": 4,
+      "Rarity": 6,
+      "RequiredCraftingLevel": 25,
+      "RequiredTier": 5,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 54 },
+        { "ItemId": "high_alloy_steel", "Count": 30 },
+        { "ItemId": "vega_string", "Count": 22 },
+        { "ItemId": "compound_glue", "Count": 12 },
+        { "ItemId": "lumber_essence", "Count": 2 },
+        { "ItemId": "elemental_essence", "Count": 1 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 240.0,
+      "TimePerAdditionalUnit": 240.0
+    }
+  ]
+}

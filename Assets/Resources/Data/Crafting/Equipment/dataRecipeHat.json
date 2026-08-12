@@ -1,0 +1,114 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_hat_r1",
+      "DisplayName": "Cotton Hat",
+      "Description": "A basic cotton hat stitched with organic glue.",
+      "Category": 2,
+      "EquipmentType": 1,
+      "Rarity": 1,
+      "RequiredCraftingLevel": 1,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "cotton_thread", "Count": 6 },
+        { "ItemId": "disposed_logs", "Count": 2 },
+        { "ItemId": "organic_glue", "Count": 2 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 20.0,
+      "TimePerAdditionalUnit": 20.0
+    },
+    {
+      "RecipeId": "craft_hat_r2",
+      "DisplayName": "Thick Thread Hat",
+      "Description": "A hat woven from thick thread with concentrated glue.",
+      "Category": 2,
+      "EquipmentType": 1,
+      "Rarity": 2,
+      "RequiredCraftingLevel": 5,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "thick_thread", "Count": 10 },
+        { "ItemId": "logs", "Count": 4 },
+        { "ItemId": "concentrated_glue", "Count": 3 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 30.0,
+      "TimePerAdditionalUnit": 30.0
+    },
+    {
+      "RecipeId": "craft_hat_r3",
+      "DisplayName": "Silk Hat",
+      "Description": "A refined hat crafted from silk thread and fine lumber.",
+      "Category": 2,
+      "EquipmentType": 1,
+      "Rarity": 3,
+      "RequiredCraftingLevel": 10,
+      "RequiredTier": 2,
+      "Ingredients": [
+        { "ItemId": "silk_thread", "Count": 14 },
+        { "ItemId": "rough_lumber", "Count": 6 },
+        { "ItemId": "strong_glue", "Count": 4 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 45.0,
+      "TimePerAdditionalUnit": 45.0
+    },
+    {
+      "RecipeId": "craft_hat_r4",
+      "DisplayName": "Compound Hat",
+      "Description": "A legendary hat woven with compound thread and high-grade lumber.",
+      "Category": 2,
+      "EquipmentType": 1,
+      "Rarity": 4,
+      "RequiredCraftingLevel": 15,
+      "RequiredTier": 3,
+      "Ingredients": [
+        { "ItemId": "compound_thread", "Count": 18 },
+        { "ItemId": "fine_lumber", "Count": 8 },
+        { "ItemId": "colored_glue", "Count": 5 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 60.0,
+      "TimePerAdditionalUnit": 60.0
+    },
+    {
+      "RecipeId": "craft_hat_r5",
+      "DisplayName": "Azureworm Hat",
+      "Description": "A mythic hat woven from azureworm silk with super glue binding.",
+      "Category": 2,
+      "EquipmentType": 1,
+      "Rarity": 5,
+      "RequiredCraftingLevel": 20,
+      "RequiredTier": 4,
+      "Ingredients": [
+        { "ItemId": "azureworm_silk", "Count": 22 },
+        { "ItemId": "high_grade_lumber", "Count": 2 },
+        { "ItemId": "super_glue", "Count": 6 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 90.0,
+      "TimePerAdditionalUnit": 90.0
+    },
+    {
+      "RecipeId": "craft_hat_r6",
+      "DisplayName": "Vega Hat",
+      "Description": "A divine hat woven with Vega String and infused with elemental essence.",
+      "Category": 2,
+      "EquipmentType": 1,
+      "Rarity": 6,
+      "RequiredCraftingLevel": 25,
+      "RequiredTier": 5,
+      "Ingredients": [
+        { "ItemId": "vega_string", "Count": 26 },
+        { "ItemId": "lumber_essence", "Count": 3 },
+        { "ItemId": "compound_glue", "Count": 8 },
+        { "ItemId": "elemental_essence", "Count": 1 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 120.0,
+      "TimePerAdditionalUnit": 120.0
+    }
+  ]
+}

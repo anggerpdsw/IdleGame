@@ -1,3 +1,4 @@
+using System;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
@@ -31,13 +32,42 @@ namespace IdleDefenseSurvival.Items
             float refundRate = CalculateRefundRate(job, policy, recipe);
             if (refundRate <= 0f) return;
 
-            // Refund ingredients
-            if (recipe.Ingredients != null)
+            // Refund ingredients from job snapshot (immutable-at-creation copy).
+            // Falls back to live recipe only for legacy jobs predating the snapshot feature —
+            // those should be transient since they were never persisted with the new field.
+            var ingredientSource = (CraftIngredient[])null;
+            bool snapshotAvailable = job.IngredientsSnapshot != null && job.IngredientsSnapshot.Length > 0;
+            if (snapshotAvailable)
             {
-                foreach (var ingredient in recipe.Ingredients)
+                ingredientSource = Array.ConvertAll(job.IngredientsSnapshot, s => new CraftIngredient
+                {
+                    ItemId = s.ItemId,
+                    Count = s.Count,
+                    Consumed = s.Consumed,
+                    CanSubstitute = s.CanSubstitute,
+                    SubstituteItemIds = s.SubstituteItemIds,
+                    MinQuality = s.MinQuality,
+                    MinLevel = s.MinLevel,
+                    MinEnhance = s.MinEnhance,
+                    ReturnOnFail = s.ReturnOnFail
+                });
+                Debug.Log($"[CraftRefundService] Using ingredient snapshot for job {job.JobId}");
+            }
+            else if (recipe.Ingredients != null)
+            {
+                ingredientSource = recipe.Ingredients;
+                Debug.LogWarning($"[CraftRefundService] Job {job.JobId} missing IngredientsSnapshot — falling back to live recipe (legacy path)");
+            }
+
+            if (ingredientSource != null)
+            {
+                foreach (var ingredient in ingredientSource)
                 {
                     if (!ingredient.Consumed) continue;
-                    int refundCount = Mathf.RoundToInt(ingredient.Count * job.Count * refundRate);
+                    // Snapshot.Count is already scaled by job.Count; legacy recipe path needs the multiplier.
+                    int refundCount = snapshotAvailable
+                        ? Mathf.RoundToInt(ingredient.Count * refundRate)
+                        : Mathf.RoundToInt(ingredient.Count * job.Count * refundRate);
                     if (refundCount > 0)
                     {
                         _inventory.AddItem(ingredient.ItemId, refundCount);

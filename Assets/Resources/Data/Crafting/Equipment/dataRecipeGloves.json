@@ -1,0 +1,114 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_gloves_r1",
+      "DisplayName": "Leather Gloves",
+      "Description": "Basic leather gloves crafted from tanned hide and cotton thread.",
+      "Category": 2,
+      "EquipmentType": 2,
+      "Rarity": 1,
+      "RequiredCraftingLevel": 1,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 8 },
+        { "ItemId": "cotton_thread", "Count": 3 },
+        { "ItemId": "organic_glue", "Count": 2 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 30.0,
+      "TimePerAdditionalUnit": 30.0
+    },
+    {
+      "RecipeId": "craft_gloves_r2",
+      "DisplayName": "Reinforced Leather Gloves",
+      "Description": "Leather gloves reinforced with thick thread and stronger glue.",
+      "Category": 2,
+      "EquipmentType": 2,
+      "Rarity": 2,
+      "RequiredCraftingLevel": 5,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 12 },
+        { "ItemId": "thick_thread", "Count": 5 },
+        { "ItemId": "concentrated_glue", "Count": 3 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 45.0,
+      "TimePerAdditionalUnit": 45.0
+    },
+    {
+      "RecipeId": "craft_gloves_r3",
+      "DisplayName": "Thick Leather Gloves",
+      "Description": "Heavy leather gloves with silk thread reinforcement.",
+      "Category": 2,
+      "EquipmentType": 2,
+      "Rarity": 3,
+      "RequiredCraftingLevel": 10,
+      "RequiredTier": 2,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 18 },
+        { "ItemId": "silk_thread", "Count": 8 },
+        { "ItemId": "strong_glue", "Count": 5 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 60.0,
+      "TimePerAdditionalUnit": 60.0
+    },
+    {
+      "RecipeId": "craft_gloves_r4",
+      "DisplayName": "Silk-Lined Gloves",
+      "Description": "Leather gloves lined with compound thread for superior dexterity.",
+      "Category": 2,
+      "EquipmentType": 2,
+      "Rarity": 4,
+      "RequiredCraftingLevel": 15,
+      "RequiredTier": 3,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 24 },
+        { "ItemId": "compound_thread", "Count": 12 },
+        { "ItemId": "colored_glue", "Count": 6 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 90.0,
+      "TimePerAdditionalUnit": 90.0
+    },
+    {
+      "RecipeId": "craft_gloves_r5",
+      "DisplayName": "Azureworm Gloves",
+      "Description": "Leather gloves woven with Azureworm silk for legendary protection.",
+      "Category": 2,
+      "EquipmentType": 2,
+      "Rarity": 5,
+      "RequiredCraftingLevel": 20,
+      "RequiredTier": 4,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 32 },
+        { "ItemId": "azureworm_silk", "Count": 16 },
+        { "ItemId": "super_glue", "Count": 8 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 120.0,
+      "TimePerAdditionalUnit": 120.0
+    },
+    {
+      "RecipeId": "craft_gloves_r6",
+      "DisplayName": "Vega Gloves",
+      "Description": "Divine leather gloves woven with Vega String and infused with essence.",
+      "Category": 2,
+      "EquipmentType": 2,
+      "Rarity": 6,
+      "RequiredCraftingLevel": 25,
+      "RequiredTier": 5,
+      "Ingredients": [
+        { "ItemId": "leather", "Count": 40 },
+        { "ItemId": "vega_string", "Count": 20 },
+        { "ItemId": "compound_glue", "Count": 10 },
+        { "ItemId": "dream_of_reminiscence", "Count": 1 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 180.0,
+      "TimePerAdditionalUnit": 180.0
+    }
+  ]
+}

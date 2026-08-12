@@ -193,6 +193,16 @@ namespace IdleDefenseSurvival.Items
             return _items.Values.Where(i => i.ItemRarity == rarity).ToList();
         }
 
+        public IReadOnlyList<ItemData> GetItemsByRole(ItemRole role)
+        {
+            return _items.Values.Where(i => i.Role == role).ToList();
+        }
+
+        public IReadOnlyList<ItemData> GetItemsByFamily(CraftingFamily family)
+        {
+            return _items.Values.Where(i => i.CraftingFamily == family).ToList();
+        }
+
         public IReadOnlyList<EquipmentData> GetEquipmentByType(EquipmentType type)
         {
             return _equipment.Values.Where(e => e.EquipmentType == type).ToList();
@@ -308,7 +318,10 @@ namespace IdleDefenseSurvival.Items
                 Category = ItemCategory.Gem,
                 ItemRarity = gem.ItemRarity,
                 Icon = gem.Icon,
-                StackSize = 999 // Gem in inventory stacks until socketed (then it becomes a GemInstance)
+                StackSize = 999, // Gem in inventory stacks until socketed (then it becomes a GemInstance)
+                Role = ItemRole.Material,
+                CraftingFamily = CraftingFamily.Stone,
+                CraftingTier = (int)gem.ItemRarity
             };
 
             OnItemDataAdded?.Invoke(gem.GemId);

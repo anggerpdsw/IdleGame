@@ -1,0 +1,108 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_cape_r1",
+      "DisplayName": "Cotton Cape",
+      "Description": "A simple cotton cape stitched with organic glue.",
+      "Category": 2,
+      "EquipmentType": 3,
+      "Rarity": 1,
+      "RequiredCraftingLevel": 1,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "cotton_thread", "Count": 8 },
+        { "ItemId": "organic_glue", "Count": 3 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_cape_r2",
+      "DisplayName": "Thick Thread Cape",
+      "Description": "A cape woven from thick thread with concentrated glue.",
+      "Category": 2,
+      "EquipmentType": 3,
+      "Rarity": 2,
+      "RequiredCraftingLevel": 5,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "thick_thread", "Count": 12 },
+        { "ItemId": "concentrated_glue", "Count": 4 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 35.0,
+      "TimePerAdditionalUnit": 35.0
+    },
+    {
+      "RecipeId": "craft_cape_r3",
+      "DisplayName": "Silk Cape",
+      "Description": "A refined cape crafted from silk thread with strong glue.",
+      "Category": 2,
+      "EquipmentType": 3,
+      "Rarity": 3,
+      "RequiredCraftingLevel": 10,
+      "RequiredTier": 2,
+      "Ingredients": [
+        { "ItemId": "silk_thread", "Count": 16 },
+        { "ItemId": "strong_glue", "Count": 5 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 50.0,
+      "TimePerAdditionalUnit": 50.0
+    },
+    {
+      "RecipeId": "craft_cape_r4",
+      "DisplayName": "Compound Cape",
+      "Description": "A legendary cape woven with compound thread and colored glue.",
+      "Category": 2,
+      "EquipmentType": 3,
+      "Rarity": 4,
+      "RequiredCraftingLevel": 15,
+      "RequiredTier": 3,
+      "Ingredients": [
+        { "ItemId": "compound_thread", "Count": 20 },
+        { "ItemId": "colored_glue", "Count": 6 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 70.0,
+      "TimePerAdditionalUnit": 70.0
+    },
+    {
+      "RecipeId": "craft_cape_r5",
+      "DisplayName": "Azureworm Cape",
+      "Description": "A mythic cape woven from azureworm silk with super glue binding.",
+      "Category": 2,
+      "EquipmentType": 3,
+      "Rarity": 5,
+      "RequiredCraftingLevel": 20,
+      "RequiredTier": 4,
+      "Ingredients": [
+        { "ItemId": "azureworm_silk", "Count": 24 },
+        { "ItemId": "super_glue", "Count": 7 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 100.0,
+      "TimePerAdditionalUnit": 100.0
+    },
+    {
+      "RecipeId": "craft_cape_r6",
+      "DisplayName": "Vega Cape",
+      "Description": "A divine cape woven with Vega String and infused with essence of hope.",
+      "Category": 2,
+      "EquipmentType": 3,
+      "Rarity": 6,
+      "RequiredCraftingLevel": 25,
+      "RequiredTier": 5,
+      "Ingredients": [
+        { "ItemId": "vega_string", "Count": 28 },
+        { "ItemId": "compound_glue", "Count": 9 },
+        { "ItemId": "essence_of_hope", "Count": 1 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 140.0,
+      "TimePerAdditionalUnit": 140.0
+    }
+  ]
+}

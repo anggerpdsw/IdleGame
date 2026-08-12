@@ -39,6 +39,12 @@ namespace IdleDefenseSurvival.Items
         public CraftResultData[] Results;    // Generated results when complete
         public string FailureReason;         // If failed
 
+        // ============ Snapshot (immutable at creation) ============
+        // Frozen copy of recipe ingredients scaled by job.Count, captured when the job was created.
+        // Survives recipe/database mutations so refund and audit paths see what was actually consumed.
+        // DecomposedRequirementsSnapshot[] is intentionally absent — no runtime resolver/aggregator exists.
+        public CraftIngredientSnapshot[] IngredientsSnapshot;
+
         // ============ Helper Methods ============
         public static CraftJob Create(string recipeId, int count, long durationTicks)
         {

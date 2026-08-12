@@ -52,6 +52,13 @@ namespace IdleDefenseSurvival.Items
 
             // Create job
             var job = CraftJob.Create(recipeId, count, totalDurationTicks);
+
+            // Capture ingredient snapshot before transaction starts. Deep-copies recipe state
+            // so refund/audit paths remain immune to recipe or database mutations post-creation.
+            job.IngredientsSnapshot = recipe.Ingredients != null
+                ? Array.ConvertAll(recipe.Ingredients, ing => CraftIngredientSnapshot.From(ing, count))
+                : null;
+
             _jobs[job.JobId] = job;
             _jobQueue.Enqueue(job.JobId);
 
@@ -180,7 +187,8 @@ namespace IdleDefenseSurvival.Items
                     CompletedCount = j.CompletedCount,
                     Status = j.Status,
                     Results = j.Results,
-                    FailureReason = j.FailureReason
+                    FailureReason = j.FailureReason,
+                    IngredientsSnapshot = j.IngredientsSnapshot
                 }).ToList(),
                 MaxConcurrentJobs = _maxConcurrentJobs
             };
@@ -207,7 +215,8 @@ namespace IdleDefenseSurvival.Items
                     CompletedCount = jobData.CompletedCount,
                     Status = jobData.Status,
                     Results = jobData.Results,
-                    FailureReason = jobData.FailureReason
+                    FailureReason = jobData.FailureReason,
+                    IngredientsSnapshot = jobData.IngredientsSnapshot
                 };
                 _jobs[job.JobId] = job;
 
@@ -295,5 +304,7 @@ namespace IdleDefenseSurvival.Items
         public CraftJobStatus Status;
         public CraftResultData[] Results;
         public string FailureReason;
+        // Null for jobs created before the snapshot feature — callers must null-check.
+        public CraftIngredientSnapshot[] IngredientsSnapshot;
     }
 }

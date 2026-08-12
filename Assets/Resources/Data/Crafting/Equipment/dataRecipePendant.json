@@ -1,0 +1,108 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_pendant_r1",
+      "DisplayName": "Pig Iron Pendant",
+      "Description": "A simple pig iron pendant strung on cotton thread.",
+      "Category": 2,
+      "EquipmentType": 7,
+      "Rarity": 1,
+      "RequiredCraftingLevel": 1,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "pig_iron", "Count": 4 },
+        { "ItemId": "cotton_thread", "Count": 2 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 18.0,
+      "TimePerAdditionalUnit": 18.0
+    },
+    {
+      "RecipeId": "craft_pendant_r2",
+      "DisplayName": "Carbon Steel Pendant",
+      "Description": "A high-carbon steel pendant on thick thread.",
+      "Category": 2,
+      "EquipmentType": 7,
+      "Rarity": 2,
+      "RequiredCraftingLevel": 5,
+      "RequiredTier": 1,
+      "Ingredients": [
+        { "ItemId": "high_carbon_steel", "Count": 6 },
+        { "ItemId": "thick_thread", "Count": 4 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_pendant_r3",
+      "DisplayName": "Refined Steel Pendant",
+      "Description": "A refined steel pendant with silk thread wrapping.",
+      "Category": 2,
+      "EquipmentType": 7,
+      "Rarity": 3,
+      "RequiredCraftingLevel": 10,
+      "RequiredTier": 2,
+      "Ingredients": [
+        { "ItemId": "refined_steel", "Count": 9 },
+        { "ItemId": "silk_thread", "Count": 6 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 40.0,
+      "TimePerAdditionalUnit": 40.0
+    },
+    {
+      "RecipeId": "craft_pendant_r4",
+      "DisplayName": "Steel Alloy Pendant",
+      "Description": "A legendary pendant forged from steel alloy with compound thread.",
+      "Category": 2,
+      "EquipmentType": 7,
+      "Rarity": 4,
+      "RequiredCraftingLevel": 15,
+      "RequiredTier": 3,
+      "Ingredients": [
+        { "ItemId": "steel_alloy", "Count": 12 },
+        { "ItemId": "compound_thread", "Count": 8 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 55.0,
+      "TimePerAdditionalUnit": 55.0
+    },
+    {
+      "RecipeId": "craft_pendant_r5",
+      "DisplayName": "High Alloy Pendant",
+      "Description": "A mythic pendant forged from high alloy steel with azureworm silk.",
+      "Category": 2,
+      "EquipmentType": 7,
+      "Rarity": 5,
+      "RequiredCraftingLevel": 20,
+      "RequiredTier": 4,
+      "Ingredients": [
+        { "ItemId": "high_alloy_steel", "Count": 14 },
+        { "ItemId": "azureworm_silk", "Count": 10 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 80.0,
+      "TimePerAdditionalUnit": 80.0
+    },
+    {
+      "RecipeId": "craft_pendant_r6",
+      "DisplayName": "Vega Pendant",
+      "Description": "A divine pendant forged from high alloy steel with Vega String and elemental essence inlay.",
+      "Category": 2,
+      "EquipmentType": 7,
+      "Rarity": 6,
+      "RequiredCraftingLevel": 25,
+      "RequiredTier": 5,
+      "Ingredients": [
+        { "ItemId": "high_alloy_steel", "Count": 18 },
+        { "ItemId": "vega_string", "Count": 12 },
+        { "ItemId": "elemental_essence", "Count": 1 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 110.0,
+      "TimePerAdditionalUnit": 110.0
+    }
+  ]
+}

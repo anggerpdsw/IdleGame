@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival
     public enum ProjectileOwner { Player, Tank, Enemy }
     public enum RewardType { Gold, Gem, Meat, Exp, Card, Ticket, Energy, Item, Equipment, Hero }
     public enum Role { Fighter, Tank, Golem, Caster, Ranger, Agile, Beast, BOSS }
-    public enum SceneState { CardCollection, Game, Inventory, MainMenu }
+    public enum SceneState { CardCollection, Crafting, Game, Inventory, MainMenu }
     public enum SpawnMode { Circle, FourSides }
     public enum UltimateDMG { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
     public enum WaveState { ActiveWave, Defeat, InterWave, Victory }
