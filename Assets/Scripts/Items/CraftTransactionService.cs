@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Items.Decomposition;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -54,6 +55,25 @@ namespace IdleDefenseSurvival.Items
                         return TransactionResult.Fail($"Failed to reserve {ingredient.ItemId}: {reserved.Reason}");
                     }
                 }
+
+            // P0-B step 10: reserve decomposed requirements
+            var decomposedReqsReserve = DecomposedRequirementResolver.Compute(recipe.Rarity);
+            if (decomposedReqsReserve.Count > 0)
+            {
+                var decomposedScaledReserve = DecomposedRequirementAggregator.SumPerJob(decomposedReqsReserve, count);
+                for (int dr = 0; dr < decomposedScaledReserve.Count; dr++)
+                {
+                    var entry = decomposedScaledReserve[dr];
+                    int have = _inventory.GetTotalQuantity(entry.ItemId);
+                    if (have < entry.Count)
+                    {
+                        Rollback();
+                        return TransactionResult.Fail($"Failed to reserve {entry.ItemId}: need {entry.Count}, have {have}");
+                    }
+                    _reservedMaterials.Add(new ReservedMaterial { ItemId = entry.ItemId, Count = entry.Count, MinQuality = 0, MinLevel = 0, MinEnhance = 0 });
+                }
+            }
+
             }
 
             // Reserve currency
@@ -161,6 +181,21 @@ namespace IdleDefenseSurvival.Items
                         return ValidationResult.Fail($"Not enough {ingredient.ItemId}: need {required}, have {available}");
                     }
                 }
+
+            // P0-B step 10: validate decomposed requirements (R2-R6 only)
+            var decomposedReqsValidate = DecomposedRequirementResolver.Compute(recipe.Rarity);
+            if (decomposedReqsValidate.Count > 0)
+            {
+                var decomposedScaledValidate = DecomposedRequirementAggregator.SumPerJob(decomposedReqsValidate, count);
+                for (int dv = 0; dv < decomposedScaledValidate.Count; dv++)
+                {
+                    int need = decomposedScaledValidate[dv].Count;
+                    int have = _inventory.GetTotalQuantity(decomposedScaledValidate[dv].ItemId);
+                    if (have < need)
+                        return ValidationResult.Fail($"Not enough {decomposedScaledValidate[dv].ItemId}: need {need}, have {have}");
+                }
+            }
+
             }
 
             // Check currency

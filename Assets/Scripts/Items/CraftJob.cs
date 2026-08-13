@@ -15,6 +15,12 @@ namespace IdleDefenseSurvival.Items
         public string JobId;                 // Unique GUID for this craft job
         public string RecipeId;              // Reference to recipe
 
+        // ============ Execution Snapshot (P0-A) ============
+        // Immutable root containing RecipeSnapshot, CostSnapshot, Context, CraftCount, CompletionSeed.
+        // Built at StartCraft; RecipeVersion is derived via ExecutionSnapshot.Recipe.RecipeVersion (§16.3).
+        public CraftExecutionSnapshot ExecutionSnapshot;
+        public long? CompletionSeed;         // mirrors ExecutionSnapshot.CompletionSeed for legacy lookup (I-21, I-20)
+
         // ============ Timing (UTC ticks for persistence) ============
         public long StartTimeUtc;            // DateTime.UtcNow.Ticks when started
         public long EndTimeUtc;              // StartTimeUtc + DurationTicks
@@ -98,11 +104,12 @@ namespace IdleDefenseSurvival.Items
     /// </summary>
     public enum CraftJobStatus
     {
-        Queued = 0,      // Waiting to start (for future queue priority system)
-        Crafting = 1,    // Currently in progress
-        Complete = 2,    // Finished successfully
-        Cancelled = 3,   // Cancelled by player
-        Failed = 4       // Failed (insufficient resources, etc.)
+        Queued = 0,               // Waiting to start (for future queue priority system)
+        Crafting = 1,             // Currently in progress
+        Complete = 2,             // Finished successfully
+        Cancelled = 3,            // Cancelled by player
+        Failed = 4,               // Failed (insufficient resources, etc.)
+        RewardPendingCommit = 5   // Two-phase completion: Results+Seed durable, Phase B in flight (I-20, §13.2)
     }
 
     /// <summary>

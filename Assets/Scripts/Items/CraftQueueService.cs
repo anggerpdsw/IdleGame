@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IdleDefenseSurvival.Items.Decomposition;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Items
@@ -58,6 +59,30 @@ namespace IdleDefenseSurvival.Items
             job.IngredientsSnapshot = recipe.Ingredients != null
                 ? Array.ConvertAll(recipe.Ingredients, ing => CraftIngredientSnapshot.From(ing, count))
                 : null;
+
+            // P0-B step 10: build CraftExecutionSnapshot at job creation (I-21 — seed-at-build)
+            var recipeSnapshot = new RecipeSnapshot(
+                recipe.RecipeId, recipe.RecipeVersion, recipe.EquipmentType.ToString(), recipe.Rarity,
+                job.IngredientsSnapshot != null
+                    ? Array.ConvertAll(job.IngredientsSnapshot, s => new CraftIngredientSnapshot { ItemId = s.ItemId, Count = s.Count })
+                    : Array.Empty<CraftIngredientSnapshot>());
+            var materialsCosts = job.IngredientsSnapshot != null
+                ? Array.ConvertAll(job.IngredientsSnapshot, s => new IngredientCost { ItemId = s.ItemId, Count = s.Count })
+                : Array.Empty<IngredientCost>();
+            var decomposedReqs = DecomposedRequirementResolver.Compute(recipe.Rarity);
+            var decomposedCosts = DecomposedRequirementAggregator.SumPerJob(decomposedReqs, count);
+            var progressionCosts = new IngredientCost[decomposedCosts.Count];
+            for (int pi = 0; pi < decomposedCosts.Count; pi++)
+                progressionCosts[pi] = new IngredientCost { ItemId = decomposedCosts[pi].ItemId, Count = decomposedCosts[pi].Count };
+            var additionalCosts = recipe.AdditionalCosts != null
+                ? Array.ConvertAll(recipe.AdditionalCosts, c => new CostEntry { CurrencyId = c.Currency.ToString(), Amount = c.Amount * count })
+                : Array.Empty<CostEntry>();
+            var currencySnap = new CurrencySnapshot(recipe.GoldCost * count, recipe.GemCost * count, additionalCosts);
+            var costSnap = new CostSnapshot(materialsCosts, Array.Empty<IngredientCost>(), progressionCosts, currencySnap);
+            var contextSnap = new CraftContextSnapshot(); // P0-D will populate via CraftContextBuilder
+            var seed = (long)_rng.Next(1, int.MaxValue); // sentinel 0 banned per I-21 (lower bound 1 guarantees positive)
+            job.ExecutionSnapshot = new CraftExecutionSnapshot(recipeSnapshot, costSnap, contextSnap, seed, count);
+            job.CompletionSeed = seed;
 
             _jobs[job.JobId] = job;
             _jobQueue.Enqueue(job.JobId);
@@ -172,6 +197,7 @@ namespace IdleDefenseSurvival.Items
         }
 
         // ============ Persistence ============
+        private static readonly System.Random _rng = new(); // static prevents millisecond-clock collision when multiple jobs start in the same tick
         public CraftQueueSaveData GetSaveData()
         {
             return new CraftQueueSaveData
@@ -188,7 +214,9 @@ namespace IdleDefenseSurvival.Items
                     Status = j.Status,
                     Results = j.Results,
                     FailureReason = j.FailureReason,
-                    IngredientsSnapshot = j.IngredientsSnapshot
+                    IngredientsSnapshot = j.IngredientsSnapshot,
+                    ExecutionSnapshot = j.ExecutionSnapshot,
+                    CompletionSeed = j.CompletionSeed
                 }).ToList(),
                 MaxConcurrentJobs = _maxConcurrentJobs
             };
@@ -216,7 +244,9 @@ namespace IdleDefenseSurvival.Items
                     Status = jobData.Status,
                     Results = jobData.Results,
                     FailureReason = jobData.FailureReason,
-                    IngredientsSnapshot = jobData.IngredientsSnapshot
+                    IngredientsSnapshot = jobData.IngredientsSnapshot,
+                    ExecutionSnapshot = jobData.ExecutionSnapshot,
+                    CompletionSeed = jobData.CompletionSeed
                 };
                 _jobs[job.JobId] = job;
 
@@ -288,23 +318,4 @@ namespace IdleDefenseSurvival.Items
         public int MaxConcurrentJobs = 1;
     }
 
-    /// <summary>
-    /// Serialized craft job for persistence.
-    /// </summary>
-    [Serializable]
-    public class CraftJobSaveData
-    {
-        public string JobId;
-        public string RecipeId;
-        public long StartTimeUtc;
-        public long EndTimeUtc;
-        public long DurationTicks;
-        public int Count;
-        public int CompletedCount;
-        public CraftJobStatus Status;
-        public CraftResultData[] Results;
-        public string FailureReason;
-        // Null for jobs created before the snapshot feature — callers must null-check.
-        public CraftIngredientSnapshot[] IngredientsSnapshot;
-    }
 }

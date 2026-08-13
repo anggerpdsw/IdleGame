@@ -18,6 +18,7 @@ namespace IdleDefenseSurvival.Items
         public ItemCategory Category = ItemCategory.None;
         public EquipmentType EquipmentType = EquipmentType.None; // Which equipment slot this recipe crafts
         public int Rarity = 1; // 1=Common, 2=Rare, 3=Epic, 4=Legendary, 5=Mythic, 6=Divine
+        public int RecipeVersion = 1; // v3.5 §8.1 — defaults to 1 when JSON omits the field
 
         // ============ Requirements ============
         public int RequiredCraftingLevel = 1;

@@ -439,11 +439,11 @@ namespace IdleDefenseSurvival.Items
         }
 
         public static RequiredFamily Single(CraftingFamily f) =>
-            new RequiredFamily(f, new[] { f }, false, false);
+            new(f, new[] { f }, false, false);
         public static RequiredFamily Alternative(params CraftingFamily[] fs) =>
-            new RequiredFamily(fs[0], fs, true, false);
+            new(fs[0], fs, true, false);
         public static RequiredFamily Optional(CraftingFamily f) =>
-            new RequiredFamily(f, new[] { f }, false, true);
+            new(f, new[] { f }, false, true);
     }
 
     /// <summary>

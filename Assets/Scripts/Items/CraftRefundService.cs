@@ -2,6 +2,7 @@ using System;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Items.Decomposition;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Items
@@ -34,29 +35,58 @@ namespace IdleDefenseSurvival.Items
 
             // Refund ingredients from job snapshot (immutable-at-creation copy).
             // Falls back to live recipe only for legacy jobs predating the snapshot feature —
-            // those should be transient since they were never persisted with the new field.
+
+            // P0-B step 10: ExecutionSnapshot.Cost.Materials is the new source of truth (P0-A).
+            // Priority: ExecutionSnapshot.Cost.Materials -> IngredientsSnapshot[] -> recipe.Ingredients.
             var ingredientSource = (CraftIngredient[])null;
-            bool snapshotAvailable = job.IngredientsSnapshot != null && job.IngredientsSnapshot.Length > 0;
-            if (snapshotAvailable)
+            bool snapshotAvailable = false;
+            if (job.ExecutionSnapshot != null &&
+                job.ExecutionSnapshot.Cost.Materials != null &&
+                job.ExecutionSnapshot.Cost.Materials.Length > 0)
             {
-                ingredientSource = Array.ConvertAll(job.IngredientsSnapshot, s => new CraftIngredient
-                {
-                    ItemId = s.ItemId,
-                    Count = s.Count,
-                    Consumed = s.Consumed,
-                    CanSubstitute = s.CanSubstitute,
-                    SubstituteItemIds = s.SubstituteItemIds,
-                    MinQuality = s.MinQuality,
-                    MinLevel = s.MinLevel,
-                    MinEnhance = s.MinEnhance,
-                    ReturnOnFail = s.ReturnOnFail
-                });
+                ingredientSource = Array.ConvertAll(
+                    job.ExecutionSnapshot.Cost.Materials,
+                    c => new CraftIngredient
+                    {
+                        ItemId = c.ItemId,
+                        Count = c.Count,
+                        Consumed = true,
+                        CanSubstitute = false,
+                        SubstituteItemIds = null,
+                        MinQuality = 0,
+                        MinLevel = 0,
+                        MinEnhance = 0,
+                        ReturnOnFail = false
+                    });
+
+                snapshotAvailable = true;
+                Debug.Log($"[CraftRefundService] Using ExecutionSnapshot.Cost.Materials for job {job.JobId}");
+            }
+            else if (job.IngredientsSnapshot != null && job.IngredientsSnapshot.Length > 0)
+            {
+                ingredientSource = Array.ConvertAll(
+                    job.IngredientsSnapshot,
+                    s => new CraftIngredient
+                    {
+                        ItemId = s.ItemId,
+                        Count = s.Count,
+                        Consumed = s.Consumed,
+                        CanSubstitute = s.CanSubstitute,
+                        SubstituteItemIds = s.SubstituteItemIds,
+                        MinQuality = s.MinQuality,
+                        MinLevel = s.MinLevel,
+                        MinEnhance = s.MinEnhance,
+                        ReturnOnFail = s.ReturnOnFail
+                    });
+
+                snapshotAvailable = true;
                 Debug.Log($"[CraftRefundService] Using ingredient snapshot for job {job.JobId}");
             }
             else if (recipe.Ingredients != null)
             {
                 ingredientSource = recipe.Ingredients;
-                Debug.LogWarning($"[CraftRefundService] Job {job.JobId} missing IngredientsSnapshot — falling back to live recipe (legacy path)");
+                Debug.LogWarning(
+                    $"[CraftRefundService] Job {job.JobId} missing IngredientsSnapshot — falling back to live recipe (legacy path)");
             }
 
             if (ingredientSource != null)
@@ -64,14 +94,26 @@ namespace IdleDefenseSurvival.Items
                 foreach (var ingredient in ingredientSource)
                 {
                     if (!ingredient.Consumed) continue;
-                    // Snapshot.Count is already scaled by job.Count; legacy recipe path needs the multiplier.
+
                     int refundCount = snapshotAvailable
                         ? Mathf.RoundToInt(ingredient.Count * refundRate)
                         : Mathf.RoundToInt(ingredient.Count * job.Count * refundRate);
+
                     if (refundCount > 0)
-                    {
                         _inventory.AddItem(ingredient.ItemId, refundCount);
-                    }
+                }
+            }
+
+            // P0-B step 11: refund decomposed requirements (Cost.Progression) if ExecutionSnapshot exists.
+            // Cost.Progression[i].Count is pre-scaled by job.Count via SumPerJob — no extra multiplier.
+            // Null-guard handles legacy jobs (created before P0-B step 10) that lack ExecutionSnapshot.
+            if (job.ExecutionSnapshot?.Cost.Progression != null)
+            {
+                foreach (var prog in job.ExecutionSnapshot.Cost.Progression)
+                {
+                    int refundCount = Mathf.RoundToInt(prog.Count * refundRate);
+                    if (refundCount > 0)
+                        _inventory.AddItem(prog.ItemId, refundCount);
                 }
             }
 
