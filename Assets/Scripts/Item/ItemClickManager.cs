@@ -22,9 +22,7 @@ namespace IdleDefenseSurvival.Item
         private void Awake()
         {
             // Get camera from this GameObject, fallback to main camera
-            _mainCamera = GetComponent<UnityEngine.Camera>();
-            if (_mainCamera == null)
-                _mainCamera = UnityEngine.Camera.main;
+            _mainCamera = GetComponent<UnityEngine.Camera>() ?? UnityEngine.Camera.main;
 
             // Set default layer mask to "Items" layer (layer 6)
             if (_itemLayerMask == 0)

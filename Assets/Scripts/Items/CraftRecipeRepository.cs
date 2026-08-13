@@ -114,7 +114,6 @@ namespace IdleDefenseSurvival.Items
                 }
             }
 
-            Debug.Log($"[CraftRecipeRepository] Loaded {totalLoaded} recipes from JSON files");
             Debug.Log($"[CraftRecipeRepository] Loaded {_allRecipes.Count} recipes, {_unlockedRecipeIds.Count} unlocked, {_knownRecipeIds.Count} known");
         }
 

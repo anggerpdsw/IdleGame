@@ -49,6 +49,9 @@ namespace IdleDefenseSurvival
         // Daily Reward        
         public const int REWARD_COUNT = 7;
         public const int COOLDOWN_MINUTES = 5;
+        public const int DAILY_GOLD_REWARD = 10000;
+        public const int DAILY_MEAT_REWARD = 500;
+        public const int DAILY_EXP_REWARD = 2500;
 
     }
 

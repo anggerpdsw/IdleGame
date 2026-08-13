@@ -67,6 +67,35 @@ namespace IdleDefenseSurvival.Items
             };
         }
 
+        /// <summary>
+        /// Overload that seeds the job with a pre-built immutable <see cref="CraftExecutionSnapshot"/>
+        /// and an ingredients snapshot. Used by <see cref="CraftSnapshotBuilder"/> flow to ensure
+        /// the same snapshot object is shared between journal and job — single source of truth (P0-C).
+        /// JobId is generated here; no queue/journal logic added.
+        ///</summary>
+        public static CraftJob Create(
+            string recipeId,
+            int count,
+            long durationTicks,
+            CraftExecutionSnapshot snapshot,
+            CraftIngredientSnapshot[] ingredientsSnapshot)
+        {
+            var now = DateTime.UtcNow.Ticks;
+            return new CraftJob
+            {
+                JobId = Guid.NewGuid().ToString(),
+                RecipeId = recipeId,
+                StartTimeUtc = now,
+                DurationTicks = durationTicks,
+                EndTimeUtc = now + durationTicks,
+                Count = count,
+                Status = CraftJobStatus.Queued,
+                ExecutionSnapshot = snapshot,
+                CompletionSeed = snapshot?.CompletionSeed,
+                IngredientsSnapshot = ingredientsSnapshot
+            };
+        }
+
         public TimeSpan GetTimeRemaining()
         {
             if (IsComplete || Status == CraftJobStatus.Cancelled) return TimeSpan.Zero;

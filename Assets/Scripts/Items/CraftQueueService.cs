@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Items.Decomposition;
 using UnityEngine;
+using IdleDefenseSurvival.Items.Random;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -60,29 +61,9 @@ namespace IdleDefenseSurvival.Items
                 ? Array.ConvertAll(recipe.Ingredients, ing => CraftIngredientSnapshot.From(ing, count))
                 : null;
 
-            // P0-B step 10: build CraftExecutionSnapshot at job creation (I-21 — seed-at-build)
-            var recipeSnapshot = new RecipeSnapshot(
-                recipe.RecipeId, recipe.RecipeVersion, recipe.EquipmentType.ToString(), recipe.Rarity,
-                job.IngredientsSnapshot != null
-                    ? Array.ConvertAll(job.IngredientsSnapshot, s => new CraftIngredientSnapshot { ItemId = s.ItemId, Count = s.Count })
-                    : Array.Empty<CraftIngredientSnapshot>());
-            var materialsCosts = job.IngredientsSnapshot != null
-                ? Array.ConvertAll(job.IngredientsSnapshot, s => new IngredientCost { ItemId = s.ItemId, Count = s.Count })
-                : Array.Empty<IngredientCost>();
-            var decomposedReqs = DecomposedRequirementResolver.Compute(recipe.Rarity);
-            var decomposedCosts = DecomposedRequirementAggregator.SumPerJob(decomposedReqs, count);
-            var progressionCosts = new IngredientCost[decomposedCosts.Count];
-            for (int pi = 0; pi < decomposedCosts.Count; pi++)
-                progressionCosts[pi] = new IngredientCost { ItemId = decomposedCosts[pi].ItemId, Count = decomposedCosts[pi].Count };
-            var additionalCosts = recipe.AdditionalCosts != null
-                ? Array.ConvertAll(recipe.AdditionalCosts, c => new CostEntry { CurrencyId = c.Currency.ToString(), Amount = c.Amount * count })
-                : Array.Empty<CostEntry>();
-            var currencySnap = new CurrencySnapshot(recipe.GoldCost * count, recipe.GemCost * count, additionalCosts);
-            var costSnap = new CostSnapshot(materialsCosts, Array.Empty<IngredientCost>(), progressionCosts, currencySnap);
-            var contextSnap = new CraftContextSnapshot(); // P0-D will populate via CraftContextBuilder
-            var seed = (long)_rng.Next(1, int.MaxValue); // sentinel 0 banned per I-21 (lower bound 1 guarantees positive)
-            job.ExecutionSnapshot = new CraftExecutionSnapshot(recipeSnapshot, costSnap, contextSnap, seed, count);
-            job.CompletionSeed = seed;
+            // P0-B step 10 + P0-C: build CraftExecutionSnapshot via builder (single source of truth)
+            job.ExecutionSnapshot = CraftSnapshotBuilder.Build(recipe, count, _rng, job.IngredientsSnapshot);
+            job.CompletionSeed = job.ExecutionSnapshot.CompletionSeed;
 
             _jobs[job.JobId] = job;
             _jobQueue.Enqueue(job.JobId);
@@ -103,6 +84,22 @@ namespace IdleDefenseSurvival.Items
                 if (jobId != null) jobIds.Add(jobId);
             }
             return jobIds;
+        }
+
+        /// <summary>
+        /// Strict enqueue-only API (P0-C). Inserts a pre-built <see cref="CraftJob"/> into the queue state.
+        /// Caller is responsible for: building the job, journal append, journal checkpoint, and lifecycle.
+        /// Does NOT call <see cref="TryStartNextJob"/> — that transition is orchestrated by caller.
+        ///</summary>
+        /// <returns>true if enqueued; false if job is null, JobId invalid/empty, or JobId already present</returns>
+        public bool EnqueueJob(CraftJob job)
+        {
+            if (job == null) return false;
+            if (string.IsNullOrEmpty(job.JobId)) return false;
+            if (_jobs.ContainsKey(job.JobId)) return false;
+            _jobs[job.JobId] = job;
+            _jobQueue.Enqueue(job.JobId);
+            return true;
         }
 
         public void Update()
@@ -197,7 +194,7 @@ namespace IdleDefenseSurvival.Items
         }
 
         // ============ Persistence ============
-        private static readonly System.Random _rng = new(); // static prevents millisecond-clock collision when multiple jobs start in the same tick
+        private static readonly IRandomProvider _rng = new UnityRandomProvider(); // static prevents millisecond-clock collision when multiple jobs start in the same tick
         public CraftQueueSaveData GetSaveData()
         {
             return new CraftQueueSaveData

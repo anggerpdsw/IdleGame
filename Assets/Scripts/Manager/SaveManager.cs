@@ -13,6 +13,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Save;
+using IdleDefenseSurvival.Core.Interfaces;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -38,6 +39,19 @@ namespace IdleDefenseSurvival.Manager
         public static SaveManager Instance => _instance;
 
         public bool IsSaveLoaded { get; private set; } = false;
+
+        // P0-C: craft transaction journal reference. Set via RegisterJournal() at startup.
+        private CraftTransactionJournal _craftTransactionJournal;
+
+        /// <summary>
+        /// P0-C: bind the runtime journal instance so GatherAllData/ApplyAllData
+        /// can persist and restore in-flight craft transactions.
+        /// Called once during CraftService.Initialize.
+        ///</summary>
+        public void RegisterJournal(CraftTransactionJournal journal)
+        {
+            _craftTransactionJournal = journal;
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatic()
@@ -189,12 +203,23 @@ namespace IdleDefenseSurvival.Manager
             try
             {
                 var saveData = GatherAllData();
-                SaveToFile(saveData);
+                PersistDurably(saveData);
             }
             catch (Exception e)
             {
                 Debug.LogError($"[SaveManager] Failed to save: {e.Message}\n{e.StackTrace}");
             }
+        }
+
+        /// <summary>
+        /// Gather fresh runtime state (including journal) and durably persist (I-17).
+        /// Used by CraftTransactionService at each checkpoint so no stale SaveData is written.
+        /// Throws IOException on filesystem failure so the transaction caller can react.
+        ///</summary>
+        public void PersistCurrentStateDurably()
+        {
+            var data = GatherAllData();
+            PersistDurably(data);
         }
 
         public void MarkCardInventoryDirty()
@@ -241,7 +266,7 @@ namespace IdleDefenseSurvival.Manager
                     {
                         currency = GatherCurrency()
                     };
-                    SaveToFile(initialData);
+                    PersistDurably(initialData);
                     Debug.Log("[SaveManager] Initial save created.");
                     NotifySaveLoaded();
                     AccountManager.Instance?.NotifyDataLoaded();
@@ -261,7 +286,7 @@ namespace IdleDefenseSurvival.Manager
                     {
                         currency = GatherCurrency()
                     };
-                    SaveToFile(initialData);
+                    PersistDurably(initialData);
                     Debug.Log("[SaveManager] Initial save created.");
                     NotifySaveLoaded();
                     AccountManager.Instance?.NotifyDataLoaded();
@@ -310,6 +335,7 @@ namespace IdleDefenseSurvival.Manager
             data.dailyReward ??= new DailyRewardSaveData();
             data.cardInventory ??= new CardInventoryData();
             data.inventory ??= new Dictionary<string, long>();
+            data.craftJournal ??= new CraftJournalSaveData();   // P0-C migration default
         }
 
         public void DeleteAll()
@@ -571,7 +597,13 @@ namespace IdleDefenseSurvival.Manager
         // -------------------------------------------------------------------
         // File I/O (unchanged)
         // -------------------------------------------------------------------
-        private void SaveToFile(SaveData data)
+        /// <summary>
+        /// Synchronous durable write (I-17). Returns ONLY after data is requested to be on disk.
+        /// Throws IOException on filesystem failure. Pure IO — caller supplies the freshest SaveData.
+        /// Uses FileOptions.WriteThrough + Flush(true) to request OS-level durable flush.
+        /// Note: OS/storage stack may still buffer; this is best-effort durability, not absolute hardware commit.
+        ///</summary>
+        public void PersistDurably(SaveData data)
         {
             if (!Directory.Exists(SaveDir)) Directory.CreateDirectory(SaveDir);
             string json = JsonConvert.SerializeObject(data, Formatting.Indented,
@@ -580,7 +612,13 @@ namespace IdleDefenseSurvival.Manager
                     NullValueHandling = NullValueHandling.Ignore,
                     Converters = { new CustomDataConverter() }
                 });
-            File.WriteAllText(SaveFile, json);
+            var bytes = System.Text.Encoding.UTF8.GetBytes(json);
+            using var fs = new FileStream(SaveFile, FileMode.Create, FileAccess.Write, FileShare.None,
+                                           4096, FileOptions.WriteThrough);
+            fs.Write(bytes, 0, bytes.Length);
+            fs.Flush();
+            // Request OS-level durable flush (I-17). Not a guarantee of hardware commit.
+            fs.Flush(true);
         }
 
         private SaveData LoadFromFile()

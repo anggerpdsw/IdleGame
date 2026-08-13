@@ -1,5 +1,6 @@
 using UnityEngine;
-using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Core.Interfaces;
+using System;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -74,9 +75,29 @@ namespace IdleDefenseSurvival.Manager
             // No-op.
         }
 
+        public bool IsRewardedAvailable()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ShowRewardedVideo(Action<bool> onComplete)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RegisterWaveCompletion(int conqueredCount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnSceneEnter(string sceneName)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         // Additional public methods to bridge into existing AdsManager behavior –
         // in case other code references AdsManager.Instance. This provides a backward‑compatible layer.
-            }
+    }
 }

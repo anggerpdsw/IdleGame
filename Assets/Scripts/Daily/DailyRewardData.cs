@@ -37,19 +37,20 @@ namespace IdleDefenseSurvival.Data
         private long GetGoldReward()
         {
             var highestGold = SaveManager.Instance?.GetHighestGoldEarned() ?? 0L;
-            return Math.Max(100000L, highestGold);
+            return Math.Max(GameConstants.DAILY_GOLD_REWARD, highestGold);
         }
 
         private long GetMeatReward()
         {
             var highestMeat = SaveManager.Instance?.GetHighestMeatEarned() ?? 0L;
-            return Math.Max(1000L, highestMeat);
+            return Math.Max(GameConstants.DAILY_MEAT_REWARD, highestMeat);
         }
 
         private long GetExpReward()
         {
             var highestExp = SaveManager.Instance?.GetHighestExpEarned() ?? 0L;
-            return Math.Max(3000L, highestExp / 2);
+            int tier = SaveManager.Instance?.GetHighestUnlockedTier() ?? 1;
+            return Math.Max(GameConstants.DAILY_EXP_REWARD, highestExp / 2 * tier);
         }
     }
 

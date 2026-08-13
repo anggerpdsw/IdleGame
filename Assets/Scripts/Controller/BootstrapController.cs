@@ -51,12 +51,12 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<InventoryService>();
             EnsureSingleton<DropBagManager>();
             EnsureSingleton<EquipmentService>();
-            EnsureSingleton<CraftService>();
             EnsureSingleton<SaveManager>();
             // Attribute stat modifiers need SaveManager (AccountData) to exist; it is created above.
             // If the save has not loaded yet, AttributeModifierManager re-applies on OnSaveLoaded.
             EnsureSingleton<AttributeModifierManager>();
             EnsureSingleton<GameManager>();
+            EnsureSingleton<CraftService>();
 
             if (SaveManager.Instance?.IsSaveLoaded == true) {
                 // Dev: fill inventory once when the save is truly fresh (no save file yet)
@@ -64,7 +64,6 @@ namespace IdleDefenseSurvival.Core
             } else {
                 SaveManager.OnSaveLoaded += OnSaveLoaded_SeedIfEmpty;
             }
-
             // Load save data AFTER all managers exist (SaveManager.Start() will handle loading via coroutine)
             IsInitialized = true;
             StartCoroutine(LoadMainMenu());

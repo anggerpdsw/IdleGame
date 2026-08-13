@@ -157,8 +157,6 @@ namespace IdleDefenseSurvival.Items
                 }
 
                 foreach (var entry in data) registerAction(entry);
-
-                Debug.Log($"[ItemDatabase] Loaded {data.Count} entries from {resourcePath}.json");
             }
             catch (Exception e)
             {

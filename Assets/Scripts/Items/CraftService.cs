@@ -56,6 +56,7 @@ namespace IdleDefenseSurvival.Items
         private CraftContextBuilder _contextBuilder;
         private CraftCompletionService _completionService;
         private CraftRefundService _refundService;
+        private CraftTransactionJournal _transactionJournal;
         private SaveManager _saveManager;
         #endregion
 
@@ -79,7 +80,9 @@ namespace IdleDefenseSurvival.Items
             // Create all sub-services
             _repository = new CraftRecipeRepository();
             _validator = new CraftValidator(_repository, inventory, economy, _saveManager);
-            _transactionService = new CraftTransactionService(inventory, economy);
+            _transactionJournal = new CraftTransactionJournal();
+            _saveManager.RegisterJournal(_transactionJournal);
+            _transactionService = new CraftTransactionService(inventory, economy, _transactionJournal, _saveManager);
             _queueService = new CraftQueueService(_repository);
             _rollService = new CraftRollService(_repository, new UnityRandomProvider(), _formulasConfig);
             _rewardService = new CraftRewardService(ItemGenerator.Instance);
@@ -102,8 +105,6 @@ namespace IdleDefenseSurvival.Items
 
             // Load recipes from equipment data
             _repository.Initialize();
-
-            Debug.Log("[CraftService] Initialized with modular pipeline architecture");
         }
 
         #endregion

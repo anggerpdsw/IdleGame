@@ -1,5 +1,5 @@
 using System;
-using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Core.Interfaces;
 using IdleDefenseSurvival.Manager;
 using UnityEngine;
 using UnityEngine.Events;
@@ -45,7 +45,24 @@ namespace IdleDefenseSurvival.Economy
         [Serializable] public class CurrencyChangedEvent : UnityEvent<CurrencyType, long, long> { }
 
         [Header("Events")]
-        public CurrencyChangedEvent OnCurrencyChanged { get; } = new();
+        [SerializeField] private CurrencyChangedEvent _onCurrencyChanged = new();
+        public CurrencyChangedEvent OnCurrencyChanged => _onCurrencyChanged;
+
+        // IEconomyService.OnCurrencyChanged — explicit interface implementation.
+        // Action backing field is the source of truth; bridge dispatches to both
+        // Action subscribers (interface consumers) and UnityEvent subscribers (Inspector/UI).
+        private event Action<CurrencyType, long, long> _currencyChanged;
+        event Action<CurrencyType, long, long> IEconomyService.OnCurrencyChanged
+        {
+            add { _currencyChanged += value; }
+            remove { _currencyChanged -= value; }
+        }
+
+        private void RaiseCurrencyChanged(CurrencyType type, long oldAmount, long newAmount)
+        {
+            _currencyChanged?.Invoke(type, oldAmount, newAmount);
+            _onCurrencyChanged?.Invoke(type, oldAmount, newAmount);
+        }
 
         // -------------------------------------------------------------------
         // Currency Data
@@ -70,19 +87,28 @@ namespace IdleDefenseSurvival.Economy
         {
             if (amount <= 0) return;
 
+            // Overflow guard: amount + oldAmount must not wrap past long.MaxValue.
             long oldAmount = _currency.Get(type);
-            _currency.Set(type, oldAmount + amount);
+            if (amount > long.MaxValue - oldAmount)
+            {
+                if (_debug)
+                    Debug.LogWarning($"[Economy] {type} overflow prevented (have {oldAmount}, add {amount}).");
+                return;
+            }
+
+            long newAmount = oldAmount + amount;
+            _currency.Set(type, newAmount);
 
             // Catat earning
             SaveManager.Instance?.AddEarn(type, amount);
 
-            // Fire event
-            OnCurrencyChanged?.Invoke(type, oldAmount, _currency.Get(type));
+            // Fire event (action + UnityEvent)
+            RaiseCurrencyChanged(type, oldAmount, newAmount);
 
             // Log
             if (!string.IsNullOrEmpty(reason) && _debug)
             {
-                Debug.Log($"[Economy] +{amount} {type} from {reason} (Total: {_currency.Get(type)})");
+                Debug.Log($"[Economy] +{amount} {type} from {reason} (Total: {newAmount})");
             }
         }
 
@@ -92,6 +118,8 @@ namespace IdleDefenseSurvival.Economy
         /// <returns>True if successful, false if insufficient funds</returns>
         public bool TrySpendCurrency(CurrencyType type, long amount, string reason = "")
         {
+            if (amount <= 0) return false;
+
             if (!_currency.HasEnough(type, amount))
             {
                 if (_debug)
@@ -100,18 +128,19 @@ namespace IdleDefenseSurvival.Economy
             }
 
             long oldAmount = _currency.Get(type);
-            _currency.Set(type, oldAmount - amount);
+            long newAmount = oldAmount - amount;
+            _currency.Set(type, newAmount);
 
             // Catat spending
             SaveManager.Instance?.AddSpending(type, amount);
-            
-            // Fire event
-            OnCurrencyChanged?.Invoke(type, oldAmount, _currency.Get(type));
+
+            // Fire event (action + UnityEvent)
+            RaiseCurrencyChanged(type, oldAmount, newAmount);
 
             // Log
             if (!string.IsNullOrEmpty(reason) && _debug)
             {
-                Debug.Log($"[Economy] -{amount} {type} for {reason} (Remaining: {_currency.Get(type)})");
+                Debug.Log($"[Economy] -{amount} {type} for {reason} (Remaining: {newAmount})");
             }
 
             return true;
@@ -133,15 +162,22 @@ namespace IdleDefenseSurvival.Economy
         public void SetCurrency(CurrencyType type, long amount)
         {
             long oldAmount = _currency.Get(type);
-            _currency.Set(type, amount);
-            OnCurrencyChanged?.Invoke(type, oldAmount, amount);
+            long validated = amount < 0 ? 0 : amount;
+            _currency.Set(type, validated);
+            RaiseCurrencyChanged(type, oldAmount, validated);
         }
 
         // -------------------------------------------------------------------
         // Save/Load
         // -------------------------------------------------------------------
 
-        public CurrencyData GetCurrencyData() => _currency;
+        /// <summary>
+        /// Returns a defensive copy so external code cannot mutate Economy state by reference.
+        ///</summary>
+        public CurrencyData GetCurrencyData() => new CurrencyData(
+            _currency.gold,
+            _currency.gem,
+            _currency.meat);
 
         public void SetCurrencyData(CurrencyData data)
         {
@@ -151,15 +187,19 @@ namespace IdleDefenseSurvival.Economy
             long oldGem  = _currency.gem;
             long oldMeat = _currency.meat;
 
-            _currency = data;
+            // Defensive copy + clamp negatives so a tampered save cannot poison runtime state.
+            _currency = new CurrencyData(
+                Math.Max(0L, data.gold),
+                Math.Max(0L, data.gem),
+                Math.Max(0L, data.meat));
 
-            // Fire events for each currency type
+            // Fire events for each currency type (action + UnityEvent)
             if (oldGold != _currency.gold)
-                OnCurrencyChanged?.Invoke(CurrencyType.Gold, oldGold, _currency.gold);
+                RaiseCurrencyChanged(CurrencyType.Gold, oldGold, _currency.gold);
             if (oldGem != _currency.gem)
-                OnCurrencyChanged?.Invoke(CurrencyType.Gem, oldGem, _currency.gem);
+                RaiseCurrencyChanged(CurrencyType.Gem, oldGem, _currency.gem);
             if (oldMeat != _currency.meat)
-                OnCurrencyChanged?.Invoke(CurrencyType.Meat, oldMeat, _currency.meat);
+                RaiseCurrencyChanged(CurrencyType.Meat, oldMeat, _currency.meat);
         }
 
     }

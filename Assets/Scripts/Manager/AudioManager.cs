@@ -1,4 +1,5 @@
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Core.Interfaces;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Manager

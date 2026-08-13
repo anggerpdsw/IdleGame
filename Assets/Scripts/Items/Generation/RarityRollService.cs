@@ -143,9 +143,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
         public RarityWeightArray GetWeightsForTier(int tier, int wave)
         {
-            var entry = Array.Find(Entries, e => tier >= e.MinTier && tier <= e.MaxTier);
-            if (entry == null) entry = Entries[^1];
-
+            var entry = Array.Find(Entries, e => tier >= e.MinTier && tier <= e.MaxTier) ?? Entries[^1];
             var weights = new float[entry.Weights.Length];
             Array.Copy(entry.Weights, weights, entry.Weights.Length);
 

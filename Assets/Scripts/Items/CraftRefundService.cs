@@ -1,9 +1,7 @@
 using System;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Economy;
-using IdleDefenseSurvival.Core;
-using IdleDefenseSurvival.Items.Decomposition;
 using UnityEngine;
+using IdleDefenseSurvival.Core.Interfaces;
 
 namespace IdleDefenseSurvival.Items
 {

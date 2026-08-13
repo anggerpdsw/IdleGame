@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Core.Interfaces;
 
 namespace IdleDefenseSurvival.Items
 {

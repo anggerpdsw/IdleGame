@@ -10,6 +10,11 @@ namespace IdleDefenseSurvival.Core.Interfaces
         void LoadAll();
         void DeleteAll();
 
+        // P0-C: gather fresh runtime state (including journal) and write durably.
+        // Used by CraftTransactionService at each checkpoint — prevents stale SaveData propagation.
+        // Throws IOException on filesystem failure so the caller can react.
+        void PersistCurrentStateDurably();
+
         // Wave progress API
         // Current tier concept removed – tier selection handled by MainMenu and WaveManager.
 
