@@ -302,7 +302,7 @@ namespace IdleDefenseSurvival.Manager
             catch (Exception e)
             {
                 Debug.LogError($"[SaveManager] Failed to load: {e.Message}\n{e.StackTrace}");
-                OnSaveLoaded?.Invoke();
+                NotifySaveLoaded();
             }
             finally
             {
@@ -598,10 +598,8 @@ namespace IdleDefenseSurvival.Manager
         // File I/O (unchanged)
         // -------------------------------------------------------------------
         /// <summary>
-        /// Synchronous durable write (I-17). Returns ONLY after data is requested to be on disk.
-        /// Throws IOException on filesystem failure. Pure IO — caller supplies the freshest SaveData.
-        /// Uses FileOptions.WriteThrough + Flush(true) to request OS-level durable flush.
-        /// Note: OS/storage stack may still buffer; this is best-effort durability, not absolute hardware commit.
+        /// Synchronous durable write (I-17). Atomic via temp file + move.
+        /// Throws IOException on filesystem failure.
         ///</summary>
         public void PersistDurably(SaveData data)
         {
@@ -612,13 +610,10 @@ namespace IdleDefenseSurvival.Manager
                     NullValueHandling = NullValueHandling.Ignore,
                     Converters = { new CustomDataConverter() }
                 });
-            var bytes = System.Text.Encoding.UTF8.GetBytes(json);
-            using var fs = new FileStream(SaveFile, FileMode.Create, FileAccess.Write, FileShare.None,
-                                           4096, FileOptions.WriteThrough);
-            fs.Write(bytes, 0, bytes.Length);
-            fs.Flush();
-            // Request OS-level durable flush (I-17). Not a guarantee of hardware commit.
-            fs.Flush(true);
+            string tempPath = SaveFile + ".tmp";
+            File.WriteAllText(tempPath, json);
+            // Replace existing file atomically
+            File.Replace(tempPath, SaveFile, null);
         }
 
         private SaveData LoadFromFile()
@@ -677,7 +672,8 @@ namespace IdleDefenseSurvival.Manager
                 cardInventory = cardInventory,
                 inventoryData = inventoryData,
                 equipmentData = equipmentData,
-                craftQueue = craftQueue
+                craftQueue = craftQueue,
+                craftJournal = _craftTransactionJournal?.GetSaveData()
             };
         }
 
@@ -754,6 +750,10 @@ namespace IdleDefenseSurvival.Manager
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftService.Instance != null && data.craftQueue != null)
                 CraftService.Instance.LoadQueueSaveData(data.craftQueue);
+
+            // Restore craft transaction journal (P0-C recovery source of truth)
+            if (_craftTransactionJournal != null && data.craftJournal != null)
+                _craftTransactionJournal.LoadFromSaveData(data.craftJournal);
 
             AccountManager.Instance?.NotifyDataLoaded();
         }

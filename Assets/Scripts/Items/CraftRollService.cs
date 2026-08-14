@@ -25,6 +25,9 @@ namespace IdleDefenseSurvival.Items
 
         // ============ Public API ============
 
+        /// <summary>Access to the default RNG provider for snapshot building (P0-C).</summary>
+        public IRandomProvider RngProvider => _defaultRng;
+
         /// <summary>
         /// Rolls a craft using the pipeline architecture.
         /// </summary>

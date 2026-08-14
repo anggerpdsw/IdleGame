@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Items.Decomposition;
 using UnityEngine;
-using IdleDefenseSurvival.Items.Random;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -13,7 +12,6 @@ namespace IdleDefenseSurvival.Items
     /// </summary>
     public sealed class CraftQueueService
     {
-        private readonly CraftRecipeRepository _repository;
         private readonly Dictionary<string, CraftJob> _jobs = new(); // JobId -> CraftJob
         private readonly Queue<string> _jobQueue = new();           // Order of jobs (for priority)
         private int _maxConcurrentJobs = 1;                          // Can be upgraded
@@ -33,58 +31,9 @@ namespace IdleDefenseSurvival.Items
         public int MaxConcurrentJobs => _maxConcurrentJobs;
         public int ActiveJobCount => _activeJobCount;
 
-        public CraftQueueService(CraftRecipeRepository repository)
-        {
-            _repository = repository;
-        }
+        public CraftQueueService() { }
 
         // ============ Public API ============
-        public string StartCraft(string recipeId, int count = 1)
-        {
-            if (!_repository.TryGetRecipe(recipeId, out var recipe))
-            {
-                Debug.LogWarning($"[CraftQueue] Recipe not found: {recipeId}");
-                return null;
-            }
-
-            // Calculate total duration
-            long baseTicks = (long)(recipe.BaseCraftTime * TimeSpan.TicksPerSecond);
-            long additionalTicks = (long)(recipe.TimePerAdditionalUnit * TimeSpan.TicksPerSecond * (count - 1));
-            long totalDurationTicks = baseTicks + additionalTicks;
-
-            // Create job
-            var job = CraftJob.Create(recipeId, count, totalDurationTicks);
-
-            // Capture ingredient snapshot before transaction starts. Deep-copies recipe state
-            // so refund/audit paths remain immune to recipe or database mutations post-creation.
-            job.IngredientsSnapshot = recipe.Ingredients != null
-                ? Array.ConvertAll(recipe.Ingredients, ing => CraftIngredientSnapshot.From(ing, count))
-                : null;
-
-            // P0-B step 10 + P0-C: build CraftExecutionSnapshot via builder (single source of truth)
-            job.ExecutionSnapshot = CraftSnapshotBuilder.Build(recipe, count, _rng, job.IngredientsSnapshot);
-            job.CompletionSeed = job.ExecutionSnapshot.CompletionSeed;
-
-            _jobs[job.JobId] = job;
-            _jobQueue.Enqueue(job.JobId);
-
-            // Try to start immediately if slot available
-            TryStartNextJob();
-
-            Debug.Log($"[CraftQueue] Started craft job {job.JobId} for recipe {recipeId} x{count} (duration: {TimeSpan.FromTicks(totalDurationTicks)})");
-            return job.JobId;
-        }
-
-        public IReadOnlyList<string> StartBatchCraft(string recipeId, int count)
-        {
-            var jobIds = new List<string>();
-            for (int i = 0; i < count; i++)
-            {
-                var jobId = StartCraft(recipeId, 1);
-                if (jobId != null) jobIds.Add(jobId);
-            }
-            return jobIds;
-        }
 
         /// <summary>
         /// Strict enqueue-only API (P0-C). Inserts a pre-built <see cref="CraftJob"/> into the queue state.
@@ -194,7 +143,6 @@ namespace IdleDefenseSurvival.Items
         }
 
         // ============ Persistence ============
-        private static readonly IRandomProvider _rng = new UnityRandomProvider(); // static prevents millisecond-clock collision when multiple jobs start in the same tick
         public CraftQueueSaveData GetSaveData()
         {
             return new CraftQueueSaveData
@@ -262,20 +210,34 @@ namespace IdleDefenseSurvival.Items
         }
 
         // ============ Private Methods ============
-        private void TryStartNextJob()
+        public void TryStartNextJob()
         {
             if (_activeJobCount >= _maxConcurrentJobs) return;
             if (_jobQueue.Count == 0) return;
 
-            string jobId = _jobQueue.Dequeue();
+            if (!_jobQueue.TryPeek(out string jobId)) return;
+
             if (_jobs.TryGetValue(jobId, out var job))
             {
                 if (job.Status == CraftJobStatus.Queued)
                 {
+                    _jobQueue.Dequeue(); // Only remove if we are starting it
                     job.MarkCrafting();
                     _activeJobCount++;
                     OnJobStarted?.Invoke(jobId);
                 }
+                else
+                {
+                    // Job in queue is not in a startable state, remove it to prevent blocking
+                    _jobQueue.Dequeue();
+                    Debug.LogWarning($"[CraftQueue] Removed invalid job {jobId} from queue with status {job.Status}.");
+                }
+            }
+            else
+            {
+                // Job ID in queue doesn't exist in jobs dictionary, remove it
+                _jobQueue.Dequeue();
+                Debug.LogWarning($"[CraftQueue] Removed stale job ID {jobId} from queue.");
             }
         }
 

@@ -7,6 +7,16 @@ using IdleDefenseSurvival.Items;
 namespace IdleDefenseSurvival.Inventory
 {
     /// <summary>
+    /// Result of an idempotent ApplyReward operation.
+    /// </summary>
+    public enum ApplyResult
+    {
+        Success = 0,           // Reward applied successfully
+        AlreadyApplied = 1,    // RewardOperationId already exists — no-op
+        Failure = 2            // Failed (e.g., inventory full, invalid item)
+    }
+
+    /// <summary>
     /// Dirty flags for granular UI updates.
     /// </summary>
     [Flags]
@@ -160,6 +170,22 @@ namespace IdleDefenseSurvival.Inventory
         /// Marks an item dirty by instance ID with multiple flags.
         /// </summary>
         void MarkItemDirty(string instanceId, params DirtyType[] dirtyTypes);
+
+        /// <summary>
+        /// Applies a reward item with idempotency protection via rewardOperationId.
+        /// Returns ApplyResult indicating success, already-applied, or failure.
+        /// </summary>
+        ApplyResult ApplyReward(InventoryItem item, string rewardOperationId);
+
+        /// <summary>
+        /// Checks if a reward operation has already been applied (idempotency guard).
+        /// </summary>
+        bool HasAppliedOperation(string rewardOperationId);
+
+        /// <summary>
+        /// Gets the set of applied reward operation IDs for persistence/recovery.
+        /// </summary>
+        IReadOnlyCollection<string> GetAppliedRewardOperationIds();
     }
 
     /// <summary>
@@ -288,6 +314,9 @@ public class InventorySaveData
     /// <summary>Socketed gem instances (GemInstanceId-keyed). Runtime for socketed gems — never part of a stack.</summary>
     public GemInstanceData[] SocketedGems;
 
+    // P0-D: Idempotency guard for reward operations (crash-safe completion)
+    public string[] AppliedRewardOperationIds;
+
     // Migration helper: captures old "Config" field from v3 saves during deserialization.
     // Not written back on save (ShouldSerialize pattern).
     [Newtonsoft.Json.JsonProperty("Config")]
@@ -300,7 +329,8 @@ public class InventorySaveData
         Capacity = 48, // BaseCapacity from config
         LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
         Items = Array.Empty<InventoryItemData>(),
-        SocketedGems = Array.Empty<GemInstanceData>()
+        SocketedGems = Array.Empty<GemInstanceData>(),
+        AppliedRewardOperationIds = Array.Empty<string>()
     };
 }
 

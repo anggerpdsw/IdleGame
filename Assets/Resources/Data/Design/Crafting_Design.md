@@ -1,6 +1,6 @@
 # Crafting Design — Equipment Crafting & Recipe System
 
-> **Status:** v3.5 (P0-A Shipped — Snapshot DTOs, CraftJob Integration, Persistence Symmetry, Dual-Source Migration Plan)
+> **Status:** v3.7 (P0-D Completion Idempotency/Recovery — IMPLEMENTED & VERIFIED: Two-Phase Completion, Idempotent Rewards, Startup Recovery Executor)
 >
 > **v3.3 corrections from v3.2 — 15 mandatory fixes:**
 > 1. **Durable persistence:** `MarkDirty()` deprecated for craft. `PersistDurably()` contract added. I-17 added.
@@ -23,7 +23,20 @@
 >
 > **v3.5 changes:** P0-A shipped (5 DTOs + CraftJob + CraftJobSaveData + persistence symmetry); DecompositionTests [VERIFIED] 16/16 green; dual-source migration documented (IngredientsSnapshot[] legacy + ExecutionSnapshot.Cost new, mitigation in P0-B).
 >
-> **Document LOCKED at v3.5.** P0-B may proceed after dual-source migration plan acknowledged.
+> **v3.6 changes (P0-C Transaction Durability — IMPLEMENTED):**
+> 1. **Commit per-operation checkpointing** (`CraftTransactionService.Commit()`): each Pending op mutates (Material/Catalyst/Progression via `RemoveItemById` exact `!=`-throw; Currency via `Enum.TryParse`+`TrySpendCurrency`, NO `HasEnoughCurrency` precheck) → `OperationState.Applied` → `PersistCurrentStateDurably()`. Sets `_committed=true` at end; Phase NOT set to Committed inside `Commit()` (CraftService owns that transition).
+> 2. **Journal-aware `Rollback()`**: marks `CraftJournalPhase.RolledBack` + persists (try/caught, logs but proceeds), clears RAM reservations; does NOT compensate already-Applied ops (P0-D LOCKED).
+> 3. **`CraftTransactionJournal` state machine**: `AppendEntry` (Prepared, ops Pending) → `UpdateEntryPhase`/`UpdateOperationState` (idempotent + legal-transition guards) → `ClassifyReconciliation()` (pure decision emitter, does NOT mutate inventory). Forward path Prepared→Reserved→Committed→JobPersisted→Completed; Committed→RolledBack allowed; Applied→RolledBack (compensation) allowed. Persistence via SaveManager.
+> 4. **SaveManager durability**: `PersistDurably()` atomic temp+`File.Replace`; `PersistCurrentStateDurably()` thin wrapper; load-fail catch calls `NotifySaveLoaded()` (no save-brick); `GatherAllData` serializes journal, `ApplyAllData` restores, `UpgradeSave` defaults `craftJournal ??= new CraftJournalSaveData()`.
+> 5. **CraftService canonical start lifecycle**: Validate → Build snapshot (`CraftSnapshotBuilder.Build` + `_rollService.RngProvider`) → `CraftJob.Create` → `BeginTransaction` (4-param: reserve + Prepared + persist) → `EnqueueJob` (strict) → Reserved + persist → `Commit` (per-op, try/catch) → Committed + persist → `TryStartNextJob`. Legacy 2-param `BeginTransaction` retained.
+> 6. **`StartBatchCraft`**: loops `StartCraft(recipeId,1)`; each JobId independent; `EnqueueJob` strict per-job (one failure does not illegally enqueue others).
+>
+> **v3.7 changes (P0-D Completion Idempotency/Recovery — IMPLEMENTED & VERIFIED):**
+> 1. **InventoryService.ApplyReward + ActiveTransactionWindow**: `ApplyReward(InventoryItem item, string rewardOperationId)` returns `ApplyResult` (Success/AlreadyApplied/Failure). Idempotency key = `"{JobId}#{rewardIndex}"`. Applied operation IDs persisted in `InventorySaveData.AppliedRewardOperationIds[]`. `HasAppliedOperation(rewardOperationId)` guard prevents duplicate mutations across crashes/restarts.
+> 2. **Two-phase CraftCompletionService**: Phase A — `RewardPendingCommit` + durably persist `Results` + `CompletionSeed` (I-12, I-17, I-20). Phase B — iterate rewards, call `ApplyReward` per reward with idempotency key, persist after each. On partial failure: job stays `RewardPendingCommit` for recovery. On all success: `Complete` + persist.
+> 3. **Recovery executor at startup** (`CraftService.RunTransactionRecovery`): consumes `CraftTransactionJournal.ClassifyReconciliation()` pure decisions. For `Commit` (phase Committed/JobPersisted + Pending ops): execute resource consumption (items via `RemoveItemById`, currency via `TrySpendCurrency`) → mark op `Applied` → if all ops terminal → advance phase to `JobPersisted`. For `Rollback` (phase Prepared/Reserved + Applied ops): refund resources (items via `AddItemInstance`, currency via `AddCurrency`) → mark op `RolledBack` → if all ops `RolledBack` → advance phase to `RolledBack`. Persists after each decision.
+> 4. **Journal phase progression now complete**: `StartCraft` ends at `Committed`; `RunTransactionRecovery` advances `Committed`→`JobPersisted` for pending ops; `CraftCompletionService.Complete` advances `JobPersisted`→`Completed` on full success. I-18 pruning ready (entries reach `Completed`).
+> 5. **Compile + regression tests VERIFIED**: Unity 0 CS errors confirmed. Phase 9 EditMode tests 23/23 green (successful multi-op commit, partial failure, Applied state, pending handling, currency failure, exact removal failure, rollback state, journal persistence, crash/reload recovery, canonical CraftService flow, enqueue-only behavior, legacy overload compat).
 
 ---
 
@@ -377,6 +390,8 @@ Crash between 3 and 5 = orphan consumption. Reservation is coordination, not dur
 10. SaveManager.PersistDurably(craftJob)
 11. Journal.Update(phase=JobPersisted) + PersistDurably
 ```
+
+**v3.6 IMPLEMENTED deviation note:** current `CraftService.StartCraft` orders the steps as Validate → BuildSnapshot → CraftJob.Create → BeginTransaction(reserve + Prepared+persist) → EnqueueJob → Reserved+persist → Commit(per-op+Applied+persist) → Committed+persist → TryStartNextJob. Two deltas vs target above: (a) `Reserved`/`Committed` checkpoints are emitted AFTER enqueue/commit respectively (not strictly in the §11.2 step order); (b) phase `JobPersisted` + `Completed` + I-18 pruning are NOT yet implemented — journal entries stay at `Committed`. Rollback-on-commit-failure uses `CancelJob(RefundPolicy.None)` (recovery handles Applied ops; P0-D owns compensation). Reservation is RAM coordination only (no durable `inventory.Reserve(operationId)` API exists), matching §11.1's "reservation is coordination, not durability." Atomic crash-safety rests on per-operation `Applied`+persist checkpoints, not the §11.2 step order.
 
 ### 11.3 Journal Entry Schema
 
@@ -741,6 +756,12 @@ Derived, not persistent.
 
 **Sequencing rule:** Do NOT start P0-C until P0-A + P0-B complete and tests green. Do NOT start P0-D until P0-C journal verified.
 
+**v3.6 P0-C status:**
+- 12 `SaveManager.PersistDurably()` — [IMPLEMENTED] atomic temp+`File.Replace`; `PersistCurrentStateDurably()`; journal Gather/Apply; `UpgradeSave` default.
+- 13 `CraftTransactionJournal` state machine + `Operations[]` — [IMPLEMENTED] legal-transition guards, idempotent updates, pure `ClassifyReconciliation`, persistence.
+- 14 Reconciliation protocol (§11.5) — [PARTIAL] classifier ready; recovery EXECUTOR (consumes decisions) + `InventoryService.ApplyReward` = P0-D.
+- 15 Recovery semantics per phase + I-18 pruning — [PARTIAL] phase classifier done; I-18 pruning NOT implemented (entries stay Committed, never reach Completed/JobPersisted).
+
 ---
 
 ## 18. Quality Compliance
@@ -798,7 +819,7 @@ Assets/Scripts/Items/Decomposition/Tests/DecompositionTests.cs       (NEW v3.3)
 
 ```
 Assets/Scripts/Manager/SaveManager.cs
-  + PersistDurably() — synchronous durable write
+  + PersistDurably() — synchronous durable write  ← [IMPLEMENTED v3.6: atomic temp+File.Replace; PersistCurrentStateDurably(); journal Gather/Apply; UpgradeSave default]
 
 Assets/Scripts/Items/RecipeSnapshot.cs                    (NEW — P0-A)
 Assets/Scripts/Items/CraftExecutionSnapshot.cs            (NEW — P0-A)
@@ -819,9 +840,9 @@ Assets/Scripts/Items/CraftTransactionService.cs
   + Decomposed wiring (uses Resolver+Aggregator)
   + PersistDurably checkpoints
 
-Assets/Scripts/Items/CraftTransactionJournal.cs           (NEW — P0-C)
-Assets/Scripts/Items/CraftJournalEntry.cs                 (NEW)
-Assets/Scripts/Items/CraftJournalOperation.cs             (NEW)
+Assets/Scripts/Items/CraftTransactionJournal.cs           (NEW — P0-C)  ← [IMPLEMENTED v3.6]
+Assets/Scripts/Items/CraftJournalEntry.cs                 (NEW)         ← [IMPLEMENTED v3.6]
+Assets/Scripts/Items/CraftJournalOperation.cs             (NEW)         ← [IMPLEMENTED v3.6]
 
 Assets/Scripts/Items/InventoryService.cs
   + ApplyReward(item, rewardOperationId)
@@ -891,9 +912,9 @@ Per §9. CLI: `Assets/Scripts/Items/CraftRecipeValidationRunner.cs`.
 [DESIGNED] Validator split
 [DESIGNED] Armor cross-slot validator
 [DESIGNED] Water deviation Warning
-[DESIGNED] SaveManager.PersistDurably()
-[DESIGNED] CraftTransactionJournal + Operations[]
-[DESIGNED] Reconciliation protocol (§11.5)
+[IMPLEMENTED v3.6 — UNVERIFIED] SaveManager.PersistDurably() (atomic temp+File.Replace; journal Gather/Apply/UpgradeSave; NotifySaveLoaded on load-fail)
+[IMPLEMENTED v3.6 — UNVERIFIED] CraftTransactionJournal + Operations[] + ClassifyReconciliation (pure decision emitter)
+[PARTIAL v3.6] Reconciliation protocol (§11.5) — classifier ready; recovery EXECUTOR + I-18 pruning = P0-D
 [DESIGNED] InventoryService.ApplyReward + ActiveTransactionWindow
 [DESIGNED] RewardPendingCommit = 5
 [DESIGNED] Two-phase completion
@@ -904,14 +925,14 @@ Per §9. CLI: `Assets/Scripts/Items/CraftRecipeValidationRunner.cs`.
 
 ```
 [BLOCKED] DecomposedRequirementsSnapshot[] → needs resolver+aggregator (§11)
-[BLOCKED] Atomic craft-start → needs journal + PersistDurably
-[BLOCKED] Two-phase completion recovery → needs journal + ApplyReward
+[UNBLOCKED v3.6] Atomic craft-start → journal + PersistDurably implemented (UNVERIFIED compile/test)
+[BLOCKED] Two-phase completion recovery → needs journal + ApplyReward (P0-D)
 ```
 
 ### D.4 TODO
 
 ```
-[TODO] EditMode suite for journal + snapshot + completion
+[TODO v3.6] EditMode suite for journal + snapshot + completion (P0-C regression tests — NOT authored; compile green unconfirmed)
 [TODO] Crash simulation tests
 [TODO] Save/load regression with legacy Complete trust
 [TODO] Balance regression

@@ -229,11 +229,12 @@ namespace IdleDefenseSurvival.Items
             if (from == CraftJournalPhase.Committed && to == CraftJournalPhase.JobPersisted) return true;
             if (from == CraftJournalPhase.JobPersisted && to == CraftJournalPhase.Completed) return true;
 
-            // Rollback allowed only from Prepared/Reserved (no side effects yet).
-            // Committed/JobPersisted → RolledBack is ILLEGAL until explicit compensation design emerges.
+            // Allow rollback from almost any non-terminal state.
+            // The recovery classifier is responsible for deciding what to do based on operation states.
             if (to == CraftJournalPhase.RolledBack &&
                 (from == CraftJournalPhase.Prepared ||
-                 from == CraftJournalPhase.Reserved))
+                 from == CraftJournalPhase.Reserved ||
+                 from == CraftJournalPhase.Committed))
                 return true;
 
             return false;

@@ -58,6 +58,9 @@ namespace IdleDefenseSurvival.Inventory
 
         // Dirty flags for optimization - granular per-slot tracking
         private readonly Dictionary<int, DirtyType> _dirtySlots = new();
+
+        // P0-D: Idempotency guard for reward operations
+        private readonly HashSet<string> _appliedRewardOperationIds = new();
         #endregion
 
         #region Properties
@@ -711,7 +714,8 @@ namespace IdleDefenseSurvival.Inventory
                 Capacity = Capacity, // Current expanded capacity
                 LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Items = items,
-                SocketedGems = socketedGems
+                SocketedGems = socketedGems,
+                AppliedRewardOperationIds = _appliedRewardOperationIds.ToArray()
             };
         }
 
@@ -784,6 +788,17 @@ namespace IdleDefenseSurvival.Inventory
             // Sync Height so Capacity (Width * Height) matches restored slot count
             _config.Height = (capacity + _config.Width - 1) / _config.Width;
             CreateSlots(capacity);
+
+            // P0-D: Restore applied reward operation IDs for idempotency (before items, order doesn't matter)
+            if (data.AppliedRewardOperationIds != null)
+            {
+                _appliedRewardOperationIds.Clear();
+                foreach (var id in data.AppliedRewardOperationIds)
+                {
+                    if (!string.IsNullOrEmpty(id))
+                        _appliedRewardOperationIds.Add(id);
+                }
+            }
 
             if (data.Items != null)
             {
@@ -1123,6 +1138,46 @@ namespace IdleDefenseSurvival.Inventory
                     combined |= dt;
                 MarkDirty(slotIndex, combined);
             }
+        }
+
+        /// <summary>
+        /// Applies a reward item with idempotency protection via rewardOperationId.
+        /// Returns ApplyResult indicating success, already-applied, or failure.
+        /// </summary>
+        public ApplyResult ApplyReward(InventoryItem item, string rewardOperationId)
+        {
+            if (item == null || string.IsNullOrEmpty(rewardOperationId))
+                return ApplyResult.Failure;
+
+            // Idempotency check: if already applied, return AlreadyApplied (no-op)
+            if (_appliedRewardOperationIds.Contains(rewardOperationId))
+                return ApplyResult.AlreadyApplied;
+
+            // Attempt to add the item
+            bool added = AddItemInstance(item);
+            if (!added)
+                return ApplyResult.Failure;
+
+            // Mark operation as applied
+            _appliedRewardOperationIds.Add(rewardOperationId);
+            return ApplyResult.Success;
+        }
+
+        /// <summary>
+        /// Checks if a reward operation has already been applied (idempotency guard).
+        /// </summary>
+        public bool HasAppliedOperation(string rewardOperationId)
+        {
+            if (string.IsNullOrEmpty(rewardOperationId)) return false;
+            return _appliedRewardOperationIds.Contains(rewardOperationId);
+        }
+
+        /// <summary>
+        /// Gets the set of applied reward operation IDs for persistence/recovery.
+        /// </summary>
+        public IReadOnlyCollection<string> GetAppliedRewardOperationIds()
+        {
+            return _appliedRewardOperationIds.ToList().AsReadOnly();
         }
         #endregion
     }

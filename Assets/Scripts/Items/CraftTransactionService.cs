@@ -5,6 +5,7 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Items.Decomposition;
 using IdleDefenseSurvival.Core.Interfaces;
+using UnityEngine;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -238,26 +239,50 @@ namespace IdleDefenseSurvival.Items
             if (_committed || _rolledBack)
                 return TransactionResult.Fail("Transaction already completed");
 
-            // Actually consume reserved materials
-            foreach (var reserved in _reservedMaterials)
-            {
-                int removed = _inventory.RemoveItemById(reserved.ItemId, reserved.Count);
-                if (removed < reserved.Count)
-                {
-                    // This shouldn't happen if reservation worked, but handle gracefully
-                    Rollback();
-                    return TransactionResult.Fail($"Failed to consume {reserved.ItemId}: only {removed}/{reserved.Count} removed");
-                }
-            }
+            // P0-C: Refactored to per-operation checkpoint
+            var ops = _journal.GetOperations(_journalEntryId);
 
-            // Actually spend reserved currency
-            foreach (var kvp in _reservedCurrency)
+            foreach (var op in ops)
             {
-                bool spent = _economy.TrySpendCurrency(kvp.Key, kvp.Value, "Craft commit");
-                if (!spent)
+                if (op.State == OperationState.Pending)
                 {
-                    Rollback();
-                    return TransactionResult.Fail($"Failed to spend {kvp.Key}: {kvp.Value}");
+                    // Apply mutation
+                    if (op.ResourceType == ResourceKind.Material ||
+                        op.ResourceType == ResourceKind.Catalyst ||
+                        op.ResourceType == ResourceKind.Progression)
+                    {
+                        int removed = _inventory.RemoveItemById(op.ResourceId, op.Quantity);
+                        if (removed != op.Quantity)
+                        {
+                            throw new InvalidOperationException(
+                                $"Remove failed: {op.ResourceId} " +
+                                $"got {removed}/{op.Quantity}");
+                        }
+                    }
+                    else if (op.ResourceType == ResourceKind.Currency)
+                    {
+                        if (!Enum.TryParse<CurrencyType>(op.ResourceId, out var currencyType))
+                        {
+                            throw new InvalidOperationException(
+                                $"Unknown currency: {op.ResourceId}");
+                        }
+
+                        if (!_economy.TrySpendCurrency(
+                                currencyType,
+                                op.Quantity,
+                                "Craft commit"))
+                        {
+                            throw new InvalidOperationException(
+                                $"Spend failed: {op.ResourceId} " +
+                                $"amount={op.Quantity}");
+                        }
+                    }
+
+                    // Journal -> Applied
+                    _journal.UpdateOperationState(_journalEntryId, op.CraftTransactionOperationId, OperationState.Applied);
+
+                    // Durable checkpoint
+                    _saveService.PersistCurrentStateDurably();
                 }
             }
 
@@ -265,9 +290,25 @@ namespace IdleDefenseSurvival.Items
             return TransactionResult.Success();
         }
 
+        public Guid JournalEntryId => _journalEntryId;
+
         public void Rollback()
         {
             if (_committed || _rolledBack) return;
+
+            if (_journalEntryId != Guid.Empty)
+            {
+                try
+                {
+                    _journal.UpdateEntryPhase(_journalEntryId, CraftJournalPhase.RolledBack);
+                    _saveService.PersistCurrentStateDurably();
+                }
+                catch (Exception e)
+                {
+                    // Log error but proceed with clearing RAM state. The journal remains the source of truth.
+                    Debug.LogError($"[CraftTransactionService] Failed to persist rollback state for {_journalEntryId}: {e.Message}");
+                }
+            }
 
             // Release material reservations (just clear the list - materials were never actually removed)
             _reservedMaterials.Clear();
