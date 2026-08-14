@@ -51,11 +51,9 @@ namespace IdleDefenseSurvival.Items
             for (int pi = 0; pi < decomposedCosts.Count; pi++)
                 progressionCosts[pi] = new IngredientCost { ItemId = decomposedCosts[pi].ItemId, Count = decomposedCosts[pi].Count };
 
-            // CostSnapshot.Currency — scaled by count.
-            var additionalCosts = recipe.AdditionalCosts != null
-                ? Array.ConvertAll(recipe.AdditionalCosts, c => new CostEntry { CurrencyId = c.Currency.ToString(), Amount = c.Amount * count })
-                : Array.Empty<CostEntry>();
-            var currencySnap = new CurrencySnapshot(recipe.GoldCost * count, recipe.GemCost * count, additionalCosts);
+            // CostSnapshot.Currency — delegated to pure CraftCostResolver (behavior-preserving).
+            // See CraftCostResolverTests for regression invariant: resolver output == previous inline formula.
+            var currencySnap = CraftCostResolver.ComputeCurrencyCost(recipe, count);
 
             var costSnap = new CostSnapshot(materialsCosts, Array.Empty<IngredientCost>(), progressionCosts, currencySnap);
 

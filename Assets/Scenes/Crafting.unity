@@ -5596,7 +5596,7 @@ GameObject:
   - component: {fileID: 1714795243}
   - component: {fileID: 1714795242}
   m_Layer: 5
-  m_Name: ResultProgressPanel
+  m_Name: Feedback
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
