@@ -4,6 +4,7 @@ using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Core.Interfaces;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Items
@@ -21,7 +22,7 @@ namespace IdleDefenseSurvival.Items
         private readonly CraftRollService _rollService;
         private readonly CraftRewardService _rewardService;
         private readonly IInventoryService _inventory;
-        private readonly SaveManager _saveManager;
+        private readonly ISaveService _saveManager;
 
         /// <summary>recipeId, success</summary>
         public event Action<string, bool> Completed;
@@ -37,7 +38,7 @@ namespace IdleDefenseSurvival.Items
             CraftRollService rollService,
             CraftRewardService rewardService,
             IInventoryService inventory,
-            SaveManager saveManager)
+            ISaveService saveManager)
         {
             _queueService = queueService;
             _repository = repository;
@@ -57,45 +58,56 @@ namespace IdleDefenseSurvival.Items
             if (job == null) return;
 
             // Phase A: Roll, generate results, persist durable (RewardPendingCommit)
-            var context = _contextBuilder.Build();
-            var rollResult = _rollService.RollCraft(job.RecipeId, context);
-
-            if (!rollResult.Success || rollResult.Entries.Count == 0)
+            if (job.Status != CraftJobStatus.RewardPendingCommit)
             {
-                _queueService.CancelJob(jobId, RefundPolicy.ProgressBased);
-                Failed?.Invoke(jobId, rollResult.FailureReason ?? "Craft failed");
-                Completed?.Invoke(job.RecipeId, false);
-                return;
+                var context = _contextBuilder.Build();
+                var rollResult = _rollService.RollCraft(job.RecipeId, context);
+
+                if (!rollResult.Success || rollResult.Entries.Count == 0)
+                {
+                    _queueService.CancelJob(jobId, RefundPolicy.ProgressBased);
+                    Failed?.Invoke(jobId, rollResult.FailureReason ?? "Craft failed");
+                    Completed?.Invoke(job.RecipeId, false);
+                    return;
+                }
+
+                if (!_repository.TryGetRecipe(job.RecipeId, out var recipe))
+                {
+                    _queueService.CancelJob(jobId, RefundPolicy.ProgressBased);
+                    Failed?.Invoke(jobId, "Recipe not found after roll");
+                    Completed?.Invoke(job.RecipeId, false);
+                    return;
+                }
+
+                var items = _rewardService.GenerateRewards(rollResult, recipe, context);
+                job.Results = CraftResultData.FromInventoryItems(items, rollResult.ExpReward);
+
+                // Use snapshot's CompletionSeed if available, else derive from RNG for replayability
+                long completionSeed = job.ExecutionSnapshot?.CompletionSeed ?? 0;
+                if (completionSeed == 0 && job.CompletionSeed.HasValue)
+                    completionSeed = job.CompletionSeed.Value;
+                if (completionSeed == 0)
+                    completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
+                job.CompletionSeed = completionSeed;
+
+                // Phase A: Mark RewardPendingCommit and persist durably (Results + Seed)
+                job.Status = CraftJobStatus.RewardPendingCommit;
+                _saveManager.PersistCurrentStateDurably();
             }
-
-            if (!_repository.TryGetRecipe(job.RecipeId, out var recipe))
-            {
-                _queueService.CancelJob(jobId, RefundPolicy.ProgressBased);
-                Failed?.Invoke(jobId, "Recipe not found after roll");
-                Completed?.Invoke(job.RecipeId, false);
-                return;
-            }
-
-            var items = _rewardService.GenerateRewards(rollResult, recipe, context);
-            job.Results = CraftResultData.FromInventoryItems(items, rollResult.ExpReward);
-
-            // Use snapshot's CompletionSeed if available, else derive from RNG for replayability
-            long completionSeed = job.ExecutionSnapshot?.CompletionSeed ?? 0;
-            if (completionSeed == 0 && job.CompletionSeed.HasValue)
-                completionSeed = job.CompletionSeed.Value;
-            if (completionSeed == 0)
-                completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
-            job.CompletionSeed = completionSeed;
-
-            // Phase A: Mark RewardPendingCommit and persist durably (Results + Seed)
-            job.Status = CraftJobStatus.RewardPendingCommit;
-            _saveManager.PersistCurrentStateDurably();
 
             // Phase B: Apply each reward with idempotency guard
-            bool allApplied = true;
-            for (int i = 0; i < items.Length; i++)
+            var itemsToApply = job.Results.Select(r => new InventoryItem
             {
-                var item = items[i];
+                ItemId = r.ItemId,
+                Quantity = r.Count,
+                Level = r.Level,
+                AcquiredTimestamp = r.AcquiredTimestamp
+            }).ToArray();
+
+            bool allApplied = true;
+            for (int i = 0; i < itemsToApply.Length; i++)
+            {
+                var item = itemsToApply[i];
                 string rewardOperationId = $"{jobId}#{i}";
 
                 var applyResult = _inventory.ApplyReward(item, rewardOperationId);
