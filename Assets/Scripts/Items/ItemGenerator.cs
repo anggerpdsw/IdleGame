@@ -235,16 +235,6 @@ namespace IdleDefenseSurvival.Items
             return instance;
         }
 
-        /// <summary>
-        /// Creates a test generator with predefined values.
-        /// </summary>
-        public static ItemGenerator CreateForTesting(params float[] randomValues)
-        {
-            var rng = new TestRandomProvider(randomValues);
-            var instance = new ItemGenerator(rng);
-            return instance;
-        }
-
         // Internal constructor for custom RNG
         private ItemGenerator(IRandomProvider rng)
         {
