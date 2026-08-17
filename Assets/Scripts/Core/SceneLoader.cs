@@ -46,40 +46,100 @@ namespace IdleDefenseSurvival.Core
         /// </summary>
         public void SwitchScene(string unloadScene, string loadScene)
         {
-            if (_isLoading) return;
-            var routine = SwitchSceneRoutine(unloadScene, loadScene);
-            StartCoroutine(routine);
+            if (_isLoading)
+            {
+                Debug.LogWarning(
+                    $"[SceneLoader] Scene transition already running. " +
+                    $"Ignored: {unloadScene} -> {loadScene}"
+                );
+
+                return;
+            }
+
+            if (string.IsNullOrEmpty(loadScene))
+            {
+                Debug.LogError("[SceneLoader] loadScene is empty!");
+                return;
+            }
+
+            StartCoroutine(SwitchSceneRoutine(unloadScene, loadScene));
         }
 
         private IEnumerator SwitchSceneRoutine(string unloadScene, string loadScene)
         {
             _isLoading = true;
 
-            // Kembalikan ke normal ketika keluar dari Game Scene
-            if (loadScene  == _isMainMenu) ResetGlobalState();
-            
-            // Load target scene first
-            if (!IsSceneLoaded(loadScene))
+            try
             {
-                AsyncOperation loadOp = SceneManager.LoadSceneAsync(loadScene, LoadSceneMode.Additive);
-                while (!loadOp.isDone) yield return null;
+                // Reset global state ketika kembali ke MainMenu
+                if (loadScene == _isMainMenu) ResetGlobalState();
+
+                // =========================
+                // LOAD TARGET SCENE
+                // =========================
+                if (!IsSceneLoaded(loadScene))
+                {
+                    Debug.Log($"[SceneLoader] Loading scene: {loadScene}");
+                    AsyncOperation loadOp =
+                        SceneManager.LoadSceneAsync(loadScene, LoadSceneMode.Additive);
+
+                    if (loadOp == null)
+                    {
+                        Debug.LogError(
+                            $"[SceneLoader] Failed to create " +
+                            $"LoadSceneAsync for: {loadScene}"
+                        );
+                        yield break;
+                    }
+
+                    while (!loadOp.isDone) yield return null;
+                }
+                else
+                {
+                    Debug.Log($"[SceneLoader] Scene already loaded: {loadScene}");
+                }
+
+                // =========================
+                // SET ACTIVE SCENE
+                // =========================
+                Scene loadedScene = SceneManager.GetSceneByName(loadScene);
+                if (!loadedScene.IsValid() || !loadedScene.isLoaded)
+                {
+                    Debug.LogError(
+                        $"[SceneLoader] Target scene is invalid " +
+                        $"or not loaded: {loadScene}"
+                    );
+                    yield break;
+                }
+
+                SceneManager.SetActiveScene(loadedScene);
+                Debug.Log($"[SceneLoader] Active scene: {loadScene}");
+
+                // =========================
+                // UNLOAD PREVIOUS SCENE
+                // =========================
+                if (!string.IsNullOrEmpty(unloadScene) &&
+                    unloadScene != loadScene &&
+                    IsSceneLoaded(unloadScene))
+                {
+                    Debug.Log($"[SceneLoader] Unloading scene: {unloadScene}");
+                    AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(unloadScene);
+                    if (unloadOp != null)
+                        while (!unloadOp.isDone)
+                            yield return null;
+                }
+
+                // =========================
+                // GAME CALLBACK
+                // =========================
+                if (loadScene == _isGame) OnGameSceneLoaded?.Invoke();
             }
-
-            // Set loaded scene active
-            Scene loadedScene = SceneManager.GetSceneByName(loadScene);
-            if (loadedScene.IsValid()) SceneManager.SetActiveScene(loadedScene);
-
-            // Unload previous scene
-            if (!string.IsNullOrEmpty(unloadScene) && IsSceneLoaded(unloadScene))
+            finally
             {
-                AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(unloadScene);
-                if (unloadOp != null) while (!unloadOp.isDone) yield return null;
+                // Sangat penting:
+                // jangan sampai terkunci true selamanya
+                _isLoading = false;
             }
-
-            // Scene Game sudah selesai dimuat
-            if (loadScene == _isGame) OnGameSceneLoaded?.Invoke();
-
-            _isLoading = false;
         }
 
         public void LoadGame() => SwitchScene(_isMainMenu, _isGame);
