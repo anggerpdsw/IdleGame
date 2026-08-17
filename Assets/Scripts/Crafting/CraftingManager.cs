@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
-using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Random;
+using IdleDefenseSurvival.Core;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Manager
 {
     /// <summary>
     /// Craft service orchestrator - coordinates all crafting subsystems.
     /// Uses: CraftRecipeRepository, CraftValidator, CraftTransactionService,
     /// CraftQueueService, CraftRollService, CraftRewardService, CraftPersistenceService
     /// </summary>
-    public sealed class CraftService : MonoBehaviour
+    public sealed class CraftingManager : MonoBehaviour
     {
         #region Singleton
-        private static CraftService _instance;
-        public static CraftService Instance => _instance;
+        private static CraftingManager _instance;
+        public static CraftingManager Instance => _instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatic() => _instance = null;
@@ -471,6 +472,42 @@ namespace IdleDefenseSurvival.Items
         public bool TryGetRecipe(string recipeId, out CraftRecipeData recipe) => _repository?.TryGetRecipe(recipeId, out recipe) ?? (recipe = null) is null;
 
         /// <summary>
+        /// Read-only preview of currency cost for a recipe (no transaction, no side effects).
+        /// Returns null if recipe doesn't exist or count < 1.
+        /// </summary>
+        public CurrencySnapshot? GetRecipeCostPreview(string recipeId, int count = 1)
+        {
+            if (string.IsNullOrEmpty(recipeId) || count < 1)
+                return null;
+
+            if (!_repository.TryGetRecipe(recipeId, out var recipe))
+                return null;
+
+            return CraftCostResolver.ComputeCurrencyCost(recipe, count);
+        }
+
+        /// <summary>
+        /// Read-only preview of material cost for a recipe (no transaction).
+        /// Returns empty array if recipe doesn't exist or has no ingredients.
+        /// </summary>
+        public IngredientCost[] GetRecipeMaterialPreview(string recipeId, int count = 1)
+        {
+            if (string.IsNullOrEmpty(recipeId) || count < 1)
+                return Array.Empty<IngredientCost>();
+
+            if (!_repository.TryGetRecipe(recipeId, out var recipe))
+                return Array.Empty<IngredientCost>();
+
+            return recipe.Ingredients == null || recipe.Ingredients.Length == 0
+                ? Array.Empty<IngredientCost>()
+                : Array.ConvertAll(recipe.Ingredients, ing => new IngredientCost
+                {
+                    ItemId = ing.ItemId,
+                    Count = ing.Count * count
+                });
+        }
+
+        /// <summary>
         /// Gets the current queue state.
         /// </summary>
         public IReadOnlyList<CraftJob> GetActiveJobs() => _queueService?.GetActiveJobs() ?? Array.Empty<CraftJob>();
@@ -534,6 +571,8 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Gets the formulas config for tuning.
         /// </summary>
-        public CraftFormulasConfig GetFormulasConfig() => _formulasConfig;
+        public CraftFormulasConfig GetFormulasConfig() => _formulasConfig;        
+        
+        public void OpenCrafting() => SceneLoader.Instance.LoadCrafting();
     }
 }

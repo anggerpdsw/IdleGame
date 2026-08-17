@@ -654,7 +654,7 @@ namespace IdleDefenseSurvival.Manager
             // Single source of truth for items: InventoryService slots (includes equipment items).
             var inventoryData = InventoryService.Instance != null ? InventoryService.Instance.GetSaveData() : null;
             var equipmentData = EquipmentService.Instance != null ? EquipmentService.Instance.GetSaveData() : null;
-            var craftQueue = CraftService.Instance != null ? CraftService.Instance.GetQueueSaveData() : null;
+            var craftQueue = CraftingManager.Instance != null ? CraftingManager.Instance.GetQueueSaveData() : null;
 
             return new SaveData
             {
@@ -748,8 +748,8 @@ namespace IdleDefenseSurvival.Manager
             ApplyEquipmentData(data.equipmentData);
 
             // Restore craft queue (after InventoryService loaded, for offline progress)
-            if (CraftService.Instance != null && data.craftQueue != null)
-                CraftService.Instance.LoadQueueSaveData(data.craftQueue);
+            if (CraftingManager.Instance != null && data.craftQueue != null)
+                CraftingManager.Instance.LoadQueueSaveData(data.craftQueue);
 
             // Restore craft transaction journal (P0-C recovery source of truth)
             if (_craftTransactionJournal != null && data.craftJournal != null)

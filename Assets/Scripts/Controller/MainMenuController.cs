@@ -24,6 +24,7 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private Button _vipButton;
         [SerializeField] private Button _cardButton;
         [SerializeField] private Button _inventoryButton;
+        [SerializeField] private Button _craftingButton;
 
         [Header("Game Start")]
         [SerializeField] private Button _prevButton;
@@ -47,6 +48,7 @@ namespace IdleDefenseSurvival.Controller
             if (_vipButton != null) _vipButton.onClick.AddListener(OnActiveVIP);
             if (_cardButton != null) _cardButton.onClick.AddListener(OnLoadCard);
             if (_inventoryButton != null) _inventoryButton.onClick.AddListener(OnLoadInventory);
+            if (_craftingButton != null) _craftingButton.onClick.AddListener(OnLoadCrafting);
             if (_prevButton != null) _prevButton.onClick.AddListener(OnPrevClicked);
             if (_nextButton != null) _nextButton.onClick.AddListener(OnNextClicked);
             if (_startButton != null) _startButton.onClick.AddListener(OnStartGame);
@@ -62,6 +64,7 @@ namespace IdleDefenseSurvival.Controller
             if (_vipButton != null) _vipButton.onClick.RemoveListener(OnActiveVIP);
             if (_cardButton != null) _cardButton.onClick.RemoveListener(OnLoadCard);
             if (_inventoryButton != null) _inventoryButton.onClick.RemoveListener(OnLoadInventory);
+            if (_craftingButton != null) _craftingButton.onClick.RemoveListener(OnLoadCrafting);
             if (_prevButton != null) _prevButton.onClick.RemoveListener(OnPrevClicked);
             if (_nextButton != null) _nextButton.onClick.RemoveListener(OnNextClicked);
             if (_startButton != null) _startButton.onClick.RemoveListener(OnStartGame);
@@ -110,6 +113,7 @@ namespace IdleDefenseSurvival.Controller
         public void OnStartGame() => GameManager.Instance.OpenGame(_selectedTier);
         public void OnLoadCard() => CardManager.Instance.OpenCollection();
         public void OnLoadInventory() => InventoryManager.Instance.OpenInventory();
+        public void OnLoadCrafting() => CraftingManager.Instance.OpenCrafting();
         
         private void OnShowDaily() {
             UIManager.Instance.ShowPopup(_dailyRewardPanelPrefab);

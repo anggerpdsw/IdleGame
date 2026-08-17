@@ -174,7 +174,7 @@ namespace IdleDefenseSurvival.Economy
         /// <summary>
         /// Returns a defensive copy so external code cannot mutate Economy state by reference.
         ///</summary>
-        public CurrencyData GetCurrencyData() => new CurrencyData(
+        public CurrencyData GetCurrencyData() => new(
             _currency.gold,
             _currency.gem,
             _currency.meat);

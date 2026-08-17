@@ -56,7 +56,7 @@ namespace IdleDefenseSurvival.Core
             // If the save has not loaded yet, AttributeModifierManager re-applies on OnSaveLoaded.
             EnsureSingleton<AttributeModifierManager>();
             EnsureSingleton<GameManager>();
-            EnsureSingleton<CraftService>();
+            EnsureSingleton<CraftingManager>();
 
             if (SaveManager.Instance?.IsSaveLoaded == true) {
                 // Dev: fill inventory once when the save is truly fresh (no save file yet)

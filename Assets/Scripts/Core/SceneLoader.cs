@@ -85,6 +85,7 @@ namespace IdleDefenseSurvival.Core
         public void LoadGame() => SwitchScene(_isMainMenu, _isGame);
         public void LoadCardCollection() => SwitchScene(_isMainMenu, _isCardCollection);
         public void LoadInventory() => SwitchScene(_isMainMenu, _isInventory);
+        public void LoadCrafting() => SwitchScene(_isMainMenu, _isCrafting);
         public void ReturnToMainMenuFromGame() => SwitchScene(_isGame, _isMainMenu);
         public void ReturnToMainMenuFromCardCollection() => SwitchScene(_isCardCollection, _isMainMenu);
         public void ReturnToMainMenuFromInventory() => SwitchScene(_isInventory, _isMainMenu);

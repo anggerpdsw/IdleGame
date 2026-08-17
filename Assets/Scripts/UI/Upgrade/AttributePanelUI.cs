@@ -66,6 +66,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             var account = AccountManager.Instance;
             account.OnDataLoaded += Refresh;
             account.OnAttributeChanged += Refresh;
+            account.OnLevelUp += OnLevelUp;
             // Important:
             // Refresh immediately in case SaveManager already finished loading
             // before this panel became enabled.
@@ -79,7 +80,10 @@ namespace IdleDefenseSurvival.UI.Upgrade
             if (account == null) return;
             account.OnDataLoaded -= Refresh;
             account.OnAttributeChanged -= Refresh;
+            account.OnLevelUp -= OnLevelUp;
         }
+
+        private void OnLevelUp(int level) => Refresh();
 
         /// <summary>Refresh all rows + remaining points from AccountManager.</summary>
         public void Refresh()

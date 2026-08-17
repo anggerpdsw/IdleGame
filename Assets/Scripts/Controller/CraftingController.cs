@@ -15,8 +15,12 @@ namespace IdleDefenseSurvival.Controller
 
         public void OnBack() => SceneLoader.Instance.ReturnToMainMenuFromCrafting();
 
-        private void OnEnable() => _backButton?.onClick.AddListener(OnBack);
-        private void OnDisable() => _backButton?.onClick.RemoveListener(OnBack);
+        private void OnEnable() {
+            if (_backButton != null) _backButton.onClick.AddListener(OnBack);
+        }
+        private void OnDisable() {
+            if (_backButton != null) _backButton.onClick.RemoveListener(OnBack);
+        }
 
     }
 }

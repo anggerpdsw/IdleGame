@@ -117,7 +117,7 @@ namespace IdleDefenseSurvival.Items.Tests
             public int SpendCallCount = 0;
             public CurrencyType LastSpendCurrency;
             public long LastSpendAmount;
-            private CurrencyData _currencyData = new CurrencyData();
+            private CurrencyData _currencyData = new();
 
             public long Gold => _currencyData.Get(CurrencyType.Gold);
             public long Gem => _currencyData.Get(CurrencyType.Gem);
