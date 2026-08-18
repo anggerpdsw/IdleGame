@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
+using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Items.Generation;
 using UnityEngine;
-using IdleDefenseSurvival.Equipment;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Enhanced craft recipe data with support for multiple result types,
@@ -74,8 +76,63 @@ namespace IdleDefenseSurvival.Items
         public bool IsValid() =>
             !string.IsNullOrEmpty(RecipeId) &&
             !string.IsNullOrEmpty(DisplayName) &&
-            (Ingredients == null || Ingredients.Length > 0) &&
+            Ingredients != null && Ingredients.Length > 0 &&
             (PossibleResults != null && PossibleResults.Length > 0 || GuaranteedResult != null);
+
+        public static CraftRecipeData FromGeneration(CraftRecipeData source)
+        {
+            if (source == null) return null;
+            return new CraftRecipeData
+            {
+                RecipeId = source.RecipeId,
+                DisplayName = source.RecipeId,
+                Description = string.Empty,
+                Category = source.Category,
+                EquipmentType = EquipmentType.None,
+                Rarity = 1,
+                RecipeVersion = 1,
+
+                RequiredCraftingLevel = 1,
+                RequiredQuests = Array.Empty<string>(),
+                RequiredTier = 1,
+                RequiredRecipes = Array.Empty<CraftRecipeData>(),
+
+                Ingredients = source.Ingredients,
+
+                GoldCost = source.GoldCost,
+                GemCost = source.GemCost,
+                AdditionalCosts = Array.Empty<CurrencyCost>(),
+
+                BaseCraftTime = 0f,
+                TimePerAdditionalUnit = 0f,
+
+                PossibleResults = source.PossibleResults,
+                GuaranteedResult = source.GuaranteedResult,
+
+                BaseExpReward = source.BaseExpReward,
+                ExpPerAdditionalUnit = source.ExpPerAdditionalUnit,
+
+                BaseSuccessRate = source.BaseSuccessRate,
+                SuccessRatePerLevel = source.SuccessRatePerLevel,
+
+                QualityChances = Array.Empty<QualityChance>(),
+                Conditions = Array.Empty<CraftCondition>(),
+
+                AutoUnlock = false,
+                UnlockSource = UnlockSource.None,
+                UnlockParameter = null,
+
+                RefundPolicy = source.RefundPolicy,
+
+                RecipeIcon = null,
+                CraftStartSound = null,
+                CraftCompleteSound = null,
+                CraftFailSound = null,
+
+                Tags = Array.Empty<string>()
+            };
+        }
+
     }
 
     /// <summary>
@@ -259,5 +316,26 @@ namespace IdleDefenseSurvival.Items
         Full = 2,              // Always full refund
         ProgressBased = 3,     // Refund based on progress
         HalfAfterHalf = 4,     // Full before 50%, half after 50%, none after 90%
+    }
+    
+    /// <summary>
+    /// Save data for CraftRecipeRepository.
+    /// </summary>
+    [Serializable]
+    public class CraftRecipeRepositorySaveData
+    {
+        public List<string> UnlockedRecipeIds = new();
+        public List<string> KnownRecipeIds = new();
+    }
+
+    /// <summary>
+    /// JSON wrapper for recipe files (root object with SchemaVersion + Recipes array).
+    /// Matches the shape of Assets/Resources/Data/Crafting/dataRecipe*.json files.
+    ///</summary>
+    [Serializable]
+    public class RecipeFile
+    {
+        public int SchemaVersion = 1;
+        public List<CraftRecipeData> Recipes = new();
     }
 }

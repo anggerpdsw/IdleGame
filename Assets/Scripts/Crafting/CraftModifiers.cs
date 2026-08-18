@@ -4,7 +4,7 @@ using System.Linq;
 using IdleDefenseSurvival.Items.Random;
 using UnityEngine;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Source of a craft reward entry - strongly typed for compile-time safety.

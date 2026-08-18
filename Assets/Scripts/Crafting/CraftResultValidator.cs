@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Items;
 using UnityEngine;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Validates craft results after pipeline execution.

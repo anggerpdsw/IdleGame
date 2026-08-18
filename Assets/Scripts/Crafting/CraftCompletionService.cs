@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items.Random;
-using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Core.Interfaces;
 using UnityEngine;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Handles a completed craft queue job using two-phase completion (P0-D).

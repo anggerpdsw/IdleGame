@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using IdleDefenseSurvival.Manager;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Builds CraftContext from player progression data.

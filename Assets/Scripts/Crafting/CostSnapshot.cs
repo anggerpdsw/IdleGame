@@ -1,6 +1,6 @@
 using System;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Scaled cost captured at snapshot build. Mirrors §10.1 CostSnapshot shape.

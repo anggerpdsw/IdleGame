@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// One transaction record in the craft journal (§11.3 schema).

@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Items.Generation;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Repository for craft recipes - loads and manages all available recipes.
@@ -39,7 +39,7 @@ namespace IdleDefenseSurvival.Items
         private void LoadRecipesFromDatabase()
         {
             // Load recipes from EquipmentData (existing system)
-            var allEquipment = ItemDatabase.Instance?.AllEquipment.Values ?? Enumerable.Empty<EquipmentData>();
+            var allEquipment = ItemDatabase.Instance.AllEquipment.Values ?? Enumerable.Empty<EquipmentData>();
             foreach (var equip in allEquipment)
             {
                 if (equip.CraftRecipe != null)
@@ -251,24 +251,4 @@ namespace IdleDefenseSurvival.Items
         }
     }
 
-    /// <summary>
-    /// Save data for CraftRecipeRepository.
-    /// </summary>
-    [Serializable]
-    public class CraftRecipeRepositorySaveData
-    {
-        public List<string> UnlockedRecipeIds = new();
-        public List<string> KnownRecipeIds = new();
-    }
-
-    /// <summary>
-    /// JSON wrapper for recipe files (root object with SchemaVersion + Recipes array).
-    /// Matches the shape of Assets/Resources/Data/Crafting/dataRecipe*.json files.
-    ///</summary>
-    [Serializable]
-    public class RecipeFile
-    {
-        public int SchemaVersion = 1;
-        public List<CraftRecipeData> Recipes = new();
-    }
 }

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using IdleDefenseSurvival.Items;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Crafting configuration loaded from Assets/Resources/Data/Crafting/dataConfigCrafting.json.

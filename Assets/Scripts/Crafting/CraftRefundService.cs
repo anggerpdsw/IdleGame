@@ -3,7 +3,7 @@ using IdleDefenseSurvival.Inventory;
 using UnityEngine;
 using IdleDefenseSurvival.Core.Interfaces;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Calculates and applies refunds for cancelled craft jobs based on policy.

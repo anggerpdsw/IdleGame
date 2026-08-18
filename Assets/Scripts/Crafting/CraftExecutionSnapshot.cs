@@ -1,6 +1,6 @@
 using System;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Immutable per-job execution state. Built ONCE at StartCraft.

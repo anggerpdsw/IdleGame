@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq; // Added this
-using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Crafting;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -42,22 +42,6 @@ namespace IdleDefenseSurvival.Items.Generation
         public bool IsCritical = false;
         public int FixedLevel = 0;
         public int FixedEnhance = 0;
-    }
-
-    public class CraftRecipeData
-    {
-        public string RecipeId;
-        public CraftCategory Category;
-        public float BaseSuccessRate;
-        public float SuccessRatePerLevel;
-        public RecipeResult[] PossibleResults;
-        public GuaranteedResult GuaranteedResult;
-        public long BaseExpReward;
-        public long ExpPerAdditionalUnit;
-        public long GoldCost;
-        public long GemCost;
-        public RecipeIngredient[] Ingredients;
-        public RecipeRefundPolicy RefundPolicy;
     }
 
     public enum CraftCategory

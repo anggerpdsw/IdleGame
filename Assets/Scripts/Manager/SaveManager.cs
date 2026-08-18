@@ -1,5 +1,4 @@
 // Updated SaveManager: removed current tier runtime management; tier selection handled by MainMenu and WaveManager.
-using IdleDefenseSurvival.Core;
 using System.Collections.Generic;
 using System.Collections;
 using System.IO;
@@ -14,6 +13,7 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Save;
 using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Crafting;
 
 namespace IdleDefenseSurvival.Manager
 {

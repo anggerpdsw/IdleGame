@@ -2,7 +2,7 @@ using System;
 using IdleDefenseSurvival.Items.Decomposition;
 using IdleDefenseSurvival.Items.Random;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Pure static factory for <see cref="CraftExecutionSnapshot"/>.

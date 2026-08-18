@@ -1,6 +1,6 @@
 using System;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// One resource-mutation row in a journal entry.

@@ -1,6 +1,6 @@
 using System;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Frozen value-only player state read by roll/reward (I-19).

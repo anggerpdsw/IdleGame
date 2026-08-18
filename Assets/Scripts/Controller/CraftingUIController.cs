@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Controller
 {

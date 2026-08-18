@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Crafting;
 
 namespace IdleDefenseSurvival.Manager
 {

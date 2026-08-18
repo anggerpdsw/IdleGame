@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Interface for craft service - handles crafting recipes, queue management, and progression.

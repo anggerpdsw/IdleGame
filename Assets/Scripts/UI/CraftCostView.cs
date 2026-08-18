@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 using IdleDefenseSurvival.Economy;
-using IdleDefenseSurvival.Items; // For CurrencySnapshot
+using IdleDefenseSurvival.Crafting; // For CurrencySnapshot
 
 namespace IdleDefenseSurvival.UI
 {

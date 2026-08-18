@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Items.Random;
 using UnityEngine;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Fluent builder for creating CraftResultEntry objects.

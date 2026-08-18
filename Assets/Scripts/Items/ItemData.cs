@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items.Generation;
 using UnityEngine;
+using IdleDefenseSurvival.Crafting;
 
 namespace IdleDefenseSurvival.Items
 {

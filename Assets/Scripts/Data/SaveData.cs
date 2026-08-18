@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Economy;
-using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Crafting;
 
 namespace IdleDefenseSurvival.Data
 {

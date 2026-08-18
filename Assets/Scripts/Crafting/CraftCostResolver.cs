@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Pure cost resolver for craft currency computation.

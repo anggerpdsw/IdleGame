@@ -1,4 +1,4 @@
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Facade for craft queue persistence.

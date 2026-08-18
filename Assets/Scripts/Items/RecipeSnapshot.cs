@@ -1,6 +1,6 @@
 using System;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Immutable recipe data captured at StartCraft (I-16).

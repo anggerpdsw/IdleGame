@@ -4,8 +4,9 @@ using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Items;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Validates if a recipe can be crafted.

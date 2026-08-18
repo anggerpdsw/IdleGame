@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IdleDefenseSurvival.Items;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Pure validation runner — no NUnit, no Editor dependency, no UnityEngine.Object.

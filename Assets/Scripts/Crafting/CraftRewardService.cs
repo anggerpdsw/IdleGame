@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Generation;
-using IdleDefenseSurvival.Equipment;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Generates final crafted items with proper levels, stats, and quality.

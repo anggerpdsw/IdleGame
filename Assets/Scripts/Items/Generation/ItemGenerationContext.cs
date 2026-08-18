@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Crafting;
 
 namespace IdleDefenseSurvival.Items.Generation
 {

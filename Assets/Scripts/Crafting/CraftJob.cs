@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Items;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Represents a single crafting job in the queue.
@@ -141,39 +142,4 @@ namespace IdleDefenseSurvival.Items
         RewardPendingCommit = 5   // Two-phase completion: Results+Seed durable, Phase B in flight (I-20, §13.2)
     }
 
-    /// <summary>
-    /// Serialized craft result for persistence.
-    /// </summary>
-    [Serializable]
-    public class CraftResultData
-    {
-        public string ItemId;
-        public int Count;
-        public int Level;
-        public int Quality;
-        public bool IsCritical;
-        public string Source; // "Normal", "Critical", "Bonus", "Mastery", "Event"
-        public long AcquiredTimestamp;
-
-        public static CraftResultData[] FromInventoryItems(InventoryItem[] items, long expReward = 0)
-        {
-            if (items == null || items.Length == 0) return Array.Empty<CraftResultData>();
-
-            var results = new List<CraftResultData>();
-            foreach (var item in items)
-            {
-                results.Add(new CraftResultData
-                {
-                    ItemId = item.ItemId,
-                    Count = item.Quantity,
-                    Level = item.Level,
-                    Quality = (int)item.GetRarity(),
-                    IsCritical = false, // Would need to track this from roll result
-                    Source = "Normal",
-                    AcquiredTimestamp = item.AcquiredTimestamp
-                });
-            }
-            return results.ToArray();
-        }
-    }
 }

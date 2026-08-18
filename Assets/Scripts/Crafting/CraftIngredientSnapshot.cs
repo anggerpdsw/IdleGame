@@ -1,6 +1,6 @@
 using System;
 
-namespace IdleDefenseSurvival.Items
+namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Immutable-at-creation copy of <see cref="CraftIngredient"/> captured when a craft job is created.
