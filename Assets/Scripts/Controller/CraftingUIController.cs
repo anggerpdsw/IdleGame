@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -21,7 +22,20 @@ namespace IdleDefenseSurvival.Controller
     {
         [Header("Recipe List")]
         [SerializeField] private RectTransform _recipeContent;
-        [SerializeField] private GameObject _recipeEntryTemplate;
+        [SerializeField] private CraftingRecipeEntry _recipeEntryPrefabs;
+
+        [Header("Category Filters")]
+        [SerializeField] private Button _categoryAllButton;
+        [SerializeField] private Button[] _categoryButtons; 
+        // Array index 0 = EquipmentType.Hat (enum value 1)
+        // Array index 1 = EquipmentType.Armor (enum value 2)
+        // dst.
+        [SerializeField] private Image _categoryAllSelection;
+        // Selection image untuk tombol All
+        [SerializeField] private Image[] _categorySelections;
+        // Array index 0 = Selection Hat
+        // Array index 1 = Selection Armor
+        // dst.
 
         [Header("Detail Panel")]
         [SerializeField] private Image _resultIcon;
@@ -46,7 +60,8 @@ namespace IdleDefenseSurvival.Controller
         private string _selectedRecipeId;
         private int _quantity = 1;
         private string _currentJobId;
-        private readonly List<GameObject> _entries = new();
+        private EquipmentType _currentCategoryFilter = EquipmentType.None; // None = All
+        private readonly List<CraftingRecipeEntry> _entries = new();
         private readonly List<GameObject> _materialRows = new();
 
         #region Pure decision logic (EditMode-testable)
@@ -77,12 +92,17 @@ namespace IdleDefenseSurvival.Controller
         private void Awake()
         {
             ValidateReferences();
-            if (_recipeEntryTemplate != null) _recipeEntryTemplate.SetActive(false);
+            if (_recipeEntryPrefabs != null) _recipeEntryPrefabs.gameObject.SetActive(false);
             if (_materialRowTemplate != null) _materialRowTemplate.SetActive(false);
             if (_feedbackText != null) _feedbackText.text = "";
         }
 
-        private void OnEnable()
+        private void Start()
+        {
+            Bind();
+        }
+
+        private void Bind()
         {
             var svc = CraftingManager.Instance;
             if (svc == null)
@@ -101,7 +121,58 @@ namespace IdleDefenseSurvival.Controller
             if (_minusButton != null) _minusButton.onClick.AddListener(OnMinusClicked);
             if (_craftButton != null) _craftButton.onClick.AddListener(OnCraftClicked);
 
+            BindCategoryButtons();
             PopulateRecipeList();
+            UpdateCategorySelection(); // init selection highlight (All active by default)
+        }
+
+        private void BindCategoryButtons()
+        {
+            // All
+            if (_categoryAllButton != null)
+            {
+                _categoryAllButton.onClick.AddListener(
+                    () => OnCategoryFilterChanged(EquipmentType.None)
+                );
+            }
+
+            // Category buttons
+            // Array index 0 corresponds to enum value 1.
+            if (_categoryButtons == null) return;
+            for (int i = 0; i < _categoryButtons.Length; i++)
+            {
+                var button = _categoryButtons[i];
+                if (button == null) continue;
+                EquipmentType category = (EquipmentType)(i + 1);
+                button.onClick.AddListener(() => OnCategoryFilterChanged(category));
+            }
+        }
+
+        private void OnCategoryFilterChanged(EquipmentType category)
+        {
+            _currentCategoryFilter = category;
+            UpdateCategorySelection();
+            PopulateRecipeList();
+        }
+
+        private void UpdateCategorySelection()
+        {
+            // All
+            if (_categoryAllSelection != null)
+            {
+                _categoryAllSelection.gameObject.SetActive(
+                    _currentCategoryFilter == EquipmentType.None
+                );
+            }
+            if (_categorySelections == null) return;
+            // Array index 0 corresponds to enum value 1.
+            for (int i = 0; i < _categorySelections.Length; i++)
+            {
+                var selection = _categorySelections[i];
+                if (selection == null) continue;
+                EquipmentType category = (EquipmentType)(i + 1);
+                selection.gameObject.SetActive(_currentCategoryFilter == category);
+            }
         }
 
         private void OnDisable()
@@ -126,7 +197,7 @@ namespace IdleDefenseSurvival.Controller
         private void ValidateReferences()
         {
             if (_recipeContent == null) Debug.LogError("[CraftingUIController] Missing required reference: _recipeContent");
-            if (_recipeEntryTemplate == null) Debug.LogError("[CraftingUIController] Missing required reference: _recipeEntryTemplate");
+            if (_recipeEntryPrefabs == null) Debug.LogError("[CraftingUIController] Missing required reference: _recipeEntryPrefabs");
             if (_resultIcon == null) Debug.LogError("[CraftingUIController] Missing required reference: _resultIcon");
             if (_resultName == null) Debug.LogError("[CraftingUIController] Missing required reference: _resultName");
             if (_descriptionText == null) Debug.LogError("[CraftingUIController] Missing required reference: _descriptionText");
@@ -141,6 +212,10 @@ namespace IdleDefenseSurvival.Controller
             if (_craftButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _craftButton");
             if (_progressSlider == null) Debug.LogError("[CraftingUIController] Missing required reference: _progressSlider");
             if (_feedbackText == null) Debug.LogError("[CraftingUIController] Missing required reference: _feedbackText");
+            if (_categoryAllButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllButton");
+            if (_categoryButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryButtons");
+            if (_categoryAllSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllSelection");
+            if (_categorySelections == null) Debug.LogError("[CraftingUIController] Missing required reference: _categorySelections");
         }
 
         #endregion
@@ -153,23 +228,53 @@ namespace IdleDefenseSurvival.Controller
             var recipes = CraftingManager.Instance.GetKnownRecipes();
             if (recipes == null) return;
 
-            foreach (var recipe in recipes)
+            // Filter by category (EquipmentType.None = All)
+            var filteredRecipes = recipes.Where(r =>
+                r != null &&
+                !string.IsNullOrEmpty(r.RecipeId) &&
+                (_currentCategoryFilter == EquipmentType.None || r.EquipmentType == _currentCategoryFilter)
+            );
+
+            // Sort by rarity (highest first: Divine=6, Mythic=5, Legendary=4, Epic=3, Rare=2, Common=1)
+            var sortedRecipes = filteredRecipes.OrderByDescending(r => r.Rarity).ToList();
+            foreach (var recipe in sortedRecipes)
             {
-                if (recipe == null || string.IsNullOrEmpty(recipe.RecipeId)) continue;
-                var entry = Instantiate(_recipeEntryTemplate, _recipeContent);
-                entry.SetActive(true);
-                if (_recipeEntryTemplate.GetComponent<CraftingRecipeEntry>() != null)
-                {
-                    // Template already carries the entry component; re-init the clone
-                    entry.GetComponent<CraftingRecipeEntry>().Initialize(recipe.RecipeId, recipe.DisplayName, ResolveRecipeIcon(recipe), this);
-                }
-                else
-                {
-                    var component = entry.AddComponent<CraftingRecipeEntry>();
-                    component.Initialize(recipe.RecipeId, recipe.DisplayName, ResolveRecipeIcon(recipe), this);
-                }
+                var entry = Instantiate(_recipeEntryPrefabs, _recipeContent);
+                entry.gameObject.SetActive(true);
+                // Template already carries the entry component; re-init the clone
+                entry.Initialize(recipe.RecipeId, ResolveRecipeIcon(recipe), (Rarity)recipe.Rarity, this);
                 _entries.Add(entry);
+                // Check material affordability and dim if insufficient
+                UpdateEntryAffordability(entry, recipe);
             }
+        }
+
+        private void UpdateEntryAffordability(CraftingRecipeEntry entry, CraftRecipeData recipe)
+        {
+            if (entry == null || recipe == null) return;
+
+            var reqs = CraftingManager.Instance.GetRecipeMaterialPreview(recipe.RecipeId, 1);
+            if (reqs == null || reqs.Length == 0) return;
+
+            bool canAffordMaterials = true;
+            if (InventoryService.Instance != null)
+            {
+                foreach (var req in reqs)
+                {
+                    int owned = InventoryService.Instance.GetTotalQuantity(req.ItemId);
+                    if (owned < req.Count)
+                    {
+                        canAffordMaterials = false;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                canAffordMaterials = false;
+            }
+
+            entry.SetAffordable(canAffordMaterials, GameColors.empty, GameColors.white);
         }
 
         private Sprite ResolveRecipeIcon(CraftRecipeData recipe)
@@ -177,6 +282,7 @@ namespace IdleDefenseSurvival.Controller
             if (recipe.GuaranteedResult == null || string.IsNullOrEmpty(recipe.GuaranteedResult.ItemId)) return null;
             if (ItemDatabase.Instance == null) return null;
             var itemData = ItemDatabase.Instance.GetItem(recipe.GuaranteedResult.ItemId);
+            Debug.LogWarning($"[CraftingUIController] itemData: {itemData}");
             if (itemData == null || string.IsNullOrEmpty(itemData.IconKey)) return null;
             return ItemResources.GetItemSource(itemData.IconKey);
         }
@@ -238,11 +344,14 @@ namespace IdleDefenseSurvival.Controller
             {
                 var row = Instantiate(_materialRowTemplate, _materialList);
                 row.SetActive(true);
+                var icon = row.GetComponentInChildren<Image>();
+                if (icon != null)
+                    icon.sprite = ItemResources.GetItemSource($"Material/{req.ItemId}");
                 var text = row.GetComponentInChildren<TextMeshProUGUI>();
                 if (text != null)
                 {
                     int owned = InventoryService.Instance != null ? InventoryService.Instance.GetTotalQuantity(req.ItemId) : 0;
-                    text.text = $"{req.ItemId}: {owned} / {req.Count}";
+                    text.text = $"{owned} / {req.Count}";
                     text.color = owned >= req.Count ? GameColors.white : GameColors.red;
                 }
                 _materialRows.Add(row);
@@ -392,19 +501,15 @@ namespace IdleDefenseSurvival.Controller
         #endregion
 
         #region Cleanup
-
-        private void ClearRecipeEntries()
+        private void ClearRecipeEntries() => ClearChildren(_recipeContent, _entries);
+        private void ClearMaterialRows() => ClearChildren(_materialList, _materialRows);
+        private void ClearChildren<T>(Transform container, List<T> items)
         {
-            foreach (var e in _entries) if (e != null) Destroy(e);
-            _entries.Clear();
+            if (container != null)
+                for (int i = container.childCount - 1; i >= 0; i--)
+                    Destroy(container.GetChild(i).gameObject);
+            items.Clear();
         }
-
-        private void ClearMaterialRows()
-        {
-            foreach (var r in _materialRows) if (r != null) Destroy(r);
-            _materialRows.Clear();
-        }
-
         #endregion
     }
 }

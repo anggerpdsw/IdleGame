@@ -17,8 +17,18 @@ namespace IdleDefenseSurvival.Crafting
         public string RecipeId;
         public string DisplayName;
         [TextArea] public string Description;
+        /// <summary>
+        /// Broad item category.
+        /// Example: Equipment, Consumable, Material.
+        /// </summary>
         public ItemCategory Category = ItemCategory.None;
+        /// <summary>
+        /// Specific equipment slot/type.
+        /// Only relevant when Category represents equipment.
+        /// Example: Hat, Weapon, Armor.
+        /// </summary>
         public EquipmentType EquipmentType = EquipmentType.None; // Which equipment slot this recipe crafts
+        public bool IsEquipment => EquipmentType != EquipmentType.None;
         public int Rarity = 1; // 1=Common, 2=Rare, 3=Epic, 4=Legendary, 5=Mythic, 6=Divine
         public int RecipeVersion = 1; // v3.5 §8.1 — defaults to 1 when JSON omits the field
 
@@ -41,7 +51,9 @@ namespace IdleDefenseSurvival.Crafting
         // ============ Results ============
         public CraftResult[] PossibleResults; // For RNG crafting
         public CraftResult GuaranteedResult;  // Always granted (in addition to RNG)
-        public bool Deterministic => PossibleResults == null || PossibleResults.Length == 0;
+        public bool HasRandomResults => PossibleResults != null && PossibleResults.Length > 0;
+        public bool HasGuaranteedResult => GuaranteedResult != null;
+        public bool IsDeterministic => !HasRandomResults;
 
         // ============ Experience ============
         public long BaseExpReward = 0;
@@ -56,7 +68,7 @@ namespace IdleDefenseSurvival.Crafting
         public CraftCondition[] Conditions; // Special conditions (time of day, biome, etc.)
 
         // ============ Unlocking ============
-        public bool AutoUnlock = false; // Unlocked automatically when requirements met
+        public bool AutoUnlock = true; // Unlocked automatically when requirements met
         public UnlockSource UnlockSource = UnlockSource.None;
         public string UnlockParameter; // Quest ID, tier, etc.
 
@@ -73,63 +85,78 @@ namespace IdleDefenseSurvival.Crafting
         public string[] Tags; // For filtering/searching
 
         // ============ Validation ============
-        public bool IsValid() =>
-            !string.IsNullOrEmpty(RecipeId) &&
-            !string.IsNullOrEmpty(DisplayName) &&
-            Ingredients != null && Ingredients.Length > 0 &&
-            (PossibleResults != null && PossibleResults.Length > 0 || GuaranteedResult != null);
+        public bool IsValid()
+        {
+            if (string.IsNullOrEmpty(RecipeId)) return false;
+            if (string.IsNullOrEmpty(DisplayName)) return false;
+            if (Ingredients == null || Ingredients.Length == 0) return false;
+            bool hasPossibleResults = PossibleResults != null && PossibleResults.Length > 0;
+            bool hasGuaranteedResult = GuaranteedResult != null && !string.IsNullOrEmpty(GuaranteedResult.ItemId);
+            return hasPossibleResults || hasGuaranteedResult;
+        }
 
         public static CraftRecipeData FromGeneration(CraftRecipeData source)
         {
             if (source == null) return null;
             return new CraftRecipeData
             {
+                // Identity
                 RecipeId = source.RecipeId,
-                DisplayName = source.RecipeId,
-                Description = string.Empty,
+                DisplayName = source.DisplayName,
+                Description = source.Description,
                 Category = source.Category,
-                EquipmentType = EquipmentType.None,
-                Rarity = 1,
-                RecipeVersion = 1,
+                EquipmentType = source.EquipmentType,
+                Rarity = source.Rarity,
+                RecipeVersion = source.RecipeVersion,
 
-                RequiredCraftingLevel = 1,
-                RequiredQuests = Array.Empty<string>(),
-                RequiredTier = 1,
-                RequiredRecipes = Array.Empty<CraftRecipeData>(),
+                // Requirements
+                RequiredCraftingLevel = source.RequiredCraftingLevel,
+                RequiredQuests = source.RequiredQuests ?? Array.Empty<string>(),
+                RequiredTier = source.RequiredTier,
+                RequiredRecipes = source.RequiredRecipes ?? Array.Empty<CraftRecipeData>(),
 
+                // Costs
                 Ingredients = source.Ingredients,
-
                 GoldCost = source.GoldCost,
                 GemCost = source.GemCost,
-                AdditionalCosts = Array.Empty<CurrencyCost>(),
+                AdditionalCosts = source.AdditionalCosts ?? Array.Empty<CurrencyCost>(),
 
-                BaseCraftTime = 0f,
-                TimePerAdditionalUnit = 0f,
+                // Timing
+                BaseCraftTime = source.BaseCraftTime,
+                TimePerAdditionalUnit = source.TimePerAdditionalUnit,
 
+                // Results
                 PossibleResults = source.PossibleResults,
                 GuaranteedResult = source.GuaranteedResult,
 
+                // Experience
                 BaseExpReward = source.BaseExpReward,
                 ExpPerAdditionalUnit = source.ExpPerAdditionalUnit,
 
+                // Success
                 BaseSuccessRate = source.BaseSuccessRate,
                 SuccessRatePerLevel = source.SuccessRatePerLevel,
+                QualityChances = source.QualityChances ?? Array.Empty<QualityChance>(),
 
-                QualityChances = Array.Empty<QualityChance>(),
-                Conditions = Array.Empty<CraftCondition>(),
+                // Conditions
+                Conditions = source.Conditions ?? Array.Empty<CraftCondition>(),
 
-                AutoUnlock = false,
-                UnlockSource = UnlockSource.None,
-                UnlockParameter = null,
+                // Unlock
+                AutoUnlock = source.AutoUnlock,
+                UnlockSource = source.UnlockSource,
+                UnlockParameter = source.UnlockParameter,
 
+                // Refund
                 RefundPolicy = source.RefundPolicy,
 
-                RecipeIcon = null,
-                CraftStartSound = null,
-                CraftCompleteSound = null,
-                CraftFailSound = null,
+                // Visual / Audio
+                RecipeIcon = source.RecipeIcon,
+                CraftStartSound = source.CraftStartSound,
+                CraftCompleteSound = source.CraftCompleteSound,
+                CraftFailSound = source.CraftFailSound,
 
-                Tags = Array.Empty<string>()
+                // Tags
+                Tags = source.Tags ?? Array.Empty<string>()
             };
         }
 
@@ -289,21 +316,6 @@ namespace IdleDefenseSurvival.Crafting
         public float QualityBonus = 0f;
         public int RequiredLevel = 1;
         public long UpgradeCost = 0;
-    }
-
-    /// <summary>
-    /// Category for organizing craft recipes.
-    /// </summary>
-    public enum CraftCategory
-    {
-        None = 0,
-        Weapon = 1,
-        Armor = 2,
-        Accessory = 3,
-        Consumable = 4,
-        Material = 5,
-        Gem = 6,
-        Special = 7,
     }
 
     /// <summary>

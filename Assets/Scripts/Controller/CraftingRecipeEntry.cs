@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -13,24 +13,23 @@ namespace IdleDefenseSurvival.Controller
     /// </summary>
     public class CraftingRecipeEntry : MonoBehaviour
     {
-        private TextMeshProUGUI _nameText;
-        private Image _iconImage;
-        private Button _button;
+        [SerializeField] private Image _rarity;
+        [SerializeField] private Image _iconImage;
+        [SerializeField] private Button _button;
 
         private string _recipeId;
         private CraftingUIController _controller;
 
-        public void Initialize(string recipeId, string displayName, Sprite icon, CraftingUIController controller)
+        public void Initialize(string recipeId, Sprite icon, Rarity rarity, CraftingUIController controller)
         {
             _recipeId = recipeId;
             _controller = controller;
 
-            _nameText = GetComponentInChildren<TextMeshProUGUI>(true);
-            _iconImage = GetComponentInChildren<Image>(true);
-            _button = GetComponentInChildren<Button>(true);
-
-            if (_nameText != null) _nameText.text = displayName;
             if (_iconImage != null && icon != null) _iconImage.sprite = icon;
+
+            // Apply rarity color to the rarity image
+            if (_rarity != null)
+                _rarity.color = GetRarityColor(rarity);
 
             if (_button != null)
             {
@@ -41,6 +40,28 @@ namespace IdleDefenseSurvival.Controller
             {
                 Debug.LogWarning($"[CraftingRecipeEntry] No Button found on {gameObject.name}");
             }
+        }
+
+        public static Color GetRarityColor(Rarity rarity)
+        {
+            return rarity switch
+            {
+                Rarity.Common => GameColors.commonGray,
+                Rarity.Rare => GameColors.rareBlue,
+                Rarity.Epic => GameColors.epicPurple,
+                Rarity.Legendary => GameColors.legendaryOrange,
+                Rarity.Mythic => GameColors.mythicPink,
+                Rarity.Divine => GameColors.divineGold,
+                _ => GameColors.white,
+            };
+        }
+
+        public void SetAffordable(bool affordable, Color dimColor, Color normalColor)
+        {
+            // Keep button interactable so user can click to view details
+            // The main craft button in CraftingUIController handles the actual craft disable
+            if (_iconImage != null)
+                _iconImage.color = affordable ? normalColor : dimColor;
         }
 
         private void OnClicked()

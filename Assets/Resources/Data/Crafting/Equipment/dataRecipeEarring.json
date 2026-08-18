@@ -1,7 +1,6 @@
 {
   "SchemaVersion": 1,
-  "Recipes": [
-    {
+  "Recipes": [{
       "RecipeId": "craft_earring_r1",
       "DisplayName": "Quartz Earring",
       "Description": "A simple pig iron earring set with rough quartz on cotton thread.",
@@ -10,11 +9,22 @@
       "Rarity": 1,
       "RequiredCraftingLevel": 1,
       "RequiredTier": 1,
-      "Ingredients": [
-        { "ItemId": "pig_iron", "Count": 2 },
-        { "ItemId": "rough_quartz", "Count": 1 },
-        { "ItemId": "cotton_thread", "Count": 1 },
-        { "ItemId": "water", "Count": 10 }
+      "Ingredients": [{
+          "ItemId": "pig_iron",
+          "Count": 2
+        },
+        {
+          "ItemId": "rough_quartz",
+          "Count": 1
+        },
+        {
+          "ItemId": "cotton_thread",
+          "Count": 1
+        },
+        {
+          "ItemId": "water",
+          "Count": 10
+        }
       ],
       "BaseCraftTime": 15.0,
       "TimePerAdditionalUnit": 15.0
@@ -28,11 +38,22 @@
       "Rarity": 2,
       "RequiredCraftingLevel": 5,
       "RequiredTier": 1,
-      "Ingredients": [
-        { "ItemId": "high_carbon_steel", "Count": 4 },
-        { "ItemId": "normal_ruby", "Count": 1 },
-        { "ItemId": "thick_thread", "Count": 2 },
-        { "ItemId": "water", "Count": 20 }
+      "Ingredients": [{
+          "ItemId": "high_carbon_steel",
+          "Count": 4
+        },
+        {
+          "ItemId": "normal_ruby",
+          "Count": 1
+        },
+        {
+          "ItemId": "thick_thread",
+          "Count": 2
+        },
+        {
+          "ItemId": "water",
+          "Count": 20
+        }
       ],
       "BaseCraftTime": 22.0,
       "TimePerAdditionalUnit": 22.0
@@ -46,11 +67,22 @@
       "Rarity": 3,
       "RequiredCraftingLevel": 10,
       "RequiredTier": 2,
-      "Ingredients": [
-        { "ItemId": "refined_steel", "Count": 6 },
-        { "ItemId": "refined_sapphire", "Count": 1 },
-        { "ItemId": "silk_thread", "Count": 3 },
-        { "ItemId": "water", "Count": 30 }
+      "Ingredients": [{
+          "ItemId": "refined_steel",
+          "Count": 6
+        },
+        {
+          "ItemId": "refined_sapphire",
+          "Count": 1
+        },
+        {
+          "ItemId": "silk_thread",
+          "Count": 3
+        },
+        {
+          "ItemId": "water",
+          "Count": 30
+        }
       ],
       "BaseCraftTime": 35.0,
       "TimePerAdditionalUnit": 35.0
@@ -64,11 +96,22 @@
       "Rarity": 4,
       "RequiredCraftingLevel": 15,
       "RequiredTier": 3,
-      "Ingredients": [
-        { "ItemId": "steel_alloy", "Count": 8 },
-        { "ItemId": "rare_emerald", "Count": 1 },
-        { "ItemId": "compound_thread", "Count": 4 },
-        { "ItemId": "water", "Count": 50 }
+      "Ingredients": [{
+          "ItemId": "steel_alloy",
+          "Count": 8
+        },
+        {
+          "ItemId": "rare_emerald",
+          "Count": 1
+        },
+        {
+          "ItemId": "compound_thread",
+          "Count": 4
+        },
+        {
+          "ItemId": "water",
+          "Count": 50
+        }
       ],
       "BaseCraftTime": 50.0,
       "TimePerAdditionalUnit": 50.0
@@ -82,11 +125,22 @@
       "Rarity": 5,
       "RequiredCraftingLevel": 20,
       "RequiredTier": 4,
-      "Ingredients": [
-        { "ItemId": "high_alloy_steel", "Count": 10 },
-        { "ItemId": "legendary_diamond", "Count": 1 },
-        { "ItemId": "azureworm_silk", "Count": 5 },
-        { "ItemId": "water", "Count": 80 }
+      "Ingredients": [{
+          "ItemId": "high_alloy_steel",
+          "Count": 10
+        },
+        {
+          "ItemId": "legendary_diamond",
+          "Count": 1
+        },
+        {
+          "ItemId": "azureworm_silk",
+          "Count": 5
+        },
+        {
+          "ItemId": "water",
+          "Count": 80
+        }
       ],
       "BaseCraftTime": 75.0,
       "TimePerAdditionalUnit": 75.0
@@ -100,12 +154,26 @@
       "Rarity": 6,
       "RequiredCraftingLevel": 25,
       "RequiredTier": 5,
-      "Ingredients": [
-        { "ItemId": "high_alloy_steel", "Count": 14 },
-        { "ItemId": "mythic_sapphire", "Count": 1 },
-        { "ItemId": "vega_string", "Count": 6 },
-        { "ItemId": "essence_of_hope", "Count": 1 },
-        { "ItemId": "water", "Count": 120 }
+      "Ingredients": [{
+          "ItemId": "high_alloy_steel",
+          "Count": 14
+        },
+        {
+          "ItemId": "mythic_sapphire",
+          "Count": 1
+        },
+        {
+          "ItemId": "vega_string",
+          "Count": 6
+        },
+        {
+          "ItemId": "essence_of_hope",
+          "Count": 1
+        },
+        {
+          "ItemId": "water",
+          "Count": 120
+        }
       ],
       "BaseCraftTime": 100.0,
       "TimePerAdditionalUnit": 100.0

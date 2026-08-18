@@ -180,8 +180,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 0.938,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -233,6 +233,13 @@
           "MaxCount": 1,
           "Weight": 0.188,
           "MinTier": 3
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -305,6 +312,20 @@
           "MaxCount": 1,
           "Weight": 0.25,
           "MinTier": 3
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -370,6 +391,20 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -486,6 +521,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -689,6 +731,20 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -737,8 +793,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -776,6 +832,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -795,8 +858,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -853,8 +916,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 0.938,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -926,7 +989,7 @@
           "ItemId": "rock",
           "MinCount": 1,
           "MaxCount": 1,
-          "Weight": 0.375,
+          "Weight": 0.5,
           "MinTier": 1
         }
       ]
@@ -955,6 +1018,20 @@
           "ItemId": "logs",
           "MinCount": 1,
           "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
           "Weight": 0.5,
           "MinTier": 1
         }
@@ -1003,12 +1080,20 @@
       "element": "Water",
       "exp": 1,
       "dropItems": [{
-        "ItemId": "cotton_thread",
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Weight": 1.375,
-        "MinTier": 1
-      }]
+          "ItemId": "cotton_thread",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 1.375,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
+        }
+      ]
     },
     {
       "id": "Fire Wisp",
@@ -1053,12 +1138,20 @@
       "element": "Wind",
       "exp": 2,
       "dropItems": [{
-        "ItemId": "cotton_thread",
-        "MinCount": 1,
-        "MaxCount": 2,
-        "Weight": 1.25,
-        "MinTier": 1
-      }]
+          "ItemId": "cotton_thread",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 1.25,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        }
+      ]
     },
     {
       "id": "Crimson Imp",
@@ -1095,12 +1188,20 @@
       "element": "None",
       "exp": 3,
       "dropItems": [{
-        "ItemId": "rock",
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Weight": 1.375,
-        "MinTier": 1
-      }]
+          "ItemId": "stone_dust",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.75,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rock",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        }
+      ]
     },
     {
       "id": "Goblin Grunt",
@@ -1118,8 +1219,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.375,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1245,12 +1346,20 @@
       "element": "Water",
       "exp": 4,
       "dropItems": [{
-        "ItemId": "cotton_thread",
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Weight": 1.375,
-        "MinTier": 1
-      }]
+          "ItemId": "cotton_thread",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 1.375,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
+        }
+      ]
     },
     {
       "id": "Goblin Scout",
@@ -1268,8 +1377,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.375,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1318,8 +1427,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.125,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1347,8 +1456,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.25,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1376,8 +1485,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.125,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1405,8 +1514,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.25,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1434,8 +1543,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.125,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1550,7 +1659,14 @@
           "ItemId": "rock",
           "MinCount": 1,
           "MaxCount": 1,
-          "Weight": 0.375,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         }
       ]
@@ -1569,12 +1685,20 @@
       "element": "Wood",
       "exp": 6,
       "dropItems": [{
-        "ItemId": "organic_glue",
-        "MinCount": 1,
-        "MaxCount": 2,
-        "Weight": 1.375,
-        "MinTier": 1
-      }]
+          "ItemId": "organic_glue",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 1.375,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        }
+      ]
     },
     {
       "id": "Embershard Golem",
@@ -1631,6 +1755,13 @@
           "MaxCount": 1,
           "Weight": 0.438,
           "MinTier": 1
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -1650,8 +1781,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.125,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1708,8 +1839,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.125,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1745,6 +1876,20 @@
           "ItemId": "logs",
           "MinCount": 1,
           "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
           "Weight": 0.5,
           "MinTier": 1
         }
@@ -1834,6 +1979,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -1882,8 +2034,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.25,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -1950,6 +2102,13 @@
           "MaxCount": 1,
           "Weight": 0.313,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -1969,8 +2128,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.125,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -2037,6 +2196,13 @@
           "MaxCount": 1,
           "Weight": 0.375,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -2056,8 +2222,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.25,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -2095,6 +2261,20 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -2153,6 +2333,20 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "rough_lumber",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -2172,8 +2366,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1.25,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -2240,6 +2434,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -2298,6 +2499,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -2317,8 +2525,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
@@ -2326,6 +2534,13 @@
           "MinCount": 1,
           "MaxCount": 1,
           "Weight": 0.438,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "leather",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         }
       ]
@@ -2385,6 +2600,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "water",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.5,
+          "MinTier": 1
         }
       ]
     },
@@ -2433,8 +2655,8 @@
       "dropItems": [{
           "ItemId": "rock",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 1,
+          "MaxCount": 1,
+          "Weight": 0.5,
           "MinTier": 1
         },
         {
