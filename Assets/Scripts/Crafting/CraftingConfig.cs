@@ -21,6 +21,7 @@ namespace IdleDefenseSurvival.Crafting
         public Dictionary<int, float> RarityMultipliers = new();
         public Dictionary<string, int> ProfileBaselines = new();
         public Dictionary<int, int> WaterBaselineTable = new();
+        public Dictionary<int, EquipmentAttributeTierConfig> AttributeRolls = new();
         public float WaterTolerancePercent = 0.20f;
         public float ArmorMarginPercent = 0.20f;
 
@@ -87,5 +88,27 @@ namespace IdleDefenseSurvival.Crafting
         {
             return WaterBaselineTable.TryGetValue(rarity, out int q) ? q : 0;
         }
+
+        /// <summary>
+        /// Get attribute roll configuration for a rarity (1..6). v3.8 §20.3.
+        /// Returns null when the rarity has no entry (data gap) — caller degrades safely.
+        /// </summary>
+        public EquipmentAttributeTierConfig GetAttributeTierConfig(int rarity)
+        {
+            return AttributeRolls.TryGetValue(rarity, out var cfg) ? cfg : null;
+        }
+    }
+
+    /// <summary>
+    /// Attribute roll tier configuration — how many times MainAttribute is rolled and
+    /// the value range per roll, keyed by equipment rarity (1=Common..6=Divine).
+    /// Loaded from dataConfigCrafting.json "AttributeRolls". v3.8 §20.3.
+    /// </summary>
+    [Serializable]
+    public class EquipmentAttributeTierConfig
+    {
+        public int MaxRolls = 1;
+        public int MinValue = 3;
+        public int MaxValue = 6;
     }
 }

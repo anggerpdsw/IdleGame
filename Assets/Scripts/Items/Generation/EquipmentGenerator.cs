@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Items.Random;
 
 namespace IdleDefenseSurvival.Items.Generation
@@ -20,6 +20,7 @@ namespace IdleDefenseSurvival.Items.Generation
         private readonly EnchantmentGenerator _enchantGen;
         private readonly AffixGenerator _affixGen;
         private readonly ItemValidator _validator;
+        private readonly AttributeRollService _attributeRoll;
 
         public EquipmentGenerator(
             IRandomProvider rng,
@@ -28,7 +29,8 @@ namespace IdleDefenseSurvival.Items.Generation
             SocketGenerator socketGen = null,
             EnchantmentGenerator enchantGen = null,
             AffixGenerator affixGen = null,
-            ItemValidator validator = null)
+            ItemValidator validator = null,
+            AttributeRollService attributeRoll = null)
         {
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = rarityRoll ?? new RarityRollService(_rng);
@@ -37,6 +39,8 @@ namespace IdleDefenseSurvival.Items.Generation
             _enchantGen = enchantGen ?? new EnchantmentGenerator(_rng);
             _affixGen = affixGen ?? new AffixGenerator(_rng);
             _validator = validator ?? new ItemValidator();
+            // Same RNG as the other roll services: attribute rolls are deterministic under a seeded provider (I-11).
+            _attributeRoll = attributeRoll ?? new AttributeRollService(_rng);
         }
 
         /// <summary>
@@ -62,6 +66,19 @@ namespace IdleDefenseSurvival.Items.Generation
             if (secondaryStats.Length > 0)
             {
                 ApplySecondaryStats(item, secondaryStats);
+            }
+
+            // 4b. Roll main attributes (v3.8 §20) — craft-sourced only; rarity here is
+            // recipe.Rarity via context.ForcedQuality (set by CraftRewardService).
+            if (context.Source == ItemSource.Craft)
+            {
+                var tierConfig = CraftingConfig.Load().GetAttributeTierConfig((int)rarity);
+                var attributes = _attributeRoll.RollAttributes(rarity, tierConfig);
+                if (attributes.Length > 0)
+                {
+                    item.CustomData ??= new Dictionary<string, object>();
+                    item.CustomData["AttributeStats"] = attributes;
+                }
             }
 
             // 5. Generate sockets

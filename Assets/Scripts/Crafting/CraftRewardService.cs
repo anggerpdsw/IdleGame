@@ -21,7 +21,7 @@ namespace IdleDefenseSurvival.Crafting
         }
 
         // ============ Public API ============
-        public InventoryItem[] GenerateRewards(CraftRollResult rollResult, CraftRecipeData recipe, CraftContext context)
+        public InventoryItem[] GenerateRewards(CraftRollResult rollResult, CraftRecipeData recipe, CraftContext context, long seed = 0)
         {
             if (!rollResult.Success || rollResult.Entries.Count == 0)
                 return Array.Empty<InventoryItem>();
@@ -32,7 +32,7 @@ namespace IdleDefenseSurvival.Crafting
             {
                 for (int i = 0; i < entry.Count; i++)
                 {
-                    var item = GenerateSingleItem(entry, recipe, context);
+                    var item = GenerateSingleItem(entry, recipe, context, seed + i);
                     if (item != null)
                         items.Add(item);
                 }
@@ -41,14 +41,14 @@ namespace IdleDefenseSurvival.Crafting
             return items.ToArray();
         }
 
-        private InventoryItem GenerateSingleItem(CraftResultEntry entry, CraftRecipeData recipe, CraftContext context)
+        private InventoryItem GenerateSingleItem(CraftResultEntry entry, CraftRecipeData recipe, CraftContext context, long seed)
         {
             // Slot-based fallback: craft_* recipe ids don't directly resolve as EquipmentData.
-            // Resolve via the 11 base templates (equip_<slot>_base) and scale by recipe.RequiredTier.
+            // Resolve via the 11 base templates (equip_<slot>_base); rarity/level from the recipe.
             var slot = InferSlotFromRecipe(recipe);
             if (slot.HasValue && recipe.Category == ItemCategory.Equipment)
             {
-                return GenerateEquipmentFromBase(entry, recipe, context, slot.Value);
+                return GenerateEquipmentFromBase(recipe, context, slot.Value, seed);
             }
 
             // Build generation context for non-equipment items
@@ -71,14 +71,17 @@ namespace IdleDefenseSurvival.Crafting
 
         // ============ Equipment Generation ============
         /// <summary>
-        /// Generates equipment using base template + rarity scaling via ItemDatabase.GenerateEquipment.
-        /// Overrides display name with recipe-specific identity (e.g., Vega Hat vs generic Hat).
+        /// Generates equipment using base template + rarity from recipe.Rarity (v3.8 §20.1).
+        /// Rarity is the sole output tier; RequiredTier remains a progression gate and
+        /// only feeds the generated item's level. Routes through ItemGenerator so the full
+        /// EquipmentGenerator pipeline runs (CustomData: AttributeStats/secondaries/affixes/sockets).
+        /// Uses a seeded ItemGenerator so attribute rolls are deterministic under CompletionSeed (I-11).
         ///</summary>
         private InventoryItem GenerateEquipmentFromBase(
-            CraftResultEntry entry,
             CraftRecipeData recipe,
             CraftContext context,
-            EquipmentType slot)
+            EquipmentType slot,
+            long seed)
         {
             var db = ItemDatabase.Instance;
             if (db == null) return null;
@@ -91,20 +94,28 @@ namespace IdleDefenseSurvival.Crafting
                 return null;
             }
 
-            int rarityLevel = recipe.RequiredTier > 0 ? recipe.RequiredTier : 1;
-            var generated = db.GenerateEquipment(
-                baseEquip.Id,
-                (Rarity)rarityLevel,
-                rarityLevel,
-                slot);
+            // v3.8 §20.1 — rarity source of truth: recipe.Rarity (1=Common..6=Divine), never RequiredTier.
+            int rarityLevel = recipe.Rarity > 0 ? recipe.Rarity : 1;
+            // Level: RequiredTier is a progression gate, reused as item level (pre-v3.8 behavior).
+            int level = recipe.RequiredTier > 0 ? recipe.RequiredTier : 1;
 
-            if (generated == null) return null;
+            var genContext = new ItemGenerationContext
+            {
+                Source = ItemSource.Craft,
+                RecipeId = recipe.RecipeId,
+                PlayerLevel = context.CraftingLevel,
+                CraftingMastery = context.GetMasteryLevel(recipe.RecipeId),
+                BlacksmithLevel = context.BlacksmithLevel,
+                EventModifiers = (IReadOnlyList<EventCraftModifier>)context.ActiveEventModifiers,
+                Luck = context.Luck,
+                ForcedQuality = rarityLevel,
+                FixedLevel = level,
+                EquipmentType = slot,
+                Category = ItemCategory.Equipment
+            };
 
-            // Override with recipe-specific identity (rarity + slot-specific naming)
-            if (!string.IsNullOrEmpty(recipe.DisplayName))
-                generated.Name = recipe.DisplayName;
-
-            return ToInventoryItem(generated);
+            var item = ItemGenerator.CreateDeterministic((int)seed).GenerateEquipmentFromBase(baseEquip, genContext);
+            return item;
         }
 
         /// <summary>
@@ -127,19 +138,5 @@ namespace IdleDefenseSurvival.Crafting
             return null;
         }
 
-        /// <summary>
-        /// Converts EquipmentData -> InventoryItem with proper InstanceId.
-        ///</summary>
-        private static InventoryItem ToInventoryItem(EquipmentData equip)
-        {
-            return new InventoryItem
-            {
-                ItemId = equip.Id,
-                Quantity = 1,
-                Level = equip.BaseLevel,
-                EnhanceLevel = 0,
-                AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-            };
-        }
     }
 }

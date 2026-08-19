@@ -19,6 +19,8 @@ namespace IdleDefenseSurvival.Crafting
         public bool IsCritical;
         public string Source; // "Normal", "Critical", "Bonus", "Mastery", "Event"
         public long AcquiredTimestamp;
+        /// <summary>Rolled instance data (AttributeStats/secondaries/affixes). v3.8 §20.5 — must survive the rebuild chain.</summary>
+        public Dictionary<string, object> CustomData;
 
         public static CraftResultData[] FromInventoryItems(InventoryItem[] items, long expReward = 0)
         {
@@ -35,7 +37,8 @@ namespace IdleDefenseSurvival.Crafting
                     Quality = (int)item.GetRarity(),
                     IsCritical = false, // Would need to track this from roll result
                     Source = "Normal",
-                    AcquiredTimestamp = item.AcquiredTimestamp
+                    AcquiredTimestamp = item.AcquiredTimestamp,
+                    CustomData = item.CustomData != null ? new Dictionary<string, object>(item.CustomData) : null
                 });
             }
             return results.ToArray();

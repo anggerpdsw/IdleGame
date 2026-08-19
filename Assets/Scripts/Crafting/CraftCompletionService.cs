@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Items.Random;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Crafting
@@ -57,8 +59,17 @@ namespace IdleDefenseSurvival.Crafting
             // Phase A: Roll, generate results, persist durable (RewardPendingCommit)
             if (job.Status != CraftJobStatus.RewardPendingCommit)
             {
+                // v3.8 §20.7 — CompletionSeed resolves BEFORE any roll; it seeds both the
+                // craft roll and equipment attribute generation (I-11 determinism).
+                long completionSeed = job.ExecutionSnapshot?.CompletionSeed ?? 0;
+                if (completionSeed == 0 && job.CompletionSeed.HasValue)
+                    completionSeed = job.CompletionSeed.Value;
+                if (completionSeed == 0)
+                    completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
+                job.CompletionSeed = completionSeed;
+
                 var context = _contextBuilder.Build();
-                var rollResult = _rollService.RollCraft(job.RecipeId, context);
+                var rollResult = _rollService.RollCraft(job.RecipeId, context, new SeedRandomProvider((int)completionSeed));
 
                 if (!rollResult.Success || rollResult.Entries.Count == 0)
                 {
@@ -76,16 +87,8 @@ namespace IdleDefenseSurvival.Crafting
                     return;
                 }
 
-                var items = _rewardService.GenerateRewards(rollResult, recipe, context);
+                var items = _rewardService.GenerateRewards(rollResult, recipe, context, completionSeed);
                 job.Results = CraftResultData.FromInventoryItems(items, rollResult.ExpReward);
-
-                // Use snapshot's CompletionSeed if available, else derive from RNG for replayability
-                long completionSeed = job.ExecutionSnapshot?.CompletionSeed ?? 0;
-                if (completionSeed == 0 && job.CompletionSeed.HasValue)
-                    completionSeed = job.CompletionSeed.Value;
-                if (completionSeed == 0)
-                    completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
-                job.CompletionSeed = completionSeed;
 
                 // Phase A: Mark RewardPendingCommit and persist durably (Results + Seed)
                 job.Status = CraftJobStatus.RewardPendingCommit;
@@ -98,7 +101,8 @@ namespace IdleDefenseSurvival.Crafting
                 ItemId = r.ItemId,
                 Quantity = r.Count,
                 Level = r.Level,
-                AcquiredTimestamp = r.AcquiredTimestamp
+                AcquiredTimestamp = r.AcquiredTimestamp,
+                CustomData = r.CustomData != null ? new Dictionary<string, object>(r.CustomData) : null
             }).ToArray();
 
             bool allApplied = true;
@@ -139,7 +143,8 @@ namespace IdleDefenseSurvival.Crafting
                     ItemId = r.ItemId,
                     Quantity = r.Count,
                     Level = r.Level,
-                    AcquiredTimestamp = r.AcquiredTimestamp
+                    AcquiredTimestamp = r.AcquiredTimestamp,
+                    CustomData = r.CustomData != null ? new Dictionary<string, object>(r.CustomData) : null
                 }).ToArray();
                 Result?.Invoke(job.RecipeId, resultItems);
             }

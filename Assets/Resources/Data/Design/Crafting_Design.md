@@ -37,6 +37,14 @@
 > 3. **Recovery executor at startup** (`CraftService.RunTransactionRecovery`): consumes `CraftTransactionJournal.ClassifyReconciliation()` pure decisions. For `Commit` (phase Committed/JobPersisted + Pending ops): execute resource consumption (items via `RemoveItemById`, currency via `TrySpendCurrency`) → mark op `Applied` → if all ops terminal → advance phase to `JobPersisted`. For `Rollback` (phase Prepared/Reserved + Applied ops): refund resources (items via `AddItemInstance`, currency via `AddCurrency`) → mark op `RolledBack` → if all ops `RolledBack` → advance phase to `RolledBack`. Persists after each decision.
 > 4. **Journal phase progression now complete**: `StartCraft` ends at `Committed`; `RunTransactionRecovery` advances `Committed`→`JobPersisted` for pending ops; `CraftCompletionService.Complete` advances `JobPersisted`→`Completed` on full success. I-18 pruning ready (entries reach `Completed`).
 > 5. **Compile + regression tests VERIFIED**: Unity 0 CS errors confirmed. Phase 9 EditMode tests 23/23 green (successful multi-op commit, partial failure, Applied state, pending handling, currency failure, exact removal failure, rollback state, journal persistence, crash/reload recovery, canonical CraftService flow, enqueue-only behavior, legacy overload compat).
+>
+> **v3.8 changes (P0-E Equipment Attribute Generation — DESIGNED):**
+> 1. **Rarity source of truth enforced:** crafted equipment rarity = `CraftRecipeData.Rarity` (1..6). KNOWN BUG: `CraftRewardService.GenerateEquipmentFromBase` reads `recipe.RequiredTier` (CraftRewardService.cs:94) — must be corrected to `recipe.Rarity`.
+> 2. **Attribute enum:** reuse `MainAttribute` (Enumku.cs:20). NO new `EquipmentAttribute`.
+> 3. **Tier config:** central `AttributeRolls` table (MaxRolls/MinValue/MaxValue per rarity 1..6) in `dataConfigCrafting.json`.
+> 4. **Roll service:** `AttributeRollService` — MaxRolls rolls, random MainAttribute + value, aggregate via `Dictionary<MainAttribute,int>`, store `CustomData["AttributeStats"]`.
+> 5. **Rebuild chain:** 3 lossy rebuild points (ToInventoryItem / FromInventoryItems / Complete Phase B) must carry `CustomData` or attributes (and existing secondaries/affixes) die before ApplyReward.
+> 6. **Determinism:** `CompletionSeed` must resolve BEFORE roll (currently after, CraftCompletionService.cs:83-88) to honor I-11.
 
 ---
 
@@ -868,6 +876,125 @@ Assets/Scripts/Items/Tests/CraftExecutionSnapshotTests.cs (NEW — EditMode)
 
 ---
 
+## 20. Equipment Attribute Generation (v3.8)
+
+> **Status:** [DESIGNED] — attribute rolls on crafted equipment. Rarity source of truth: `CraftRecipeData.Rarity`. No random rarity.
+
+### 20.1 Source of Truth
+
+Crafted equipment rarity MUST come from `CraftRecipeData.Rarity` (1..6). No random rarity in the crafting flow.
+
+```text
+Rarity = 1 → Common
+Rarity = 2 → Rare
+Rarity = 3 → Epic
+Rarity = 4 → Legendary
+Rarity = 5 → Mythic
+Rarity = 6 → Divine
+```
+
+**KNOWN BUG [v3.8]:** `CraftRewardService.GenerateEquipmentFromBase` uses `recipe.RequiredTier` for the rarity level (CraftRewardService.cs:94), not `recipe.Rarity`. `RequiredTier` is a gating requirement, NOT the output rarity. Must be corrected to `int rarityLevel = recipe.Rarity;`.
+
+### 20.2 Attribute Enum
+
+Reuse existing `MainAttribute { Constitution, Strength, Intelligence, Dexterity }` (Enumku.cs:20). NO new `EquipmentAttribute` enum.
+
+```text
+MainAttribute.Constitution → CON
+MainAttribute.Strength     → STR
+MainAttribute.Intelligence → INT
+MainAttribute.Dexterity    → DEX
+```
+
+### 20.3 Tier Configuration
+
+Central config. NOT hardcoded in generation logic. Lives in `dataConfigCrafting.json` under `AttributeRolls` (per-rarity key). One source of truth.
+
+| Rarity | MaxRolls | MinValue | MaxValue |
+| -----: | -------: | -------: | -------: |
+|      1 |        1 |        3 |        6 |
+|      2 |        2 |        5 |       10 |
+|      3 |        3 |        8 |       16 |
+|      4 |        4 |       12 |       24 |
+|      5 |        5 |       17 |       34 |
+|      6 |        6 |       25 |       50 |
+
+Runtime lookup: `EquipmentAttributeTierConfig` (Rarity / MaxRolls / MinValue / MaxValue), loaded with `CraftingConfig`.
+
+### 20.4 Roll Algorithm
+
+`AttributeRollService.RollAttributes(Rarity rarity, IRandomProvider rng)` → `AttributeStatEntry[]`.
+
+**Roll count = MaxRolls — number of random rolls, NOT number of unique attributes.** Duplicates allowed on all rarities and aggregated:
+
+```text
+for roll in 1..MaxRolls:
+    attribute = random MainAttribute
+    value     = random MinValue..MaxValue
+
+    if aggregate contains attribute:
+        aggregate[attribute] += value
+    else:
+        aggregate[attribute]  = value
+```
+
+Output: one `AttributeStatEntry` per aggregated attribute (class already defined, ItemData.cs:224). No duplicate entries.
+
+Example (Divine, 6 rolls): `STR+30, STR+40, CON+27, DEX+35, INT+29, STR+25` → `STR+95, CON+27, DEX+35, INT+29`.
+
+### 20.5 Storage & Persistence
+
+- Rolled attributes stored per instance: `InventoryItem.CustomData["AttributeStats"]` = `AttributeStatEntry[]` — same pattern as `CustomData["SecondaryStats"]` / `CustomData["Affixes"]`.
+- `CustomDataConverter` (Save/CustomDataConverter.cs) MUST add case `"AttributeStats"` → `ToObject<AttributeStatEntry[]>()` for typed round-trip. Without it, post-load casts fail.
+
+### 20.6 Integration Points
+
+1. **Rarity fix:** `CraftRewardService.GenerateEquipmentFromBase` — rarity from `recipe.Rarity` (§20.1).
+2. **Pipeline route:** crafted equipment must go through `ItemGenerator`/`EquipmentGenerator.Generate` (which populates `CustomData`), NOT `ItemDatabase.GenerateEquipment` directly. `EquipmentGenerator` gains `AttributeRollService` (injected with the SAME `IRandomProvider` as `StatRollService`), called after secondary stats, storing to `CustomData["AttributeStats"]`.
+3. **Rebuild chain — 3 lossy points MUST carry `CustomData`:**
+   - `CraftRewardService.ToInventoryItem` (CraftRewardService.cs:133)
+   - `CraftResultData.FromInventoryItems` (CraftData.cs:23) — add `CustomData` field
+   - `CraftCompletionService.Complete` Phase B rebuilds (lines 96-102, 137-143)
+   Without this, attribute rolls (and existing secondaries/affixes/sockets) are dropped before `ApplyReward`.
+
+### 20.7 Determinism (I-11)
+
+`CompletionSeed` must be resolved BEFORE the roll and passed into roll + attribute generation (currently resolved after, CraftCompletionService.cs:83-88). Attribute rolls use the same `IRandomProvider`/seed as the rest of generation → identical snapshot + seed ⇒ identical attribute results.
+
+### 20.8 Backward Compatibility
+
+- Legacy saved equipment: `CustomData` absent → null-coalesce to empty → zero attribute bonus. Identical behavior to today. No save migration.
+- Consumers (AttributeModifierManager aggregation) must guard missing `CustomData["AttributeStats"]`, mirroring missing-`Affixes` handling.
+
+### 20.9 Testing (EditMode)
+
+| Rarity | Assert |
+| -----: | ------ |
+|      1 | exactly 1 roll; each value 3..6 |
+|      2 | exactly 2 rolls; each value 5..10; duplicates allowed |
+|      3 | exactly 3 rolls; each value 8..16; duplicates allowed |
+|      4 | exactly 4 rolls; each value 12..24; duplicates allowed |
+|      5 | exactly 5 rolls; each value 17..34; duplicates allowed |
+|      6 | exactly 6 rolls; each value 25..50; duplicates allowed |
+
+Aggregation test: `STR+5, STR+8, STR+6` → single `STR+19` entry.
+
+### 20.10 Files
+
+```
+Assets/Scripts/Items/Generation/AttributeRollService.cs    (NEW)
+Assets/Scripts/Crafting/EquipmentAttributeTierConfig.cs     (NEW — or extend CraftingConfig)
+Assets/Scripts/Items/Generation/EquipmentGenerator.cs       (~ inject AttributeRollService)
+Assets/Scripts/Crafting/CraftRewardService.cs               (~ recipe.Rarity + pipeline route)
+Assets/Scripts/Crafting/CraftData.cs                        (~ CraftResultData.CustomData)
+Assets/Scripts/Crafting/CraftCompletionService.cs           (~ carry CustomData in rebuilds)
+Assets/Scripts/Save/CustomDataConverter.cs                  (~ "AttributeStats" case)
+Assets/Resources/Data/Crafting/dataConfigCrafting.json      (~ AttributeRolls table)
+Assets/Scripts/Items/Generation/Tests/AttributeRollTests.cs (NEW — EditMode)
+```
+
+---
+
 ## Appendix A — Recipe Matrix
 
 11 × 6 = 66 recipes.
@@ -918,6 +1045,7 @@ Per §9. CLI: `Assets/Scripts/Items/CraftRecipeValidationRunner.cs`.
 [DESIGNED] InventoryService.ApplyReward + ActiveTransactionWindow
 [DESIGNED] RewardPendingCommit = 5
 [DESIGNED] Two-phase completion
+[DESIGNED v3.8] Equipment attribute generation (§20) — recipe.Rarity source of truth, AttributeRollService, CustomData["AttributeStats"]
 [DESIGNED] Failed semantics (§12.3)
 ```
 

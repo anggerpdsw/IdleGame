@@ -464,6 +464,11 @@ namespace IdleDefenseSurvival.Controller
             if (_feedbackText != null) _feedbackText.text = success ? "Craft Complete!" : "Craft Failed!";
             _currentJobId = null;
             RefreshControls();
+            if (success)
+            {
+                RebuildMaterials(); // Refresh material counts after consumption
+                RefreshCost();
+            }
         }
 
         private void OnCraftResult(string recipeId, InventoryItem[] results)
