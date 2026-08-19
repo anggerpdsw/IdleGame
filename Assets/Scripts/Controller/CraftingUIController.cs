@@ -111,12 +111,12 @@ namespace IdleDefenseSurvival.Controller
                 Debug.LogError("[CraftingUIController] CraftingManager.Instance is null — scene cannot operate.");
                 return;
             }
-            svc.OnJobStarted += OnJobStartedForList;
-            svc.OnJobProgress += OnJobProgressForList;
+            svc.OnJobStarted      += OnJobStartedForList;
+            svc.OnJobProgress     += OnJobProgressForList;
             svc.OnJobReadyToClaim += OnJobReadyToClaimForList;
-            svc.OnJobClaimed += OnJobClaimedForList;
-            svc.OnJobCancelled += OnJobCancelledForList;
-            svc.OnCraftFailed += OnCraftFailed;
+            svc.OnJobClaimed      += OnJobClaimedForList;
+            svc.OnJobCancelled    += OnJobCancelledForList;
+            svc.OnCraftFailed     += OnCraftFailed;
 
             if (_plusButton != null) _plusButton.onClick.AddListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.AddListener(OnMinusClicked);
@@ -280,12 +280,13 @@ namespace IdleDefenseSurvival.Controller
 
         private Sprite ResolveRecipeIcon(CraftRecipeData recipe)
         {
-            if (recipe.GuaranteedResult == null || string.IsNullOrEmpty(recipe.GuaranteedResult.ItemId)) return null;
-            if (ItemDatabase.Instance == null) return null;
-            var itemData = ItemDatabase.Instance.GetItem(recipe.GuaranteedResult.ItemId);
-            Debug.LogWarning($"[CraftingUIController] itemData: {itemData}");
-            if (itemData == null || string.IsNullOrEmpty(itemData.IconKey)) return null;
-            return ItemResources.GetItemSource(itemData.IconKey);
+            if (recipe == null || ItemDatabase.Instance == null) return null;
+
+            // Deterministic equipment: icon from base template for the equipment slot
+            string baseId = $"equip_{recipe.EquipmentType.ToString().ToLower()}_base";
+            var baseEquip = ItemDatabase.Instance.GetEquipment(baseId);
+            if (baseEquip == null || string.IsNullOrEmpty(baseEquip.IconKey)) return null;
+            return ItemResources.GetItemSource(baseEquip.IconKey);
         }
 
         public void OnRecipeSelected(string recipeId)
@@ -569,11 +570,15 @@ namespace IdleDefenseSurvival.Controller
         private void OnClaimJob(string jobId)
         {
             var svc = CraftingManager.Instance;
-            if (svc != null)
+            if (svc == null)
             {
-                svc.ClaimJob(jobId);
-                // Job list refreshed via OnJobClaimed event
+                Debug.LogError("[CraftingUI] CraftingManager.Instance is null.");
+                return;
             }
+
+            // Job list refreshed via OnJobClaimed event
+            Debug.Log($"[CraftingUIController] Claim requested | JobId={jobId}");
+            svc.ClaimJob(jobId);
         }
 
         private void ClearJobEntries()

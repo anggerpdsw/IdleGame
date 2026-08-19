@@ -149,9 +149,10 @@ namespace IdleDefenseSurvival.Crafting
 
         public IReadOnlyList<CraftRecipeData> GetRecipesForItem(string itemId)
         {
+            // Deterministic equipment: recipe produces equipment of its EquipmentType
+            // All recipes for a slot produce items of that slot type
             return _allRecipes.Values
-                .Where(r => r.PossibleResults?.Any(res => res.ItemId == itemId) ?? false
-                         || r.GuaranteedResult?.ItemId == itemId)
+                .Where(r => r != null && r.EquipmentType != EquipmentType.None)
                 .ToList();
         }
 

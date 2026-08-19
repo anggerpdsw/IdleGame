@@ -49,11 +49,8 @@ namespace IdleDefenseSurvival.Crafting
         public float TimePerAdditionalUnit = 0f; // Extra time per unit beyond first
 
         // ============ Results ============
-        public CraftResult[] PossibleResults; // For RNG crafting
-        public CraftResult GuaranteedResult;  // Always granted (in addition to RNG)
-        public bool HasRandomResults => PossibleResults != null && PossibleResults.Length > 0;
-        public bool HasGuaranteedResult => GuaranteedResult != null;
-        public bool IsDeterministic => !HasRandomResults;
+        // NOTE: Deterministic equipment crafting - no RNG result arrays.
+        // Reward generated from recipe metadata (Rarity, RequiredTier, EquipmentType).
 
         // ============ Experience ============
         public long BaseExpReward = 0;
@@ -90,9 +87,8 @@ namespace IdleDefenseSurvival.Crafting
             if (string.IsNullOrEmpty(RecipeId)) return false;
             if (string.IsNullOrEmpty(DisplayName)) return false;
             if (Ingredients == null || Ingredients.Length == 0) return false;
-            bool hasPossibleResults = PossibleResults != null && PossibleResults.Length > 0;
-            bool hasGuaranteedResult = GuaranteedResult != null && !string.IsNullOrEmpty(GuaranteedResult.ItemId);
-            return hasPossibleResults || hasGuaranteedResult;
+            // Deterministic equipment always produces an item via recipe metadata.
+            return true;
         }
 
         public static CraftRecipeData FromGeneration(CraftRecipeData source)
@@ -125,9 +121,7 @@ namespace IdleDefenseSurvival.Crafting
                 BaseCraftTime = source.BaseCraftTime,
                 TimePerAdditionalUnit = source.TimePerAdditionalUnit,
 
-                // Results
-                PossibleResults = source.PossibleResults,
-                GuaranteedResult = source.GuaranteedResult,
+                // Results - omitted (deterministic equipment generation)
 
                 // Experience
                 BaseExpReward = source.BaseExpReward,

@@ -107,89 +107,7 @@ namespace IdleDefenseSurvival.Crafting
         }
     }
 
-    /// <summary>
-    /// Stage 3: Roll base results from recipe.
-    /// </summary>
-    public class BaseRewardStage : CraftPipelineStageBase
-    {
-        public override string StageName => "BaseReward";
-        public override int Order => 100;
-
-        public override void Execute(CraftPipelineContext ctx)
-        {
-            if (!ctx.Success) return;
-            if (ctx.Recipe.PossibleResults == null || ctx.Recipe.PossibleResults.Length == 0) return;
-
-            var result = RollBaseResult(ctx);
-            if (result != null)
-            {
-                ctx.Entries.Add(result);
-            }
-        }
-
-        private CraftResultEntry RollBaseResult(CraftPipelineContext ctx)
-        {
-            var results = ctx.Recipe.PossibleResults;
-            float totalWeight = results.Sum(r => r.Weight);
-            float roll = ctx.Rng.Range(0f, totalWeight);
-            float accumulated = 0f;
-
-            foreach (var recipeResult in results)
-            {
-                accumulated += recipeResult.Weight;
-                if (roll <= accumulated)
-                {
-                    int count = ctx.Rng.Range(recipeResult.MinCount, recipeResult.MaxCount + 1);
-                    int quality = ctx.Rng.Range(recipeResult.MinQuality, recipeResult.MaxQuality + 1);
-
-                    // Only create ONE entry with the total count (not multiple entries)
-                    return new CraftResultEntry
-                    {
-                        ItemId = recipeResult.ItemId,
-                        Count = count,
-                        Quality = quality,
-                        Source = CraftRewardSource.Normal.ToString(),
-                        IsCritical = false,
-                        FixedLevel = recipeResult.FixedLevel,
-                        FixedEnhance = recipeResult.FixedEnhance
-                    };
-                }
-            }
-
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// Stage 4: Apply guaranteed results.
-    /// </summary>
-    public class GuaranteedStage : CraftPipelineStageBase
-    {
-        public override string StageName => "GuaranteedReward";
-        public override int Order => 150;
-
-        public override void Execute(CraftPipelineContext ctx)
-        {
-            if (!ctx.Success) return;
-            if (ctx.Recipe.GuaranteedResult == null) return;
-
-            var gr = ctx.Recipe.GuaranteedResult;
-            int count = ctx.Rng.Range(gr.MinCount, gr.MaxCount + 1);
-            int quality = ctx.Rng.Range(gr.MinQuality, gr.MaxQuality + 1);
-
-            ctx.Entries.Add(new CraftResultEntry
-            {
-                ItemId = gr.ItemId,
-                Count = count,
-                Quality = quality,
-                Source = CraftRewardSource.Guaranteed.ToString(),
-                IsCritical = false,
-                FixedLevel = gr.FixedLevel,
-                FixedEnhance = gr.FixedEnhance
-            });
-        }
-    }
-
+    
     /// <summary>
     /// Stage 5: Apply mastery bonuses.
     /// </summary>
@@ -217,21 +135,17 @@ namespace IdleDefenseSurvival.Crafting
 
             if (ctx.Rng.ChancePercent(bonusChance))
             {
-                // Grant extra item of same type as main result
-                var mainResult = ctx.Recipe.PossibleResults?.FirstOrDefault(r => r.IsMainResult)
-                              ?? ctx.Recipe.PossibleResults?.FirstOrDefault();
-                if (mainResult != null)
+                // Grant extra equipment of same slot as the recipe
+                ctx.Entries.Add(new CraftResultEntry
                 {
-                    int quality = ctx.Rng.Range(mainResult.MinQuality, mainResult.MaxQuality + 1);
-                    ctx.Entries.Add(new CraftResultEntry
-                    {
-                        ItemId = mainResult.ItemId,
-                        Count = 1,
-                        Quality = quality,
-                        Source = CraftRewardSource.Mastery.ToString(),
-                        IsCritical = false
-                    });
-                }
+                    ItemId = "mastery_extra", // Marker - actual item generated in CraftRewardService
+                    Count = 1,
+                    Quality = ctx.Recipe.Rarity,
+                    Source = CraftRewardSource.Mastery.ToString(),
+                    IsCritical = false,
+                    FixedLevel = ctx.Recipe.RequiredTier,
+                    FixedEnhance = 0
+                });
             }
         }
     }
@@ -266,8 +180,36 @@ namespace IdleDefenseSurvival.Crafting
     }
 
     /// <summary>
+    /// Stage 3: Add base equipment result (deterministic - no RNG).
+    /// Equipment is generated from recipe metadata (Rarity, RequiredTier, EquipmentType).
+    /// </summary>
+    public class BaseEquipmentStage : CraftPipelineStageBase
+    {
+        public override string StageName => "BaseEquipment";
+        public override int Order => 100;
+
+        public override void Execute(CraftPipelineContext ctx)
+        {
+            if (!ctx.Success) return;
+
+            // Deterministic: one equipment item per craft (count comes from job, not recipe)
+            // The actual item generation happens in CraftRewardService using recipe metadata
+            ctx.Entries.Add(new CraftResultEntry
+            {
+                ItemId = "crafted_equipment", // Placeholder - resolved in CraftRewardService
+                Count = 1,
+                Quality = ctx.Recipe.Rarity, // Recipe rarity is the quality tier
+                Source = CraftRewardSource.Normal.ToString(),
+                IsCritical = false,
+                FixedLevel = ctx.Recipe.RequiredTier,
+                FixedEnhance = 0
+            });
+        }
+    }
+
+    /// <summary>
     /// Stage 7: Apply critical craft effects.
-    /// Runs LAST so it can multiply ALL accumulated results (base + guaranteed + mastery + event).
+    /// Runs LAST so it can multiply ALL accumulated results (base + mastery + event).
     /// </summary>
     public class CriticalStage : CraftPipelineStageBase
     {
@@ -363,18 +305,17 @@ namespace IdleDefenseSurvival.Crafting
                         break;
 
                     case CriticalType.FreeExtraItem:
-                        if (ctx.Recipe.PossibleResults != null && ctx.Recipe.PossibleResults.Length > 0)
+                        // Grant an extra equipment of same slot/rarity
+                        criticalEntry = new CraftResultEntry
                         {
-                            var extraResult = ctx.Recipe.PossibleResults[ctx.Rng.Range(0, ctx.Recipe.PossibleResults.Length)];
-                            criticalEntry = new CraftResultEntry
-                            {
-                                ItemId = extraResult.ItemId,
-                                Count = ctx.Rng.Range(extraResult.MinCount, extraResult.MaxCount + 1),
-                                Quality = ctx.Rng.Range(extraResult.MinQuality, extraResult.MaxQuality + 1),
-                                Source = CraftRewardSource.Critical.ToString() + "_Extra",
-                                IsCritical = true
-                            };
-                        }
+                            ItemId = "crafted_equipment",
+                            Count = 1,
+                            Quality = ctx.Recipe.Rarity,
+                            Source = CraftRewardSource.Critical.ToString() + "_Extra",
+                            IsCritical = true,
+                            FixedLevel = ctx.Recipe.RequiredTier,
+                            FixedEnhance = 0
+                        };
                         break;
 
                     case CriticalType.Masterpiece:
@@ -538,8 +479,7 @@ namespace IdleDefenseSurvival.Crafting
             // Register stages in order
             RegisterStage(new ValidationStage());
             RegisterStage(new SuccessStage(_config));
-            RegisterStage(new BaseRewardStage());
-            RegisterStage(new GuaranteedStage());
+            RegisterStage(new BaseEquipmentStage());
             RegisterStage(new MasteryStage(_config));
             RegisterStage(new EventStage());
             RegisterStage(new CriticalStage(_config));
@@ -590,10 +530,7 @@ namespace IdleDefenseSurvival.Crafting
                 }
 
                 // Early exit on failure
-                if (!pipelineCtx.Success && stage.Order >= 10)
-                {
-                    break;
-                }
+                if (!pipelineCtx.Success && stage.Order >= 10) break;
             }
 
             return new CraftRollResult
