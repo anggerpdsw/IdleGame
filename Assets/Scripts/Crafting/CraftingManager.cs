@@ -38,12 +38,12 @@ namespace IdleDefenseSurvival.Manager
         #endregion
 
         #region Events
-        public event Action<string, bool> OnCraftCompleted;      // recipeId, success
-        public event Action<string, InventoryItem[]> OnCraftResult; // recipeId, result items
-        public event Action<string> OnCraftStarted;              // jobId
-        public event Action<string, float> OnCraftProgress;      // jobId, progress (0-1)
-        public event Action<string, string> OnCraftFailed;       // jobId, reason
-        public event Action<string> OnCraftCancelled;            // jobId
+        public event Action<string> OnJobStarted;              // jobId (crafting began)
+        public event Action<string, float> OnJobProgress;      // jobId, progress (0-1)
+        public event Action<string> OnJobReadyToClaim;         // jobId (timer finished)
+        public event Action<string, InventoryItem[]> OnJobClaimed; // jobId, result items
+        public event Action<string> OnJobCancelled;            // jobId
+        public event Action<string, string> OnCraftFailed;     // jobId, reason
         #endregion
 
         #region Services
@@ -90,15 +90,18 @@ namespace IdleDefenseSurvival.Manager
                 _queueService, _repository, _contextBuilder, _rollService, _rewardService, inventory, _saveManager);
 
             // Subscribe to queue events
-            _queueService.OnJobStarted += id => OnCraftStarted?.Invoke(id);
-            _queueService.OnJobProgress += (id, p) => OnCraftProgress?.Invoke(id, p);
-            _queueService.OnJobCompleted += jobId => _completionService.Complete(jobId);
-            _queueService.OnJobCancelled += id => OnCraftCancelled?.Invoke(id);
+            _queueService.OnJobStarted += id => OnJobStarted?.Invoke(id);
+            _queueService.OnJobProgress += (id, p) => OnJobProgress?.Invoke(id, p);
+            _queueService.OnJobReadyToClaim += id => OnJobReadyToClaim?.Invoke(id);
+            _queueService.OnJobCancelled += id => OnJobCancelled?.Invoke(id);
 
-            // Forward completion results
-            _completionService.Completed += (recipeId, success) => OnCraftCompleted?.Invoke(recipeId, success);
+            // Forward completion service events
+            _completionService.Claimed += (jobId, success) =>
+            {
+                if (success) OnJobClaimed?.Invoke(jobId, Array.Empty<InventoryItem>()); // items in Result event
+            };
             _completionService.Failed += (jobId, reason) => OnCraftFailed?.Invoke(jobId, reason);
-            _completionService.Result += (recipeId, items) => OnCraftResult?.Invoke(recipeId, items);
+            _completionService.Result += (jobId, recipeId, items) => OnJobClaimed?.Invoke(jobId, items);
 
             // Load recipes from equipment data
             _repository.Initialize();
@@ -108,7 +111,7 @@ namespace IdleDefenseSurvival.Manager
         #region Unity Lifecycle
         private void Update()
         {
-            // Update craft queue (handles progress, completion, starting queued jobs)
+            // Update craft queue (handles progress, ready-to-claim, starting queued jobs)
             _queueService?.Update();
         }
         #endregion
@@ -158,7 +161,7 @@ namespace IdleDefenseSurvival.Manager
             // 2. Generate completion seed for deterministic results
             long completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
 
-            // 3. Create Job (minimal - only runtime state)
+            // 3. Create Job (queued - EndTimeUtc = 0)
             long baseTicks = (long)(recipe.BaseCraftTime * TimeSpan.TicksPerSecond);
             long additionalTicks = (long)(recipe.TimePerAdditionalUnit * TimeSpan.TicksPerSecond * (count - 1));
             long totalDurationTicks = baseTicks + additionalTicks;
@@ -204,7 +207,7 @@ namespace IdleDefenseSurvival.Manager
                 return null;
             }
 
-            // 7. Try to start job from queue
+            // 7. Try to start job from queue (if slot available)
             _queueService.TryStartNextJob();
 
             return job.JobId;
@@ -233,7 +236,7 @@ namespace IdleDefenseSurvival.Manager
             var job = _queueService.GetJob(jobId);
             if (job == null) return false;
 
-            bool wasActive = job.IsActive;
+            bool wasActive = job.IsCrafting;
             bool success = _queueService.CancelJob(jobId, policy);
 
             if (success && wasActive)
@@ -262,7 +265,7 @@ namespace IdleDefenseSurvival.Manager
         }
 
         /// <summary>
-        /// Clears all completed jobs from the queue.
+        /// Clears all ready-to-claim jobs from the queue.
         /// </summary>
         public void ClearCompletedJobs()
         {
@@ -270,18 +273,11 @@ namespace IdleDefenseSurvival.Manager
         }
 
         /// <summary>
-        /// Claims a completed job, removing it from the queue and triggering save.
+        /// Claims a ready-to-claim job: generates deterministic reward, adds to inventory, removes job.
         /// </summary>
         public void ClaimJob(string jobId)
         {
-            var queue = _queueService;
-            if (queue == null) return;
-
-            bool removed = queue.RemoveJob(jobId);
-            if (removed)
-            {
-                _persistenceService?.CreateSaveData();
-            }
+            _completionService?.ClaimJob(jobId);
         }
         #endregion
 
@@ -343,7 +339,7 @@ namespace IdleDefenseSurvival.Manager
         /// </summary>
         public IReadOnlyList<CraftJob> GetActiveJobs() => _queueService?.GetActiveJobs() ?? Array.Empty<CraftJob>();
         public IReadOnlyList<CraftJob> GetPendingJobs() => _queueService?.GetPendingJobs() ?? Array.Empty<CraftJob>();
-        public IReadOnlyList<CraftJob> GetCompletedJobs() => _queueService?.GetCompletedJobs() ?? Array.Empty<CraftJob>();
+        public IReadOnlyList<CraftJob> GetReadyToClaimJobs() => _queueService?.GetReadyToClaimJobs() ?? Array.Empty<CraftJob>();
         public IReadOnlyList<CraftJob> GetAllJobs() => _queueService?.GetAllJobs() ?? Array.Empty<CraftJob>();
         #endregion
 

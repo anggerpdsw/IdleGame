@@ -22,14 +22,12 @@ namespace IdleDefenseSurvival.Crafting
         }
 
         /// <summary>
-        /// Restores the queue from saved state, including offline progress.
+        /// Restores the queue from saved state.
+        /// Offline progress is automatic via EndTimeUtc comparison (no manual calculation needed).
         /// </summary>
         public void RestoreSaveData(CraftQueueSaveData data)
         {
             _queueService.LoadFromSaveData(data);
-
-            // Calculate offline progress after load
-            _queueService.CalculateOfflineProgress();
         }
     }
 }

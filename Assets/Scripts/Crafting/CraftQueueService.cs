@@ -7,40 +7,39 @@ namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Manages the queue of craft jobs with unique IDs, persistence, and offline progress.
-    /// Supports batch crafting, multiple concurrent jobs, and priority queue.
+    /// State derived from EndTimeUtc: Queued (EndTimeUtc=0), Crafting (EndTimeUtc > UtcNow), ReadyToClaim (EndTimeUtc <= UtcNow).
+    /// No mutable _activeJobCount counter; computed from jobs.
     /// </summary>
     public sealed class CraftQueueService
     {
         private readonly Dictionary<string, CraftJob> _jobs = new(); // JobId -> CraftJob
-        private readonly Queue<string> _jobQueue = new();           // Order of jobs (for priority)
+        private readonly Queue<string> _jobQueue = new();           // FIFO order for pending jobs
         private int _maxConcurrentJobs = 1;                          // Can be upgraded
-        private int _activeJobCount = 0;
 
         // Events
-        public event Action<string> OnJobStarted;       // jobId
+        public event Action<string> OnJobStarted;       // jobId (job began crafting)
         public event Action<string, float> OnJobProgress; // jobId, progress (0-1)
-        public event Action<string> OnJobCompleted;     // jobId (results rolled by CraftService)
+        public event Action<string> OnJobReadyToClaim;  // jobId (timer finished, ready for claim)
         public event Action<string> OnJobCancelled;     // jobId
-        public event Action<string, CraftJobStatus> OnJobStatusChanged; // jobId, new status
+        public event Action<string, CraftJobStatus> OnJobStatusChanged; // jobId, new status (computed)
 
         // ============ Properties ============
         public IReadOnlyDictionary<string, CraftJob> Jobs => _jobs;
-        public IReadOnlyList<CraftJob> ActiveJobs => _jobs.Values.Where(j => j.IsActive).ToList();
-        public IReadOnlyList<CraftJob> PendingJobs => _jobs.Values.Where(j => j.IsPending).OrderBy(j => j.StartTimeUtc).ToList();
-        public IReadOnlyList<CraftJob> CompletedJobs => _jobs.Values.Where(j => j.IsComplete).ToList();
+        public IReadOnlyList<CraftJob> ActiveJobs => _jobs.Values.Where(j => j.IsCrafting).ToList();
+        public IReadOnlyList<CraftJob> PendingJobs => _jobs.Values.Where(j => j.IsQueued).OrderBy(j => j.EndTimeUtc).ToList();
+        public IReadOnlyList<CraftJob> ReadyToClaimJobs => _jobs.Values.Where(j => j.IsReadyToClaim).ToList();
         public int MaxConcurrentJobs => _maxConcurrentJobs;
-        public int ActiveJobCount => _activeJobCount;
+        public int ActiveJobCount => _jobs.Values.Count(j => j.IsCrafting);
+        public bool HasAvailableSlot => ActiveJobCount < _maxConcurrentJobs;
 
         public CraftQueueService() { }
 
         // ============ Public API ============
 
         /// <summary>
-        /// Strict enqueue-only API (P0-C). Inserts a pre-built <see cref="CraftJob"/> into the queue state.
-        /// Caller is responsible for: building the job, journal append, journal checkpoint, and lifecycle.
-        /// Does NOT call <see cref="TryStartNextJob"/> — that transition is orchestrated by caller.
-        ///</summary>
-        /// <returns>true if enqueued; false if job is null, JobId invalid/empty, or JobId already present</returns>
+        /// Enqueues a pre-built CraftJob. Job starts queued (EndTimeUtc=0).
+        /// Caller must call TryStartNextJob or ensure slot available.
+        /// </summary>
         public bool EnqueueJob(CraftJob job)
         {
             if (job == null) return false;
@@ -53,20 +52,21 @@ namespace IdleDefenseSurvival.Crafting
 
         public void Update()
         {
-            // Update active jobs progress
-            foreach (var job in _jobs.Values.Where(j => j.IsActive))
+            // Fire progress for crafting jobs
+            foreach (var job in _jobs.Values.Where(j => j.IsCrafting))
             {
                 float progress = job.Progress;
                 OnJobProgress?.Invoke(job.JobId, progress);
-
-                if (progress >= 1f)
-                {
-                    CompleteJob(job.JobId);
-                }
             }
 
-            // Try to start queued jobs
-            while (_activeJobCount < _maxConcurrentJobs && _jobQueue.Count > 0)
+            // Fire ReadyToClaim event once per job that just became ready
+            foreach (var job in _jobs.Values.Where(j => j.IsReadyToClaim))
+            {
+                OnJobReadyToClaim?.Invoke(job.JobId);
+            }
+
+            // Try to start queued jobs while slots available
+            while (HasAvailableSlot && _jobQueue.Count > 0)
             {
                 TryStartNextJob();
             }
@@ -80,7 +80,7 @@ namespace IdleDefenseSurvival.Crafting
 
         public IReadOnlyList<CraftJob> GetActiveJobs() => ActiveJobs;
         public IReadOnlyList<CraftJob> GetPendingJobs() => PendingJobs;
-        public IReadOnlyList<CraftJob> GetCompletedJobs() => CompletedJobs;
+        public IReadOnlyList<CraftJob> GetReadyToClaimJobs() => ReadyToClaimJobs;
         public IReadOnlyList<CraftJob> GetAllJobs() => _jobs.Values.ToList();
 
         public float GetJobProgress(string jobId)
@@ -101,11 +101,18 @@ namespace IdleDefenseSurvival.Crafting
         {
             if (!_jobs.TryGetValue(jobId, out var job)) return false;
 
-            if (job.IsComplete) return false; // Can't cancel completed
+            if (job.IsReadyToClaim) return false; // Can't cancel completed jobs - must claim
 
+            bool wasActive = job.IsCrafting;
             string reason = $"Cancelled (policy: {policy})";
-            job.MarkCancelled(reason);
-            _activeJobCount = Math.Max(0, _activeJobCount - 1);
+            _jobs.Remove(jobId); // Remove entirely
+
+            if (wasActive)
+            {
+                // Active count computed dynamically, no manual decrement needed
+            }
+
+            OnJobStatusChanged?.Invoke(jobId, CraftJobStatus.Cancelled);
             OnJobCancelled?.Invoke(jobId);
 
             // Refund handled by CraftService using policy
@@ -114,8 +121,8 @@ namespace IdleDefenseSurvival.Crafting
 
         public void ClearCompletedJobs()
         {
-            var completed = _jobs.Values.Where(j => j.IsComplete).Select(j => j.JobId).ToList();
-            foreach (var id in completed)
+            var readyToClaim = _jobs.Values.Where(j => j.IsReadyToClaim).Select(j => j.JobId).ToList();
+            foreach (var id in readyToClaim)
             {
                 _jobs.Remove(id);
             }
@@ -124,42 +131,15 @@ namespace IdleDefenseSurvival.Crafting
         public bool RemoveJob(string jobId)
         {
             if (!_jobs.TryGetValue(jobId, out var job)) return false;
-            if (job.Status != CraftJobStatus.Complete) return false;
+            if (!job.IsReadyToClaim) return false; // Only removable when ready to claim
 
             _jobs.Remove(jobId);
-            RebuildQueue();
             return true;
-        }
-
-        private void RebuildQueue()
-        {
-            _jobQueue.Clear();
-            foreach (var job in _jobs.Values.Where(j => j.Status == CraftJobStatus.Queued || j.Status == CraftJobStatus.Crafting)
-                .OrderBy(j => j.StartTimeUtc))
-            {
-                _jobQueue.Enqueue(job.JobId);
-            }
         }
 
         public void SetMaxConcurrentJobs(int max)
         {
             _maxConcurrentJobs = Math.Max(1, max);
-        }
-
-        // ============ Offline Progress ============
-        public void CalculateOfflineProgress()
-        {
-            var now = DateTime.UtcNow.Ticks;
-            foreach (var job in _jobs.Values.Where(j => j.Status == CraftJobStatus.Crafting))
-            {
-                long elapsed = now - job.StartTimeUtc;
-                if (elapsed >= job.DurationTicks)
-                {
-                    // Job would have completed while offline
-                    CompleteJob(job.JobId);
-                }
-                // Progress events will fire on next Update()
-            }
         }
 
         // ============ Persistence ============
@@ -172,14 +152,9 @@ namespace IdleDefenseSurvival.Crafting
                     JobId = j.JobId,
                     RecipeId = j.RecipeId,
                     RecipeVersion = j.RecipeVersion,
-                    StartTimeUtc = j.StartTimeUtc,
                     EndTimeUtc = j.EndTimeUtc,
                     DurationTicks = j.DurationTicks,
                     Count = j.Count,
-                    CompletedCount = j.CompletedCount,
-                    Status = j.Status,
-                    Results = j.Results,
-                    FailureReason = j.FailureReason,
                     CompletionSeed = j.CompletionSeed
                 }).ToList(),
                 MaxConcurrentJobs = _maxConcurrentJobs
@@ -190,14 +165,11 @@ namespace IdleDefenseSurvival.Crafting
         {
             _jobs.Clear();
             _jobQueue.Clear();
-            _activeJobCount = 0;
 
             if (data == null || data.Jobs == null) return;
 
             foreach (var jobData in data.Jobs)
             {
-                // Handle legacy save migration: new format has RecipeVersion and CompletionSeed directly
-                // Legacy format has ExecutionSnapshot and IngredientsSnapshot
                 int recipeVersion = jobData.RecipeVersion > 0 ? jobData.RecipeVersion : 1;
                 long completionSeed = jobData.CompletionSeed;
 
@@ -207,74 +179,68 @@ namespace IdleDefenseSurvival.Crafting
                     RecipeId = jobData.RecipeId,
                     RecipeVersion = recipeVersion,
                     CompletionSeed = completionSeed,
-                    StartTimeUtc = jobData.StartTimeUtc,
                     EndTimeUtc = jobData.EndTimeUtc,
                     DurationTicks = jobData.DurationTicks,
-                    Count = jobData.Count,
-                    CompletedCount = jobData.CompletedCount,
-                    Status = jobData.Status,
-                    Results = jobData.Results,
-                    FailureReason = jobData.FailureReason
+                    Count = jobData.Count
                 };
                 _jobs[job.JobId] = job;
 
-                // Re-queue active/pending jobs
-                if (job.Status == CraftJobStatus.Crafting || job.Status == CraftJobStatus.Queued)
+                // Re-queue pending jobs (EndTimeUtc == 0)
+                if (job.IsQueued)
                 {
                     _jobQueue.Enqueue(job.JobId);
-                    if (job.Status == CraftJobStatus.Crafting)
-                        _activeJobCount++;
                 }
+                // Active/ReadyToClaim jobs don't need queue entry
             }
 
             _maxConcurrentJobs = data.MaxConcurrentJobs > 0 ? data.MaxConcurrentJobs : 1;
 
-            Debug.Log($"[CraftQueue] Loaded {_jobs.Count} jobs, {_activeJobCount} active, queue: {_jobQueue.Count}");
+            // Fire events for already-active/ready jobs so UI can reflect them immediately
+            foreach (var job in _jobs.Values)
+            {
+                if (job.IsCrafting)
+                {
+                    OnJobStarted?.Invoke(job.JobId);
+                }
+                else if (job.IsReadyToClaim)
+                {
+                    OnJobReadyToClaim?.Invoke(job.JobId);
+                }
+            }
+
+            Debug.Log($"[CraftQueue] Loaded {_jobs.Count} jobs, {ActiveJobCount} active, {ReadyToClaimJobs.Count} ready, queue: {_jobQueue.Count}");
         }
 
         // ============ Private Methods ============
         public void TryStartNextJob()
         {
-            if (_activeJobCount >= _maxConcurrentJobs) return;
+            if (!HasAvailableSlot) return;
             if (_jobQueue.Count == 0) return;
 
             if (!_jobQueue.TryPeek(out string jobId)) return;
 
             if (_jobs.TryGetValue(jobId, out var job))
             {
-                if (job.Status == CraftJobStatus.Queued)
+                if (job.IsQueued)
                 {
-                    _jobQueue.Dequeue(); // Only remove if we are starting it
-                    job.MarkCrafting();
-                    _activeJobCount++;
+                    _jobQueue.Dequeue();
+                    job.Start(); // Sets EndTimeUtc = now + DurationTicks
+
+                    OnJobStatusChanged?.Invoke(jobId, job.Status);
                     OnJobStarted?.Invoke(jobId);
                 }
                 else
                 {
-                    // Job in queue is not in a startable state, remove it to prevent blocking
+                    // Job in queue is not queued, remove it to prevent blocking
                     _jobQueue.Dequeue();
-                    Debug.LogWarning($"[CraftQueue] Removed invalid job {jobId} from queue with status {job.Status}.");
+                    Debug.LogWarning($"[CraftQueue] Removed invalid job {jobId} from queue (not queued).");
                 }
             }
             else
             {
-                // Job ID in queue doesn't exist in jobs dictionary, remove it
                 _jobQueue.Dequeue();
                 Debug.LogWarning($"[CraftQueue] Removed stale job ID {jobId} from queue.");
             }
-        }
-
-        private void CompleteJob(string jobId)
-        {
-            if (!_jobs.TryGetValue(jobId, out var job)) return;
-            if (job.IsComplete) return; // Already completed
-
-            _activeJobCount = Math.Max(0, _activeJobCount - 1);
-            job.MarkComplete(null); // Results set by CraftService after roll
-            OnJobCompleted?.Invoke(jobId);
-
-            // Try to start next queued job
-            TryStartNextJob();
         }
     }
 
@@ -283,11 +249,11 @@ namespace IdleDefenseSurvival.Crafting
     /// </summary>
     public enum RefundPolicy
     {
-        None = 0,           // No refund
-        Full = 1,           // Full refund always
-        ProgressBased = 2,  // Refund based on progress (1 - progress)
-        HalfAfterHalf = 3,  // Full refund before 50%, 50% refund after 50%, none after 90%
-        Custom = 4          // Custom policy (configured per recipe)
+        None = 0,
+        Full = 1,
+        ProgressBased = 2,
+        HalfAfterHalf = 3,
+        Custom = 4
     }
 
     /// <summary>
@@ -300,4 +266,19 @@ namespace IdleDefenseSurvival.Crafting
         public int MaxConcurrentJobs = 1;
     }
 
+    /// <summary>
+    /// Simplified save data for a single job.
+    /// Only persists: JobId, RecipeId, RecipeVersion, CompletionSeed, EndTimeUtc, DurationTicks, Count.
+    /// </summary>
+    [Serializable]
+    public class CraftJobSaveData
+    {
+        public string JobId;
+        public string RecipeId;
+        public int RecipeVersion = 1;
+        public long EndTimeUtc;
+        public long DurationTicks;
+        public int Count = 1;
+        public long CompletionSeed;
+    }
 }

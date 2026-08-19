@@ -44,36 +44,6 @@ namespace IdleDefenseSurvival.Crafting
             return results.ToArray();
         }
     }
-    
-    /// <summary>
-    /// Persisted CraftJob representation. Survives save/load.
-    /// Minimal schema: only runtime state persisted. Recipe data resolved from RecipeId at runtime.
-    ///</summary>
-    [Serializable]
-    public class CraftJobSaveData
-    {
-        // ============ Identity ============
-        public string JobId;
-        public string RecipeId;
-        public int RecipeVersion = 1;
-
-        // ============ Deterministic Completion ============
-        public long CompletionSeed;
-
-        // ============ Timing ============
-        public long StartTimeUtc;
-        public long EndTimeUtc;
-        public long DurationTicks;
-
-        // ============ Quantity & Status ============
-        public int Count;
-        public int CompletedCount;
-        public CraftJobStatus Status;
-
-        // ============ Result ============
-        public CraftResultData[] Results;
-        public string FailureReason;
-    }
 
     /// <summary>
     /// Per-resource scaled cost entry. Count = per-unit * jobCount.

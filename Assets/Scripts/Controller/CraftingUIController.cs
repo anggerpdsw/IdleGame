@@ -61,7 +61,6 @@ namespace IdleDefenseSurvival.Controller
 
         private string _selectedRecipeId;
         private int _quantity = 1;
-        private string _currentJobId;
         private EquipmentType _currentCategoryFilter = EquipmentType.None; // None = All
         private readonly List<CraftingRecipeEntry> _entries = new();
         private readonly List<GameObject> _materialRows = new();
@@ -112,16 +111,12 @@ namespace IdleDefenseSurvival.Controller
                 Debug.LogError("[CraftingUIController] CraftingManager.Instance is null — scene cannot operate.");
                 return;
             }
-            svc.OnCraftCompleted += OnCraftCompleted;
+            svc.OnJobStarted += OnJobStartedForList;
+            svc.OnJobProgress += OnJobProgressForList;
+            svc.OnJobReadyToClaim += OnJobReadyToClaimForList;
+            svc.OnJobClaimed += OnJobClaimedForList;
+            svc.OnJobCancelled += OnJobCancelledForList;
             svc.OnCraftFailed += OnCraftFailed;
-            svc.OnCraftCancelled += OnCraftCancelled;
-
-            var queue = svc.GetQueueService();
-            if (queue != null)
-            {
-                queue.OnJobStatusChanged += OnJobStatusChanged;
-                queue.OnJobCompleted += OnJobCompletedForList;
-            }
 
             if (_plusButton != null) _plusButton.onClick.AddListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.AddListener(OnMinusClicked);
@@ -186,16 +181,12 @@ namespace IdleDefenseSurvival.Controller
         {
             var svc = CraftingManager.Instance;
             if (svc == null) return;
-            svc.OnCraftCompleted -= OnCraftCompleted;
+            svc.OnJobStarted -= OnJobStartedForList;
+            svc.OnJobProgress -= OnJobProgressForList;
+            svc.OnJobReadyToClaim -= OnJobReadyToClaimForList;
+            svc.OnJobClaimed -= OnJobClaimedForList;
+            svc.OnJobCancelled -= OnJobCancelledForList;
             svc.OnCraftFailed -= OnCraftFailed;
-            svc.OnCraftCancelled -= OnCraftCancelled;
-
-            var queue = svc.GetQueueService();
-            if (queue != null)
-            {
-                queue.OnJobStatusChanged -= OnJobStatusChanged;
-                queue.OnJobCompleted -= OnJobCompletedForList;
-            }
 
             if (_plusButton != null) _plusButton.onClick.RemoveListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.RemoveListener(OnMinusClicked);
@@ -387,10 +378,8 @@ namespace IdleDefenseSurvival.Controller
             if (_quantityText != null) _quantityText.text = _quantity.ToString();
             if (_craftButton == null) return;
 
-            bool busy = !string.IsNullOrEmpty(_currentJobId);
-            bool hasRecipe = !string.IsNullOrEmpty(_selectedRecipeId);
             var svc = CraftingManager.Instance;
-            if (svc == null || !hasRecipe)
+            if (svc == null || string.IsNullOrEmpty(_selectedRecipeId))
             {
                 _craftButton.interactable = false;
                 return;
@@ -400,14 +389,14 @@ namespace IdleDefenseSurvival.Controller
             long gem = EconomyManager.Instance != null ? EconomyManager.Instance.GetCurrency(CurrencyType.Gem) : 0;
             var cost = svc.GetRecipeCostPreview(_selectedRecipeId, _quantity);
             var reqs = svc.GetRecipeMaterialPreview(_selectedRecipeId, _quantity);
-            int totalQuantity = 0;
-            if (InventoryService.Instance != null)
-                foreach (var r in reqs)
-                    totalQuantity += InventoryService.Instance.GetTotalQuantity(r.ItemId);
             static int owned(string id) => InventoryService.Instance != null ? InventoryService.Instance.GetTotalQuantity(id) : 0;
 
             bool canAfford = CanAffordCurrency(cost, gold, gem) && CanAffordMaterials(reqs, owned);
-            _craftButton.interactable = !busy && canAfford;
+
+            // Check concurrent slot availability
+            bool hasConcurrentSlot = svc.GetQueueService() != null && svc.GetQueueService().HasAvailableSlot;
+
+            _craftButton.interactable = canAfford && hasConcurrentSlot;
         }
 
         #endregion
@@ -438,8 +427,6 @@ namespace IdleDefenseSurvival.Controller
             var jobId = svc.StartCraft(_selectedRecipeId, _quantity);
             if (!string.IsNullOrEmpty(jobId))
             {
-                _currentJobId = jobId;
-                if (_craftButton != null) _craftButton.interactable = false;
                 PopulateJobList(); // Show new job immediately in list
             }
             else
@@ -461,36 +448,87 @@ namespace IdleDefenseSurvival.Controller
 
         #region Job events
 
-        /// <summary>
-        /// NOTE: OnCraftCompleted carries (recipeId, success) — no jobId.
-        /// This UI tracks a single job (_currentJobId). Progress/failed/cancelled are
-        /// jobId-filtered; completion is accepted for the tracked job only.
-        /// Multi-job UI requires OnCraftCompleted to include jobId.
-        /// </summary>
-        private void OnCraftCompleted(string recipeId, bool success)
+        private void OnJobStartedForList(string jobId)
         {
-            if (string.IsNullOrEmpty(_currentJobId)) return;
-            _currentJobId = null;
-            RefreshControls();
-            if (success)
+            // Job has entered crafting state; ensure it appears in list
+            RefreshJobEntry(jobId);
+        }
+
+        private void OnJobProgressForList(string jobId, float progress)
+        {
+            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
+            if (entry != null)
             {
-                RebuildMaterials(); // Refresh material counts after consumption
-                RefreshCost();
+                entry.SetProgress(progress);
+            }
+        }
+
+        private void OnJobReadyToClaimForList(string jobId)
+        {
+            // Job timer finished, now ready to claim
+            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
+            if (entry != null)
+            {
+                entry.SetProgress(1f);
+                entry.SetStatus(CraftJobStatus.Complete);
+                entry.SetClaimVisible(true);
+            }
+            else
+            {
+                // Entry doesn't exist yet (e.g., loaded before UI built) - create it
+                RefreshJobEntry(jobId);
+            }
+        }
+
+        private void OnJobClaimedForList(string jobId, InventoryItem[] items)
+        {
+            // Job claimed and removed - refresh list
+            PopulateJobList();
+            RebuildMaterials();
+            RefreshCost();
+            RefreshControls();
+        }
+
+        private void OnJobCancelledForList(string jobId)
+        {
+            // Job cancelled - remove from list
+            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
+            if (entry != null)
+            {
+                _jobEntries.Remove(entry);
+                Destroy(entry.gameObject);
             }
         }
 
         private void OnCraftFailed(string jobId, string reason)
         {
-            if (jobId != _currentJobId) return;
-            _currentJobId = null;
+            // Craft start failed - refresh controls
             RefreshControls();
         }
 
-        private void OnCraftCancelled(string jobId)
+        private void RefreshJobEntry(string jobId)
         {
-            if (jobId != _currentJobId) return;
-            _currentJobId = null;
-            RefreshControls();
+            var svc = CraftingManager.Instance;
+            if (svc == null) return;
+
+            var job = svc.GetQueueService()?.GetJob(jobId);
+            if (job == null) return;
+
+            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
+
+            if (entry == null)
+            {
+                PopulateJobList();
+                return;
+            }
+
+            entry.SetProgress(job.Progress);
+            entry.SetStatus(job.Status);
+
+            if (job.IsReadyToClaim)
+            {
+                entry.SetClaimVisible(true);
+            }
         }
 
         #endregion
@@ -503,8 +541,13 @@ namespace IdleDefenseSurvival.Controller
             var svc = CraftingManager.Instance;
             if (svc == null) return;
 
-            var jobs = svc.GetAllJobs().OrderBy(j => j.StartTimeUtc);
-            foreach (var job in jobs)
+            // Order: Active jobs first (by start time), then ReadyToClaim, then Queued
+            var allJobs = svc.GetAllJobs();
+            var orderedJobs = allJobs
+                .OrderByDescending(j => j.IsCrafting ? 0 : (j.IsReadyToClaim ? 1 : 2))
+                .ThenBy(j => j.EndTimeUtc == 0 ? 0 : j.EndTimeUtc);
+
+            foreach (var job in orderedJobs)
             {
                 var entryObj = Instantiate(_jobEntryPrefab, _jobList);
                 entryObj.gameObject.SetActive(true);
@@ -529,29 +572,7 @@ namespace IdleDefenseSurvival.Controller
             if (svc != null)
             {
                 svc.ClaimJob(jobId);
-                PopulateJobList();
-                svc.GetQueueSaveData(); // Triggers save
-            }
-        }
-
-        private void OnJobStatusChanged(string jobId, CraftJobStatus status)
-        {
-            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
-            if (entry != null)
-            {
-                entry.SetStatus(status);
-                if (status == CraftJobStatus.Complete)
-                    entry.SetClaimVisible(true);
-            }
-            PopulateJobList();
-        }
-
-        private void OnJobCompletedForList(string jobId)
-        {
-            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
-            if (entry != null)
-            {
-                entry.SetProgress(1f);
+                // Job list refreshed via OnJobClaimed event
             }
         }
 

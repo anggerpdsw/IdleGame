@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using IdleDefenseSurvival.Crafting;
 
-namespace IdleDefenseSurvival.Controller
+namespace IdleDefenseSurvival.Crafting
 {
     public class JobEntryUI : MonoBehaviour
     {
@@ -11,7 +10,6 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private Slider _progressSlider;
         [SerializeField] private Button _claimButton;
-        [SerializeField] private GameObject _claimContainer;
         [SerializeField] private TextMeshProUGUI _statusText;
 
         public string JobId { get; private set; }
@@ -36,10 +34,10 @@ namespace IdleDefenseSurvival.Controller
         public void SetStatus(CraftJobStatus status)
         {
             bool isCrafting = status == CraftJobStatus.Crafting;
-            bool isComplete = status == CraftJobStatus.Complete;
+            bool isReadyToClaim = status == CraftJobStatus.Complete;
 
-            _progressSlider.gameObject.SetActive(isCrafting);
-            _claimContainer.SetActive(isComplete);
+            _progressSlider.gameObject.SetActive(isCrafting || !isReadyToClaim);
+            _claimButton.gameObject.SetActive(isReadyToClaim);
 
             if (_statusText != null)
             {
@@ -47,7 +45,6 @@ namespace IdleDefenseSurvival.Controller
                 {
                     CraftJobStatus.Queued => "Queued",
                     CraftJobStatus.Crafting => "Crafting...",
-                    CraftJobStatus.RewardPendingCommit => "Finalizing...",
                     CraftJobStatus.Complete => "Ready to Claim",
                     CraftJobStatus.Cancelled => "Cancelled",
                     CraftJobStatus.Failed => "Failed",
@@ -56,6 +53,6 @@ namespace IdleDefenseSurvival.Controller
             }
         }
 
-        public void SetClaimVisible(bool v) => _claimContainer.SetActive(v);
+        public void SetClaimVisible(bool v) => _claimButton.gameObject.SetActive(v);
     }
 }

@@ -9,9 +9,9 @@ using UnityEngine;
 namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
-    /// Handles a completed craft queue job using two-phase completion (P0-D).
-    /// Phase A: Mark job RewardPendingCommit, roll, persist Results+CompletionSeed durably.
-    /// Phase B: Iterate rewards, apply each via InventoryService.ApplyReward with idempotency key.
+    /// Handles CLAIM of a ready-to-claim craft job.
+    /// Generates deterministic reward using CompletionSeed, adds to inventory, removes job on success.
+    /// Called only when player clicks Claim (not automatically on timer completion).
     /// </summary>
     public sealed class CraftCompletionService
     {
@@ -23,12 +23,12 @@ namespace IdleDefenseSurvival.Crafting
         private readonly IInventoryService _inventory;
         private readonly ISaveService _saveManager;
 
-        /// <summary>recipeId, success</summary>
-        public event Action<string, bool> Completed;
+        /// <summary>jobId, success</summary>
+        public event Action<string, bool> Claimed;
         /// <summary>jobId, reason</summary>
         public event Action<string, string> Failed;
-        /// <summary>recipeId, result items</summary>
-        public event Action<string, InventoryItem[]> Result;
+        /// <summary>jobId, recipeId, result items</summary>
+        public event Action<string, string, InventoryItem[]> Result;
 
         public CraftCompletionService(
             CraftQueueService queueService,
@@ -49,64 +49,61 @@ namespace IdleDefenseSurvival.Crafting
         }
 
         /// <summary>
-        /// Completes a queue job using two-phase commit (P0-D).
+        /// Claims a ready-to-claim job: validates, generates reward deterministically, adds to inventory, removes job.
         /// </summary>
-        public void Complete(string jobId)
+        public void ClaimJob(string jobId)
         {
             var job = _queueService.GetJob(jobId);
-            if (job == null) return;
-
-            // Phase A: Roll, generate results, persist durable (RewardPendingCommit)
-            if (job.Status != CraftJobStatus.RewardPendingCommit)
+            if (job == null)
             {
-                // v3.8 §20.7 — CompletionSeed resolves BEFORE any roll; it seeds both the
-                // craft roll and equipment attribute generation (I-11 determinism).
-                long completionSeed = job.CompletionSeed;
-                if (completionSeed == 0)
-                    completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
-                job.CompletionSeed = completionSeed;
-
-                var context = _contextBuilder.Build();
-                var rollResult = _rollService.RollCraft(job.RecipeId, context, new SeedRandomProvider((int)completionSeed));
-
-                if (!rollResult.Success || rollResult.Entries.Count == 0)
-                {
-                    _queueService.CancelJob(jobId, RefundPolicy.ProgressBased);
-                    Failed?.Invoke(jobId, rollResult.FailureReason ?? "Craft failed");
-                    Completed?.Invoke(job.RecipeId, false);
-                    return;
-                }
-
-                if (!_repository.TryGetRecipe(job.RecipeId, out var recipe))
-                {
-                    _queueService.CancelJob(jobId, RefundPolicy.ProgressBased);
-                    Failed?.Invoke(jobId, "Recipe not found after roll");
-                    Completed?.Invoke(job.RecipeId, false);
-                    return;
-                }
-
-                var items = _rewardService.GenerateRewards(rollResult, recipe, context, completionSeed);
-                job.Results = CraftResultData.FromInventoryItems(items, rollResult.ExpReward);
-
-                // Phase A: Mark RewardPendingCommit and persist durably (Results + Seed)
-                job.MarkRewardPendingCommit();
-                _saveManager.PersistCurrentStateDurably();
+                Failed?.Invoke(jobId, "Job not found");
+                Claimed?.Invoke(jobId, false);
+                return;
             }
 
-            // Phase B: Apply each reward with idempotency guard
-            var itemsToApply = job.Results.Select(r => new InventoryItem
+            if (!job.IsReadyToClaim)
             {
-                ItemId = r.ItemId,
-                Quantity = r.Count,
-                Level = r.Level,
-                AcquiredTimestamp = r.AcquiredTimestamp,
-                CustomData = r.CustomData != null ? new Dictionary<string, object>(r.CustomData) : null
-            }).ToArray();
+                Failed?.Invoke(jobId, "Job not ready to claim");
+                Claimed?.Invoke(jobId, false);
+                return;
+            }
 
-            bool allApplied = true;
-            for (int i = 0; i < itemsToApply.Length; i++)
+            if (!_repository.TryGetRecipe(job.RecipeId, out var recipe))
             {
-                var item = itemsToApply[i];
+                Failed?.Invoke(jobId, "Recipe not found");
+                Claimed?.Invoke(jobId, false);
+                return;
+            }
+
+            // Use stored CompletionSeed for deterministic reward generation
+            long completionSeed = job.CompletionSeed;
+            if (completionSeed == 0)
+            {
+                Failed?.Invoke(jobId, "Invalid completion seed");
+                Claimed?.Invoke(jobId, false);
+                return;
+            }
+
+            // Roll and generate rewards using the stored seed
+            var context = _contextBuilder.Build();
+            var rollResult = _rollService.RollCraft(job.RecipeId, context, new SeedRandomProvider((int)completionSeed));
+
+            if (!rollResult.Success || rollResult.Entries.Count == 0)
+            {
+                Failed?.Invoke(jobId, rollResult.FailureReason ?? "Craft failed");
+                Claimed?.Invoke(jobId, false);
+                return;
+            }
+
+            var items = _rewardService.GenerateRewards(rollResult, recipe, context, completionSeed);
+
+            // Apply each reward with idempotency guard
+            bool allApplied = true;
+            var appliedItems = new List<InventoryItem>();
+
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
                 string rewardOperationId = $"{jobId}#{i}";
 
                 var applyResult = _inventory.ApplyReward(item, rewardOperationId);
@@ -114,37 +111,32 @@ namespace IdleDefenseSurvival.Crafting
                 {
                     Debug.LogError($"[CraftCompletion] ApplyReward failed for {item.ItemId} (op={rewardOperationId})");
                     allApplied = false;
-                    // Don't break — continue attempting remaining rewards; already-applied ones are idempotent
                 }
-                // Persist after each reward to make progress durable
-                _saveManager.PersistCurrentStateDurably();
+                else
+                {
+                    appliedItems.Add(item);
+                }
             }
 
             if (!allApplied)
             {
-                // Some rewards failed to apply; job stays in RewardPendingCommit for recovery
+                // Some rewards failed to apply; job stays for retry
                 Failed?.Invoke(jobId, "Partial reward application failure");
-                Completed?.Invoke(job.RecipeId, false);
+                Claimed?.Invoke(jobId, false);
                 return;
             }
 
-            // All rewards applied successfully — mark Complete
-            job.Status = CraftJobStatus.Complete;
-            job.CompletedCount = job.Count;
-            _saveManager.PersistCurrentStateDurably();
-
-            Completed?.Invoke(job.RecipeId, true);
-            if (job.Results != null)
+            // All rewards applied successfully — remove job from queue
+            bool removed = _queueService.RemoveJob(jobId);
+            if (removed)
             {
-                var resultItems = job.Results.Select(r => new InventoryItem
-                {
-                    ItemId = r.ItemId,
-                    Quantity = r.Count,
-                    Level = r.Level,
-                    AcquiredTimestamp = r.AcquiredTimestamp,
-                    CustomData = r.CustomData != null ? new Dictionary<string, object>(r.CustomData) : null
-                }).ToArray();
-                Result?.Invoke(job.RecipeId, resultItems);
+                _saveManager.PersistCurrentStateDurably();
+            }
+
+            Claimed?.Invoke(jobId, true);
+            if (appliedItems.Count > 0)
+            {
+                Result?.Invoke(jobId, job.RecipeId, appliedItems.ToArray());
             }
         }
     }

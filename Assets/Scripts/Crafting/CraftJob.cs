@@ -1,11 +1,13 @@
 using System;
+using UnityEngine;
 
 namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Represents a single crafting job in the queue.
-    /// Minimal, recipe-driven design: only runtime state persisted.
-    /// Recipe data (equipment type, rarity, ingredients, cost, duration) resolved from RecipeId at runtime.
+    /// Minimal persistence: only JobId, RecipeId, RecipeVersion, CompletionSeed, EndTimeUtc, DurationTicks, Count.
+    /// State (Queued/Crafting/ReadyToClaim) computed from EndTimeUtc and current time.
+    /// No StartTimeUtc, no persisted Status, no Results.
     /// </summary>
     [Serializable]
     public class CraftJob
@@ -19,95 +21,88 @@ namespace IdleDefenseSurvival.Crafting
         public long CompletionSeed;          // Seed generated at job creation for deterministic results
 
         // ============ Timing (UTC ticks for persistence) ============
-        public long StartTimeUtc;            // DateTime.UtcNow.Ticks when started
-        public long EndTimeUtc;              // StartTimeUtc + DurationTicks
+        // EndTimeUtc == 0 means job is queued (not started)
+        // EndTimeUtc > 0 means job started; EndTimeUtc = startTime + DurationTicks
+        public long EndTimeUtc;              // 0 = queued; >0 = absolute end time in UTC ticks
         public long DurationTicks;           // Total craft time in ticks (100ns units)
 
-        // ============ Quantity & Status ============
+        // ============ Quantity ============
         public int Count = 1;                // Number of items to craft (batch support)
-        public int CompletedCount = 0;       // How many have completed (for batch)
-        public CraftJobStatus Status = CraftJobStatus.Queued;
 
-        // ============ Progress ============
-        // Computed property - not serialized
-        public float Progress => Status == CraftJobStatus.Complete ? 1f :
-                                Status == CraftJobStatus.Cancelled ? 0f :
-                                (float)Math.Max(0, Math.Min(1, (DateTime.UtcNow.Ticks - StartTimeUtc) / (double)DurationTicks));
+        // ============ Computed State (not serialized) ============
+        public bool IsQueued => EndTimeUtc == 0;
+        public bool IsCrafting => EndTimeUtc > 0 && DateTime.UtcNow.Ticks < EndTimeUtc;
+        public bool IsReadyToClaim => EndTimeUtc > 0 && DateTime.UtcNow.Ticks >= EndTimeUtc;
 
-        public bool IsComplete => Status == CraftJobStatus.Complete;
-        public bool IsActive => Status == CraftJobStatus.Crafting;
-        public bool IsPending => Status == CraftJobStatus.Queued;
+        public float Progress
+        {
+            get
+            {
+                if (IsQueued) return 0f;
+                long now = DateTime.UtcNow.Ticks;
+                long start = EndTimeUtc - DurationTicks;
+                if (now <= start) return 0f;
+                if (now >= EndTimeUtc) return 1f;
+                return (float)(now - start) / DurationTicks;
+            }
+        }
 
-        // ============ Result ============
-        public CraftResultData[] Results;    // Generated results when complete
-        public string FailureReason;         // If failed
+        public TimeSpan GetTimeRemaining()
+        {
+            if (IsQueued) return TimeSpan.Zero;
+            long remaining = EndTimeUtc - DateTime.UtcNow.Ticks;
+            return TimeSpan.FromTicks(Math.Max(0, remaining));
+        }
 
         // ============ Helper Methods ============
         public static CraftJob Create(string recipeId, int count, long durationTicks, int recipeVersion, long completionSeed)
         {
-            var now = DateTime.UtcNow.Ticks;
             return new CraftJob
             {
                 JobId = Guid.NewGuid().ToString(),
                 RecipeId = recipeId,
                 RecipeVersion = recipeVersion,
                 CompletionSeed = completionSeed,
-                StartTimeUtc = now,
+                EndTimeUtc = 0, // Queued initially
                 DurationTicks = durationTicks,
-                EndTimeUtc = now + durationTicks,
-                Count = count,
-                Status = CraftJobStatus.Queued
+                Count = count
             };
         }
 
-        public TimeSpan GetTimeRemaining()
+        /// <summary>
+        /// Starts the job by setting EndTimeUtc to now + DurationTicks.
+        /// Call only when a concurrent slot is available.
+        /// </summary>
+        public void Start()
         {
-            if (IsComplete || Status == CraftJobStatus.Cancelled) return TimeSpan.Zero;
-            var remaining = EndTimeUtc - DateTime.UtcNow.Ticks;
-            return remaining > 0 ? TimeSpan.FromTicks(remaining) : TimeSpan.Zero;
+            if (EndTimeUtc != 0) return; // Already started
+            EndTimeUtc = DateTime.UtcNow.Ticks + DurationTicks;
         }
 
-        public void MarkCrafting()
+        /// <summary>
+        /// Compatibility property for UI - derives status from time-based state.
+        /// Not serialized.
+        /// </summary>
+        public CraftJobStatus Status
         {
-            Status = CraftJobStatus.Crafting;
-        }
-
-        public void MarkComplete(CraftResultData[] results)
-        {
-            Status = CraftJobStatus.Complete;
-            Results = results;
-            CompletedCount = Count;
-        }
-
-        public void MarkCancelled(string reason)
-        {
-            Status = CraftJobStatus.Cancelled;
-            FailureReason = reason;
-        }
-
-        public void MarkFailed(string reason)
-        {
-            Status = CraftJobStatus.Failed;
-            FailureReason = reason;
-        }
-
-        public void MarkRewardPendingCommit()
-        {
-            Status = CraftJobStatus.RewardPendingCommit;
+            get
+            {
+                if (IsQueued) return CraftJobStatus.Queued;
+                if (IsReadyToClaim) return CraftJobStatus.Complete;
+                return CraftJobStatus.Crafting;
+            }
         }
     }
 
     /// <summary>
-    /// Status of a craft job.
+    /// Status of a craft job (computed, not persisted).
     /// </summary>
     public enum CraftJobStatus
     {
-        Queued = 0,               // Waiting to start (for future queue priority system)
-        Crafting = 1,             // Currently in progress
-        Complete = 2,             // Finished successfully
-        Cancelled = 3,            // Cancelled by player
-        Failed = 4,               // Failed (insufficient resources, etc.)
-        RewardPendingCommit = 5   // Two-phase completion: Results+Seed durable, Phase B in flight (I-20, §13.2)
+        Queued = 0,
+        Crafting = 1,
+        Complete = 2, // Means "Ready to Claim" in new lifecycle
+        Cancelled = 3,
+        Failed = 4
     }
-
 }
