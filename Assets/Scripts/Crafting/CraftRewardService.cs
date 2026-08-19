@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Generation;
+using IdleDefenseSurvival.Items.Random;
 
 namespace IdleDefenseSurvival.Crafting
 {
@@ -10,6 +11,9 @@ namespace IdleDefenseSurvival.Crafting
     /// Generates final crafted items with proper levels, stats, and quality.
     /// Uses ItemGenerator for shared item generation logic.
     /// Slot-fallback resolves craft_* recipe ids to base equipment templates.
+    /// Equipment rarity comes from recipe.Rarity; level comes from recipe.RequiredTier.
+    /// AttributeStats are generated procedurally at craft time (not from base template).
+    /// Uses deterministic seeded RNG via CompletionSeed for I-11 replay consistency.
     ///</summary>
     public sealed class CraftRewardService
     {
@@ -114,6 +118,7 @@ namespace IdleDefenseSurvival.Crafting
                 Category = ItemCategory.Equipment
             };
 
+            // Use deterministic generator seeded with CompletionSeed for I-11 replay consistency.
             var item = ItemGenerator.CreateDeterministic((int)seed).GenerateEquipmentFromBase(baseEquip, genContext);
             return item;
         }
@@ -137,6 +142,5 @@ namespace IdleDefenseSurvival.Crafting
             if (id.Contains("_shoes") || id.Contains("_boots")) return EquipmentType.Shoes;
             return null;
         }
-
     }
 }

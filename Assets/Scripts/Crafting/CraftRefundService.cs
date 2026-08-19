@@ -1,12 +1,15 @@
 using System;
+using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using UnityEngine;
 using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Items.Decomposition;
 
 namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Calculates and applies refunds for cancelled craft jobs based on policy.
+    /// Recipe-driven: all refund data resolved from CraftRecipeData via job.RecipeId.
     /// </summary>
     public sealed class CraftRefundService
     {
@@ -26,111 +29,82 @@ namespace IdleDefenseSurvival.Crafting
         /// </summary>
         public void Refund(CraftJob job, RefundPolicy policy)
         {
-            if (!_repository.TryGetRecipe(job.RecipeId, out var recipe)) return;
+            if (!_repository.TryGetRecipe(job.RecipeId, out var recipe))
+            {
+                Debug.LogWarning($"[CraftRefundService] Cannot refund job {job.JobId}: Recipe {job.RecipeId} not found.");
+                return;
+            }
 
             float refundRate = CalculateRefundRate(job, policy, recipe);
-            if (refundRate <= 0f) return;
-
-            // Refund ingredients from job snapshot (immutable-at-creation copy).
-            // Falls back to live recipe only for legacy jobs predating the snapshot feature —
-
-            // P0-B step 10: ExecutionSnapshot.Cost.Materials is the new source of truth (P0-A).
-            // Priority: ExecutionSnapshot.Cost.Materials -> IngredientsSnapshot[] -> recipe.Ingredients.
-            var ingredientSource = (CraftIngredient[])null;
-            bool snapshotAvailable = false;
-            if (job.ExecutionSnapshot != null &&
-                job.ExecutionSnapshot.Cost.Materials != null &&
-                job.ExecutionSnapshot.Cost.Materials.Length > 0)
+            if (refundRate <= 0f)
             {
-                ingredientSource = Array.ConvertAll(
-                    job.ExecutionSnapshot.Cost.Materials,
-                    c => new CraftIngredient
-                    {
-                        ItemId = c.ItemId,
-                        Count = c.Count,
-                        Consumed = true,
-                        CanSubstitute = false,
-                        SubstituteItemIds = null,
-                        MinQuality = 0,
-                        MinLevel = 0,
-                        MinEnhance = 0,
-                        ReturnOnFail = false
-                    });
-
-                snapshotAvailable = true;
-                Debug.Log($"[CraftRefundService] Using ExecutionSnapshot.Cost.Materials for job {job.JobId}");
-            }
-            else if (job.IngredientsSnapshot != null && job.IngredientsSnapshot.Length > 0)
-            {
-                ingredientSource = Array.ConvertAll(
-                    job.IngredientsSnapshot,
-                    s => new CraftIngredient
-                    {
-                        ItemId = s.ItemId,
-                        Count = s.Count,
-                        Consumed = s.Consumed,
-                        CanSubstitute = s.CanSubstitute,
-                        SubstituteItemIds = s.SubstituteItemIds,
-                        MinQuality = s.MinQuality,
-                        MinLevel = s.MinLevel,
-                        MinEnhance = s.MinEnhance,
-                        ReturnOnFail = s.ReturnOnFail
-                    });
-
-                snapshotAvailable = true;
-                Debug.Log($"[CraftRefundService] Using ingredient snapshot for job {job.JobId}");
-            }
-            else if (recipe.Ingredients != null)
-            {
-                ingredientSource = recipe.Ingredients;
-                Debug.LogWarning(
-                    $"[CraftRefundService] Job {job.JobId} missing IngredientsSnapshot — falling back to live recipe (legacy path)");
+                Debug.Log($"[CraftRefundService] No refund for job {job.JobId} (refund rate: {refundRate:F2})");
+                return;
             }
 
-            if (ingredientSource != null)
+            // Refund ingredients from the recipe, scaled by job.Count
+            if (recipe.Ingredients != null)
             {
-                foreach (var ingredient in ingredientSource)
+                foreach (var ingredient in recipe.Ingredients)
                 {
                     if (!ingredient.Consumed) continue;
 
-                    int refundCount = snapshotAvailable
-                        ? Mathf.RoundToInt(ingredient.Count * refundRate)
-                        : Mathf.RoundToInt(ingredient.Count * job.Count * refundRate);
+                    int totalRequired = ingredient.Count * job.Count;
+                    int refundCount = Mathf.RoundToInt(totalRequired * refundRate);
 
                     if (refundCount > 0)
+                    {
                         _inventory.AddItem(ingredient.ItemId, refundCount);
+                        Debug.Log($"[CraftRefundService] Refunded {refundCount} x {ingredient.ItemId} for job {job.JobId}");
+                    }
                 }
             }
 
-            // P0-B step 11: refund decomposed requirements (Cost.Progression) if ExecutionSnapshot exists.
-            // Cost.Progression[i].Count is pre-scaled by job.Count via SumPerJob — no extra multiplier.
-            // Null-guard handles legacy jobs (created before P0-B step 10) that lack ExecutionSnapshot.
-            if (job.ExecutionSnapshot?.Cost.Progression != null)
+            // Refund decomposed requirements (if any)
+            var decomposedReqs = DecomposedRequirementResolver.Compute(recipe.Rarity);
+            if (decomposedReqs != null && decomposedReqs.Count > 0)
             {
-                foreach (var prog in job.ExecutionSnapshot.Cost.Progression)
+                var decomposedScaled = DecomposedRequirementAggregator.SumPerJob(decomposedReqs, job.Count);
+                foreach (var prog in decomposedScaled)
                 {
                     int refundCount = Mathf.RoundToInt(prog.Count * refundRate);
                     if (refundCount > 0)
+                    {
                         _inventory.AddItem(prog.ItemId, refundCount);
+                        Debug.Log($"[CraftRefundService] Refunded {refundCount} x {prog.ItemId} (decomposed) for job {job.JobId}");
+                    }
                 }
             }
 
             // Refund currency
             long goldRefund = Mathf.RoundToInt(recipe.GoldCost * job.Count * refundRate);
             long gemRefund = Mathf.RoundToInt(recipe.GemCost * job.Count * refundRate);
-            if (goldRefund > 0) _economy.AddCurrency(CurrencyType.Gold, goldRefund);
-            if (gemRefund > 0) _economy.AddCurrency(CurrencyType.Gem, gemRefund);
+
+            if (goldRefund > 0)
+            {
+                _economy.AddCurrency(CurrencyType.Gold, goldRefund);
+                Debug.Log($"[CraftRefundService] Refunded {goldRefund} Gold for job {job.JobId}");
+            }
+            if (gemRefund > 0)
+            {
+                _economy.AddCurrency(CurrencyType.Gem, gemRefund);
+                Debug.Log($"[CraftRefundService] Refunded {gemRefund} Gems for job {job.JobId}");
+            }
 
             if (recipe.AdditionalCosts != null)
             {
                 foreach (var cost in recipe.AdditionalCosts)
                 {
                     long refund = Mathf.RoundToInt(cost.Amount * job.Count * refundRate);
-                    if (refund > 0) _economy.AddCurrency(cost.Currency, refund);
+                    if (refund > 0)
+                    {
+                        _economy.AddCurrency(cost.Currency, refund);
+                        Debug.Log($"[CraftRefundService] Refunded {refund} {cost.Currency} for job {job.JobId}");
+                    }
                 }
             }
 
-            Debug.Log($"[CraftRefundService] Refunded {refundRate * 100:F0}% for job {job.JobId}");
+            Debug.Log($"[CraftRefundService] Total refund for job {job.JobId} with rate {refundRate * 100:F0}% completed.");
         }
 
         private static float CalculateRefundRate(CraftJob job, RefundPolicy policy, CraftRecipeData recipe)

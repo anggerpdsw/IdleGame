@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items.Decomposition;
-using IdleDefenseSurvival.Core.Interfaces;
-using UnityEngine;
+using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Crafting;
+using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Items.Decomposition;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -16,7 +16,6 @@ namespace IdleDefenseSurvival.Items
     {
         private readonly IInventoryService _inventory;
         private readonly IEconomyService _economy;
-        private readonly CraftTransactionJournal _journal;
         private readonly ISaveService _saveService;
 
         // Pending transaction state
@@ -24,17 +23,14 @@ namespace IdleDefenseSurvival.Items
         private readonly Dictionary<CurrencyType, long> _reservedCurrency = new();
         private bool _committed = false;
         private bool _rolledBack = false;
-        private Guid _journalEntryId = Guid.Empty; // P0-C: journal entry tracking
 
         public CraftTransactionService(
             IInventoryService inventory,
             IEconomyService economy,
-            CraftTransactionJournal journal,
             ISaveService saveService)
         {
             _inventory = inventory;
             _economy = economy;
-            _journal = journal;
             _saveService = saveService;
         }
 
@@ -67,7 +63,7 @@ namespace IdleDefenseSurvival.Items
                 }
             }
 
-            // P0-B step 10: reserve decomposed requirements (always, independent of regular ingredients)
+            // Reserve decomposed requirements (always, independent of regular ingredients)
             var decomposedReqsReserve = DecomposedRequirementResolver.Compute(recipe.Rarity);
             if (decomposedReqsReserve.Count > 0)
             {
@@ -125,162 +121,32 @@ namespace IdleDefenseSurvival.Items
             return TransactionResult.Success();
         }
 
-        /// <summary>
-        /// Canonical P0-C entry point. Same reservation semantics as the 2-param legacy overload,
-        /// plus journal append (Prepared) + durable checkpoint AFTER successful reservation.
-        /// Old 2-param overload retained for the legacy caller until 5C-1 replaces it.
-        ///</summary>
-        public TransactionResult BeginTransaction(
-            string jobId,
-            CraftRecipeData recipe,
-            CraftExecutionSnapshot snapshot,
-            int count = 1)
-        {
-            if (string.IsNullOrEmpty(jobId))
-                return TransactionResult.Fail("jobId required");
-            if (recipe == null)
-                return TransactionResult.Fail("recipe required");
-            if (snapshot == null)
-                return TransactionResult.Fail("snapshot required");
-
-            Reset();
-
-            // Validate first
-            var validation = ValidateRecipe(recipe, count);
-            if (!validation.IsSuccess)
-            {
-                return TransactionResult.Fail(validation.Reason);
-            }
-
-            // Reserve materials (P0-B verbatim)
-            if (recipe.Ingredients != null)
-            {
-                foreach (var ingredient in recipe.Ingredients)
-                {
-                    if (!ingredient.Consumed) continue;
-
-                    int required = ingredient.Count * count;
-                    var reserved = ReserveMaterial(ingredient.ItemId, required, ingredient);
-                    if (!reserved.IsSuccess)
-                    {
-                        Rollback();
-                        return TransactionResult.Fail($"Failed to reserve {ingredient.ItemId}: {reserved.Reason}");
-                    }
-                }
-            }
-
-            // P0-B step 10: reserve decomposed requirements (ALWAYS, independent of regular ingredients)
-            var decomposedReqsReserve = DecomposedRequirementResolver.Compute(recipe.Rarity);
-            if (decomposedReqsReserve.Count > 0)
-            {
-                var decomposedScaledReserve = DecomposedRequirementAggregator.SumPerJob(decomposedReqsReserve, count);
-                for (int dr = 0; dr < decomposedScaledReserve.Count; dr++)
-                {
-                    var entry = decomposedScaledReserve[dr];
-                    int have = _inventory.GetTotalQuantity(entry.ItemId);
-                    if (have < entry.Count)
-                    {
-                        Rollback();
-                        return TransactionResult.Fail($"Failed to reserve {entry.ItemId}: need {entry.Count}, have {have}");
-                    }
-                    _reservedMaterials.Add(new ReservedMaterial { ItemId = entry.ItemId, Count = entry.Count, MinQuality = 0, MinLevel = 0, MinEnhance = 0 });
-                }
-            }
-
-            // Reserve currency (P0-B verbatim)
-            if (recipe.GoldCost > 0)
-            {
-                long cost = recipe.GoldCost * count;
-                if (!_economy.HasEnoughCurrency(CurrencyType.Gold, cost))
-                {
-                    Rollback();
-                    return TransactionResult.Fail($"Insufficient gold: need {cost}");
-                }
-                _reservedCurrency[CurrencyType.Gold] = cost;
-            }
-
-            if (recipe.GemCost > 0)
-            {
-                long cost = recipe.GemCost * count;
-                if (!_economy.HasEnoughCurrency(CurrencyType.Gem, cost))
-                {
-                    Rollback();
-                    return TransactionResult.Fail($"Insufficient gems: need {cost}");
-                }
-                _reservedCurrency[CurrencyType.Gem] = cost;
-            }
-
-            if (recipe.AdditionalCosts != null)
-            {
-                foreach (var cost in recipe.AdditionalCosts)
-                {
-                    long totalCost = cost.Amount * count;
-                    if (!_economy.HasEnoughCurrency(cost.Currency, totalCost))
-                    {
-                        Rollback();
-                        return TransactionResult.Fail($"Insufficient {cost.Currency}: need {totalCost}");
-                    }
-                    _reservedCurrency[cost.Currency] = totalCost;
-                }
-            }
-
-            // P0-C: Append journal entry (Prepared) + durable checkpoint AFTER successful reservation
-            var ops = BuildOperations(snapshot);
-            _journalEntryId = _journal.AppendEntry(jobId, snapshot, ops);
-            _saveService.PersistCurrentStateDurably();
-
-            return TransactionResult.Success();
-        }
-
+        
         public TransactionResult Commit()
         {
             if (_committed || _rolledBack)
                 return TransactionResult.Fail("Transaction already completed");
 
-            // P0-C: Refactored to per-operation checkpoint
-            var ops = _journal.GetOperations(_journalEntryId);
-
-            foreach (var op in ops)
+            // Consume materials
+            foreach (var material in _reservedMaterials)
             {
-                if (op.State == OperationState.Pending)
+                int removed = _inventory.RemoveItemById(material.ItemId, material.Count);
+                if (removed != material.Count)
                 {
-                    // Apply mutation
-                    if (op.ResourceType == ResourceKind.Material ||
-                        op.ResourceType == ResourceKind.Catalyst ||
-                        op.ResourceType == ResourceKind.Progression)
-                    {
-                        int removed = _inventory.RemoveItemById(op.ResourceId, op.Quantity);
-                        if (removed != op.Quantity)
-                        {
-                            throw new InvalidOperationException(
-                                $"Remove failed: {op.ResourceId} " +
-                                $"got {removed}/{op.Quantity}");
-                        }
-                    }
-                    else if (op.ResourceType == ResourceKind.Currency)
-                    {
-                        if (!Enum.TryParse<CurrencyType>(op.ResourceId, out var currencyType))
-                        {
-                            throw new InvalidOperationException(
-                                $"Unknown currency: {op.ResourceId}");
-                        }
+                    throw new InvalidOperationException(
+                        $"Remove failed: {material.ItemId} " +
+                        $"got {removed}/{material.Count}");
+                }
+            }
 
-                        if (!_economy.TrySpendCurrency(
-                                currencyType,
-                                op.Quantity,
-                                "Craft commit"))
-                        {
-                            throw new InvalidOperationException(
-                                $"Spend failed: {op.ResourceId} " +
-                                $"amount={op.Quantity}");
-                        }
-                    }
-
-                    // Journal -> Applied
-                    _journal.UpdateOperationState(_journalEntryId, op.CraftTransactionOperationId, OperationState.Applied);
-
-                    // Durable checkpoint
-                    _saveService.PersistCurrentStateDurably();
+            // Spend currency
+            foreach (var kvp in _reservedCurrency)
+            {
+                if (!_economy.TrySpendCurrency(kvp.Key, kvp.Value, "Craft commit"))
+                {
+                    throw new InvalidOperationException(
+                        $"Spend failed: {kvp.Key} " +
+                        $"amount={kvp.Value}");
                 }
             }
 
@@ -288,25 +154,9 @@ namespace IdleDefenseSurvival.Items
             return TransactionResult.Success();
         }
 
-        public Guid JournalEntryId => _journalEntryId;
-
         public void Rollback()
         {
             if (_committed || _rolledBack) return;
-
-            if (_journalEntryId != Guid.Empty)
-            {
-                try
-                {
-                    _journal.UpdateEntryPhase(_journalEntryId, CraftJournalPhase.RolledBack);
-                    _saveService.PersistCurrentStateDurably();
-                }
-                catch (Exception e)
-                {
-                    // Log error but proceed with clearing RAM state. The journal remains the source of truth.
-                    Debug.LogError($"[CraftTransactionService] Failed to persist rollback state for {_journalEntryId}: {e.Message}");
-                }
-            }
 
             // Release material reservations (just clear the list - materials were never actually removed)
             _reservedMaterials.Clear();
@@ -339,7 +189,7 @@ namespace IdleDefenseSurvival.Items
                 }
             }
 
-            // P0-B step 10: validate decomposed requirements (R2-R6 only) - ALWAYS, independent of regular ingredients
+            // Validate decomposed requirements (R2-R6 only) - ALWAYS, independent of regular ingredients
             var decomposedReqsValidate = DecomposedRequirementResolver.Compute(recipe.Rarity);
             if (decomposedReqsValidate.Count > 0)
             {
@@ -384,7 +234,6 @@ namespace IdleDefenseSurvival.Items
         private ReserveResult ReserveMaterial(string itemId, int count, CraftIngredient ingredient)
         {
             // For now, just validate availability. Actual removal happens on Commit.
-            // In a more complex system, we could "mark" items as reserved.
             int available = _inventory.GetTotalQuantity(itemId);
 
             if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0 || ingredient.MinEnhance > 0)
@@ -430,54 +279,6 @@ namespace IdleDefenseSurvival.Items
             _reservedCurrency.Clear();
             _committed = false;
             _rolledBack = false;
-            _journalEntryId = Guid.Empty;
-        }
-
-        // ============ P0-C: Operation Builders ============
-
-        private static CraftJournalOperation[] BuildOperations(CraftExecutionSnapshot snapshot)
-        {
-            var ops = new List<CraftJournalOperation>();
-            var cost = snapshot.Cost;
-
-            foreach (var m in cost.Materials ?? Array.Empty<IngredientCost>())
-                ops.Add(MakeOp(ResourceKind.Material, m.ItemId, m.Count));
-
-            foreach (var c in cost.Catalysts ?? Array.Empty<IngredientCost>())
-                ops.Add(MakeOp(ResourceKind.Catalyst, c.ItemId, c.Count));
-
-            foreach (var p in cost.Progression ?? Array.Empty<IngredientCost>())
-                ops.Add(MakeOp(ResourceKind.Progression, p.ItemId, p.Count));
-
-            if (cost.Currency.GoldSnapshot > 0)
-                ops.Add(MakeOp(ResourceKind.Currency, "Gold", cost.Currency.GoldSnapshot));
-            if (cost.Currency.GemSnapshot > 0)
-                ops.Add(MakeOp(ResourceKind.Currency, "Gem", cost.Currency.GemSnapshot));
-            foreach (var ac in cost.Currency.AdditionalCosts ?? Array.Empty<CostEntry>())
-                ops.Add(MakeOp(ResourceKind.Currency, ac.CurrencyId, ac.Amount));
-
-            return ops.ToArray();
-        }
-
-        private static CraftJournalOperation MakeOp(ResourceKind kind, string resourceId, long quantity)
-        {
-            ValidateQuantity(resourceId, kind, quantity);
-            return new CraftJournalOperation
-            {
-                CraftTransactionOperationId = Guid.NewGuid(),
-                ResourceType = kind,
-                ResourceId = resourceId,
-                Quantity = (int)quantity,
-                State = OperationState.Pending
-            };
-        }
-
-        private static void ValidateQuantity(string resourceId, ResourceKind kind, long value)
-        {
-            if (value < 0)
-                throw new InvalidOperationException($"Negative quantity for {kind}:{resourceId} = {value}");
-            if (value > int.MaxValue)
-                throw new InvalidOperationException($"Quantity overflow int for {kind}:{resourceId} = {value}");
         }
 
         // ============ Internal Classes ============

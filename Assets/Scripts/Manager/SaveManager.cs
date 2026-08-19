@@ -13,7 +13,7 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Save;
 using IdleDefenseSurvival.Core.Interfaces;
-using IdleDefenseSurvival.Crafting;
+// ponytail: CraftTransactionJournal removed; re-add when journal feature returns.
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -40,18 +40,7 @@ namespace IdleDefenseSurvival.Manager
 
         public bool IsSaveLoaded { get; private set; } = false;
 
-        // P0-C: craft transaction journal reference. Set via RegisterJournal() at startup.
-        private CraftTransactionJournal _craftTransactionJournal;
-
-        /// <summary>
-        /// P0-C: bind the runtime journal instance so GatherAllData/ApplyAllData
-        /// can persist and restore in-flight craft transactions.
-        /// Called once during CraftService.Initialize.
-        ///</summary>
-        public void RegisterJournal(CraftTransactionJournal journal)
-        {
-            _craftTransactionJournal = journal;
-        }
+        // Craft journal removed – not needed for current work.
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatic()
@@ -335,7 +324,6 @@ namespace IdleDefenseSurvival.Manager
             data.dailyReward ??= new DailyRewardSaveData();
             data.cardInventory ??= new CardInventoryData();
             data.inventory ??= new Dictionary<string, long>();
-            data.craftJournal ??= new CraftJournalSaveData();   // P0-C migration default
         }
 
         public void DeleteAll()
@@ -612,8 +600,11 @@ namespace IdleDefenseSurvival.Manager
                 });
             string tempPath = SaveFile + ".tmp";
             File.WriteAllText(tempPath, json);
-            // Replace existing file atomically
-            File.Replace(tempPath, SaveFile, null);
+            // Replace existing file atomically; fall back to Move if destination doesn't exist yet
+            if (File.Exists(SaveFile))
+                File.Replace(tempPath, SaveFile, null);
+            else
+                File.Move(tempPath, SaveFile);
         }
 
         private SaveData LoadFromFile()
@@ -672,8 +663,7 @@ namespace IdleDefenseSurvival.Manager
                 cardInventory = cardInventory,
                 inventoryData = inventoryData,
                 equipmentData = equipmentData,
-                craftQueue = craftQueue,
-                craftJournal = _craftTransactionJournal?.GetSaveData()
+                craftQueue = craftQueue
             };
         }
 
@@ -750,10 +740,6 @@ namespace IdleDefenseSurvival.Manager
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftingManager.Instance != null && data.craftQueue != null)
                 CraftingManager.Instance.LoadQueueSaveData(data.craftQueue);
-
-            // Restore craft transaction journal (P0-C recovery source of truth)
-            if (_craftTransactionJournal != null && data.craftJournal != null)
-                _craftTransactionJournal.LoadFromSaveData(data.craftJournal);
 
             AccountManager.Instance?.NotifyDataLoaded();
         }

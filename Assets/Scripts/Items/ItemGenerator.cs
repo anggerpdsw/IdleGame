@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items.Random;
@@ -23,6 +24,7 @@ namespace IdleDefenseSurvival.Items
     /// <summary>
     /// Item Generator Facade - Maintains backward compatibility with old API.
     /// Internally delegates to specialized generator components.
+    /// Supports deterministic generation via CreateDeterministic(seed) for I-11 replay consistency.
     /// </summary>
     public sealed class ItemGenerator
     {
@@ -62,7 +64,7 @@ namespace IdleDefenseSurvival.Items
             _affixGen = new AffixGenerator(_rng);
             _validator = new ItemValidator();
 
-            // Initialize generators with shared services
+            // Initialize generators with shared services (single RNG source for determinism)
             _equipmentGen = new EquipmentGenerator(_rng, _rarityRoll, _statRoll, _socketGen, _enchantGen, _affixGen, _validator);
             _gemGen = new GemGenerator(_rng, _rarityRoll, _validator);
             _consumableGen = new ConsumableGenerator(_rng, _rarityRoll, _validator);
@@ -155,7 +157,7 @@ namespace IdleDefenseSurvival.Items
         {
             var items = ItemDatabase.Instance?.GetItemsByCategory(category)?
                 .Where(i => i.ItemRarity == rarity)
-                .ToList() ?? new System.Collections.Generic.List<ItemData>();
+                .ToList() ?? new List<ItemData>();
 
             if (items.Count == 0) return null;
 
@@ -227,6 +229,10 @@ namespace IdleDefenseSurvival.Items
 
         /// <summary>
         /// Creates a deterministic generator with a specific seed.
+        /// All sub-generators share the SAME SeedRandomProvider instance so that
+        /// AttributeRollService, RarityRollService, StatRollService, SocketGenerator,
+        /// EnchantmentGenerator, AffixGenerator all consume from one RNG stream.
+        /// This guarantees I-11 determinism: same seed -> same AttributeStats.
         /// </summary>
         public static ItemGenerator CreateDeterministic(int seed)
         {

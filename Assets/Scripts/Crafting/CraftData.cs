@@ -46,21 +46,8 @@ namespace IdleDefenseSurvival.Crafting
     }
     
     /// <summary>
-    /// Root container for craft transaction journal entries.
-    /// Embedded in SaveData.craftJournal.
-    ///</summary>
-    [Serializable]
-    public class CraftJournalSaveData
-    {
-        public List<CraftJournalEntry> Entries = new();
-
-        public static CraftJournalSaveData Empty => new();
-    }
-    
-    /// <summary>
     /// Persisted CraftJob representation. Survives save/load.
-    /// §15.1 persistent state; §15.2 required fields for P0-A.
-    /// Legacy fields preserved for migration per §15.3.
+    /// Minimal schema: only runtime state persisted. Recipe data resolved from RecipeId at runtime.
     ///</summary>
     [Serializable]
     public class CraftJobSaveData
@@ -68,10 +55,10 @@ namespace IdleDefenseSurvival.Crafting
         // ============ Identity ============
         public string JobId;
         public string RecipeId;
+        public int RecipeVersion = 1;
 
-        // ============ P0-A: Execution Snapshot ============
-        public CraftExecutionSnapshot ExecutionSnapshot;   // root aggregate
-        public long? CompletionSeed;                       // mirrors ExecutionSnapshot.CompletionSeed for legacy lookup
+        // ============ Deterministic Completion ============
+        public long CompletionSeed;
 
         // ============ Timing ============
         public long StartTimeUtc;
@@ -86,11 +73,18 @@ namespace IdleDefenseSurvival.Crafting
         // ============ Result ============
         public CraftResultData[] Results;
         public string FailureReason;
-
-        // ============ Legacy Migration Field (§15.3) ============
-        // Preserved for backward compatibility with pre-v3.3 saves.
-        // New code reads from ExecutionSnapshot.Cost.Materials instead.
-        public CraftIngredientSnapshot[] IngredientsSnapshot;
     }
+
+    /// <summary>
+    /// Per-resource scaled cost entry. Count = per-unit * jobCount.
+    /// Used for read-only material cost previews.
+    /// </summary>
+    [Serializable]
+    public struct IngredientCost
+    {
+        public string ItemId;
+        public int Count;
+    }
+
 
 }

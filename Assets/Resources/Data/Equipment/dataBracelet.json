@@ -1,35 +1,28 @@
-[{
-    "Id": "equip_bracelet_lifesteal",
-    "Name": "Vampire Bracelet",
-    "Description": "Leeches life from foes. +6 STR, +6 DEX, +2% Life Steal",
+[
+  {
+    "Id": "equip_bracelet_base",
+    "Name": "Base Bracelet",
+    "Description": "Base template for all bracelets. Used by crafting system to generate specific rarity bracelets.",
     "Category": 1,
-    "ItemRarity": 4,
+    "ItemRarity": 1,
     "EquipmentType": 10,
-    "SellPrice": 130,
+    "SellPrice": 20,
     "StackSize": 1,
     "BaseLevel": 1,
     "MaxLevel": 50,
-    "MaxDurability": 90,
+    "MaxDurability": 100,
     "DurabilityLossPerUse": 1,
-    "RepairCostPerDurability": 8,
+    "RepairCostPerDurability": 5,
     "MaxSockets": 1,
-    "IconKey": "Equipment/Bracelet/lifesteal",
-    "AttributeStats": [{
-        "Attribute": "Strength",
-        "BaseValue": 6,
-        "ValuePerLevel": 0.4,
-        "ValuePerEnhance": 0.8
-    }, {
-        "Attribute": "Dexterity",
-        "BaseValue": 6,
-        "ValuePerLevel": 0.4,
-        "ValuePerEnhance": 0.8
-    }],
-    "CombatStats": [{
+    "IconKey": "Equipment/Bracelet/base",
+    "CombatStats": [
+      {
         "Stat": 10,
         "BaseValue": 2,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.2,
         "Mode": 2
-    }]
-}]
+      }
+    ]
+  }
+]

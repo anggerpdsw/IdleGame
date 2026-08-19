@@ -31,6 +31,5 @@ namespace IdleDefenseSurvival.Data
 
         // Crafting system
         public CraftQueueSaveData craftQueue;
-        public CraftJournalSaveData craftJournal;   // P0-C: craft transaction journal
     }
 }

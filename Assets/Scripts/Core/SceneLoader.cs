@@ -79,7 +79,6 @@ namespace IdleDefenseSurvival.Core
                 // =========================
                 if (!IsSceneLoaded(loadScene))
                 {
-                    Debug.Log($"[SceneLoader] Loading scene: {loadScene}");
                     AsyncOperation loadOp =
                         SceneManager.LoadSceneAsync(loadScene, LoadSceneMode.Additive);
 
@@ -113,7 +112,6 @@ namespace IdleDefenseSurvival.Core
                 }
 
                 SceneManager.SetActiveScene(loadedScene);
-                Debug.Log($"[SceneLoader] Active scene: {loadScene}");
 
                 // =========================
                 // UNLOAD PREVIOUS SCENE
@@ -122,7 +120,6 @@ namespace IdleDefenseSurvival.Core
                     unloadScene != loadScene &&
                     IsSceneLoaded(unloadScene))
                 {
-                    Debug.Log($"[SceneLoader] Unloading scene: {unloadScene}");
                     AsyncOperation unloadOp = SceneManager.UnloadSceneAsync(unloadScene);
                     if (unloadOp != null)
                         while (!unloadOp.isDone)

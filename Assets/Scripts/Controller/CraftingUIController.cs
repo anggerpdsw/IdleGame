@@ -26,7 +26,7 @@ namespace IdleDefenseSurvival.Controller
 
         [Header("Category Filters")]
         [SerializeField] private Button _categoryAllButton;
-        [SerializeField] private Button[] _categoryButtons; 
+        [SerializeField] private Button[] _categoryButtons;
         // Array index 0 = EquipmentType.Hat (enum value 1)
         // Array index 1 = EquipmentType.Armor (enum value 2)
         // dst.
@@ -54,8 +54,10 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private Button _plusButton;
         [SerializeField] private Button _minusButton;
         [SerializeField] private Button _craftButton;
-        [SerializeField] private Slider _progressSlider;
-        [SerializeField] private TextMeshProUGUI _feedbackText;
+
+        [Header("Job List")]
+        [SerializeField] private RectTransform _jobList;
+        [SerializeField] private JobEntryUI _jobEntryPrefab;
 
         private string _selectedRecipeId;
         private int _quantity = 1;
@@ -63,6 +65,7 @@ namespace IdleDefenseSurvival.Controller
         private EquipmentType _currentCategoryFilter = EquipmentType.None; // None = All
         private readonly List<CraftingRecipeEntry> _entries = new();
         private readonly List<GameObject> _materialRows = new();
+        private readonly List<JobEntryUI> _jobEntries = new();
 
         #region Pure decision logic (EditMode-testable)
 
@@ -94,7 +97,6 @@ namespace IdleDefenseSurvival.Controller
             ValidateReferences();
             if (_recipeEntryPrefabs != null) _recipeEntryPrefabs.gameObject.SetActive(false);
             if (_materialRowTemplate != null) _materialRowTemplate.SetActive(false);
-            if (_feedbackText != null) _feedbackText.text = "";
         }
 
         private void Start()
@@ -110,12 +112,16 @@ namespace IdleDefenseSurvival.Controller
                 Debug.LogError("[CraftingUIController] CraftingManager.Instance is null — scene cannot operate.");
                 return;
             }
-            svc.OnCraftStarted += OnCraftStarted;
-            svc.OnCraftProgress += OnCraftProgress;
             svc.OnCraftCompleted += OnCraftCompleted;
-            svc.OnCraftResult += OnCraftResult;
             svc.OnCraftFailed += OnCraftFailed;
             svc.OnCraftCancelled += OnCraftCancelled;
+
+            var queue = svc.GetQueueService();
+            if (queue != null)
+            {
+                queue.OnJobStatusChanged += OnJobStatusChanged;
+                queue.OnJobCompleted += OnJobCompletedForList;
+            }
 
             if (_plusButton != null) _plusButton.onClick.AddListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.AddListener(OnMinusClicked);
@@ -123,6 +129,7 @@ namespace IdleDefenseSurvival.Controller
 
             BindCategoryButtons();
             PopulateRecipeList();
+            PopulateJobList();
             UpdateCategorySelection(); // init selection highlight (All active by default)
         }
 
@@ -179,12 +186,16 @@ namespace IdleDefenseSurvival.Controller
         {
             var svc = CraftingManager.Instance;
             if (svc == null) return;
-            svc.OnCraftStarted -= OnCraftStarted;
-            svc.OnCraftProgress -= OnCraftProgress;
             svc.OnCraftCompleted -= OnCraftCompleted;
-            svc.OnCraftResult -= OnCraftResult;
             svc.OnCraftFailed -= OnCraftFailed;
             svc.OnCraftCancelled -= OnCraftCancelled;
+
+            var queue = svc.GetQueueService();
+            if (queue != null)
+            {
+                queue.OnJobStatusChanged -= OnJobStatusChanged;
+                queue.OnJobCompleted -= OnJobCompletedForList;
+            }
 
             if (_plusButton != null) _plusButton.onClick.RemoveListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.RemoveListener(OnMinusClicked);
@@ -192,6 +203,7 @@ namespace IdleDefenseSurvival.Controller
 
             ClearRecipeEntries();
             ClearMaterialRows();
+            ClearJobEntries();
         }
 
         private void ValidateReferences()
@@ -210,8 +222,6 @@ namespace IdleDefenseSurvival.Controller
             if (_plusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _plusButton");
             if (_minusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _minusButton");
             if (_craftButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _craftButton");
-            if (_progressSlider == null) Debug.LogError("[CraftingUIController] Missing required reference: _progressSlider");
-            if (_feedbackText == null) Debug.LogError("[CraftingUIController] Missing required reference: _feedbackText");
             if (_categoryAllButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllButton");
             if (_categoryButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryButtons");
             if (_categoryAllSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllSelection");
@@ -430,14 +440,13 @@ namespace IdleDefenseSurvival.Controller
             {
                 _currentJobId = jobId;
                 if (_craftButton != null) _craftButton.interactable = false;
-                if (_progressSlider != null) _progressSlider.value = 0f;
-                if (_feedbackText != null) _feedbackText.text = "Crafting...";
+                PopulateJobList(); // Show new job immediately in list
             }
             else
             {
-                if (_feedbackText != null) _feedbackText.text = "Cannot craft: " + (CanCraftReason() ?? "unknown");
                 RefreshControls();
             }
+            RebuildMaterials();
         }
 
         private string CanCraftReason()
@@ -461,7 +470,6 @@ namespace IdleDefenseSurvival.Controller
         private void OnCraftCompleted(string recipeId, bool success)
         {
             if (string.IsNullOrEmpty(_currentJobId)) return;
-            if (_feedbackText != null) _feedbackText.text = success ? "Craft Complete!" : "Craft Failed!";
             _currentJobId = null;
             RefreshControls();
             if (success)
@@ -471,26 +479,9 @@ namespace IdleDefenseSurvival.Controller
             }
         }
 
-        private void OnCraftResult(string recipeId, InventoryItem[] results)
-        {
-            if (_feedbackText != null)
-                _feedbackText.text = results != null && results.Length > 0 ? $"Got: {results[0].ItemId} (+{results.Length - 1} more)" : "Items added to inventory!";
-        }
-
-        private void OnCraftStarted(string jobId)
-        {
-            if (jobId == _currentJobId && _progressSlider != null) _progressSlider.value = 0f;
-        }
-
-        private void OnCraftProgress(string jobId, float progress)
-        {
-            if (jobId == _currentJobId && _progressSlider != null) _progressSlider.value = progress;
-        }
-
         private void OnCraftFailed(string jobId, string reason)
         {
             if (jobId != _currentJobId) return;
-            if (_feedbackText != null) _feedbackText.text = $"Failed: {reason}";
             _currentJobId = null;
             RefreshControls();
         }
@@ -498,9 +489,80 @@ namespace IdleDefenseSurvival.Controller
         private void OnCraftCancelled(string jobId)
         {
             if (jobId != _currentJobId) return;
-            if (_feedbackText != null) _feedbackText.text = "Craft Cancelled";
             _currentJobId = null;
             RefreshControls();
+        }
+
+        #endregion
+
+        #region Job List
+
+        private void PopulateJobList()
+        {
+            ClearJobEntries();
+            var svc = CraftingManager.Instance;
+            if (svc == null) return;
+
+            var jobs = svc.GetAllJobs().OrderBy(j => j.StartTimeUtc);
+            foreach (var job in jobs)
+            {
+                var entryObj = Instantiate(_jobEntryPrefab, _jobList);
+                entryObj.gameObject.SetActive(true);
+                if (!entryObj.TryGetComponent<JobEntryUI>(out var entry)) continue;
+
+                Sprite icon = null;
+                string recipeName = job.RecipeId;
+                if (svc.TryGetRecipe(job.RecipeId, out var recipe))
+                {
+                    icon = ResolveRecipeIcon(recipe);
+                    recipeName = recipe.DisplayName;
+                }
+
+                entry.Initialize(job.JobId, icon, recipeName, job.Progress, job.Status, OnClaimJob);
+                _jobEntries.Add(entry);
+            }
+        }
+
+        private void OnClaimJob(string jobId)
+        {
+            var svc = CraftingManager.Instance;
+            if (svc != null)
+            {
+                svc.ClaimJob(jobId);
+                PopulateJobList();
+                svc.GetQueueSaveData(); // Triggers save
+            }
+        }
+
+        private void OnJobStatusChanged(string jobId, CraftJobStatus status)
+        {
+            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
+            if (entry != null)
+            {
+                entry.SetStatus(status);
+                if (status == CraftJobStatus.Complete)
+                    entry.SetClaimVisible(true);
+            }
+            PopulateJobList();
+        }
+
+        private void OnJobCompletedForList(string jobId)
+        {
+            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
+            if (entry != null)
+            {
+                entry.SetProgress(1f);
+            }
+        }
+
+        private void ClearJobEntries()
+        {
+            if (_jobList != null)
+            {
+                for (int i = _jobList.childCount - 1; i >= 0; i--)
+                    Destroy(_jobList.GetChild(i).gameObject);
+            }
+            _jobEntries.Clear();
         }
 
         #endregion

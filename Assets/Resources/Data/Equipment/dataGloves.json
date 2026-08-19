@@ -1,30 +1,28 @@
-[{
-    "Id": "equip_gloves_fighter",
-    "Name": "Fighter Gloves",
-    "Description": "Reinforced knuckles. +10 STR, +5% Knockback",
+[
+  {
+    "Id": "equip_gloves_base",
+    "Name": "Base Gloves",
+    "Description": "Base template for all gloves. Used by crafting system to generate specific rarity gloves.",
     "Category": 1,
-    "ItemRarity": 3,
+    "ItemRarity": 1,
     "EquipmentType": 2,
-    "SellPrice": 60,
+    "SellPrice": 20,
     "StackSize": 1,
     "BaseLevel": 1,
     "MaxLevel": 50,
     "MaxDurability": 100,
     "DurabilityLossPerUse": 1,
-    "RepairCostPerDurability": 6,
+    "RepairCostPerDurability": 5,
     "MaxSockets": 1,
-    "IconKey": "Equipment/Gloves/fighter",
-    "AttributeStats": [{
-        "Attribute": "Strength",
-        "BaseValue": 10,
-        "ValuePerLevel": 0.8,
-        "ValuePerEnhance": 1.2
-    }],
-    "CombatStats": [{
+    "IconKey": "Equipment/Gloves/base",
+    "CombatStats": [
+      {
         "Stat": 6,
-        "BaseValue": 5,
-        "ValuePerLevel": 0.3,
-        "ValuePerEnhance": 0.5,
+        "BaseValue": 4,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4,
         "Mode": 2
-    }]
-}]
+      }
+    ]
+  }
+]

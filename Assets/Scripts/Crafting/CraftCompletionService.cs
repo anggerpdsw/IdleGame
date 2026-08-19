@@ -61,9 +61,7 @@ namespace IdleDefenseSurvival.Crafting
             {
                 // v3.8 §20.7 — CompletionSeed resolves BEFORE any roll; it seeds both the
                 // craft roll and equipment attribute generation (I-11 determinism).
-                long completionSeed = job.ExecutionSnapshot?.CompletionSeed ?? 0;
-                if (completionSeed == 0 && job.CompletionSeed.HasValue)
-                    completionSeed = job.CompletionSeed.Value;
+                long completionSeed = job.CompletionSeed;
                 if (completionSeed == 0)
                     completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
                 job.CompletionSeed = completionSeed;
@@ -91,7 +89,7 @@ namespace IdleDefenseSurvival.Crafting
                 job.Results = CraftResultData.FromInventoryItems(items, rollResult.ExpReward);
 
                 // Phase A: Mark RewardPendingCommit and persist durably (Results + Seed)
-                job.Status = CraftJobStatus.RewardPendingCommit;
+                job.MarkRewardPendingCommit();
                 _saveManager.PersistCurrentStateDurably();
             }
 

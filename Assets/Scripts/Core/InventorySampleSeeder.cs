@@ -15,18 +15,14 @@ namespace IdleDefenseSurvival.Core
             var inv = InventoryService.Instance;
             if (inv == null || ItemDatabase.Instance == null || inv.AllItems.Count > 0) return;
 
-            inv.AddItem("potion_ap", 9);
             inv.AddItem("potion_hp", 10);
             inv.AddItem("potion_mp", 11);
-            inv.AddItem("potion_sp", 12);
-            inv.AddItem("stone_dust", 40);
             inv.AddItem("essence_of_hope", 9);
-            inv.AddItem("gold_pouch", 3);
-            inv.AddItem("equip_hat_leather");
-            inv.AddItem("equip_gloves_fighter");
-            inv.AddItem("equip_armor_iron");
-            inv.AddItem("equip_ring_ruby");
-            inv.AddItem("gem_sapphire", 3);
+            inv.AddItem("water", 999);
+            inv.AddItem("leather", 999);
+            inv.AddItem("disposed_logs", 999);
+            inv.AddItem("organic_glue", 999);
+            inv.AddItem("cotton_thread", 999);
         }
     }
 }

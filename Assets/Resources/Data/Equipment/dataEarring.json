@@ -15,14 +15,6 @@
     "RepairCostPerDurability": 5,
     "MaxSockets": 1,
     "IconKey": "Equipment/Earring/base",
-    "AttributeStats": [
-      {
-        "Attribute": "Intelligence",
-        "BaseValue": 6,
-        "ValuePerLevel": 0.5,
-        "ValuePerEnhance": 1.0
-      }
-    ],
     "CombatStats": [
       {
         "Stat": 12,

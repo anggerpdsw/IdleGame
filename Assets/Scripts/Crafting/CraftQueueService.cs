@@ -21,6 +21,7 @@ namespace IdleDefenseSurvival.Crafting
         public event Action<string, float> OnJobProgress; // jobId, progress (0-1)
         public event Action<string> OnJobCompleted;     // jobId (results rolled by CraftService)
         public event Action<string> OnJobCancelled;     // jobId
+        public event Action<string, CraftJobStatus> OnJobStatusChanged; // jobId, new status
 
         // ============ Properties ============
         public IReadOnlyDictionary<string, CraftJob> Jobs => _jobs;
@@ -120,6 +121,26 @@ namespace IdleDefenseSurvival.Crafting
             }
         }
 
+        public bool RemoveJob(string jobId)
+        {
+            if (!_jobs.TryGetValue(jobId, out var job)) return false;
+            if (job.Status != CraftJobStatus.Complete) return false;
+
+            _jobs.Remove(jobId);
+            RebuildQueue();
+            return true;
+        }
+
+        private void RebuildQueue()
+        {
+            _jobQueue.Clear();
+            foreach (var job in _jobs.Values.Where(j => j.Status == CraftJobStatus.Queued || j.Status == CraftJobStatus.Crafting)
+                .OrderBy(j => j.StartTimeUtc))
+            {
+                _jobQueue.Enqueue(job.JobId);
+            }
+        }
+
         public void SetMaxConcurrentJobs(int max)
         {
             _maxConcurrentJobs = Math.Max(1, max);
@@ -150,6 +171,7 @@ namespace IdleDefenseSurvival.Crafting
                 {
                     JobId = j.JobId,
                     RecipeId = j.RecipeId,
+                    RecipeVersion = j.RecipeVersion,
                     StartTimeUtc = j.StartTimeUtc,
                     EndTimeUtc = j.EndTimeUtc,
                     DurationTicks = j.DurationTicks,
@@ -158,8 +180,6 @@ namespace IdleDefenseSurvival.Crafting
                     Status = j.Status,
                     Results = j.Results,
                     FailureReason = j.FailureReason,
-                    IngredientsSnapshot = j.IngredientsSnapshot,
-                    ExecutionSnapshot = j.ExecutionSnapshot,
                     CompletionSeed = j.CompletionSeed
                 }).ToList(),
                 MaxConcurrentJobs = _maxConcurrentJobs
@@ -176,10 +196,17 @@ namespace IdleDefenseSurvival.Crafting
 
             foreach (var jobData in data.Jobs)
             {
+                // Handle legacy save migration: new format has RecipeVersion and CompletionSeed directly
+                // Legacy format has ExecutionSnapshot and IngredientsSnapshot
+                int recipeVersion = jobData.RecipeVersion > 0 ? jobData.RecipeVersion : 1;
+                long completionSeed = jobData.CompletionSeed;
+
                 var job = new CraftJob
                 {
                     JobId = jobData.JobId,
                     RecipeId = jobData.RecipeId,
+                    RecipeVersion = recipeVersion,
+                    CompletionSeed = completionSeed,
                     StartTimeUtc = jobData.StartTimeUtc,
                     EndTimeUtc = jobData.EndTimeUtc,
                     DurationTicks = jobData.DurationTicks,
@@ -187,10 +214,7 @@ namespace IdleDefenseSurvival.Crafting
                     CompletedCount = jobData.CompletedCount,
                     Status = jobData.Status,
                     Results = jobData.Results,
-                    FailureReason = jobData.FailureReason,
-                    IngredientsSnapshot = jobData.IngredientsSnapshot,
-                    ExecutionSnapshot = jobData.ExecutionSnapshot,
-                    CompletionSeed = jobData.CompletionSeed
+                    FailureReason = jobData.FailureReason
                 };
                 _jobs[job.JobId] = job;
 

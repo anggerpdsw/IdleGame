@@ -1,11 +1,12 @@
-[{
-    "Id": "equip_hat_leather",
-    "Name": "Leather Hat",
-    "Description": "A simple leather hat. +8 INT, +3% Cooldown Reduction",
+[
+  {
+    "Id": "equip_hat_base",
+    "Name": "Base Hat",
+    "Description": "Base template for all hats. Used by crafting system to generate specific rarity hats.",
     "Category": 1,
-    "ItemRarity": 2,
+    "ItemRarity": 1,
     "EquipmentType": 1,
-    "SellPrice": 35,
+    "SellPrice": 20,
     "StackSize": 1,
     "BaseLevel": 1,
     "MaxLevel": 50,
@@ -13,47 +14,15 @@
     "DurabilityLossPerUse": 1,
     "RepairCostPerDurability": 5,
     "MaxSockets": 1,
-    "IconKey": "Equipment/Hat/leather",
-    "AttributeStats": [{
-        "Attribute": "Intelligence",
-        "BaseValue": 8,
-        "ValuePerLevel": 0.6,
-        "ValuePerEnhance": 1.0
-    }],
-    "CombatStats": [{
+    "IconKey": "Equipment/Hat/base",
+    "CombatStats": [
+      {
         "Stat": 12,
-        "BaseValue": 3,
+        "BaseValue": 4,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4,
         "Mode": 2
-    }]
-}, {
-    "Id": "equip_hat_mystic",
-    "Name": "Mystic Hat",
-    "Description": "Enchanted cloth woven with starlight. +10 INT, +5% Cooldown Reduction",
-    "Category": 1,
-    "ItemRarity": 5,
-    "EquipmentType": 1,
-    "SellPrice": 200,
-    "StackSize": 1,
-    "BaseLevel": 1,
-    "MaxLevel": 60,
-    "MaxDurability": 110,
-    "DurabilityLossPerUse": 1,
-    "RepairCostPerDurability": 10,
-    "MaxSockets": 2,
-    "IconKey": "Equipment/Hat/mystic",
-    "AttributeStats": [{
-        "Attribute": "Intelligence",
-        "BaseValue": 10,
-        "ValuePerLevel": 0.8,
-        "ValuePerEnhance": 1.5
-    }],
-    "CombatStats": [{
-        "Stat": 12,
-        "BaseValue": 5,
-        "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0.4,
-        "Mode": 2
-    }]
-}]
+      }
+    ]
+  }
+]

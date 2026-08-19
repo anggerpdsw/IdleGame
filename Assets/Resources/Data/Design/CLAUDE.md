@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) and other coding age
 
 ---
 
-# 1. PROJECT MANDATE
+# 1. PROJECT MANDATE - Build Manual Unity project to check compilation
 
 ## Project
 
@@ -157,7 +157,6 @@ If two systems need the same rule, extract or reuse the authoritative service/ca
 - Unity Input System
 - UGUI
 - Physics2D
-- Unity Test Framework
 - DOTween
 - Newtonsoft.Json
 - JSON runtime data under `Assets/Resources/Data`
@@ -1704,7 +1703,5 @@ When uncertain:
 > **Keep UI separate from domain logic.**
 >
 > **Preserve persistent data.**
->
-> **Test the edge case.**
 >
 > **Document the decision.**

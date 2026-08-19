@@ -1,26 +1,22 @@
 using System;
-using System.Collections.Generic;
-using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
     /// Represents a single crafting job in the queue.
-    /// Uses unique JobId (Guid) to support multiple concurrent crafts of same recipe.
+    /// Minimal, recipe-driven design: only runtime state persisted.
+    /// Recipe data (equipment type, rarity, ingredients, cost, duration) resolved from RecipeId at runtime.
     /// </summary>
     [Serializable]
     public class CraftJob
     {
         // ============ Identity ============
         public string JobId;                 // Unique GUID for this craft job
-        public string RecipeId;              // Reference to recipe
+        public string RecipeId;              // Reference to recipe (single source of truth)
+        public int RecipeVersion = 1;        // Recipe version at job creation (for migration/compatibility)
 
-        // ============ Execution Snapshot (P0-A) ============
-        // Immutable root containing RecipeSnapshot, CostSnapshot, Context, CraftCount, CompletionSeed.
-        // Built at StartCraft; RecipeVersion is derived via ExecutionSnapshot.Recipe.RecipeVersion (§16.3).
-        public CraftExecutionSnapshot ExecutionSnapshot;
-        public long? CompletionSeed;         // mirrors ExecutionSnapshot.CompletionSeed for legacy lookup (I-21, I-20)
+        // ============ Deterministic Completion ============
+        public long CompletionSeed;          // Seed generated at job creation for deterministic results
 
         // ============ Timing (UTC ticks for persistence) ============
         public long StartTimeUtc;            // DateTime.UtcNow.Ticks when started
@@ -46,54 +42,21 @@ namespace IdleDefenseSurvival.Crafting
         public CraftResultData[] Results;    // Generated results when complete
         public string FailureReason;         // If failed
 
-        // ============ Snapshot (immutable at creation) ============
-        // Frozen copy of recipe ingredients scaled by job.Count, captured when the job was created.
-        // Survives recipe/database mutations so refund and audit paths see what was actually consumed.
-        // DecomposedRequirementsSnapshot[] is intentionally absent — no runtime resolver/aggregator exists.
-        public CraftIngredientSnapshot[] IngredientsSnapshot;
-
         // ============ Helper Methods ============
-        public static CraftJob Create(string recipeId, int count, long durationTicks)
+        public static CraftJob Create(string recipeId, int count, long durationTicks, int recipeVersion, long completionSeed)
         {
             var now = DateTime.UtcNow.Ticks;
             return new CraftJob
             {
                 JobId = Guid.NewGuid().ToString(),
                 RecipeId = recipeId,
+                RecipeVersion = recipeVersion,
+                CompletionSeed = completionSeed,
                 StartTimeUtc = now,
                 DurationTicks = durationTicks,
                 EndTimeUtc = now + durationTicks,
                 Count = count,
                 Status = CraftJobStatus.Queued
-            };
-        }
-
-        /// <summary>
-        /// Overload that seeds the job with a pre-built immutable <see cref="CraftExecutionSnapshot"/>
-        /// and an ingredients snapshot. Used by <see cref="CraftSnapshotBuilder"/> flow to ensure
-        /// the same snapshot object is shared between journal and job — single source of truth (P0-C).
-        /// JobId is generated here; no queue/journal logic added.
-        ///</summary>
-        public static CraftJob Create(
-            string recipeId,
-            int count,
-            long durationTicks,
-            CraftExecutionSnapshot snapshot,
-            CraftIngredientSnapshot[] ingredientsSnapshot)
-        {
-            var now = DateTime.UtcNow.Ticks;
-            return new CraftJob
-            {
-                JobId = Guid.NewGuid().ToString(),
-                RecipeId = recipeId,
-                StartTimeUtc = now,
-                DurationTicks = durationTicks,
-                EndTimeUtc = now + durationTicks,
-                Count = count,
-                Status = CraftJobStatus.Queued,
-                ExecutionSnapshot = snapshot,
-                CompletionSeed = snapshot?.CompletionSeed,
-                IngredientsSnapshot = ingredientsSnapshot
             };
         }
 
@@ -126,6 +89,11 @@ namespace IdleDefenseSurvival.Crafting
         {
             Status = CraftJobStatus.Failed;
             FailureReason = reason;
+        }
+
+        public void MarkRewardPendingCommit()
+        {
+            Status = CraftJobStatus.RewardPendingCommit;
         }
     }
 

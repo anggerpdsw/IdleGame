@@ -57,7 +57,6 @@ namespace IdleDefenseSurvival.Manager
         private CraftContextBuilder _contextBuilder;
         private CraftCompletionService _completionService;
         private CraftRefundService _refundService;
-        private CraftTransactionJournal _transactionJournal;
         private SaveManager _saveManager;
         #endregion
 
@@ -81,8 +80,6 @@ namespace IdleDefenseSurvival.Manager
             // Create all sub-services
             _repository = new CraftRecipeRepository();
             _validator = new CraftValidator(_repository, inventory, economy, _saveManager);
-            _transactionJournal = new CraftTransactionJournal();
-            _saveManager.RegisterJournal(_transactionJournal);
             _queueService = new CraftQueueService();
             _rollService = new CraftRollService(_repository, new UnityRandomProvider(), _formulasConfig);
             _rewardService = new CraftRewardService(ItemGenerator.Instance);
@@ -105,172 +102,6 @@ namespace IdleDefenseSurvival.Manager
 
             // Load recipes from equipment data
             _repository.Initialize();
-
-            // P0-D: Run recovery executor after journal is loaded (SaveManager calls LoadFromSaveData on journal before this)
-            RunTransactionRecovery(inventory, economy);
-        }
-
-        /// <summary>
-        /// P0-D Recovery executor: consumes CraftTransactionJournal.ClassifyReconciliation() decisions
-        /// and executes the required compensations. Called once at startup after journal is hydrated.
-        /// </summary>
-        private void RunTransactionRecovery(IInventoryService inventory, EconomyManager economy)
-        {
-            if (_transactionJournal == null) return;
-
-            var decisions = _transactionJournal.ClassifyReconciliation();
-            if (decisions.Count == 0) return;
-
-            Debug.Log($"[CraftService] Recovery: processing {decisions.Count} reconciliation decisions");
-
-            foreach (var decision in decisions)
-            {
-                try
-                {
-                    switch (decision.Action)
-                    {
-                        case ReconciliationAction.Commit:
-                            ExecuteCommit(decision, inventory, economy);
-                            break;
-
-                        case ReconciliationAction.Rollback:
-                            ExecuteRollback(decision, inventory, economy);
-                            break;
-
-                        case ReconciliationAction.Skip:
-                            // No action needed
-                            break;
-                    }
-
-                    // Persist journal state after each decision
-                    _saveManager.PersistCurrentStateDurably();
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError($"[CraftService] Recovery failed for decision {decision.Action} (entry={decision.EntryId}, op={decision.OperationId}): {e.Message}");
-                    // Continue with other decisions; this one will be retried on next startup
-                }
-            }
-        }
-
-        /// <summary>
-        /// Executes a Commit decision: consumes the resource for Pending operations.
-        /// </summary>
-        private void ExecuteCommit(ReconciliationDecision decision, IInventoryService inventory, EconomyManager economy)
-        {
-            switch (decision.ResourceType)
-            {
-                case ResourceKind.Material:
-                case ResourceKind.Catalyst:
-                case ResourceKind.Progression:
-                    // These were reserved but not yet consumed — consume now via exact removal
-                    int removed = inventory.RemoveItemById(decision.ResourceId, decision.Quantity);
-                    if (removed != decision.Quantity)
-                    {
-                        Debug.LogWarning($"[CraftService] Recovery commit: expected to remove {decision.Quantity} of {decision.ResourceId}, removed {removed}");
-                    }
-                    break;
-
-                case ResourceKind.Currency:
-                    // Currency was reserved — spend now
-                    if (Enum.TryParse<CurrencyType>(decision.ResourceId, out var currencyType))
-                    {
-                        bool spent = economy.TrySpendCurrency(currencyType, decision.Quantity, "CraftRecoveryCommit");
-                        if (!spent)
-                        {
-                            Debug.LogError($"[CraftService] Recovery commit: failed to spend {decision.Quantity} {currencyType} for {decision.JobId}");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"[CraftService] Recovery commit: unknown currency {decision.ResourceId}");
-                    }
-                    break;
-            }
-
-            // Mark operation as Applied
-            _transactionJournal.UpdateOperationState(decision.EntryId, decision.OperationId, OperationState.Applied);
-
-            // If all operations in entry are now Applied/RolledBack, advance phase to JobPersisted
-            var ops = _transactionJournal.GetOperations(decision.EntryId);
-            bool allTerminal = true;
-            foreach (var o in ops)
-            {
-                if (o.State != OperationState.Applied && o.State != OperationState.RolledBack)
-                {
-                    allTerminal = false;
-                    break;
-                }
-            }
-            if (allTerminal)
-            {
-                _transactionJournal.UpdateEntryPhase(decision.EntryId, CraftJournalPhase.JobPersisted);
-            }
-        }
-
-        /// <summary>
-        /// Executes a Rollback decision: refunds the resource for Applied operations.
-        /// Uses idempotency guard (HasAppliedOperation) to avoid double-refund.
-        /// </summary>
-        private void ExecuteRollback(ReconciliationDecision decision, IInventoryService inventory, EconomyManager economy)
-        {
-            switch (decision.ResourceType)
-            {
-                case ResourceKind.Material:
-                case ResourceKind.Catalyst:
-                case ResourceKind.Progression:
-                    // Refund items back to inventory
-                    var itemData = ItemDatabase.Instance?.GetItem(decision.ResourceId);
-                    if (itemData != null)
-                    {
-                        for (int i = 0; i < decision.Quantity; i++)
-                        {
-                            var refundItem = new InventoryItem
-                            {
-                                ItemId = decision.ResourceId,
-                                Quantity = 1,
-                                AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-                            };
-                            inventory.AddItemInstance(refundItem);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"[CraftService] Recovery rollback: item not found {decision.ResourceId}");
-                    }
-                    break;
-
-                case ResourceKind.Currency:
-                    // Refund currency
-                    if (Enum.TryParse<CurrencyType>(decision.ResourceId, out var currencyType))
-                    {
-                        economy.AddCurrency(currencyType, decision.Quantity, "CraftRecoveryRollback");
-                    }
-                    else
-                    {
-                        Debug.LogError($"[CraftService] Recovery rollback: unknown currency {decision.ResourceId}");
-                    }
-                    break;
-            }
-
-            // Mark operation as RolledBack
-            _transactionJournal.UpdateOperationState(decision.EntryId, decision.OperationId, OperationState.RolledBack);
-
-            // If all operations in entry are now RolledBack, advance phase to RolledBack
-            var rollbackOps = _transactionJournal.GetOperations(decision.EntryId);
-            bool allRolledBack = true;
-            foreach (var o in rollbackOps)
-            {
-                if (o.State != OperationState.RolledBack)
-                {
-                    allRolledBack = false;
-                    break;
-                }
-            }
-            if (allRolledBack)
-            {
-                _transactionJournal.UpdateEntryPhase(decision.EntryId, CraftJournalPhase.RolledBack);
-            }
         }
         #endregion
 
@@ -280,6 +111,7 @@ namespace IdleDefenseSurvival.Manager
             // Update craft queue (handles progress, completion, starting queued jobs)
             _queueService?.Update();
         }
+        #endregion
 
         // ============ Persistence ============
         /// <summary>
@@ -297,7 +129,6 @@ namespace IdleDefenseSurvival.Manager
         {
             _persistenceService?.RestoreSaveData(data);
         }
-        #endregion
 
         #region Public API - Craft Operations
         /// <summary>
@@ -324,49 +155,39 @@ namespace IdleDefenseSurvival.Manager
 
             if (!_repository.TryGetRecipe(recipeId, out var recipe)) return null;
 
-            // 2. Build Execution Snapshot (P0-C)
-            var ingredientsSnapshot = recipe.Ingredients != null
-                ? Array.ConvertAll(recipe.Ingredients, ing => CraftIngredientSnapshot.From(ing, count))
-                : null;
-            var executionSnapshot = CraftSnapshotBuilder.Build(recipe, count, _rollService.RngProvider, ingredientsSnapshot);
+            // 2. Generate completion seed for deterministic results
+            long completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
 
-            // 3. Create Job
+            // 3. Create Job (minimal - only runtime state)
             long baseTicks = (long)(recipe.BaseCraftTime * TimeSpan.TicksPerSecond);
             long additionalTicks = (long)(recipe.TimePerAdditionalUnit * TimeSpan.TicksPerSecond * (count - 1));
             long totalDurationTicks = baseTicks + additionalTicks;
-            var job = CraftJob.Create(recipeId, count, totalDurationTicks, executionSnapshot, ingredientsSnapshot);
+            var job = CraftJob.Create(recipeId, count, totalDurationTicks, recipe.RecipeVersion, completionSeed);
 
-            // 4. Begin atomic transaction (reserves materials, creates PREPARED journal entry, persists)
-            var transaction = new CraftTransactionService(InventoryService.Instance, EconomyManager.Instance, _transactionJournal, _saveManager);
-            var transactionResult = transaction.BeginTransaction(job.JobId, recipe, executionSnapshot, count);
+            // 4. Begin atomic transaction (reserves materials/currency)
+            var transaction = new CraftTransactionService(InventoryService.Instance, EconomyManager.Instance, _saveManager);
+            var transactionResult = transaction.BeginTransaction(recipe, count);
 
             if (!transactionResult.IsSuccess)
             {
                 Debug.Log($"[CraftService] Transaction failed for {recipeId}: {transactionResult.Reason}");
-                // No need to rollback, as BeginTransaction does it internally on failure
                 return null;
             }
 
             // 5. Enqueue job
             if (!_queueService.EnqueueJob(job))
             {
-                transaction.Rollback(); // Rolls back the journal entry and persists
+                transaction.Rollback();
                 Debug.LogError($"[CraftService] Failed to enqueue job {job.JobId}. Transaction rolled back.");
                 return null;
             }
 
-            // 6. Mark as Reserved and persist
-            _transactionJournal.UpdateEntryPhase(transaction.JournalEntryId, CraftJournalPhase.Reserved);
-            _saveManager.PersistCurrentStateDurably();
-
-
-            // 7. Commit transaction (consumes resources with per-operation checkpoints)
+            // 6. Commit transaction (consumes resources)
             try
             {
                 var commitResult = transaction.Commit();
                 if (!commitResult.IsSuccess)
                 {
-                    // This path indicates a non-exception failure, which current Commit() doesn't do. Safeguard.
                     transaction.Rollback();
                     _queueService.CancelJob(job.JobId, RefundPolicy.None);
                     OnCraftFailed?.Invoke(job.JobId, commitResult.Reason);
@@ -376,8 +197,6 @@ namespace IdleDefenseSurvival.Manager
             }
             catch (Exception e)
             {
-                // Exception during commit leaves journal in a partial state.
-                // Mark for rollback and let recovery handle compensation.
                 transaction.Rollback();
                 _queueService.CancelJob(job.JobId, RefundPolicy.None);
                 OnCraftFailed?.Invoke(job.JobId, e.Message);
@@ -385,11 +204,7 @@ namespace IdleDefenseSurvival.Manager
                 return null;
             }
 
-            // 8. Mark as Committed and persist
-            _transactionJournal.UpdateEntryPhase(transaction.JournalEntryId, CraftJournalPhase.Committed);
-            _saveManager.PersistCurrentStateDurably();
-
-            // 9. Try to start job from queue
+            // 7. Try to start job from queue
             _queueService.TryStartNextJob();
 
             return job.JobId;
@@ -452,6 +267,21 @@ namespace IdleDefenseSurvival.Manager
         public void ClearCompletedJobs()
         {
             _queueService?.ClearCompletedJobs();
+        }
+
+        /// <summary>
+        /// Claims a completed job, removing it from the queue and triggering save.
+        /// </summary>
+        public void ClaimJob(string jobId)
+        {
+            var queue = _queueService;
+            if (queue == null) return;
+
+            bool removed = queue.RemoveJob(jobId);
+            if (removed)
+            {
+                _persistenceService?.CreateSaveData();
+            }
         }
         #endregion
 
@@ -572,8 +402,11 @@ namespace IdleDefenseSurvival.Manager
         /// <summary>
         /// Gets the formulas config for tuning.
         /// </summary>
-        public CraftFormulasConfig GetFormulasConfig() => _formulasConfig;        
-        
+        public CraftFormulasConfig GetFormulasConfig() => _formulasConfig;
+
+        /// <summary>Gets the queue service for direct job queries (UI access).</summary>
+        public CraftQueueService GetQueueService() => _queueService;
+
         public void OpenCrafting() => SceneLoader.Instance.LoadCrafting();
     }
 }

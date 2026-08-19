@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "Id": "equip_pants_base",
+    "Name": "Base Pants",
+    "Description": "Base template for all pants. Used by crafting system to generate specific rarity pants.",
+    "Category": 1,
+    "ItemRarity": 1,
+    "EquipmentType": 6,
+    "SellPrice": 20,
+    "StackSize": 1,
+    "BaseLevel": 1,
+    "MaxLevel": 50,
+    "MaxDurability": 100,
+    "DurabilityLossPerUse": 1,
+    "RepairCostPerDurability": 5,
+    "MaxSockets": 1,
+    "IconKey": "Equipment/Pants/base",
+    "CombatStats": [
+      {
+        "Stat": 10,
+        "BaseValue": 4,
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4,
+        "Mode": 2
+      }
+    ]
+  }
+]
