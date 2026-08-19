@@ -59,7 +59,6 @@ namespace IdleDefenseSurvival.Crafting
         // ============ Success & Quality ============
         public float BaseSuccessRate = 100f; // Percentage
         public float SuccessRatePerLevel = 0f; // Bonus per crafting level
-        public QualityChance[] QualityChances; // Chance for higher quality results
 
         // ============ Conditions ============
         public CraftCondition[] Conditions; // Special conditions (time of day, biome, etc.)
@@ -130,7 +129,6 @@ namespace IdleDefenseSurvival.Crafting
                 // Success
                 BaseSuccessRate = source.BaseSuccessRate,
                 SuccessRatePerLevel = source.SuccessRatePerLevel,
-                QualityChances = source.QualityChances ?? Array.Empty<QualityChance>(),
 
                 // Conditions
                 Conditions = source.Conditions ?? Array.Empty<CraftCondition>(),
@@ -218,18 +216,6 @@ namespace IdleDefenseSurvival.Crafting
     }
 
     /// <summary>
-    /// Quality chance for RNG quality results.
-    /// </summary>
-    [Serializable]
-    public class QualityChance
-    {
-        public int QualityLevel;       // Quality tier (1 = Common, 2 = Rare, etc.)
-        public float BaseChance = 0f;  // Base percentage chance
-        public float ChancePerLevel = 0f; // Bonus per crafting level
-        public float ChancePerLuck = 0f;  // Bonus per luck stat
-    }
-
-    /// <summary>
     /// Condition for crafting availability.
     /// </summary>
     [Serializable]
@@ -293,23 +279,6 @@ namespace IdleDefenseSurvival.Crafting
         TimeOfDay = 5,
         Biome = 6,
         Weather = 7,
-    }
-
-    /// <summary>
-    /// Crafting station data - for station-based crafting (future expansion).
-    /// </summary>
-    [Serializable]
-    public class CraftStationData
-    {
-        public string StationId;
-        public string StationName;
-        public EquipmentType StationType; // Which equipment slot this station uses
-        public CraftRecipeData[] Recipes; // Recipes exclusive to this station
-        public float SpeedMultiplier = 1f;
-        public float SuccessRateBonus = 0f;
-        public float QualityBonus = 0f;
-        public int RequiredLevel = 1;
-        public long UpgradeCost = 0;
     }
 
     /// <summary>

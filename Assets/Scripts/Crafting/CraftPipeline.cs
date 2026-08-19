@@ -107,78 +107,6 @@ namespace IdleDefenseSurvival.Crafting
         }
     }
 
-    
-    /// <summary>
-    /// Stage 5: Apply mastery bonuses.
-    /// </summary>
-    public class MasteryStage : CraftPipelineStageBase
-    {
-        private readonly CraftFormulasConfig _config;
-
-        public MasteryStage(CraftFormulasConfig config = null)
-        {
-            _config = config ?? new CraftFormulasConfig();
-        }
-
-        public override string StageName => "MasteryBonus";
-        public override int Order => 200;
-
-        public override void Execute(CraftPipelineContext ctx)
-        {
-            if (!ctx.Success) return;
-
-            int masteryLevel = ctx.Context.GetMasteryLevel(ctx.Recipe.RecipeId);
-            if (masteryLevel <= 0) return;
-
-            int effectiveLevel = Mathf.Min(masteryLevel, _config.MasteryMaxBonusLevel);
-            float bonusChance = effectiveLevel * _config.MasteryBonusChancePerLevel;
-
-            if (ctx.Rng.ChancePercent(bonusChance))
-            {
-                // Grant extra equipment of same slot as the recipe
-                ctx.Entries.Add(new CraftResultEntry
-                {
-                    ItemId = "mastery_extra", // Marker - actual item generated in CraftRewardService
-                    Count = 1,
-                    Quality = ctx.Recipe.Rarity,
-                    Source = CraftRewardSource.Mastery.ToString(),
-                    IsCritical = false,
-                    FixedLevel = ctx.Recipe.RequiredTier,
-                    FixedEnhance = 0
-                });
-            }
-        }
-    }
-
-    /// <summary>
-    /// Stage 6: Apply event/seasonal modifiers.
-    /// </summary>
-    public class EventStage : CraftPipelineStageBase
-    {
-        public override string StageName => "EventModifiers";
-        public override int Order => 250;
-
-        public override void Execute(CraftPipelineContext ctx)
-        {
-            if (!ctx.Success) return;
-
-            // Apply all event modifiers from context
-            var modifiers = ctx.Context.ActiveEventModifiers;
-            if (modifiers == null || modifiers.Count == 0) return;
-
-            // Sort by priority
-            var sortedModifiers = modifiers.OrderBy(m => m.Priority).ToList();
-
-            foreach (var modifier in sortedModifiers)
-            {
-                if (modifier.CanApply(ctx.Context, ctx.Recipe))
-                {
-                    modifier.Apply(ctx);
-                }
-            }
-        }
-    }
-
     /// <summary>
     /// Stage 3: Add base equipment result (deterministic - no RNG).
     /// Equipment is generated from recipe metadata (Rarity, RequiredTier, EquipmentType).
@@ -208,141 +136,36 @@ namespace IdleDefenseSurvival.Crafting
     }
 
     /// <summary>
-    /// Stage 7: Apply critical craft effects.
-    /// Runs LAST so it can multiply ALL accumulated results (base + mastery + event).
+    /// Stage 5: Apply event/seasonal modifiers.
     /// </summary>
-    public class CriticalStage : CraftPipelineStageBase
+    public class EventStage : CraftPipelineStageBase
     {
-        private readonly CraftFormulasConfig _config;
-
-        public CriticalStage(CraftFormulasConfig config = null)
-        {
-            _config = config ?? new CraftFormulasConfig();
-        }
-
-        public override string StageName => "CriticalCraft";
-        public override int Order => 300;
+        public override string StageName => "EventModifiers";
+        public override int Order => 250;
 
         public override void Execute(CraftPipelineContext ctx)
         {
             if (!ctx.Success) return;
 
-            float criticalChance = CalculateCriticalChance(ctx);
-            criticalChance += ctx.CriticalChanceBonus;
-            criticalChance *= ctx.CriticalChanceMultiplier;
-            criticalChance = Mathf.Clamp(criticalChance, 0f, _config.MaxCriticalChance);
+            // Apply all event modifiers from context
+            var modifiers = ctx.Context.ActiveEventModifiers;
+            if (modifiers == null || modifiers.Count == 0) return;
 
-            if (!ctx.Rng.ChancePercent(criticalChance))
-                return;
+            // Sort by priority
+            var sortedModifiers = modifiers.OrderBy(m => m.Priority).ToList();
 
-            // Critical triggered! Apply effect to ALL current entries
-            var criticalType = DetermineCriticalType(ctx);
-            ApplyCriticalEffect(ctx, criticalType);
-        }
-
-        private float CalculateCriticalChance(CraftPipelineContext ctx)
-        {
-            float chance = ctx.Context.BaseCriticalChance;
-            chance += ctx.Context.CraftingLevel * _config.LevelToCriticalChance;
-            chance += ctx.Context.Luck * _config.LuckToCriticalChance;
-            return chance;
-        }
-
-        private CriticalType DetermineCriticalType(CraftPipelineContext ctx)
-        {
-            float roll = ctx.Rng.NextFloat();
-            float cumulative = 0f;
-
-            cumulative += ctx.Context.MasterpieceChance + _config.MasterpieceWeight;
-            if (roll < cumulative) return CriticalType.Masterpiece;
-
-            cumulative += ctx.Context.QualityBonusChance + _config.QualityBonusWeight;
-            if (roll < cumulative) return CriticalType.BonusQuality;
-
-            cumulative += ctx.Context.ExtraItemChance + _config.ExtraItemWeight;
-            if (roll < cumulative) return CriticalType.FreeExtraItem;
-
-            return CriticalType.DoubleResult;
-        }
-
-        private void ApplyCriticalEffect(CraftPipelineContext ctx, CriticalType type)
-        {
-            // Snapshot current entries to apply critical effect to ALL of them
-            var currentEntries = new List<CraftResultEntry>(ctx.Entries);
-
-            foreach (var entry in currentEntries)
+            foreach (var modifier in sortedModifiers)
             {
-                CraftResultEntry criticalEntry = null;
-
-                switch (type)
+                if (modifier.CanApply(ctx.Context, ctx.Recipe))
                 {
-                    case CriticalType.DoubleResult:
-                        criticalEntry = new CraftResultEntry
-                        {
-                            ItemId = entry.ItemId,
-                            Count = entry.Count,
-                            Quality = entry.Quality,
-                            Source = CraftRewardSource.Critical.ToString() + "_Double",
-                            IsCritical = true,
-                            FixedLevel = entry.FixedLevel,
-                            FixedEnhance = entry.FixedEnhance,
-                            SocketCount = entry.SocketCount
-                        };
-                        break;
-
-                    case CriticalType.BonusQuality:
-                        criticalEntry = new CraftResultEntry
-                        {
-                            ItemId = entry.ItemId,
-                            Count = entry.Count,
-                            Quality = Mathf.Min(entry.Quality + 1, _config.MaxQualityTier),
-                            Source = CraftRewardSource.Critical.ToString() + "_Quality",
-                            IsCritical = true,
-                            FixedLevel = entry.FixedLevel,
-                            FixedEnhance = entry.FixedEnhance,
-                            SocketCount = entry.SocketCount
-                        };
-                        break;
-
-                    case CriticalType.FreeExtraItem:
-                        // Grant an extra equipment of same slot/rarity
-                        criticalEntry = new CraftResultEntry
-                        {
-                            ItemId = "crafted_equipment",
-                            Count = 1,
-                            Quality = ctx.Recipe.Rarity,
-                            Source = CraftRewardSource.Critical.ToString() + "_Extra",
-                            IsCritical = true,
-                            FixedLevel = ctx.Recipe.RequiredTier,
-                            FixedEnhance = 0
-                        };
-                        break;
-
-                    case CriticalType.Masterpiece:
-                        criticalEntry = new CraftResultEntry
-                        {
-                            ItemId = entry.ItemId,
-                            Count = entry.Count * 2,
-                            Quality = _config.MaxQualityTier,
-                            Source = CraftRewardSource.Critical.ToString() + "_Masterpiece",
-                            IsCritical = true,
-                            FixedLevel = entry.FixedLevel,
-                            FixedEnhance = entry.FixedEnhance,
-                            SocketCount = entry.SocketCount
-                        };
-                        break;
-                }
-
-                if (criticalEntry != null)
-                {
-                    ctx.Entries.Add(criticalEntry);
+                    modifier.Apply(ctx);
                 }
             }
         }
     }
 
     /// <summary>
-    /// Stage 8: Validate final results (quality bounds, count bounds, valid item IDs).
+    /// Stage 7: Validate final results (quality bounds, count bounds, valid item IDs).
     /// </summary>
     public class ValidationFinalStage : CraftPipelineStageBase
     {
@@ -395,6 +218,10 @@ namespace IdleDefenseSurvival.Crafting
             if (entry.Count <= 0)
                 return false;
 
+            // Allow placeholder IDs that will be resolved by CraftRewardService later
+            if (entry.ItemId == "crafted_equipment" || entry.ItemId == "mastery_extra")
+                return true;
+
             if (_itemDatabase != null && !_itemDatabase.IsValidItemId(entry.ItemId))
             {
                 Debug.LogWarning($"[CraftPipeline] ItemId not found in database: {entry.ItemId}");
@@ -406,7 +233,7 @@ namespace IdleDefenseSurvival.Crafting
     }
 
     /// <summary>
-    /// Stage 9: Calculate final EXP reward.
+    /// Stage 8: Calculate final EXP reward.
     /// </summary>
     public class ExperienceStage : CraftPipelineStageBase
     {
@@ -428,7 +255,7 @@ namespace IdleDefenseSurvival.Crafting
     }
 
     /// <summary>
-    /// Stage 10: Finalize - apply failure behavior if needed.
+    /// Stage 9: Finalize - apply failure behavior if needed.
     /// </summary>
     public class FinalizeStage : CraftPipelineStageBase
     {
@@ -480,9 +307,7 @@ namespace IdleDefenseSurvival.Crafting
             RegisterStage(new ValidationStage());
             RegisterStage(new SuccessStage(_config));
             RegisterStage(new BaseEquipmentStage());
-            RegisterStage(new MasteryStage(_config));
             RegisterStage(new EventStage());
-            RegisterStage(new CriticalStage(_config));
             RegisterStage(new ValidationFinalStage(_itemDatabase));
             RegisterStage(new ExperienceStage());
             RegisterStage(new FinalizeStage(_config));
@@ -526,7 +351,6 @@ namespace IdleDefenseSurvival.Crafting
                         pipelineCtx.FailureReason = $"Pipeline error in {stage.StageName}";
                         break;
                     }
-
                 }
 
                 // Early exit on failure

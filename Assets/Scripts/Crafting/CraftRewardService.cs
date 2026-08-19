@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Generation;
@@ -47,15 +48,41 @@ namespace IdleDefenseSurvival.Crafting
 
         private InventoryItem GenerateSingleItem(CraftResultEntry entry, CraftRecipeData recipe, CraftContext context, long seed)
         {
-            // Slot-based fallback: craft_* recipe ids don't directly resolve as EquipmentData.
-            // Resolve via the 11 base templates (equip_<slot>_base); rarity/level from the recipe.
-            var slot = InferSlotFromRecipe(recipe);
-            if (slot.HasValue && recipe.Category == ItemCategory.Equipment)
+            // Handle placeholder IDs for equipment (crafted_equipment, mastery_extra) without casting errors.
+            // If entry uses placeholder, generate equipment via base template regardless of recipe.Category.
+            bool isPlaceholder = entry.ItemId.StartsWith("crafted_") || entry.ItemId == "mastery_extra";
+            if (isPlaceholder)
             {
-                return GenerateEquipmentFromBase(recipe, context, slot.Value, seed);
+                var slot = InferSlotFromRecipe(recipe);
+                if (slot.HasValue)
+                {
+                    return GenerateEquipmentFromBase(recipe, context, slot.Value, seed);
+                }
+                // No slot inference → cannot generate equipment, skip.
+                return null;
             }
 
-            // Build generation context for non-equipment items
+            // Slot‑based fallback: craft_* recipe ids don't directly resolve as EquipmentData.
+            // Resolve via the 11 base templates (equip_<slot>_base); rarity/level from the recipe.
+            var slotFromRecipe = InferSlotFromRecipe(recipe);
+            if (slotFromRecipe.HasValue && recipe.Category == ItemCategory.Equipment)
+            {
+                return GenerateEquipmentFromBase(recipe, context, slotFromRecipe.Value, seed);
+            }
+
+            // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
+            // Only EventCraftModifier instances are relevant for item generation; other modifiers
+            // (e.g., ExtraItemModifier) are not compatible with the ItemGenerationContext.EventModifiers type.
+            var eventModifiers = new List<EventCraftModifier>();
+            foreach (var mod in context.ActiveEventModifiers)
+            {
+                if (mod is EventCraftModifier ev)
+                {
+                    eventModifiers.Add(ev);
+                }
+            }
+
+            // Build generation context for non‑equipment items
             var genContext = new ItemGenerationContext
             {
                 Source = ItemSource.Craft,
@@ -63,7 +90,8 @@ namespace IdleDefenseSurvival.Crafting
                 PlayerLevel = context.CraftingLevel,
                 CraftingMastery = context.GetMasteryLevel(recipe.RecipeId),
                 BlacksmithLevel = context.BlacksmithLevel,
-                EventModifiers = (IReadOnlyList<EventCraftModifier>)context.ActiveEventModifiers,
+                // Safe: eventModifiers is List<EventCraftModifier>, implements IReadOnlyList<EventCraftModifier>
+                EventModifiers = eventModifiers,
                 Luck = context.Luck,
                 ForcedQuality = entry.Quality > 0 ? entry.Quality : -1,
                 FixedLevel = entry.FixedLevel > 0 ? entry.FixedLevel : -1,
@@ -79,7 +107,7 @@ namespace IdleDefenseSurvival.Crafting
         /// Rarity is the sole output tier; RequiredTier remains a progression gate and
         /// only feeds the generated item's level. Routes through ItemGenerator so the full
         /// EquipmentGenerator pipeline runs (CustomData: AttributeStats/secondaries/affixes/sockets).
-        /// Uses a seeded ItemGenerator so attribute rolls are deterministic under CompletionSeed (I-11).
+        /// Uses deterministic seeded RNG via CompletionSeed for I-11 replay consistency.
         ///</summary>
         private InventoryItem GenerateEquipmentFromBase(
             CraftRecipeData recipe,
@@ -99,28 +127,32 @@ namespace IdleDefenseSurvival.Crafting
             }
 
             // v3.8 §20.1 — rarity source of truth: recipe.Rarity (1=Common..6=Divine), never RequiredTier.
-            int rarityLevel = recipe.Rarity > 0 ? recipe.Rarity : 1;
-            // Level: RequiredTier is a progression gate, reused as item level (pre-v3.8 behavior).
-            int level = recipe.RequiredTier > 0 ? recipe.RequiredTier : 1;
+            // EquipmentGenerator expects 0-based quality tier: 0=Common, 1=Rare, ..., 5=Divine.
+            int qualityTier = Mathf.Max(0, recipe.Rarity - 1);
+            int level = Mathf.Max(1, recipe.RequiredTier);
 
-            var genContext = new ItemGenerationContext
+            // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
+            var eventModifiers = new List<EventCraftModifier>();
+            foreach (var mod in context.ActiveEventModifiers)
             {
-                Source = ItemSource.Craft,
-                RecipeId = recipe.RecipeId,
-                PlayerLevel = context.CraftingLevel,
-                CraftingMastery = context.GetMasteryLevel(recipe.RecipeId),
-                BlacksmithLevel = context.BlacksmithLevel,
-                EventModifiers = (IReadOnlyList<EventCraftModifier>)context.ActiveEventModifiers,
-                Luck = context.Luck,
-                ForcedQuality = rarityLevel,
-                FixedLevel = level,
-                EquipmentType = slot,
-                Category = ItemCategory.Equipment
-            };
+                if (mod is EventCraftModifier ev)
+                    eventModifiers.Add(ev);
+            }
 
-            // Use deterministic generator seeded with CompletionSeed for I-11 replay consistency.
-            var item = ItemGenerator.CreateDeterministic((int)seed).GenerateEquipmentFromBase(baseEquip, genContext);
-            return item;
+            // Build context via helper — sets Source, EquipmentType, Category, PlayerLevel, ForcedQuality, FixedLevel correctly.
+            var genContext = ItemGenerationContext.Equipment(
+                                 equipmentType: slot,
+                                 rarity: (Rarity)recipe.Rarity,
+                                 level: level,
+                                 tier: recipe.RequiredTier)
+                             .With(
+                                 seed: (int)seed,
+                                 forcedQuality: qualityTier,
+                                 fixedLevel: level,
+                                 eventModifiers: eventModifiers);
+
+            // Use injected generator (shares RNG with pipeline) for I-11 determinism.
+            return _itemGenerator.GenerateEquipmentFromBase(baseEquip, genContext);
         }
 
         /// <summary>

@@ -1,23 +1,18 @@
 
 namespace IdleDefenseSurvival
 {
-    public enum CriticalType { None, Critical, SuperCritical, UltraCritical,
-        DoubleResult,
-        BonusQuality,
-        FreeExtraItem,
-        Masterpiece
-    }
+    public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
+    public enum SceneState { CardCollection, Crafting, Game, Inventory, MainMenu }
+    public enum CriticalType { None, Critical, SuperCritical, UltraCritical }
     public enum CurrencyType { Gold, Gem, Meat }
     public enum DailyRewardState { Locked, Waiting, Claimable, Claimed, CompletedToday }
     public enum DamageType { Normal, Critical, Heal, Mana, Poison, Burn, Ice, TrueDamage, Miss }
     public enum ProjectileOwner { Player, Tank, Enemy }
     public enum RewardType { Gold, Gem, Meat, Exp, Card, Ticket, Energy, Item, Equipment, Hero }
     public enum Role { Fighter, Tank, Golem, Caster, Ranger, Agile, Beast, BOSS }
-    public enum SceneState { CardCollection, Crafting, Game, Inventory, MainMenu }
     public enum SpawnMode { Circle, FourSides }
     public enum UltimateDMG { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
     public enum WaveState { ActiveWave, Defeat, InterWave, Victory }
-    public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
     /// <summary>
     /// Player build profiles. Steering auto-equip attribute weights (EquipmentAutoEquipService)
     /// and future per-build tuning. Compile-time-safe alternatives to a string.
