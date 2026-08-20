@@ -189,44 +189,30 @@ namespace IdleDefenseSurvival.UI.Inventory
                 }
             }
 
-            // Rolled secondaries (generation output)
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("SecondaryStats", out var statsObj) &&
-                statsObj is CombatStatEntry[] rolledStats)
+            // Instance attributes from AttributeData (MainAttribute + SecondAttribute)
+            if (item.AttributeData != null)
             {
-                foreach (var stat in rolledStats)
+                // Main Attributes (STR/CON/INT/DEX)
+                if (item.AttributeData.MainAttribute != null)
                 {
-                    float value = stat.GetValue(item.Level, item.EnhanceLevel);
-                    string sign = value >= 0 ? "+" : "";
-                    lines.Add($"{stat.Stat.GetDisplayName()}: {sign}{value:F1}");
-                }
-            }
-
-            // Affixes (secondary stats + attributes + passive)
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
-                affixObj is AffixInstanceData[] affixes)
-            {
-                foreach (var affix in affixes)
-                {
-                    if (affix?.StatValues != null)
+                    foreach (var attr in item.AttributeData.MainAttribute)
                     {
-                        foreach (var (stat, value) in affix.StatValues)
-                        {
-                            if (stat == SecondaryStat.None) continue;
-                            string sign = value >= 0 ? "+" : "";
-                            lines.Add($"{stat.GetDisplayName()}: {sign}{value:F1}");
-                        }
+                        if (attr.BaseValue == 0f) continue;
+                        string sign = attr.BaseValue >= 0 ? "+" : "";
+                        lines.Add($"{attr.Attribute.GetDisplayName()}: {sign}{attr.BaseValue:F1}");
                     }
+                }
 
-                    if (affix?.AttributeValues != null)
+                // Second Attributes (specialization stats)
+                if (item.AttributeData.SecondAttribute != null)
+                {
+                    foreach (var attr in item.AttributeData.SecondAttribute)
                     {
-                        foreach (var (attr, value) in affix.AttributeValues)
-                        {
-                            if (value == 0f) continue;
-                            string sign = value >= 0 ? "+" : "";
-                            lines.Add($"{attr.GetDisplayName()}: {sign}{value:F1}");
-                        }
+                        if (attr.BaseValue == 0f) continue;
+                        var secStat = (SecondaryStat)(int)attr.Attribute;
+                        if (secStat == SecondaryStat.None) continue;
+                        string sign = attr.BaseValue >= 0 ? "+" : "";
+                        lines.Add($"{secStat.GetDisplayName()}: {sign}{attr.BaseValue:F1}");
                     }
                 }
             }

@@ -203,18 +203,8 @@ namespace IdleDefenseSurvival.Crafting
             }
         }
 
-        public void UnlockRecipesByTier(int tier)
-        {
-            foreach (var recipe in _allRecipes.Values)
-            {
-                if (recipe.UnlockSource == UnlockSource.Tier
-                    && recipe.RequiredTier <= tier
-                    && !_unlockedRecipeIds.Contains(recipe.RecipeId))
-                {
-                    UnlockRecipe(recipe.RecipeId, notify: true);
-                }
-            }
-        }
+        // ponytail: Tier-based unlock removed — RequiredTier no longer exists on CraftRecipeData
+        // public void UnlockRecipesByTier(int tier) { ... }
 
         // ============ Persistence ============
         public CraftRecipeRepositorySaveData GetSaveData()

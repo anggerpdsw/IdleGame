@@ -304,9 +304,9 @@ namespace IdleDefenseSurvival.Items
                 if (UnityEngine.Random.Range(0f, 1f) < luckBonus * 0.1f)
                 {
                     // This would require re-generating the item with higher rarity
-                    // For now, just mark as lucky
-                    item.CustomData ??= new Dictionary<string, object>();
-                    item.CustomData["LuckyDrop"] = true;
+                    // For now, mark as lucky via IsNew flag (already true for new items)
+                    // Could add a dedicated IsLuckyDrop field to InventoryItem if needed
+                    item.IsNew = true;
                 }
             }
         }

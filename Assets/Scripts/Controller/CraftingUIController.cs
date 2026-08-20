@@ -115,8 +115,6 @@ namespace IdleDefenseSurvival.Controller
             svc.OnJobProgress     += OnJobProgressForList;
             svc.OnJobReadyToClaim += OnJobReadyToClaimForList;
             svc.OnJobClaimed      += OnJobClaimedForList;
-            svc.OnJobCancelled    += OnJobCancelledForList;
-            svc.OnCraftFailed     += OnCraftFailed;
 
             if (_plusButton != null) _plusButton.onClick.AddListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.AddListener(OnMinusClicked);
@@ -185,8 +183,6 @@ namespace IdleDefenseSurvival.Controller
             svc.OnJobProgress -= OnJobProgressForList;
             svc.OnJobReadyToClaim -= OnJobReadyToClaimForList;
             svc.OnJobClaimed -= OnJobClaimedForList;
-            svc.OnJobCancelled -= OnJobCancelledForList;
-            svc.OnCraftFailed -= OnCraftFailed;
 
             if (_plusButton != null) _plusButton.onClick.RemoveListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.RemoveListener(OnMinusClicked);
@@ -435,14 +431,6 @@ namespace IdleDefenseSurvival.Controller
                 RefreshControls();
             }
             RebuildMaterials();
-        }
-
-        private string CanCraftReason()
-        {
-            var svc = CraftingManager.Instance;
-            if (svc == null || string.IsNullOrEmpty(_selectedRecipeId)) return "no recipe";
-            var v = svc.CanCraft(_selectedRecipeId, _quantity);
-            return v.IsSuccess ? null : v.Reason;
         }
 
         #endregion

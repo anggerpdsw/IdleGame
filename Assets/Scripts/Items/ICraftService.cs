@@ -69,9 +69,6 @@ namespace IdleDefenseSurvival.Crafting
         /// <summary>Completes a craft immediately by spending gems (instant finish).</summary>
         bool InstantComplete(string recipeId, long gemCost = 0);
 
-        /// <summary>Cancels a craft in the queue (refunds materials based on progress).</summary>
-        bool CancelCraft(string queueId, bool refund = true);
-
         /// <summary>Clears all completed crafts from queue.</summary>
         int ClearCompletedCrafts();
 
@@ -140,8 +137,6 @@ namespace IdleDefenseSurvival.Crafting
         Queued = 0,      // Waiting for queue slot
         Crafting = 1,    // Currently crafting
         Completed = 2,   // Finished, waiting for collection
-        Cancelled = 3,   // Cancelled by player
-        Failed = 4       // Failed (insufficient materials, etc.)
     }
 
     /// <summary>

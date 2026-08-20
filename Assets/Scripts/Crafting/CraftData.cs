@@ -38,7 +38,7 @@ namespace IdleDefenseSurvival.Crafting
                     IsCritical = false, // Would need to track this from roll result
                     Source = "Normal",
                     AcquiredTimestamp = item.AcquiredTimestamp,
-                    CustomData = item.CustomData != null ? new Dictionary<string, object>(item.CustomData) : null
+                    CustomData = null
                 });
             }
             return results.ToArray();

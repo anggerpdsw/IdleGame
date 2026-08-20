@@ -33,13 +33,7 @@ namespace IdleDefenseSurvival.Items.Generation
             if (baseData != null)
             {
                 string expectedId = baseData.Id;
-
-                // Check for OverrideItemId in CustomData (used by crafted equipment)
-                if (item.CustomData != null && item.CustomData.TryGetValue("OverrideItemId", out var overrideIdObj) && overrideIdObj is string overrideItemId)
-                {
-                    expectedId = overrideItemId;
-                }
-                else if (baseData.Category == ItemCategory.Gem)
+                if (baseData.Category == ItemCategory.Gem)
                 {
                     var gemData = ItemDatabase.Instance?.GetGem(baseData.Id);
                     if (gemData != null) expectedId = gemData.GemId;

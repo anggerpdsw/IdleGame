@@ -116,35 +116,15 @@ namespace IdleDefenseSurvival.Equipment
             var itemData = item.GetEquipmentData();
             if (itemData == null) return bonuses;
 
+            // Main Attributes from itemData (ItemDatabase) — base template
             if (itemData.AttributeStats != null)
                 foreach (var attrEntry in itemData.AttributeStats)
                     AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level, item.EnhanceLevel));
 
-            // Attribute affixes (prefix like "Wise +INT") — from item.CustomData["Affixes"]
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
-                affixObj is AffixInstanceData[] affixes)
-            {
-                foreach (var affix in affixes)
-                {
-                    if (affix?.AttributeValues == null) continue;
-                    foreach (var (attr, value) in affix.AttributeValues)
-                        AddAsAttribute(bonuses, attr, value);
-                }
-            }
-
-            // Crafted attribute rolls (AttributeRollService → CustomData["AttributeStats"])
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("AttributeStats", out var attrObj) &&
-                attrObj is AttributeStatEntry[] craftedAttrs)
-            {
-                foreach (var attrEntry in craftedAttrs)
-                {
-                    float value = attrEntry.GetValue(item.Level, item.EnhanceLevel);
-                    if (value != 0f)
-                        AddAsAttribute(bonuses, attrEntry.Attribute, value);
-                }
-            }
+            // Main Attributes from item.AttributeData (instance data - e.g. equipping gives STR +6)
+            if (item.AttributeData?.MainAttribute != null)
+                foreach (var attrEntry in item.AttributeData.MainAttribute)
+                    AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.BaseValue);
 
             return bonuses;
         }
@@ -206,34 +186,30 @@ namespace IdleDefenseSurvival.Equipment
                         builder.Add(prefix, statEntry.Stat, statEntry.Mode, value);
                 }
 
-            // Rolled secondaries (StatRollService -> item.CustomData["SecondaryStats"])
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("SecondaryStats", out var statsObj) &&
-                statsObj is CombatStatEntry[] rolledStats)
-            {
-                foreach (var entry in rolledStats)
+            // Main Attributes (STR/CON/INT/DEX) — from itemData.AttributeStats (template)
+            if (itemData.AttributeStats != null)
+                foreach (var attrEntry in itemData.AttributeStats)
                 {
-                    float value = entry.GetValue(item.Level, item.EnhanceLevel);
+                    float value = attrEntry.GetValue(item.Level, item.EnhanceLevel);
                     if (value != 0)
-                        builder.Add(prefix + "_Roll", entry.Stat, entry.Mode, value);
+                        builder.AddAttribute(prefix, attrEntry.Attribute, value);
                 }
-            }
 
-            // Affixes (AffixGenerator -> item.CustomData["Affixes"])
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
-                affixObj is AffixInstanceData[] affixes)
-            {
-                foreach (var affix in affixes)
+            // Main Attributes from item.AttributeData (instance - e.g. STR +6 from equip)
+            if (item.AttributeData?.MainAttribute != null)
+                foreach (var attrEntry in item.AttributeData.MainAttribute)
+                    if (attrEntry.BaseValue != 0f)
+                        builder.AddAttribute(prefix + "_Instance", attrEntry.Attribute, attrEntry.BaseValue);
+
+            // Second Attributes from item.AttributeData (specialization stats) — stored as SecondaryStat in Attribute field
+            if (item.AttributeData?.SecondAttribute != null)
+                foreach (var attrEntry in item.AttributeData.SecondAttribute)
                 {
-                    if (affix?.StatValues == null) continue;
-                    foreach (var (stat, value) in affix.StatValues)
-                    {
-                        if (stat == SecondaryStat.None || value == 0f) continue;
-                        builder.Add(prefix + "_Affix", stat, SecondaryStatMode.Flat, value);
-                    }
+                    // SecondAttribute uses SecondaryStat enum values in Attribute field (cast from int)
+                    var secStat = (SecondaryStat)(int)attrEntry.Attribute;
+                    if (secStat != SecondaryStat.None && attrEntry.BaseValue != 0f)
+                        builder.Add(prefix + "_SecondAttr", secStat, SecondaryStatMode.Flat, attrEntry.BaseValue);
                 }
-            }
 
             if (item.Enchantment?.StatBonuses != null)
                 foreach (var statEntry in item.Enchantment.StatBonuses)
@@ -276,6 +252,7 @@ namespace IdleDefenseSurvival.Equipment
                     Value = value,
                     Permanent = true
                 });
+
         }
     }
 }

@@ -60,7 +60,7 @@ namespace IdleDefenseSurvival.Inventory
 
         // ============ Core Operations ============
         /// <summary>Adds an item to inventory. Returns the instance ID of added item or empty if failed.</summary>
-        string AddItem(string itemId, int quantity = 1, Dictionary<string, object> customData = null);
+        string AddItem(string itemId, int quantity = 1);
 
         /// <summary>Adds a specific inventory item instance.</summary>
         bool AddItemInstance(InventoryItem item);

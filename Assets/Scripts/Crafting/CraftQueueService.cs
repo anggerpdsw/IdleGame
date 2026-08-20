@@ -20,7 +20,6 @@ namespace IdleDefenseSurvival.Crafting
         public event Action<string> OnJobStarted;       // jobId (job began crafting)
         public event Action<string, float> OnJobProgress; // jobId, progress (0-1)
         public event Action<string> OnJobReadyToClaim;  // jobId (timer finished, ready for claim)
-        public event Action<string> OnJobCancelled;     // jobId
         public event Action<string, CraftJobStatus> OnJobStatusChanged; // jobId, new status (computed)
 
         // ============ Properties ============
@@ -95,28 +94,6 @@ namespace IdleDefenseSurvival.Crafting
             if (_jobs.TryGetValue(jobId, out var job))
                 return job.GetTimeRemaining();
             return TimeSpan.Zero;
-        }
-
-        public bool CancelJob(string jobId, RefundPolicy policy = RefundPolicy.ProgressBased)
-        {
-            if (!_jobs.TryGetValue(jobId, out var job)) return false;
-
-            if (job.IsReadyToClaim) return false; // Can't cancel completed jobs - must claim
-
-            bool wasActive = job.IsCrafting;
-            string reason = $"Cancelled (policy: {policy})";
-            _jobs.Remove(jobId); // Remove entirely
-
-            if (wasActive)
-            {
-                // Active count computed dynamically, no manual decrement needed
-            }
-
-            OnJobStatusChanged?.Invoke(jobId, CraftJobStatus.Cancelled);
-            OnJobCancelled?.Invoke(jobId);
-
-            // Refund handled by CraftService using policy
-            return true;
         }
 
         public void ClearCompletedJobs()
@@ -242,25 +219,13 @@ namespace IdleDefenseSurvival.Crafting
                 Debug.LogWarning($"[CraftQueue] Removed stale job ID {jobId} from queue.");
             }
         }
-    }
+}
 
-    /// <summary>
-    /// Refund policy for cancelled crafts.
-    /// </summary>
-    public enum RefundPolicy
-    {
-        None = 0,
-        Full = 1,
-        ProgressBased = 2,
-        HalfAfterHalf = 3,
-        Custom = 4
-    }
-
-    /// <summary>
-    /// Save data for CraftQueueService.
-    /// </summary>
-    [Serializable]
-    public class CraftQueueSaveData
+/// <summary>
+/// Save data for CraftQueueService.
+/// </summary>
+[Serializable]
+public class CraftQueueSaveData
     {
         public List<CraftJobSaveData> Jobs = new();
         public int MaxConcurrentJobs = 1;

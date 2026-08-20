@@ -178,7 +178,6 @@ namespace IdleDefenseSurvival.Crafting
                 // Implementation depends on tool system
             }
 
-            // Material loss handled by transaction refund policy
         }
     }
 

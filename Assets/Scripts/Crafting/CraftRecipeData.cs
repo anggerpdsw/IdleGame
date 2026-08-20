@@ -35,7 +35,8 @@ namespace IdleDefenseSurvival.Crafting
         // ============ Requirements ============
         public int RequiredCraftingLevel = 1;
         public string[] RequiredQuests;
-        public int RequiredTier = 1;
+        // ponytail: RequiredTier removed - tier no longer a crafting gate
+        // public int RequiredTier = 1;
         public CraftRecipeData[] RequiredRecipes; // Prerequisite recipes
 
         // ============ Costs ============
@@ -67,9 +68,6 @@ namespace IdleDefenseSurvival.Crafting
         public bool AutoUnlock = true; // Unlocked automatically when requirements met
         public UnlockSource UnlockSource = UnlockSource.None;
         public string UnlockParameter; // Quest ID, tier, etc.
-
-        // ============ Refund Policy ============
-        public RecipeRefundPolicy RefundPolicy = RecipeRefundPolicy.ProgressBased;
 
         // ============ Visual/Audio ============
         public Sprite RecipeIcon;
@@ -107,7 +105,7 @@ namespace IdleDefenseSurvival.Crafting
                 // Requirements
                 RequiredCraftingLevel = source.RequiredCraftingLevel,
                 RequiredQuests = source.RequiredQuests ?? Array.Empty<string>(),
-                RequiredTier = source.RequiredTier,
+                // RequiredTier removed - tier no longer a crafting gate
                 RequiredRecipes = source.RequiredRecipes ?? Array.Empty<CraftRecipeData>(),
 
                 // Costs
@@ -135,9 +133,6 @@ namespace IdleDefenseSurvival.Crafting
                 AutoUnlock = source.AutoUnlock,
                 UnlockSource = source.UnlockSource,
                 UnlockParameter = source.UnlockParameter,
-
-                // Refund
-                RefundPolicy = source.RefundPolicy,
 
                 // Visual / Audio
                 RecipeIcon = source.RecipeIcon,
@@ -183,7 +178,6 @@ namespace IdleDefenseSurvival.Crafting
         public int MinQuality = 0;             // Minimum quality required (0 = any)
         public int MinLevel = 0;               // Minimum item level required
         public int MinEnhance = 0;             // Minimum enhance level required
-        public bool ReturnOnFail = false;      // Return ingredient if craft fails
     }
 
     /// <summary>
@@ -195,12 +189,10 @@ namespace IdleDefenseSurvival.Crafting
         public string ItemId;
         public int MinCount = 1;
         public int MaxCount = 1;
-        public float Weight = 1f;              // For weighted random selection
         public int MinQuality = 0;             // Minimum quality of result
         public int MaxQuality = 0;             // Maximum quality of result
         public int FixedLevel = 0;             // Fixed level (0 = use recipe level)
         public int FixedEnhance = 0;           // Fixed enhance level
-        public bool IsMainResult = false;      // Primary result (for display)
     }
 
     /// <summary>
@@ -220,7 +212,6 @@ namespace IdleDefenseSurvival.Crafting
     public class CraftCondition
     {
         public ConditionType Type;
-        public string Parameter;
         public float MinValue;
         public float MaxValue = float.MaxValue;
         public bool Invert = false;
@@ -231,12 +222,10 @@ namespace IdleDefenseSurvival.Crafting
             return Invert ? !result : result;
         }
 
-        public bool Check(int tier, int wave, int craftingLevel, long luck)
+        public bool Check(int craftingLevel, long luck)
         {
             float value = Type switch
             {
-                ConditionType.Tier => tier,
-                ConditionType.Wave => wave,
                 ConditionType.CraftingLevel => craftingLevel,
                 ConditionType.Luck => luck,
                 ConditionType.TimeOfDay => GetTimeOfDay(),
@@ -270,8 +259,6 @@ namespace IdleDefenseSurvival.Crafting
     public enum ConditionType
     {
         None = 0,
-        Tier = 1,
-        Wave = 2,
         CraftingLevel = 3,
         Luck = 4,
         TimeOfDay = 5,
@@ -279,18 +266,6 @@ namespace IdleDefenseSurvival.Crafting
         Weather = 7,
     }
 
-    /// <summary>
-    /// Refund policy for this specific recipe.
-    /// </summary>
-    public enum RecipeRefundPolicy
-    {
-        Default = 0,           // Use global policy
-        None = 1,              // No refund ever
-        Full = 2,              // Always full refund
-        ProgressBased = 3,     // Refund based on progress
-        HalfAfterHalf = 4,     // Full before 50%, half after 50%, none after 90%
-    }
-    
     /// <summary>
     /// Save data for CraftRecipeRepository.
     /// </summary>

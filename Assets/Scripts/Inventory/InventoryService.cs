@@ -95,7 +95,7 @@ namespace IdleDefenseSurvival.Inventory
         #endregion
 
         #region Core Operations
-        public string AddItem(string itemId, int quantity = 1, Dictionary<string, object> customData = null)
+        public string AddItem(string itemId, int quantity = 1)
         {
             if (string.IsNullOrEmpty(itemId) || quantity <= 0) return string.Empty;
 
@@ -144,7 +144,7 @@ namespace IdleDefenseSurvival.Inventory
                 }
 
                 int addAmount = Math.Min(quantity, maxStack);
-                var newItem = CreateInventoryItem(itemId, addAmount, customData);
+                var newItem = CreateInventoryItem(itemId, addAmount);
                 _slots[emptySlot].Item = newItem;
                 quantity -= addAmount;
 
@@ -827,8 +827,7 @@ namespace IdleDefenseSurvival.Inventory
                 IsLocked = data.IsLocked,
                 IsNew = data.IsNew,
                 AcquiredTimestamp = data.AcquiredTimestamp,
-                AttributeData = isEquipment ? data.AttributeData : null,
-                CustomData = isEquipment ? null : data.CustomData
+                AttributeData = isEquipment ? data.AttributeData : null
             };
 
             if (isEquipment)
@@ -919,7 +918,7 @@ namespace IdleDefenseSurvival.Inventory
         #endregion
 
         #region Helper Methods
-        private InventoryItem CreateInventoryItem(string itemId, int quantity, Dictionary<string, object> customData)
+        private InventoryItem CreateInventoryItem(string itemId, int quantity)
         {
             var itemData = ItemDatabase.Instance?.GetItem(itemId);
             var equipmentData = itemData as EquipmentData;
@@ -932,7 +931,6 @@ namespace IdleDefenseSurvival.Inventory
                 MaxDurability = equipmentData?.MaxDurability ?? 0,
                 CurrentDurability = equipmentData?.MaxDurability ?? 0,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                CustomData = customData
             };
 
             // Identity rule: only unique instances (equipment) carry an InstanceId.

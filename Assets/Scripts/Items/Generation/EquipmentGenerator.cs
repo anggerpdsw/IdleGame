@@ -162,9 +162,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 EnhanceLevel = 0
             };
 
-            if (context?.CustomData != null && context.CustomData.Count > 0)
-                item.CustomData = new Dictionary<string, object>(context.CustomData);
-
             return item;
         }
 
@@ -180,17 +177,48 @@ namespace IdleDefenseSurvival.Items.Generation
 
         private void ApplySecondaryStats(InventoryItem item, CombatStatEntry[] stats)
         {
-            // Store in CustomData for now - actual stat application happens at runtime
-            item.CustomData ??= new Dictionary<string, object>();
-            item.CustomData["SecondaryStats"] = stats;
+            if (stats == null || stats.Length == 0) return;
+            var secondAttrs = new List<EquipmentAttributeEntry>();
+            foreach (var stat in stats)
+            {
+                // Map SecondaryStat to MainAttribute enum value (cast from int) for storage
+                var attrEntry = new EquipmentAttributeEntry((MainAttribute)(int)stat.Stat, stat.GetValue(item.Level, item.EnhanceLevel));
+                secondAttrs.Add(attrEntry);
+            }
+            if (item.AttributeData == null)
+                item.AttributeData = new EquipmentAttributeData(Array.Empty<EquipmentAttributeEntry>(), secondAttrs.ToArray());
+            else
+                item.AttributeData = new EquipmentAttributeData(item.AttributeData.MainAttribute, secondAttrs.ToArray());
         }
 
         private void ApplyAffixes(InventoryItem item, AffixInstanceData[] affixes)
         {
-            item.CustomData ??= new Dictionary<string, object>();
+            if (affixes == null || affixes.Length == 0) return;
+            var mainAttrs = new List<EquipmentAttributeEntry>();
+            var secondAttrs = new List<EquipmentAttributeEntry>();
+
             foreach (var affix in affixes)
-                if (affix != null) affix.ItemInstanceId = item.InstanceId;
-            item.CustomData["Affixes"] = affixes;
+            {
+                if (affix == null) continue;
+                affix.ItemInstanceId = item.InstanceId;
+                if (affix.AttributeValues != null)
+                    foreach (var (attr, value) in affix.AttributeValues)
+                        if (value != 0f) mainAttrs.Add(new EquipmentAttributeEntry(attr, value));
+                if (affix.StatValues != null)
+                    foreach (var (stat, value) in affix.StatValues)
+                        if (stat != SecondaryStat.None && value != 0f)
+                            secondAttrs.Add(new EquipmentAttributeEntry((MainAttribute)(int)stat, value));
+            }
+
+            if (mainAttrs.Count > 0 || secondAttrs.Count > 0)
+            {
+                var existingMain = item.AttributeData?.MainAttribute ?? Array.Empty<EquipmentAttributeEntry>();
+                var existingSecond = item.AttributeData?.SecondAttribute ?? Array.Empty<EquipmentAttributeEntry>();
+                item.AttributeData = new EquipmentAttributeData(
+                    existingMain.Concat(mainAttrs).ToArray(),
+                    existingSecond.Concat(secondAttrs).ToArray()
+                );
+            }
         }
 
         private void ApplyEventModifiers(InventoryItem item, EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context)

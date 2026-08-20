@@ -297,36 +297,22 @@ namespace IdleDefenseSurvival.Equipment
                 }
             }
 
-            // Rolled secondaries (generation output for non-statically-defined items)
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("SecondaryStats", out var statsObj) &&
-                statsObj is CombatStatEntry[] rolledStats)
+            // Instance attributes (MainAttribute + SecondAttribute from AttributeData)
+            if (item.AttributeData != null)
             {
-                foreach (var statEntry in rolledStats)
+                // Main Attributes (STR/CON/INT/DEX) — handled by EquipmentStatCalculator, not here
+                // Second Attributes (specialization stats stored as SecondaryStat in Attribute field)
+                if (item.AttributeData.SecondAttribute != null)
                 {
-                    float value = statEntry.GetValue(item.Level, item.EnhanceLevel);
-                    if (bonuses.ContainsKey(statEntry.Stat))
-                        bonuses[statEntry.Stat] += value;
-                    else
-                        bonuses[statEntry.Stat] = value;
-                }
-            }
-
-            // Affixes (rolled at generation; feed the same combat pool)
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
-                affixObj is AffixInstanceData[] affixes)
-            {
-                foreach (var affix in affixes)
-                {
-                    if (affix?.StatValues == null) continue;
-                    foreach (var (stat, value) in affix.StatValues)
+                    foreach (var attrEntry in item.AttributeData.SecondAttribute)
                     {
-                        if (stat == SecondaryStat.None) continue;
-                        if (bonuses.ContainsKey(stat))
-                            bonuses[stat] += value;
+                        var secStat = (SecondaryStat)(int)attrEntry.Attribute;
+                        if (secStat == SecondaryStat.None) continue;
+                        float value = attrEntry.BaseValue;
+                        if (bonuses.ContainsKey(secStat))
+                            bonuses[secStat] += value;
                         else
-                            bonuses[stat] = value;
+                            bonuses[secStat] = value;
                     }
                 }
             }

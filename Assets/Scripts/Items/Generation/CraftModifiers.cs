@@ -83,14 +83,6 @@ namespace IdleDefenseSurvival.Items.Generation
         public bool Consumed = true;
     }
 
-    public enum RecipeRefundPolicy
-    {
-        None = 0,
-        Full = 1,
-        HalfAfterHalf = 2,
-        Custom = 3
-    }
-
     // ============ Concrete Modifiers ============
 
     /// <summary>

@@ -22,6 +22,6 @@ namespace IdleDefenseSurvival.Stats
             MainAttribute.Dexterity => "DEX",
             _ => "?"
         };
-    }
 
     }
+}

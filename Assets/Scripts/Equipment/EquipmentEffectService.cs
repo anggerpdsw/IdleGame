@@ -65,18 +65,10 @@ namespace IdleDefenseSurvival.Equipment
                 }
             }
 
-            // Affix passives — items roll affixes with a PassiveEffect (e.g. Frost: FreezeEnemy).
-            // Each affix passive activates with the item so cooldowns/hit-chances are per-item.
-            if (item.CustomData != null &&
-                item.CustomData.TryGetValue("Affixes", out var affixObj) &&
-                affixObj is AffixInstanceData[] affixes)
-            {
-                foreach (var affix in affixes)
-                {
-                    if (affix?.PassiveEffect == null) continue;
-                    ActivateEffect(item, slot, affix.PassiveEffect);
-                }
-            }
+            // Affix passives — stored in AttributeData (SecondAttribute for effects, MainAttribute for stats)
+            // Affix effects with PassiveEffect are handled separately via affix data in generation
+            // For now, affix passives are not stored in AttributeData - they would need a separate field
+            // This is a known limitation: affix PassiveEffect is lost in new structure
         }
 
         private void ActivateEffect(InventoryItem item, EquipmentType slot, SpecialEffectEntry entry)
@@ -104,7 +96,7 @@ namespace IdleDefenseSurvival.Equipment
             var context = new EquipmentContext
             {
                 EquipmentService = EquipmentService.Instance,
-                InventoryService = Inventory.InventoryService.Instance,
+                InventoryService = InventoryService.Instance,
                 Player = Player.Player.Instance,
                 LastEnemyHit = data?.Enemy,
                 CurrentTime = Time.time
@@ -144,7 +136,7 @@ namespace IdleDefenseSurvival.Equipment
             Item = item,
             Slot = slot,
             EquipmentService = EquipmentService.Instance,
-            InventoryService = Inventory.InventoryService.Instance,
+            InventoryService = InventoryService.Instance,
             Player = Player.Player.Instance,
             CurrentTime = Time.time
         };

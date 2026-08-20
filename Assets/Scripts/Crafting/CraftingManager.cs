@@ -42,8 +42,6 @@ namespace IdleDefenseSurvival.Manager
         public event Action<string, float> OnJobProgress;            // jobId, progress (0-1)
         public event Action<string> OnJobReadyToClaim;               // jobId (timer finished)
         public event Action<string, InventoryItem[]> OnJobClaimed;   // jobId, reward items
-        public event Action<string> OnJobCancelled;                  // jobId
-        public event Action<string, string> OnCraftFailed;           // jobId, reason
         public event Action<string, bool> OnCraftClaimed;            // jobId, success
         #endregion
 
@@ -57,7 +55,6 @@ namespace IdleDefenseSurvival.Manager
         private CraftFormulasConfig _formulasConfig;
         private CraftContextBuilder _contextBuilder;
         private CraftCompletionService _completionService;
-        private CraftRefundService _refundService;
         private SaveManager _saveManager;
         #endregion
 
@@ -83,7 +80,6 @@ namespace IdleDefenseSurvival.Manager
             _rewardService= new CraftRewardService(ItemGenerator.Instance);
             _persistenceService = new CraftPersistenceService(_queueService);
             _contextBuilder = new CraftContextBuilder(_saveManager);
-            _refundService   = new CraftRefundService(_repository, inventory, economy);
             _completionService = new CraftCompletionService(
                 _queueService, _repository, _contextBuilder,
                 _rollService, _rewardService, inventory, _saveManager);
@@ -92,8 +88,7 @@ namespace IdleDefenseSurvival.Manager
             _queueService.OnJobStarted      += id => OnJobStarted?.Invoke(id);
             _queueService.OnJobProgress     += (id, p) => OnJobProgress?.Invoke(id, p);
             _queueService.OnJobReadyToClaim += id => OnJobReadyToClaim?.Invoke(id);
-            _queueService.OnJobCancelled   += id => OnJobCancelled?.Invoke(id);
-            _queueService.OnJobStatusChanged+= (id, status) => { /* optional UI hook */ };
+                        _queueService.OnJobStatusChanged+= (id, status) => { /* optional UI hook */ };
 
             // Completion service events → manager events
             _completionService.Claimed += (jobId, success) =>
@@ -101,7 +96,6 @@ namespace IdleDefenseSurvival.Manager
                 OnCraftClaimed?.Invoke(jobId, success);
                 // Do NOT fire OnJobClaimed here – result will be emitted via Result event.
             };
-            _completionService.Failed  += (jobId, reason) => OnCraftFailed?.Invoke(jobId, reason);
             _completionService.Result  += (jobId, recipeId, items) => OnJobClaimed?.Invoke(jobId, items);
 
             _repository.Initialize();
@@ -152,16 +146,14 @@ namespace IdleDefenseSurvival.Manager
                 if (!commitResult.IsSuccess)
                 {
                     transaction.Rollback();
-                    _queueService.CancelJob(job.JobId, RefundPolicy.None);
-                    OnCraftFailed?.Invoke(job.JobId, commitResult.Reason);
+                    Debug.LogError($"[CraftingManager] Commit failed: {commitResult.Reason}");
                     return null;
                 }
             }
             catch (Exception e)
             {
                 transaction.Rollback();
-                _queueService.CancelJob(job.JobId, RefundPolicy.None);
-                OnCraftFailed?.Invoke(job.JobId, e.Message);
+                Debug.LogError($"[CraftingManager] StartCraft exception: {e}");
                 return null;
             }
 
@@ -178,19 +170,6 @@ namespace IdleDefenseSurvival.Manager
                 if (!string.IsNullOrEmpty(id)) ids.Add(id);
             }
             return ids;
-        }
-
-        public bool CancelCraft(string jobId, RefundPolicy policy = RefundPolicy.ProgressBased)
-        {
-            var job = _queueService.GetJob(jobId);
-            if (job == null) return false;
-
-            bool wasActive = job.IsCrafting;
-            bool success   = _queueService.CancelJob(jobId, policy);
-
-            if (success && wasActive)
-                _refundService.Refund(job, policy);
-            return success;
         }
 
         public float GetProgress(string jobId) => _queueService?.GetJobProgress(jobId) ?? 0f;
@@ -250,9 +229,7 @@ namespace IdleDefenseSurvival.Manager
             if (_repository == null || _saveManager == null) return;
             var account = _saveManager.GetAccountData();
             if (account == null) return;
-
             _repository.UnlockRecipesByCraftingLevel(account.craftingLevel);
-            _repository.UnlockRecipesByTier(_saveManager.GetHighestUnlockedTier());
         }
 
         // ---------- Misc ----------

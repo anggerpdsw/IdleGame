@@ -127,10 +127,10 @@ namespace IdleDefenseSurvival.Crafting
                 return null;
             }
 
-            // v3.8 §20.1 — rarity source of truth: recipe.Rarity (1=Common..6=Divine), never RequiredTier.
+            // v3.8 §20.1 — rarity source of truth: recipe.Rarity (1=Common..6=Divine).
             // EquipmentGenerator expects 0-based quality tier: 0=Common, 1=Rare, ..., 5=Divine.
             int qualityTier = Mathf.Max(0, recipe.Rarity - 1);
-            int level = Mathf.Max(1, recipe.RequiredTier);
+            int level = Mathf.Max(1, recipe.RequiredCraftingLevel);
 
             // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
             var eventModifiers = new List<EventCraftModifier>();
@@ -145,7 +145,7 @@ namespace IdleDefenseSurvival.Crafting
                                  equipmentType: slot,
                                  rarity: (Rarity)recipe.Rarity,
                                  level: level,
-                                 tier: recipe.RequiredTier)
+                                 tier: recipe.RequiredCraftingLevel)
                              .With(
                                  seed: (int)seed,
                                  forcedQuality: qualityTier,

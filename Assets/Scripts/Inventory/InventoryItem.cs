@@ -63,9 +63,6 @@ namespace IdleDefenseSurvival.Inventory
         [Newtonsoft.Json.JsonIgnore]
         public EquipmentType EquippedSlot = EquipmentType.None;
 
-        // ============ Custom Data ============
-        public Dictionary<string, object> CustomData; // For modding/extensibility (no AttributeStats, OverrideItemId, ValuePerLevel, ValuePerEnhance)
-
         // ============ Computed Properties (NOT serialized - [JsonIgnore]) ============
         [Newtonsoft.Json.JsonIgnore] public bool IsStackable =>
             ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(ItemId)?.StackSize > 1;
@@ -96,8 +93,6 @@ namespace IdleDefenseSurvival.Inventory
             }
             if (Enchantment != null)
                 clone.Enchantment = Enchantment.Clone();
-            if (CustomData != null)
-                clone.CustomData = new Dictionary<string, object>(CustomData);
             return clone;
         }
 

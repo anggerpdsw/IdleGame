@@ -49,12 +49,7 @@ namespace IdleDefenseSurvival.Crafting
                 return ValidationResult.Fail($"Requires crafting level {recipe.RequiredCraftingLevel} (current: {playerCraftLevel})");
             }
 
-            // 4. Check tier requirement
-            int currentTier = GetCurrentTier();
-            if (currentTier < recipe.RequiredTier)
-            {
-                return ValidationResult.Fail($"Requires tier {recipe.RequiredTier} (current: {currentTier})");
-            }
+            // 4. Tier requirement removed - tier no longer a crafting gate
 
             // 5. Check prerequisite recipes
             if (recipe.RequiredRecipes != null)
@@ -134,7 +129,7 @@ namespace IdleDefenseSurvival.Crafting
             {
                 foreach (var condition in recipe.Conditions)
                 {
-                    if (!condition.Check(currentTier, GetCurrentWave(), playerCraftLevel, GetPlayerLuck()))
+                    if (!condition.Check(playerCraftLevel, GetPlayerLuck()))
                     {
                         return ValidationResult.Fail($"Condition not met: {condition.Type}");
                     }
@@ -155,17 +150,6 @@ namespace IdleDefenseSurvival.Crafting
         {
             // TODO: Integrate with player progression system
             // For now, return a default or from SaveData
-            return 1;
-        }
-
-        private int GetCurrentTier()
-        {
-            return _saveManager != null ? _saveManager.GetHighestUnlockedTier() : 1;
-        }
-
-        private int GetCurrentWave()
-        {
-            // Would integrate with WaveManager
             return 1;
         }
 
