@@ -31,6 +31,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<IdleRewardManager>();
             EnsureSingleton<RewardManager>();
             EnsureSingleton<InventoryManager>();
+            EnsureSingleton<AttributeStatLoader>();
             EnsureSingleton<DailyRewardManager>();
             EnsureSingleton<AccountManager>();
             EnsureSingleton<ModifierManager>();

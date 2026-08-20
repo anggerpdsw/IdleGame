@@ -357,7 +357,10 @@ public class InventoryItemData
     public int? CurrentDurability; // MaxDurability derived from EquipmentData
     public SocketData[] Sockets; // { IsUnlocked, GemInstanceId }
     public EnchantmentInstanceData Enchantment;
-    public Dictionary<string, object> CustomData; // rolled affixes/secondaries
+    public EquipmentAttributeData AttributeData; // Main + Secondary attributes (BaseValue only)
+
+    // ---- Non-equipment (stackables/consumables) ----
+    public Dictionary<string, object> CustomData; // Rolled affixes/secondaries for non-equipment
 
     // ---- Flags (user-facing, persisted) ----
     public bool IsFavorite = false;

@@ -4,11 +4,9 @@
       "RecipeId": "craft_earring_r1",
       "DisplayName": "Quartz Earring",
       "Description": "A simple pig iron earring set with rough quartz on cotton thread.",
-      "Category": 2,
       "EquipmentType": 9,
       "Rarity": 1,
       "RequiredCraftingLevel": 1,
-      "RequiredTier": 1,
       "Ingredients": [{
           "ItemId": "pig_iron",
           "Count": 2
@@ -33,11 +31,9 @@
       "RecipeId": "craft_earring_r2",
       "DisplayName": "Ruby Earring",
       "Description": "A high-carbon steel earring set with normal ruby on thick thread.",
-      "Category": 2,
       "EquipmentType": 9,
       "Rarity": 2,
       "RequiredCraftingLevel": 5,
-      "RequiredTier": 1,
       "Ingredients": [{
           "ItemId": "high_carbon_steel",
           "Count": 4
@@ -62,11 +58,9 @@
       "RecipeId": "craft_earring_r3",
       "DisplayName": "Sapphire Earring",
       "Description": "A refined steel earring set with refined sapphire on silk thread.",
-      "Category": 2,
       "EquipmentType": 9,
       "Rarity": 3,
       "RequiredCraftingLevel": 10,
-      "RequiredTier": 2,
       "Ingredients": [{
           "ItemId": "refined_steel",
           "Count": 6
@@ -91,11 +85,9 @@
       "RecipeId": "craft_earring_r4",
       "DisplayName": "Emerald Earring",
       "Description": "A steel alloy earring set with rare emerald on compound thread.",
-      "Category": 2,
       "EquipmentType": 9,
       "Rarity": 4,
       "RequiredCraftingLevel": 15,
-      "RequiredTier": 3,
       "Ingredients": [{
           "ItemId": "steel_alloy",
           "Count": 8
@@ -120,11 +112,9 @@
       "RecipeId": "craft_earring_r5",
       "DisplayName": "Diamond Earring",
       "Description": "A high alloy steel earring set with legendary diamond on azureworm silk.",
-      "Category": 2,
       "EquipmentType": 9,
       "Rarity": 5,
       "RequiredCraftingLevel": 20,
-      "RequiredTier": 4,
       "Ingredients": [{
           "ItemId": "high_alloy_steel",
           "Count": 10
@@ -149,11 +139,9 @@
       "RecipeId": "craft_earring_r6",
       "DisplayName": "Vega Earring",
       "Description": "A divine high alloy steel earring set with mythic sapphire and essence of hope on Vega String.",
-      "Category": 2,
       "EquipmentType": 9,
       "Rarity": 6,
       "RequiredCraftingLevel": 25,
-      "RequiredTier": 5,
       "Ingredients": [{
           "ItemId": "high_alloy_steel",
           "Count": 14

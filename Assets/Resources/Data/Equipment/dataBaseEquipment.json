@@ -1,0 +1,16 @@
+[{
+    "Id": "equip_base",
+    "Name": "Base Equipment",
+    "Description": "Base template for all equipment. Used by crafting system to generate specific rarity equipment.",
+    "Category": 1,
+    "ItemRarity": 1,
+    "EquipmentType": 4,
+    "SellPrice": 20,
+    "StackSize": 1,
+    "BaseLevel": 1,
+    "MaxLevel": [10, 15, 20, 25, 30, 50],
+    "MaxDurability": [100, 200, 300, 400, 500, 1000],
+    "DurabilityLossPerUse": [1, 3, 5, 7, 11, 13],
+    "RepairCostPerDurability": [5, 50, 100, 1000, 5000, 10000],
+    "MaxSockets": 1
+}]

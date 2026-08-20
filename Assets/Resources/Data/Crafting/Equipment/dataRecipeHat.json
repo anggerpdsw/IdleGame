@@ -4,11 +4,9 @@
       "RecipeId": "craft_hat_r1",
       "DisplayName": "Cotton Hat",
       "Description": "A basic cotton hat stitched with organic glue.",
-      "Category": 2,
       "EquipmentType": 1,
       "Rarity": 1,
       "RequiredCraftingLevel": 1,
-      "RequiredTier": 1,
       "Ingredients": [{
           "ItemId": "cotton_thread",
           "Count": 6
@@ -33,11 +31,9 @@
       "RecipeId": "craft_hat_r2",
       "DisplayName": "Thick Thread Hat",
       "Description": "A hat woven from thick thread with concentrated glue.",
-      "Category": 2,
       "EquipmentType": 1,
       "Rarity": 2,
       "RequiredCraftingLevel": 5,
-      "RequiredTier": 1,
       "Ingredients": [{
           "ItemId": "thick_thread",
           "Count": 10
@@ -62,11 +58,9 @@
       "RecipeId": "craft_hat_r3",
       "DisplayName": "Silk Hat",
       "Description": "A refined hat crafted from silk thread and fine lumber.",
-      "Category": 2,
       "EquipmentType": 1,
       "Rarity": 3,
       "RequiredCraftingLevel": 10,
-      "RequiredTier": 2,
       "Ingredients": [{
           "ItemId": "silk_thread",
           "Count": 14
@@ -91,11 +85,9 @@
       "RecipeId": "craft_hat_r4",
       "DisplayName": "Compound Hat",
       "Description": "A legendary hat woven with compound thread and high-grade lumber.",
-      "Category": 2,
       "EquipmentType": 1,
       "Rarity": 4,
       "RequiredCraftingLevel": 15,
-      "RequiredTier": 3,
       "Ingredients": [{
           "ItemId": "compound_thread",
           "Count": 18
@@ -120,11 +112,9 @@
       "RecipeId": "craft_hat_r5",
       "DisplayName": "Azureworm Hat",
       "Description": "A mythic hat woven from azureworm silk with super glue binding.",
-      "Category": 2,
       "EquipmentType": 1,
       "Rarity": 5,
       "RequiredCraftingLevel": 20,
-      "RequiredTier": 4,
       "Ingredients": [{
           "ItemId": "azureworm_silk",
           "Count": 22
@@ -149,11 +139,9 @@
       "RecipeId": "craft_hat_r6",
       "DisplayName": "Vega Hat",
       "Description": "A divine hat woven with Vega String and infused with elemental essence.",
-      "Category": 2,
       "EquipmentType": 1,
       "Rarity": 6,
       "RequiredCraftingLevel": 25,
-      "RequiredTier": 5,
       "Ingredients": [{
           "ItemId": "vega_string",
           "Count": 26

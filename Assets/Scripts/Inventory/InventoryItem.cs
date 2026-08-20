@@ -48,6 +48,9 @@ namespace IdleDefenseSurvival.Inventory
         // ============ Enchantment ============
         public EnchantmentInstanceData Enchantment; // Current enchantment data
 
+        // ============ Attribute Data (New Equipment Attribute System) ============
+        public EquipmentAttributeData AttributeData; // Main + Secondary attributes with BaseValue only
+
         // ============ Flags ============
         public bool IsFavorite = false; // Prevents accidental sell/destroy
         public bool IsLocked = false; // Prevents any modification
@@ -61,7 +64,7 @@ namespace IdleDefenseSurvival.Inventory
         public EquipmentType EquippedSlot = EquipmentType.None;
 
         // ============ Custom Data ============
-        public Dictionary<string, object> CustomData; // For modding/extensibility
+        public Dictionary<string, object> CustomData; // For modding/extensibility (no AttributeStats, OverrideItemId, ValuePerLevel, ValuePerEnhance)
 
         // ============ Computed Properties (NOT serialized - [JsonIgnore]) ============
         [Newtonsoft.Json.JsonIgnore] public bool IsStackable =>

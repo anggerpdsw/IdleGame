@@ -4,6 +4,8 @@ using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Items.Random;
+using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -78,9 +80,17 @@ namespace IdleDefenseSurvival.Items.Generation
 
                 if (attributes.Length > 0)
                 {
-                    // Store as AttributeStatEntry[] — read by EquipmentStatCalculator.GetItemAttributeBonuses
-                    item.CustomData ??= new Dictionary<string, object>();
-                    item.CustomData["AttributeStats"] = attributes;
+                    // Convert to new EquipmentAttributeData structure
+                    var mainAttrs = new List<EquipmentAttributeEntry>();
+                    var secondAttrs = new List<EquipmentAttributeEntry>();
+
+                    foreach (var attr in attributes)
+                    {
+                        // AttributeRollService only rolls MainAttributes (CON/STR/INT/DEX)
+                        mainAttrs.Add(new EquipmentAttributeEntry(attr.Attribute, attr.BaseValue));
+                    }
+
+                    item.AttributeData = new EquipmentAttributeData(mainAttrs.ToArray(), secondAttrs.ToArray());
                 }
             }
 

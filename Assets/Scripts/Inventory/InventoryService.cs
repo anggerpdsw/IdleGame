@@ -748,8 +748,7 @@ namespace IdleDefenseSurvival.Inventory
                 data.CurrentDurability = item.CurrentDurability;
                 data.Enchantment = item.Enchantment?.Clone();
                 data.Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray();
-                if (item.CustomData != null && item.CustomData.Count > 0)
-                    data.CustomData = new Dictionary<string, object>(item.CustomData);
+                data.AttributeData = item.AttributeData;
             }
             else
             {
@@ -813,12 +812,13 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         private static InventoryItem RestoreItem(InventoryItemData data)
         {
+            bool isEquipment = ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(data.ItemId) is EquipmentData;
+
             var item = new InventoryItem
             {
                 InstanceId = data.InstanceId,
                 ItemId = data.ItemId,
                 Quantity = data.Quantity,
-                // Defaults (Level=1, etc.) when the equipment fields are missing — stackables never set them.
                 Level = data.Level ?? 1,
                 EnhanceLevel = data.EnhanceLevel ?? 0,
                 CurrentDurability = data.CurrentDurability ?? 0,
@@ -827,34 +827,30 @@ namespace IdleDefenseSurvival.Inventory
                 IsLocked = data.IsLocked,
                 IsNew = data.IsNew,
                 AcquiredTimestamp = data.AcquiredTimestamp,
-                CustomData = data.CustomData
+                AttributeData = isEquipment ? data.AttributeData : null,
+                CustomData = isEquipment ? null : data.CustomData
             };
 
-            if (ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(data.ItemId) is EquipmentData)
+            if (isEquipment)
             {
                 // ---- Equipment: restore full state ----
-                // MaxDurability is static config - derive from ItemDatabase, never persist.
                 var equip = ItemDatabase.Instance.GetEquipment(data.ItemId);
                 item.MaxDurability = equip?.MaxDurability ?? 0;
                 if (item.MaxDurability > 0 && item.CurrentDurability == 0)
                 {
-                    // Full durability on first load for items saved before durability existed.
                     item.CurrentDurability = item.MaxDurability;
                 }
 
-                // Sockets: keep only unlocked entries. SocketIndex re-derived from array position.
                 if (data.Sockets != null)
                 {
                     var sockets = data.Sockets.Where(s => s != null && s.IsUnlocked).ToArray();
                     for (int i = 0; i < sockets.Length; i++)
                     {
                         sockets[i].SocketIndex = i;
-                        // GemInstanceId persisted on SocketData; GemService rehydrates the instance on load.
                     }
                     item.Sockets = sockets;
                 }
 
-                // Rare safety: equipment without InstanceId gets one (identity is required).
                 if (string.IsNullOrEmpty(item.InstanceId))
                     item.InstanceId = Guid.NewGuid().ToString();
             }
