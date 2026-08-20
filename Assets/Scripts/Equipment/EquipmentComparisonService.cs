@@ -92,7 +92,7 @@ namespace IdleDefenseSurvival.Equipment
 
         private static IEnumerable<string> GetItemEffects(InventoryItem item)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData;
+            var itemData = item.GetEquipmentData();
             if (itemData?.SpecialEffects == null) return Array.Empty<string>();
 
             return itemData.SpecialEffects

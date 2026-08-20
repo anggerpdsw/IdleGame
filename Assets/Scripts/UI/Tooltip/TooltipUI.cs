@@ -183,7 +183,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
         #region Tooltip Building
         private void BuildEquipmentTooltip(InventoryItem item, InventoryItem comparisonItem)
         {
-            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return;
+            if (item.GetEquipmentData() is not EquipmentData itemData) return;
 
             // Show/hide sections
             if (_equipmentSection != null)

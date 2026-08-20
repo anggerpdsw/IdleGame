@@ -29,20 +29,25 @@ namespace IdleDefenseSurvival.Items.Generation
                 errors.Add("InstanceId is empty");
             }
 
-            // Validate ItemId matches base data
+            // Validate ItemId matches base data (or override for crafted equipment)
             if (baseData != null)
             {
-                string baseId = baseData.Id;
-                if (baseData.Category == ItemCategory.Gem)
+                string expectedId = baseData.Id;
+
+                // Check for OverrideItemId in CustomData (used by crafted equipment)
+                if (item.CustomData != null && item.CustomData.TryGetValue("OverrideItemId", out var overrideIdObj) && overrideIdObj is string overrideItemId)
                 {
-                    // Use lookup if needed, but ItemData is not GemData
+                    expectedId = overrideItemId;
+                }
+                else if (baseData.Category == ItemCategory.Gem)
+                {
                     var gemData = ItemDatabase.Instance?.GetGem(baseData.Id);
-                    if (gemData != null) baseId = gemData.GemId;
+                    if (gemData != null) expectedId = gemData.GemId;
                 }
 
-                if (item.ItemId != baseId)
+                if (item.ItemId != expectedId)
                 {
-                    errors.Add($"ItemId {item.ItemId} doesn't match base data {baseId}");
+                    errors.Add($"ItemId {item.ItemId} doesn't match expected ID {expectedId}");
                 }
             }
 
@@ -98,9 +103,9 @@ namespace IdleDefenseSurvival.Items.Generation
                 {
                     errors.Add("Sockets array is null but equipment has socket slots");
                 }
-                else if (item.Sockets.Length != equipData.MaxSockets)
+                else if (item.Sockets.Length > equipData.MaxSockets)
                 {
-                    errors.Add($"Sockets count {item.Sockets.Length} doesn't match MaxSockets {equipData.MaxSockets}");
+                    errors.Add($"Sockets count {item.Sockets.Length} exceeds MaxSockets {equipData.MaxSockets}");
                 }
                 else
                 {

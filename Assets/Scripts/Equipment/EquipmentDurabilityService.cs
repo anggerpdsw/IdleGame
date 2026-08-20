@@ -37,7 +37,7 @@ namespace IdleDefenseSurvival.Equipment
         {
             if (!_repo.TryGetEquipped(slot, out var item)) return 0;
 
-            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData;
+            var itemData = ItemDatabase.Instance?.GetItem(item.EquipmentTemplateId) as EquipmentData;
             if (itemData == null) return 0;
 
             int needed = item.MaxDurability - item.CurrentDurability;

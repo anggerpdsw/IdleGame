@@ -18,7 +18,8 @@ namespace IdleDefenseSurvival.Inventory
     {
         // ============ Identity ============
         public string InstanceId; // Unique instance ID (GUID) — equipment (unique) only; null for stackables
-        public string ItemId; // Reference to ItemData/EquipmentData
+        public string ItemId; // Reference to ItemData/EquipmentData (concrete output ID, e.g. "cotton_hat")
+        public string EquipmentTemplateId; // Reference to base EquipmentData template (e.g. "equip_hat_base")
 
         // ============ Stack Identity ============
         /// <summary>'a'..'z' distinguishing stacks of the same item in different slots. Null = the canonical stack.</summary>
@@ -28,12 +29,14 @@ namespace IdleDefenseSurvival.Inventory
         public int Quantity = 1; // For stackable items
         public int Level = 1; // Current level
         public int EnhanceLevel = 0; // Enhancement level (+0 to +20)
-        public int LimitBreakCount = 0; // Limit break count
-        public int RefineLevel = 0; // Refinement level
-        public int TranscendLevel = 0; // Transcendence level
-        public int EvolutionStage = 0; // Evolution stage
-        public bool IsAwakened = false; // Awakening state
-        public bool IsMasterwork = false; // Masterwork state
+
+        // Advanced progression (runtime only — not persisted)
+        [Newtonsoft.Json.JsonIgnore] public int LimitBreakCount = 0;
+        [Newtonsoft.Json.JsonIgnore] public int RefineLevel = 0;
+        [Newtonsoft.Json.JsonIgnore] public int TranscendLevel = 0;
+        [Newtonsoft.Json.JsonIgnore] public int EvolutionStage = 0;
+        [Newtonsoft.Json.JsonIgnore] public bool IsAwakened = false;
+        [Newtonsoft.Json.JsonIgnore] public bool IsMasterwork = false;
 
         // ============ Durability ============
         public int CurrentDurability = 100;
@@ -66,7 +69,6 @@ namespace IdleDefenseSurvival.Inventory
         [Newtonsoft.Json.JsonIgnore] public bool IsMaxStack => Quantity >= GetMaxStackSize();
         [Newtonsoft.Json.JsonIgnore] public bool IsBroken => CurrentDurability <= 0;
         [Newtonsoft.Json.JsonIgnore] public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
-        [Newtonsoft.Json.JsonIgnore] public bool CanLimitBreak => LimitBreakCount < GetMaxLimitBreak();
         [Newtonsoft.Json.JsonIgnore] public bool HasSockets => Sockets != null && Sockets.Length > 0;
         [Newtonsoft.Json.JsonIgnore] public int FilledSocketCount => Sockets?.Count(s => s?.GemId != null) ?? 0;
         [Newtonsoft.Json.JsonIgnore] public int EmptySocketCount => Sockets?.Count(s => s?.GemId == null) ?? 0;
@@ -106,12 +108,6 @@ namespace IdleDefenseSurvival.Inventory
         {
             // Will be filled by ItemDatabase lookup
             return 20; // Default
-        }
-
-        public int GetMaxLimitBreak()
-        {
-            // Will be filled by ItemDatabase lookup
-            return 5; // Default
         }
 
         public float GetDurabilityPercent() => MaxDurability > 0 ? (float)CurrentDurability / MaxDurability : 0f;
@@ -285,8 +281,8 @@ namespace IdleDefenseSurvival.Inventory
         public int Width = 8;
         public int Height = 6;
         public int BaseCapacity = 48; // Width * Height
-        public int MaxCapacity = 200;
-        public int ExpansionCostBase = 100; // Gold cost for first expansion
+        public int MaxCapacity = 2000;
+        public int ExpansionCostBase = 10; // Gem cost for first expansion
         public float ExpansionCostMultiplier = 1.5f;
         public int SlotsPerExpansion = 8;
 

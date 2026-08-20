@@ -181,11 +181,6 @@ namespace IdleDefenseSurvival.Inventory
         /// Checks if a reward operation has already been applied (idempotency guard).
         /// </summary>
         bool HasAppliedOperation(string rewardOperationId);
-
-        /// <summary>
-        /// Gets the set of applied reward operation IDs for persistence/recovery.
-        /// </summary>
-        IReadOnlyCollection<string> GetAppliedRewardOperationIds();
     }
 
     /// <summary>
@@ -314,9 +309,6 @@ public class InventorySaveData
     /// <summary>Socketed gem instances (GemInstanceId-keyed). Runtime for socketed gems — never part of a stack.</summary>
     public GemInstanceData[] SocketedGems;
 
-    // P0-D: Idempotency guard for reward operations (crash-safe completion)
-    public string[] AppliedRewardOperationIds;
-
     // Migration helper: captures old "Config" field from v3 saves during deserialization.
     // Not written back on save (ShouldSerialize pattern).
     [Newtonsoft.Json.JsonProperty("Config")]
@@ -329,8 +321,7 @@ public class InventorySaveData
         Capacity = 48, // BaseCapacity from config
         LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
         Items = Array.Empty<InventoryItemData>(),
-        SocketedGems = Array.Empty<GemInstanceData>(),
-        AppliedRewardOperationIds = Array.Empty<string>()
+        SocketedGems = Array.Empty<GemInstanceData>()
     };
 }
 
@@ -363,12 +354,6 @@ public class InventoryItemData
     // ---- Equipment-only (unique instances) ----
     public int? Level;
     public int? EnhanceLevel;
-    public int? LimitBreakCount;
-    public int? RefineLevel;
-    public int? TranscendLevel;
-    public int? EvolutionStage;
-    public bool? IsAwakened;
-    public bool? IsMasterwork;
     public int? CurrentDurability; // MaxDurability derived from EquipmentData
     public SocketData[] Sockets; // { IsUnlocked, GemInstanceId }
     public EnchantmentInstanceData Enchantment;

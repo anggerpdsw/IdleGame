@@ -98,7 +98,8 @@ namespace IdleDefenseSurvival.Equipment
             if (item == null) return float.MinValue;
 
             var db = ItemDatabase.Instance;
-            bool hasPassive = db?.GetItem(item.ItemId) is EquipmentData itemData && RarityMechanicConfig.HasPassive(itemData.ItemRarity);
+            var equipmentData = item.GetEquipmentData();
+            bool hasPassive = equipmentData != null && RarityMechanicConfig.HasPassive(equipmentData.ItemRarity);
             var attrBonuses = EquipmentStatCalculator.GetItemAttributeBonuses(item);
             var setCounts = _repo.SnapshotSetCounts();
 

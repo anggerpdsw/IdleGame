@@ -55,7 +55,7 @@ namespace IdleDefenseSurvival.Equipment
 
         public void ActivateItemEffects(InventoryItem item, EquipmentType slot)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData;
+            var itemData = item.GetEquipmentData();
             if (itemData?.SpecialEffects != null)
             {
                 foreach (var effectEntry in itemData.SpecialEffects)

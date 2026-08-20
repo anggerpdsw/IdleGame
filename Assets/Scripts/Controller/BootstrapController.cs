@@ -57,6 +57,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<AttributeModifierManager>();
             EnsureSingleton<GameManager>();
             EnsureSingleton<CraftingManager>();
+            EnsureSingleton<UpgradeService>();
 
             if (SaveManager.Instance?.IsSaveLoaded == true) {
                 // Dev: fill inventory once when the save is truly fresh (no save file yet)

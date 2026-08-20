@@ -297,7 +297,8 @@ namespace IdleDefenseSurvival.Equipment
         {
             reason = string.Empty;
 
-            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return true;
+            var itemData = item.GetEquipmentData();
+            if (itemData == null) return true;
 
             int playerLevel = PlayerStatsManager.Instance?.GetStatInt(SkillType.HealthPoint) ?? 1;
             if (itemData.RequiredLevel > playerLevel)

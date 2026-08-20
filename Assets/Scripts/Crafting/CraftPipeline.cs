@@ -42,6 +42,8 @@ namespace IdleDefenseSurvival.Crafting
 
         public override void Execute(CraftPipelineContext ctx)
         {
+            if (!ctx.Success) return;
+
             if (ctx.Recipe == null)
             {
                 ctx.Success = false;
@@ -49,17 +51,17 @@ namespace IdleDefenseSurvival.Crafting
                 return;
             }
 
-            if (!ctx.Recipe.IsValid())
-            {
-                ctx.Success = false;
-                ctx.FailureReason = "Recipe validation failed";
-                return;
-            }
-
             if (ctx.Context == null)
             {
                 ctx.Success = false;
-                ctx.FailureReason = "CraftContext is null";
+                ctx.FailureReason = "Context is null";
+                return;
+            }
+
+            if (ctx.Rng == null)
+            {
+                ctx.Success = false;
+                ctx.FailureReason = "RNG provider is null";
                 return;
             }
         }
@@ -120,12 +122,12 @@ namespace IdleDefenseSurvival.Crafting
         {
             if (!ctx.Success) return;
 
-            // Deterministic: one equipment item per craft (count comes from job, not recipe)
-            // The actual item generation happens in CraftRewardService using recipe metadata
+            int count = Mathf.Max(1, ctx.Context?.PlayerStats?.JobCount ?? 1);
+
             ctx.Entries.Add(new CraftResultEntry
             {
                 ItemId = "crafted_equipment", // Placeholder - resolved in CraftRewardService
-                Count = 1,
+                Count = count,
                 Quality = ctx.Recipe.Rarity, // Recipe rarity is the quality tier
                 Source = CraftRewardSource.Normal.ToString(),
                 IsCritical = false,

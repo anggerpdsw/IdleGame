@@ -58,11 +58,21 @@ namespace IdleDefenseSurvival.Inventory
         }
 
         /// <summary>
+        /// Gets the equipment data using EquipmentTemplateId when available, falling back to ItemId.
+        /// </summary>
+        public static EquipmentData GetEquipmentData(this InventoryItem item)
+        {
+            if (item == null) return null;
+            var id = !string.IsNullOrEmpty(item.EquipmentTemplateId) ? item.EquipmentTemplateId : item.ItemId;
+            return ItemDatabase.Instance?.GetItem(id) as EquipmentData;
+        }
+
+        /// <summary>
         /// Gets the set ID of the item (for equipment).
         /// </summary>
         public static string GetSetId(this InventoryItem item)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId) as EquipmentData;
+            var itemData = item.GetEquipmentData();
             return itemData?.SetId ?? string.Empty;
         }
 
@@ -71,7 +81,7 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         public static ItemCategory GetItemCategory(this InventoryItem item)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId);
+            var itemData = item.GetEquipmentData();
             return itemData?.Category ?? ItemCategory.None;
         }
 
@@ -80,7 +90,7 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         public static Rarity GetRarity(this InventoryItem item)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId);
+            var itemData = item.GetEquipmentData();
             return itemData?.ItemRarity ?? Rarity.Common;
         }
 
@@ -89,7 +99,7 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         public static bool IsEquippable(this InventoryItem item)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId);
+            var itemData = item.GetEquipmentData();
             return itemData?.Category == ItemCategory.Equipment;
         }
 
@@ -98,7 +108,7 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         public static EquipmentType GetEquipmentType(this InventoryItem item)
         {
-            var itemData = ItemDatabase.Instance?.GetItem(item?.ItemId) as EquipmentData;
+            var itemData = item.GetEquipmentData();
             return itemData?.EquipmentType ?? EquipmentType.None;
         }
 

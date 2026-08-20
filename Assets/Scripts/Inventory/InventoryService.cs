@@ -59,8 +59,6 @@ namespace IdleDefenseSurvival.Inventory
         // Dirty flags for optimization - granular per-slot tracking
         private readonly Dictionary<int, DirtyType> _dirtySlots = new();
 
-        // P0-D: Idempotency guard for reward operations
-        private readonly HashSet<string> _appliedRewardOperationIds = new();
         #endregion
 
         #region Properties
@@ -543,7 +541,7 @@ namespace IdleDefenseSurvival.Inventory
             if (Capacity >= _config.MaxCapacity) return false;
 
             int cost = GetExpansionCost();
-            if (!EconomyManager.Instance.TrySpendCurrency(CurrencyType.Gold, cost, "Inventory Expansion"))
+            if (!EconomyManager.Instance.TrySpendCurrency(CurrencyType.Gem, cost, "Inventory Expansion"))
                 return false;
 
             int oldCapacity = Capacity;
@@ -557,14 +555,10 @@ namespace IdleDefenseSurvival.Inventory
             int slotsToAdd = Capacity - oldCapacity;
             int startIndex = _slots.Count;
             for (int i = 0; i < slotsToAdd; i++)
-            {
                 _slots.Add(new InventorySlot { SlotIndex = _slots.Count });
-            }
             // Mark new slots as dirty
             for (int i = startIndex; i < _slots.Count; i++)
-            {
                 MarkDirty(i, DirtyType.Item);
-            }
 
             OnCapacityChanged?.Invoke(Capacity);
             return true;
@@ -706,7 +700,7 @@ namespace IdleDefenseSurvival.Inventory
                 .ToArray();
 
             // Socketed gems live outside the stack; GemService owns them (GemInstanceId-keyed).
-            var socketedGems = IdleDefenseSurvival.Items.GemService.Instance?.GetSocketedGemsSaveData()
+            var socketedGems = GemService.Instance?.GetSocketedGemsSaveData()
                 ?? Array.Empty<GemInstanceData>();
 
             return new InventorySaveData
@@ -714,8 +708,7 @@ namespace IdleDefenseSurvival.Inventory
                 Capacity = Capacity, // Current expanded capacity
                 LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 Items = items,
-                SocketedGems = socketedGems,
-                AppliedRewardOperationIds = _appliedRewardOperationIds.ToArray()
+                SocketedGems = socketedGems
             };
         }
 
@@ -746,12 +739,6 @@ namespace IdleDefenseSurvival.Inventory
                 data.InstanceId = item.InstanceId;
                 data.Level = item.Level;
                 data.EnhanceLevel = item.EnhanceLevel;
-                data.LimitBreakCount = item.LimitBreakCount;
-                data.RefineLevel = item.RefineLevel;
-                data.TranscendLevel = item.TranscendLevel;
-                data.EvolutionStage = item.EvolutionStage;
-                data.IsAwakened = item.IsAwakened;
-                data.IsMasterwork = item.IsMasterwork;
                 data.CurrentDurability = item.CurrentDurability;
                 data.Enchantment = item.Enchantment?.Clone();
                 data.Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray();
@@ -789,26 +776,13 @@ namespace IdleDefenseSurvival.Inventory
             _config.Height = (capacity + _config.Width - 1) / _config.Width;
             CreateSlots(capacity);
 
-            // P0-D: Restore applied reward operation IDs for idempotency (before items, order doesn't matter)
-            if (data.AppliedRewardOperationIds != null)
-            {
-                _appliedRewardOperationIds.Clear();
-                foreach (var id in data.AppliedRewardOperationIds)
-                {
-                    if (!string.IsNullOrEmpty(id))
-                        _appliedRewardOperationIds.Add(id);
-                }
-            }
-
             if (data.Items != null)
             {
                 foreach (var saveItem in data.Items)
                 {
                     if (saveItem == null || string.IsNullOrEmpty(saveItem.ItemId)) continue;
-
                     var item = RestoreItem(saveItem);
                     if (item == null) continue;
-
                     int targetSlot = saveItem.SlotIndex >= 0 && saveItem.SlotIndex < _slots.Count
                         ? saveItem.SlotIndex
                         : FindEmptySlot();
@@ -837,12 +811,6 @@ namespace IdleDefenseSurvival.Inventory
                 // Defaults (Level=1, etc.) when the equipment fields are missing — stackables never set them.
                 Level = data.Level ?? 1,
                 EnhanceLevel = data.EnhanceLevel ?? 0,
-                LimitBreakCount = data.LimitBreakCount ?? 0,
-                RefineLevel = data.RefineLevel ?? 0,
-                TranscendLevel = data.TranscendLevel ?? 0,
-                EvolutionStage = data.EvolutionStage ?? 0,
-                IsAwakened = data.IsAwakened ?? false,
-                IsMasterwork = data.IsMasterwork ?? false,
                 CurrentDurability = data.CurrentDurability ?? 0,
                 Enchantment = data.Enchantment,
                 IsFavorite = data.IsFavorite,
@@ -1141,43 +1109,29 @@ namespace IdleDefenseSurvival.Inventory
         }
 
         /// <summary>
-        /// Applies a reward item with idempotency protection via rewardOperationId.
-        /// Returns ApplyResult indicating success, already-applied, or failure.
+        /// Applies a reward item without idempotency persistence (session-only).
+        /// Returns ApplyResult indicating success or failure.
         /// </summary>
         public ApplyResult ApplyReward(InventoryItem item, string rewardOperationId)
         {
             if (item == null || string.IsNullOrEmpty(rewardOperationId))
                 return ApplyResult.Failure;
 
-            // Idempotency check: if already applied, return AlreadyApplied (no-op)
-            if (_appliedRewardOperationIds.Contains(rewardOperationId))
-                return ApplyResult.AlreadyApplied;
-
             // Attempt to add the item
             bool added = AddItemInstance(item);
             if (!added)
                 return ApplyResult.Failure;
 
-            // Mark operation as applied
-            _appliedRewardOperationIds.Add(rewardOperationId);
             return ApplyResult.Success;
         }
 
         /// <summary>
-        /// Checks if a reward operation has already been applied (idempotency guard).
+        /// Checks if a reward operation has already been applied (session-only, no persistence).
         /// </summary>
         public bool HasAppliedOperation(string rewardOperationId)
         {
-            if (string.IsNullOrEmpty(rewardOperationId)) return false;
-            return _appliedRewardOperationIds.Contains(rewardOperationId);
-        }
-
-        /// <summary>
-        /// Gets the set of applied reward operation IDs for persistence/recovery.
-        /// </summary>
-        public IReadOnlyCollection<string> GetAppliedRewardOperationIds()
-        {
-            return _appliedRewardOperationIds.ToList().AsReadOnly();
+            // No persistent tracking - always returns false
+            return false;
         }
         #endregion
     }

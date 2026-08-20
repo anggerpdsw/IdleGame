@@ -281,7 +281,8 @@ namespace IdleDefenseSurvival.Equipment
 
             if (item == null) return bonuses;
 
-            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
+            var itemData = item.GetEquipmentData();
+            if (itemData == null) return bonuses;
 
             // Combat stats (crit, lifesteal, element, ...)
             if (itemData.CombatStats != null)

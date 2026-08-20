@@ -4,7 +4,6 @@ using UnityEngine;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Generation;
-using IdleDefenseSurvival.Items.Random;
 
 namespace IdleDefenseSurvival.Crafting
 {
@@ -119,10 +118,12 @@ namespace IdleDefenseSurvival.Crafting
             if (db == null) return null;
 
             string baseId = $"equip_{slot.ToString().ToLower()}_base";
+            string OutputItemId = recipe.DisplayName.ToLowerInvariant().Replace(" ", "_");  // "Cotton Hat" → "cotton_hat"
+
             var baseEquip = db.GetEquipment(baseId);
             if (baseEquip == null)
             {
-                UnityEngine.Debug.LogError($"[CraftRewardService] Missing base template: {baseId}");
+                Debug.LogError($"[CraftRewardService] Missing base template: {baseId}");
                 return null;
             }
 
@@ -149,7 +150,11 @@ namespace IdleDefenseSurvival.Crafting
                                  seed: (int)seed,
                                  forcedQuality: qualityTier,
                                  fixedLevel: level,
-                                 eventModifiers: eventModifiers);
+                                 eventModifiers: eventModifiers,
+                                 customData: new Dictionary<string, object>
+                                 {
+                                     { "OverrideItemId", OutputItemId }
+                                 });
 
             // Use injected generator (shares RNG with pipeline) for I-11 determinism.
             return _itemGenerator.GenerateEquipmentFromBase(baseEquip, genContext);

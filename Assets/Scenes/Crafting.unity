@@ -6588,8 +6588,6 @@ MonoBehaviour:
   _plusButton: {fileID: 1538214901}
   _minusButton: {fileID: 2005927888}
   _craftButton: {fileID: 1302717445}
-  _progressSlider: {fileID: 0}
-  _progressText: {fileID: 0}
   _jobList: {fileID: 272725790}
   _jobEntryPrefab: {fileID: 329149208362478867, guid: 7788ddbb47426eb428deb6addd12685f, type: 3}
 --- !u!1 &1538214899

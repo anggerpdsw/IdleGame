@@ -21,7 +21,8 @@ namespace IdleDefenseSurvival.Equipment
         public static Dictionary<SecondaryStat, float> GetItemStatBonuses(InventoryItem item)
         {
             var bonuses = new Dictionary<SecondaryStat, float>();
-            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
+            var itemData = item.GetEquipmentData();
+            if (itemData == null) return bonuses;
 
             if (itemData.CombatStats != null)
                 foreach (var statEntry in itemData.CombatStats)
@@ -110,7 +111,8 @@ namespace IdleDefenseSurvival.Equipment
         public static Dictionary<MainAttribute, float> GetItemAttributeBonuses(InventoryItem item)
         {
             var bonuses = new Dictionary<MainAttribute, float>();
-            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return bonuses;
+            var itemData = item.GetEquipmentData();
+            if (itemData == null) return bonuses;
 
             if (itemData.AttributeStats != null)
                 foreach (var attrEntry in itemData.AttributeStats)
@@ -175,7 +177,8 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>Builds `Equip:{instanceId}_{stat}` modifiers. Single source for add/remove symmetry.</summary>
         public static IEnumerable<StatModifier> CreateStatModifiers(InventoryItem item)
         {
-            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) yield break;
+            var itemData = item.GetEquipmentData();
+            if (itemData == null) yield break;
 
             string prefix = $"Equip:{item.InstanceId}";
             var builder = new ModifierBuilder();

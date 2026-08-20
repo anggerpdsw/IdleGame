@@ -120,8 +120,6 @@ namespace IdleDefenseSurvival.Crafting
                 BaseCraftTime = source.BaseCraftTime,
                 TimePerAdditionalUnit = source.TimePerAdditionalUnit,
 
-                // Results - omitted (deterministic equipment generation)
-
                 // Experience
                 BaseExpReward = source.BaseExpReward,
                 ExpPerAdditionalUnit = source.ExpPerAdditionalUnit,

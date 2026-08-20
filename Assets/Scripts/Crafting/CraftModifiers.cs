@@ -385,6 +385,7 @@ namespace IdleDefenseSurvival.Crafting
         public int CraftingLevel = 1;
         public int BlacksmithLevel = 0;
         public long Luck = 0;
+        public int JobCount = 1;           // ← tambahkan
     }
 
     [Serializable]

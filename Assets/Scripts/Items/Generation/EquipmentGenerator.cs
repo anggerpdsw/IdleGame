@@ -59,14 +59,12 @@ namespace IdleDefenseSurvival.Items.Generation
             int level = context.FixedLevel ?? CalculateLevel(baseEquipment, context);
 
             // 3. Create base item
-            var item = CreateBaseItem(baseEquipment, rarity, level);
+            var item = CreateBaseItem(baseEquipment, rarity, level, context);
 
             // 4. Generate secondary stats
             var secondaryStats = _statRoll.RollSecondaryStats(baseEquipment, rarity, context);
             if (secondaryStats.Length > 0)
-            {
                 ApplySecondaryStats(item, secondaryStats);
-            }
 
             // 4b. Roll main attributes (v3.8 §20) — craft-sourced only; rarity here is
             // recipe.Rarity via context.ForcedQuality (set by CraftRewardService).
@@ -87,9 +85,7 @@ namespace IdleDefenseSurvival.Items.Generation
             // 6. Generate affixes
             var affixes = _affixGen.GenerateAffixes(baseEquipment, rarity, context);
             if (affixes.Length > 0)
-            {
                 ApplyAffixes(item, affixes);
-            }
 
             // 7. Generate enchantment
             item.Enchantment = _enchantGen.GenerateEnchantment(baseEquipment, rarity, level, context);
@@ -123,21 +119,38 @@ namespace IdleDefenseSurvival.Items.Generation
             return Generate(baseEquipment, context);
         }
 
-        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level)
+        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context)
         {
-            return new InventoryItem
+            string outputItemId = baseEquipment.Id;
+            if (context?.CustomData != null &&
+                context.CustomData.TryGetValue("OverrideItemId", out var outputId) &&
+                outputId != null)
+            {
+                outputItemId = outputId.ToString();
+            }
+
+            var item = new InventoryItem
             {
                 InstanceId = Guid.NewGuid().ToString(),
-                ItemId = baseEquipment.Id,
+
+                // ID item konkret hasil crafting. Contoh: cotton_hat
+                ItemId = outputItemId,
+
+                // ID template equipment yang menjadi sumber data. Contoh: equip_hat_base
+                EquipmentTemplateId = baseEquipment.Id,
+
                 Quantity = 1,
                 Level = Math.Clamp(level, 1, baseEquipment.MaxLevel),
                 MaxDurability = baseEquipment.MaxDurability,
                 CurrentDurability = baseEquipment.MaxDurability,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                EnhanceLevel = 0,
-                LimitBreakCount = 0,
-                RefineLevel = 0
+                EnhanceLevel = 0
             };
+
+            if (context?.CustomData != null && context.CustomData.Count > 0)
+                item.CustomData = new Dictionary<string, object>(context.CustomData);
+
+            return item;
         }
 
         private int CalculateLevel(EquipmentData baseEquipment, ItemGenerationContext context)
