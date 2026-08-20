@@ -1,0 +1,18 @@
+{
+    "constitution": {
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4
+    },
+    "strength": {
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.3
+    },
+    "intelligence": {
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.6
+    },
+    "dexterity": {
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.5
+    }
+}

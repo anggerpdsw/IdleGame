@@ -212,6 +212,12 @@ namespace IdleDefenseSurvival.UI.Inventory
         {
             // Handled by OnEndDrag
         }
+
+        public void SetNewIndicator(bool isNew)
+        {
+            if (_newIndicator != null)
+                _newIndicator.SetActive(isNew);
+        }
         #endregion
     }
 }

@@ -1,0 +1,126 @@
+{
+    "attackRange": {
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4
+    },
+    "bounceChance": {
+        "ValuePerLevel": 0.5,
+        "ValuePerEnhance": 1.0
+    },
+    "bounceCount": {
+        "ValuePerLevel": 0.02,
+        "ValuePerEnhance": 0.05
+    },
+    "defenseBreak": {
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.6
+    },
+
+    "multiShootChance": {
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8
+    },
+    "multiShootCount": {
+        "ValuePerLevel": 0.02,
+        "ValuePerEnhance": 0.05
+    },
+
+    "knockbackChance": {
+        "ValuePerLevel": 0.4,
+        "ValuePerEnhance": 0.8
+    },
+    "stuntChance": {
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.6
+    },
+    "stuntDuration": {
+        "ValuePerLevel": 0.02,
+        "ValuePerEnhance": 0.05
+    },
+
+    "evasion": {
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.6
+    },
+    "lifeSteal": {
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3
+    },
+
+    "damagePerRange": {
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4
+    },
+    "cooldownReduction": {
+        "ValuePerLevel": 0.15,
+        "ValuePerEnhance": 0.3
+    },
+    "moveSpeed": {
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4
+    },
+    "ultimateAttack": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+
+    "bossDamage": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "eliteDamage": {
+        "ValuePerLevel": 0.3,
+        "ValuePerEnhance": 0.6
+    },
+
+    "goldGain": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "dropRate": {
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4
+    },
+    "interestWave": {
+        "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.1
+    },
+
+    "hitRate": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "penetration": {
+        "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.4
+    },
+
+    "metalDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "woodDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "fireDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "waterDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "earthDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "lightningDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    },
+    "windDamageBonus": {
+        "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5
+    }
+}

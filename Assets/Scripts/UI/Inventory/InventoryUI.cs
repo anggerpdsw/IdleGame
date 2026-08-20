@@ -206,8 +206,26 @@ namespace IdleDefenseSurvival.UI.Inventory
         /// </summary>
         public void SelectItem(InventoryItem item, int slotIndex)
         {
-            if (_infoPanel == null) return;
-            _infoPanel.ShowItem(item);
+            if (item == null) return;
+            // Tampilkan detail item
+            _infoPanel?.ShowItem(item);
+            if (!item.IsNew) return;
+            // Item sudah dilihat oleh player
+            if (item.IsNew) InventoryService.Instance?.MarkAsSeenAtSlot(slotIndex);
+            UpdateNewIndicator(slotIndex, false);
+        }
+
+        public void UpdateNewIndicator(int inventoryIndex, bool isNew)
+        {
+            if (_slotUIs == null) return;
+            foreach (var slotUI in _slotUIs)
+            {
+                if (slotUI != null && slotUI.InventoryIndex == inventoryIndex)
+                {
+                    slotUI.SetNewIndicator(isNew);
+                    return;
+                }
+            }
         }
 
         private void UpdateCapacityDisplay()

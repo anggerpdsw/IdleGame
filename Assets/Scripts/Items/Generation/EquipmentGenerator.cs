@@ -70,10 +70,15 @@ namespace IdleDefenseSurvival.Items.Generation
             // recipe.Rarity via context.ForcedQuality (set by CraftRewardService).
             if (context.Source == ItemSource.Craft)
             {
-                var tierConfig = CraftingConfig.Load().GetAttributeTierConfig((int)rarity);
-                var attributes = _attributeRoll.RollAttributes(rarity, tierConfig);
+                var tierConfig = CraftingConfig.Load()
+                    .GetAttributeTierConfig((int)rarity);
+
+                var attributes = _attributeRoll
+                    .RollAttributes(rarity, tierConfig);
+
                 if (attributes.Length > 0)
                 {
+                    // Store as AttributeStatEntry[] — read by EquipmentStatCalculator.GetItemAttributeBonuses
                     item.CustomData ??= new Dictionary<string, object>();
                     item.CustomData["AttributeStats"] = attributes;
                 }

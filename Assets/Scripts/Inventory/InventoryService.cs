@@ -302,16 +302,11 @@ namespace IdleDefenseSurvival.Inventory
 
         public bool SwapItems(int slotA, int slotB)
         {
-            if (slotA < 0 || slotA >= _slots.Count || slotB < 0 || slotB >= _slots.Count || slotA == slotB)
+            if (slotA < 0 || slotA >= _slots.Count ||
+                slotB < 0 || slotB >= _slots.Count ||
+                slotA == slotB)
                 return false;
-
-            var temp = _slots[slotA].Item;
-            _slots[slotA].Item = _slots[slotB].Item;
-            _slots[slotB].Item = temp;
-
-            if (_slots[slotA].Item != null) _slots[slotA].Item.IsNew = false;
-            if (_slots[slotB].Item != null) _slots[slotB].Item.IsNew = false;
-
+            (_slots[slotB].Item, _slots[slotA].Item) = (_slots[slotA].Item, _slots[slotB].Item);
             NotifySwapped(slotA, slotB);
             return true;
         }
@@ -532,6 +527,17 @@ namespace IdleDefenseSurvival.Inventory
                 int slotIndex = _slots.FindIndex(s => s.Item == item);
                 if (slotIndex >= 0) MarkDirty(slotIndex, DirtyType.Item | DirtyType.Tooltip);
             }
+        }
+        public bool MarkAsSeenAtSlot(int slotIndex)
+        {
+            if (slotIndex < 0 || slotIndex >= _slots.Count) return false;
+            var item = _slots[slotIndex].Item;
+            if (item == null || !item.IsNew) return false;
+            item.IsNew = false;
+            MarkDirty(slotIndex, DirtyType.Item | DirtyType.Tooltip);
+            MarkSaveDirty();
+            FlushDirtySlots();
+            return true;
         }
         #endregion
 
@@ -786,7 +792,11 @@ namespace IdleDefenseSurvival.Inventory
                     int targetSlot = saveItem.SlotIndex >= 0 && saveItem.SlotIndex < _slots.Count
                         ? saveItem.SlotIndex
                         : FindEmptySlot();
-                    if (targetSlot >= 0) _slots[targetSlot].Item = item;
+                    if (targetSlot >= 0) 
+                    {
+                        _slots[targetSlot].Item = item;
+                        _slots[targetSlot].SlotIndex = targetSlot;
+                    }
                 }
             }
 

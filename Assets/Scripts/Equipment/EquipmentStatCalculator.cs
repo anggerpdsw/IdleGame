@@ -131,6 +131,19 @@ namespace IdleDefenseSurvival.Equipment
                 }
             }
 
+            // Crafted attribute rolls (AttributeRollService → CustomData["AttributeStats"])
+            if (item.CustomData != null &&
+                item.CustomData.TryGetValue("AttributeStats", out var attrObj) &&
+                attrObj is AttributeStatEntry[] craftedAttrs)
+            {
+                foreach (var attrEntry in craftedAttrs)
+                {
+                    float value = attrEntry.GetValue(item.Level, item.EnhanceLevel);
+                    if (value != 0f)
+                        AddAsAttribute(bonuses, attrEntry.Attribute, value);
+                }
+            }
+
             return bonuses;
         }
 

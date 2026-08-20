@@ -1,28 +1,47 @@
-[
-  {
-    "Id": "equip_hat_base",
-    "Name": "Base Hat",
-    "Description": "Base template for all hats. Used by crafting system to generate specific rarity hats.",
-    "Category": 1,
-    "ItemRarity": 1,
-    "EquipmentType": 1,
-    "SellPrice": 20,
-    "StackSize": 1,
-    "BaseLevel": 1,
-    "MaxLevel": 50,
-    "MaxDurability": 100,
-    "DurabilityLossPerUse": 1,
-    "RepairCostPerDurability": 5,
-    "MaxSockets": 1,
-    "IconKey": "Equipment/Hat/base",
-    "CombatStats": [
-      {
-        "Stat": 12,
-        "BaseValue": 4,
-        "ValuePerLevel": 0.2,
-        "ValuePerEnhance": 0.4,
-        "Mode": 2
-      }
-    ]
-  }
-]
+[{
+  "Id": "equip_hat_base",
+  "Name": "Base Hat",
+  "Description": "Base template for all hats. Used by crafting system to generate specific rarity hats.",
+  "Category": 1,
+  "ItemRarity": 1,
+  "EquipmentType": 1,
+  "SellPrice": 20,
+  "StackSize": 1,
+  "BaseLevel": 1,
+  "MaxLevel": 50,
+  "MaxDurability": 100,
+  "DurabilityLossPerUse": 1,
+  "RepairCostPerDurability": 5,
+  "MaxSockets": 1,
+  "IconKey": "Equipment/Hat/base",
+  "CombatStats": [{
+    "Stat": 12,
+    "BaseValue": 4,
+    "ValuePerLevel": 0.2,
+    "ValuePerEnhance": 0.4,
+    "Mode": 2
+  }]
+}, {
+  "Id": "cotton_hat",
+  "Name": "Cotton Hat",
+  "Description": "A basic cotton hat stitched with organic glue.",
+  "Category": 1,
+  "ItemRarity": 1,
+  "EquipmentType": 1,
+  "SellPrice": 20,
+  "StackSize": 1,
+  "BaseLevel": 1,
+  "MaxLevel": 50,
+  "MaxDurability": 100,
+  "DurabilityLossPerUse": 1,
+  "RepairCostPerDurability": 5,
+  "MaxSockets": 1,
+  "IconKey": "Equipment/Hat/cotton_hat",
+  "CombatStats": [{
+    "Stat": 12,
+    "BaseValue": 4,
+    "ValuePerLevel": 0.2,
+    "ValuePerEnhance": 0.4,
+    "Mode": 2
+  }]
+}]
