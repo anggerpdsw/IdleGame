@@ -41,7 +41,12 @@ namespace IdleDefenseSurvival.Items.Generation
 
                 if (item.ItemId != expectedId)
                 {
-                    errors.Add($"ItemId {item.ItemId} doesn't match expected ID {expectedId}");
+                    // Allow crafted equipment to use overridden ItemId (shared base template "equip_base")
+                    bool isBaseEquip = baseData.Category == ItemCategory.Equipment && baseData.Id == "equip_base";
+                    if (!isBaseEquip)
+                    {
+                        errors.Add($"ItemId {item.ItemId} doesn't match expected ID {expectedId}");
+                    }
                 }
             }
 

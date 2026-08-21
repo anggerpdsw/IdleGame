@@ -102,9 +102,20 @@ namespace IdleDefenseSurvival.Inventory
             var itemData = ItemDatabase.Instance?.GetItem(itemId);
             if (itemData == null)
             {
-                Debug.LogWarning($"[InventoryService] Item not found: {itemId}");
+                Debug.LogError($"[InventoryService] Item not found: {itemId}");
                 return string.Empty;
             }
+
+            // ---- Guard: equipment must not use this path ----
+            if (itemData.Category == ItemCategory.Equipment)
+            {
+                Debug.LogError(
+                    $"[InventoryService] AddItem(string) cannot be used for equipment '{itemId}'. " +
+                    "Generated equipment must be added via AddItemInstance(InventoryItem) or AddGeneratedItem()."
+                );
+                return string.Empty;
+            }
+            // ------------------------------------------------
 
             int maxStack = itemData.StackSize > 0 ? itemData.StackSize : MaxStackSize;
 
@@ -128,13 +139,12 @@ namespace IdleDefenseSurvival.Inventory
                 }
             }
 
-            // Find empty slot for remaining quantity
+            // Add new stacks for remaining quantity
             while (quantity > 0)
             {
                 int emptySlot = FindEmptySlot();
                 if (emptySlot < 0)
                 {
-                    // Inventory full
                     if (!ExpandCapacity(1))
                     {
                         Debug.LogWarning("[InventoryService] Inventory full!");
@@ -154,6 +164,28 @@ namespace IdleDefenseSurvival.Inventory
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Adds a fully-generated equipment instance. Preserves all rarity-rolled fields.
+        /// Returns true on success, false on failure (e.g., inventory full).
+        /// </summary>
+        public bool AddGeneratedItem(InventoryItem generatedItem)
+        {
+            if (generatedItem == null)
+            {
+                Debug.LogError("[InventoryService] AddGeneratedItem called with null item.");
+                return false;
+            }
+
+            if (!generatedItem.IsEquippable())
+            {
+                Debug.LogError($"[InventoryService] AddGeneratedItem expects equipment, got '{generatedItem.ItemId}'.");
+                return false;
+            }
+
+            // Directly forward to core instance-add path – no re-creation.
+            return AddItemInstance(generatedItem);
         }
 
         public bool AddItemInstance(InventoryItem item)
@@ -748,18 +780,10 @@ namespace IdleDefenseSurvival.Inventory
                 data.DurabilityLossPerUse = item.DurabilityLossPerUse;
                 data.RepairCostPerDurability = item.RepairCostPerDurability;
                 data.MaxSockets = item.MaxSockets;
-                data.EquipmentTemplateId = item.EquipmentTemplateId;
                 data.EquipmentType = item.EquipmentType;
                 data.Enchantment = item.Enchantment?.Clone();
                 data.Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray();
                 data.AttributeData = item.AttributeData;
-
-                // Explicit arrays for save-file consumers expecting "MainAttribute"/"SecondaryAttribute"
-                if (item.AttributeData != null)
-                {
-                    data.MainAttribute = item.AttributeData.MainAttribute;
-                    data.SecondaryAttribute = item.AttributeData.SecondAttribute;
-                }
             }
             else
             {

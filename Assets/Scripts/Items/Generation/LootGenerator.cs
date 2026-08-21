@@ -33,10 +33,10 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Generates loot drops for a tier/wave using the configured loot table.
         /// </summary>
-        public InventoryItem[] GenerateLoot(int tier, int wave, int itemCount, float rarityBoost = 0f, long luck = 0, int? seed = null)
+        public InventoryItem[] GenerateLoot(int tier, int wave, int itemCount, float rarityBoost = 0f, int? seed = null)
         {
             var items = new List<InventoryItem>();
-            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed);
+            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, seed);
 
             for (int i = 0; i < itemCount; i++)
             {
@@ -79,7 +79,7 @@ namespace IdleDefenseSurvival.Items.Generation
                 .ToArray();
 
             var type = _rng.Choice(types);
-            return _equipmentGen.GenerateRandom(type, context.Tier, context.Wave, context.Luck, context.RarityBoost, context.Seed);
+            return _equipmentGen.GenerateRandom(type, context.Tier, context.Wave, context.RarityBoost, context.Seed);
         }
 
         private InventoryItem GenerateLootGem(ItemGenerationContext context)
@@ -89,17 +89,17 @@ namespace IdleDefenseSurvival.Items.Generation
                 .ToArray();
 
             var type = _rng.Choice(types);
-            return _gemGen.GenerateRandom(type, context.Tier, context.Wave, context.Luck, context.RarityBoost, context.Seed);
+            return _gemGen.GenerateRandom(type, context.Tier, context.Wave, context.RarityBoost, context.Seed);
         }
 
         private InventoryItem GenerateLootConsumable(ItemGenerationContext context)
         {
-            return _consumableGen.GenerateRandom(ItemCategory.Consumable, context.Tier, context.Wave, context.Luck, context.RarityBoost, context.Seed);
+            return _consumableGen.GenerateRandom(ItemCategory.Consumable, context.Tier, context.Wave, context.RarityBoost, context.Seed);
         }
 
         private InventoryItem GenerateLootMaterial(ItemGenerationContext context)
         {
-            return _consumableGen.GenerateRandom(ItemCategory.Material, context.Tier, context.Wave, context.Luck, context.RarityBoost, context.Seed);
+            return _consumableGen.GenerateRandom(ItemCategory.Material, context.Tier, context.Wave, context.RarityBoost, context.Seed);
         }
     }
 

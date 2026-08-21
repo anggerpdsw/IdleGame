@@ -93,14 +93,21 @@ namespace IdleDefenseSurvival.Inventory
             var itemData = item.GetEquipmentData();
             return itemData?.ItemRarity ?? Rarity.Common;
         }
-
+                
         /// <summary>
-        /// Checks if the item is equippable.
+        /// Checks if the item is an equipment instance.
+        ///
+        /// Equipment identity is determined from the runtime instance state,
+        /// not from a concrete ItemDatabase lookup by ItemId.
+        /// Crafted equipment may use a generated ItemId such as "leather_pants"
+        /// while its shared template remains "equip_base".
         /// </summary>
         public static bool IsEquippable(this InventoryItem item)
         {
-            var itemData = item.GetEquipmentData();
-            return itemData?.Category == ItemCategory.Equipment;
+            if (item == null) return false;
+            if (item.EquipmentType != EquipmentType.None) return true;
+            if (!string.IsNullOrEmpty(item.EquipmentTemplateId)) return true;
+            return item.AttributeData != null;
         }
 
         /// <summary>

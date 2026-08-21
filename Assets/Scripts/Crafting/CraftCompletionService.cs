@@ -112,8 +112,9 @@ namespace IdleDefenseSurvival.Crafting
 
                 // Roll and generate rewards using the stored seed
                 var context = _contextBuilder.Build();
-                Debug.Log($"[CraftCompletionService] Context built: craftingLevel={context.PlayerStats?.CraftingLevel ?? 0} blacksmith={context.PlayerStats?.BlacksmithLevel ?? 0} luck={context.PlayerStats?.Luck ?? 0} successBonus={context.Buffs?.SuccessRateBonus ?? 0f} critBonus={context.Buffs?.CriticalChanceBonus ?? 0f}");
-                var rollResult = _rollService.RollCraft(job.RecipeId, context, new SeedRandomProvider((int)completionSeed));
+                Debug.Log($"[CraftCompletionService] Context built: craftingLevel={context.PlayerStats?.CraftingLevel ?? 0} blacksmith={context.PlayerStats?.BlacksmithLevel ?? 0}");
+                
+                var rollResult = _rollService.RollCraftSeeded(job.RecipeId, context, (int)completionSeed);
                 Debug.Log($"[CraftCompletionService] RollCraft: success={rollResult.Success} entries={rollResult.Entries?.Count ?? 0} reason={rollResult.FailureReason}");
 
                 if (!rollResult.Success || rollResult.Entries.Count == 0)
@@ -143,6 +144,7 @@ namespace IdleDefenseSurvival.Crafting
                     }
                     else
                     {
+                        Debug.Log($"[CraftCompletionService] ApplyReward item moved to inventory");
                         appliedItems.Add(item);
                     }
                 }
@@ -157,16 +159,11 @@ namespace IdleDefenseSurvival.Crafting
 
                 // All rewards applied successfully — remove job from queue
                 bool removed = _queueService.RemoveJob(jobId);
-                if (removed)
-                {
-                    _saveManager.PersistCurrentStateDurably();
-                }
+                if (removed) _saveManager.PersistCurrentStateDurably();
 
                 Claimed?.Invoke(jobId, true);
                 if (appliedItems.Count > 0)
-                {
                     Result?.Invoke(jobId, job.RecipeId, appliedItems.ToArray());
-                }
             }
             catch (Exception ex)
             {

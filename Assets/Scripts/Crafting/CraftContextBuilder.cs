@@ -25,19 +25,12 @@ namespace IdleDefenseSurvival.Crafting
             {
                 PlayerStats = new PlayerCraftStats
                 {
+                    BlacksmithLevel = GetPlayerBlacksmithLevel(),
                     CraftingLevel = GetPlayerCraftingLevel(),
-                    BlacksmithLevel = GetBlacksmithLevel(),
-                    Luck = GetPlayerLuck()
                 },
                 Buffs = new CraftBuffContext
                 {
-                    SuccessRateBonus = GetSuccessRateBonus(),
-                    CriticalChanceBonus = GetCriticalChanceBonus(),
                     ExpMultiplier = GetExpMultiplier()
-                },
-                Mastery = new CraftMasteryContext
-                {
-                    RecipeMasteryLevels = GetRecipeMasteryLevels()
                 },
                 Events = new CraftEventContext
                 {
@@ -47,46 +40,20 @@ namespace IdleDefenseSurvival.Crafting
         }
 
         // ============ Player state sources ============
-
-        private int GetPlayerCraftingLevel()
+        private int GetPlayerBlacksmithLevel()
         {
             return _saveManager?.GetAccountData()?.craftingLevel ?? 1;
         }
 
-        private int GetBlacksmithLevel()
+        private int GetPlayerCraftingLevel()
         {
-            // Building level that affects crafting
             return 0; // Simplified
-        }
-
-        private long GetPlayerLuck()
-        {
-            // From equipment, cards, buffs, etc.
-            return 0; // Simplified
-        }
-
-        private float GetSuccessRateBonus()
-        {
-            // From equipment, buffs, cards, etc.
-            return 0f;
-        }
-
-        private float GetCriticalChanceBonus()
-        {
-            // From equipment, mastery, buffs
-            return 0f;
         }
 
         private float GetExpMultiplier()
         {
             // From VIP, events, buffs
             return 1f;
-        }
-
-        private Dictionary<string, int> GetRecipeMasteryLevels()
-        {
-            // From crafting mastery system
-            return _saveManager?.GetAccountData()?.recipeMasteryLevels ?? new Dictionary<string, int>();
         }
 
         private List<EventCraftModifier> GetActiveEventModifiers()
@@ -109,8 +76,6 @@ namespace IdleDefenseSurvival.Crafting
                         ItemId = legacy.ExtraItemId,
                         MinCount = legacy.ExtraItemCount,
                         MaxCount = legacy.ExtraItemCount,
-                        MinQuality = legacy.ExtraItemQuality,
-                        MaxQuality = legacy.ExtraItemQuality,
                         ApplicableRecipeIds = legacy.ApplicableRecipeIds,
                         ApplicableCategories = legacy.ApplicableCategories
                     });

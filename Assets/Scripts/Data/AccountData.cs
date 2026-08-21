@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 
 namespace IdleDefenseSurvival.Data
 {
@@ -9,8 +8,14 @@ namespace IdleDefenseSurvival.Data
         public int level = 1;
         public long currentExp = 0;
         public long totalExp = 0;
-        public int craftingLevel = 1; // Added
-        public Dictionary<string, int> recipeMasteryLevels = new(); // Added
+
+        // Crafting & Blacksmithing
+        public int craftingLevel = 1;
+        public long craftingCurrentExp = 0;
+        public long craftingTotalExp = 0;
+        public int blacksmithLevel = 1;
+        public long blacksmithCurrentExp = 0;
+        public long blacksmithTotalExp = 0;
 
         // Main attributes — player-allocated stat points. Base 5 each, +5 points per level-up.
         public int constitution = 5;

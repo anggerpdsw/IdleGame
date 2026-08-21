@@ -13,10 +13,9 @@ namespace IdleDefenseSurvival.Items.Generation
         public ItemSource Source { get; set; } = ItemSource.Craft;
         public string RecipeId { get; set; }
         public int PlayerLevel { get; set; } = 1;
-        public int CraftingMastery { get; set; } = 0;
+        public int CraftingLevel { get; set; } = 0;
         public int BlacksmithLevel { get; set; } = 0;
         public IReadOnlyList<EventCraftModifier> EventModifiers { get; set; }
-        public long Luck { get; set; } = 0;
         public int? ForcedQuality { get; set; } = null;
         public int? FixedLevel { get; set; } = null;
         public int? FixedEnhance { get; set; } = null;
@@ -37,9 +36,8 @@ namespace IdleDefenseSurvival.Items.Generation
         public static ItemGenerationContext Craft(
             string recipeId,
             int playerLevel,
-            int craftingMastery,
+            int craftingLevel,
             int blacksmithLevel,
-            long luck,
             IReadOnlyList<EventCraftModifier> eventModifiers = null,
             int? forcedQuality = null,
             int? fixedLevel = null,
@@ -51,9 +49,8 @@ namespace IdleDefenseSurvival.Items.Generation
                 Source = ItemSource.Craft,
                 RecipeId = recipeId,
                 PlayerLevel = playerLevel,
-                CraftingMastery = craftingMastery,
+                CraftingLevel = craftingLevel,
                 BlacksmithLevel = blacksmithLevel,
-                Luck = luck,
                 EventModifiers = eventModifiers ?? Array.Empty<EventCraftModifier>(),
                 ForcedQuality = forcedQuality,
                 FixedLevel = fixedLevel,
@@ -69,7 +66,6 @@ namespace IdleDefenseSurvival.Items.Generation
             int tier,
             int wave,
             float rarityBoost = 0f,
-            long luck = 0,
             int? seed = null)
         {
             return new ItemGenerationContext
@@ -78,7 +74,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 Tier = tier,
                 Wave = wave,
                 RarityBoost = rarityBoost,
-                Luck = luck,
                 Seed = seed
             };
         }
@@ -90,7 +85,6 @@ namespace IdleDefenseSurvival.Items.Generation
             int playerLevel,
             int tier,
             int wave,
-            long luck = 0,
             int? seed = null)
         {
             return new ItemGenerationContext
@@ -99,7 +93,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 PlayerLevel = playerLevel,
                 Tier = tier,
                 Wave = wave,
-                Luck = luck,
                 Seed = seed
             };
         }
@@ -155,7 +148,7 @@ namespace IdleDefenseSurvival.Items.Generation
             ItemSource? source = null,
             string recipeId = null,
             int? playerLevel = null,
-            int? craftingMastery = null,
+            int? craftingLevel = null,
             int? blacksmithLevel = null,
             IReadOnlyList<EventCraftModifier> eventModifiers = null,
             long? luck = null,
@@ -176,10 +169,9 @@ namespace IdleDefenseSurvival.Items.Generation
                 Source = source ?? Source,
                 RecipeId = recipeId ?? RecipeId,
                 PlayerLevel = playerLevel ?? PlayerLevel,
-                CraftingMastery = craftingMastery ?? CraftingMastery,
+                CraftingLevel = craftingLevel ?? CraftingLevel,
                 BlacksmithLevel = blacksmithLevel ?? BlacksmithLevel,
                 EventModifiers = eventModifiers ?? EventModifiers,
-                Luck = luck ?? Luck,
                 ForcedQuality = forcedQuality ?? ForcedQuality,
                 FixedLevel = fixedLevel ?? FixedLevel,
                 FixedEnhance = fixedEnhance ?? FixedEnhance,

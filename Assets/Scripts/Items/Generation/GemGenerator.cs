@@ -58,13 +58,13 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Generates a random gem of a specific type.
         /// </summary>
-        public InventoryItem GenerateRandom(GemType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public InventoryItem GenerateRandom(GemType type, int tier, int wave, float rarityBoost = 0f, int? seed = null)
         {
             var baseGems = ItemDatabase.Instance?.GetGemsByType(type)?.ToList();
             if (baseGems == null || baseGems.Count == 0) return null;
 
             var baseGem = _rng.Choice(baseGems);
-            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
+            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, seed)
                 .With(gemType: type, category: ItemCategory.Gem);
 
             return Generate(baseGem, context);

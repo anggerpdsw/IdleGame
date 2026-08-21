@@ -192,7 +192,7 @@ namespace IdleDefenseSurvival.Items
         /// </summary>
         public InventoryItem[] GenerateLootDrop(int tier, int wave, int itemCount, float rarityBoost = 0f)
         {
-            return _lootGen.GenerateLoot(tier, wave, itemCount, rarityBoost, 0, null);
+            return _lootGen.GenerateLoot(tier, wave, itemCount, rarityBoost, null);
         }
 
         private InventoryItem GenerateGenericItem(ItemData itemData, ItemGenerationContext context)

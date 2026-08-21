@@ -44,9 +44,9 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls rarity for equipment type.
         /// </summary>
-        public Rarity RollRarityForEquipment(EquipmentType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public Rarity RollRarityForEquipment(EquipmentType type, int tier, int wave, float rarityBoost = 0f, int? seed = null)
         {
-            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
+            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, seed)
                 .With(equipmentType: type, category: ItemCategory.Equipment);
             return RollRarity(context);
         }
@@ -54,9 +54,9 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Rolls rarity for gem.
         /// </summary>
-        public Rarity RollRarityForGem(GemType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public Rarity RollRarityForGem(GemType type, int tier, int wave, float rarityBoost = 0f, int? seed = null)
         {
-            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
+            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, seed)
                 .With(gemType: type, category: ItemCategory.Gem);
             return RollRarity(context);
         }
@@ -65,16 +65,6 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             var modified = new float[weights.Weights.Length];
             Array.Copy(weights.Weights, modified, weights.Weights.Length);
-
-            // Luck modifier: shifts weights toward higher rarities
-            if (context.Luck > 0)
-            {
-                float luckFactor = Math.Min(context.Luck * 0.001f, 0.5f); // Cap at 50% shift
-                for (int i = 1; i < modified.Length; i++)
-                {
-                    modified[i] *= 1f + luckFactor * (i * 0.1f);
-                }
-            }
 
             // ItemRarity boost (from events, consumables, etc.)
             if (context.RarityBoost > 0)

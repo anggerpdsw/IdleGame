@@ -181,6 +181,12 @@ namespace IdleDefenseSurvival.Inventory
         /// Checks if a reward operation has already been applied (idempotency guard).
         /// </summary>
         bool HasAppliedOperation(string rewardOperationId);
+
+        /// <summary>
+        /// Adds a fully-generated equipment instance. Preserves all rarity-rolled fields.
+        /// Returns true on success, false on failure (e.g., inventory full).
+        /// </summary>
+        bool AddGeneratedItem(InventoryItem generatedItem);
     }
 
     /// <summary>
@@ -359,13 +365,10 @@ public class InventoryItemData
     public int? DurabilityLossPerUse; // From rarity config
     public long? RepairCostPerDurability; // From rarity config
     public int? MaxSockets; // From rarity config
-    public string EquipmentTemplateId; // Reference to base EquipmentData template (e.g. "equip_base")
-    public EquipmentType EquipmentType = EquipmentType.None; // Persisted equipment slot type
+    public EquipmentType? EquipmentType; // Persisted equipment slot type (null for non-equipment)
     public SocketData[] Sockets; // { IsUnlocked, GemInstanceId }
     public EnchantmentInstanceData Enchantment;
     public EquipmentAttributeData AttributeData; // Main + Secondary attributes (BaseValue only)
-    public EquipmentAttributeEntry[] MainAttribute; // Explicit arrays for save-file consumption
-    public EquipmentAttributeEntry[] SecondaryAttribute;
 
     // ---- Non-equipment (stackables/consumables) ----
     public Dictionary<string, object> CustomData; // Rolled affixes/secondaries for non-equipment
@@ -375,5 +378,8 @@ public class InventoryItemData
     public bool IsLocked = false;
     public bool IsNew = true;
     public long AcquiredTimestamp = 0;
+
+    // Serialization helper for nullable EquipmentType
+    public bool ShouldSerializeEquipmentType() => EquipmentType.HasValue;
 }
 }

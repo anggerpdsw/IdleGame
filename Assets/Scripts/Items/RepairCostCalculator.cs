@@ -91,54 +91,30 @@ namespace IdleDefenseSurvival.Items
             // 3. Enhance scaling: +10% per enhance level
             float enhanceMultiplier = 1f + item.EnhanceLevel * 0.1f;
 
-            // 4. Limit Break scaling: +15% per limit break
-            float limitBreakMultiplier = 1f + item.LimitBreakCount * 0.15f;
-
-            // 5. Refine scaling: +8% per refine level
-            float refineMultiplier = 1f + item.RefineLevel * 0.08f;
-
-            // 6. Transcend scaling: +20% per transcend level
-            float transcendMultiplier = 1f + item.TranscendLevel * 0.2f;
-
-            // 7. Evolution scaling: +25% per evolution stage
-            float evolutionMultiplier = 1f + item.EvolutionStage * 0.25f;
-
-            // 8. Awakening scaling: +50% if awakened
-            float awakeningMultiplier = item.IsAwakened ? 1.5f : 1f;
-
-            // 9. Masterwork scaling: +30% if masterwork
-            float masterworkMultiplier = item.IsMasterwork ? 1.3f : 1f;
-
-            // 10. Durability missing % scaling: more missing = slightly higher per-point cost
+            // 4. Durability missing % scaling: more missing = slightly higher per-point cost
             float missingPercent = 1f - item.GetDurabilityPercent();
             float missingMultiplier = 1f + missingPercent * 0.2f; // Up to +20% when fully broken
 
-            // 11. Quality scaling (from item data)
+            // 5. Quality scaling (from item data)
             float qualityMultiplier = itemData.QualityMultiplier > 0 ? itemData.QualityMultiplier : 1f;
 
-            // 12. Item Tier scaling
+            // 6. Item Tier scaling
             float tierMultiplier = 1f + itemData.Tier * 0.1f;
 
-            // 13. Star/Awakening/Transcend/Corruption scalings
+            // 7. Star/Awakening/Transcend/Corruption scalings
             float starMultiplier = 1f + itemData.StarRating * 0.05f;
             float corruptionMultiplier = itemData.CorruptionTier * 0.1f + 1f;
 
-            // 14. Broken state penalty: 2x cost if completely broken
+            // 8. Broken state penalty: 2x cost if completely broken
             float brokenMultiplier = item.IsBroken ? 2f : 1f;
 
-            // 15. Global RepairCostGrowth config
+            // 9. Global RepairCostGrowth config
             float globalGrowth = _config.RepairCostGrowth;
 
             // ===== Total Multiplier =====
             float totalMultiplier = levelMultiplier *
                                    rarityMultiplier *
                                    enhanceMultiplier *
-                                   limitBreakMultiplier *
-                                   refineMultiplier *
-                                   transcendMultiplier *
-                                   evolutionMultiplier *
-                                   awakeningMultiplier *
-                                   masterworkMultiplier *
                                    missingMultiplier *
                                    qualityMultiplier *
                                    tierMultiplier *
@@ -216,12 +192,6 @@ namespace IdleDefenseSurvival.Items
                 LevelMultiplier = 1f + (item.Level - 1) * 0.05f,
                 RarityMultiplier = itemData.ItemRarity.GetDefaultUpgradeMultiplier(),
                 EnhanceMultiplier = 1f + item.EnhanceLevel * 0.1f,
-                LimitBreakMultiplier = 1f + item.LimitBreakCount * 0.15f,
-                RefineMultiplier = 1f + item.RefineLevel * 0.08f,
-                TranscendMultiplier = 1f + item.TranscendLevel * 0.2f,
-                EvolutionMultiplier = 1f + item.EvolutionStage * 0.25f,
-                AwakeningMultiplier = item.IsAwakened ? 1.5f : 1f,
-                MasterworkMultiplier = item.IsMasterwork ? 1.3f : 1f,
                 MissingPercentMultiplier = 1f + (1f - item.GetDurabilityPercent()) * 0.2f,
                 QualityMultiplier = itemData.QualityMultiplier > 0 ? itemData.QualityMultiplier : 1f,
                 TierMultiplier = 1f + itemData.Tier * 0.1f,

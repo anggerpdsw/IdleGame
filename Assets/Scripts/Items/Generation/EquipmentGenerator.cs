@@ -138,13 +138,13 @@ namespace IdleDefenseSurvival.Items.Generation
         /// Uses equipment type to find appropriate base equipment template, but all
         /// rarity-based stats come from equip_base.
         /// </summary>
-        public InventoryItem GenerateRandom(EquipmentType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public InventoryItem GenerateRandom(EquipmentType type, int tier, int wave, float rarityBoost = 0f, int? seed = null)
         {
             var baseEquipments = ItemDatabase.Instance?.GetEquipmentByType(type)?.ToList();
             if (baseEquipments == null || baseEquipments.Count == 0) return null;
 
             var baseEquipment = _rng.Choice(baseEquipments);
-            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
+            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, seed)
                 .With(equipmentType: type, category: ItemCategory.Equipment);
 
             return Generate(baseEquipment, context);
@@ -161,7 +161,7 @@ namespace IdleDefenseSurvival.Items.Generation
                 return _rng.NextInt(1, rarityConfig.MaxLevel + 1);
 
             // Drops/rewards: calculate based on player/tier/wave then clamp.
-            int calculatedLevel = Math.Max(1, context.PlayerLevel + context.CraftingMastery / 5);
+            int calculatedLevel = Math.Max(1, context.PlayerLevel + context.CraftingLevel / 5);
             calculatedLevel += context.Tier * 2;
             calculatedLevel += context.Wave / 5;
 
@@ -176,13 +176,21 @@ namespace IdleDefenseSurvival.Items.Generation
             EquipmentBaseData baseConfig,
             ItemGenerationContext context)
         {
-            // Directly map rarityConfig fields; NO extra randomisation.
-            // EquipmentBaseData.GetRarityConfig() already rolled these values.
+            // Determine ItemId: prefer OverrideItemId from context (craft recipes), else baseEquipment.Id
+            string itemId = baseEquipment?.Id ?? "unknown";
+            if (context?.CustomData != null
+                && context.CustomData.TryGetValue("OverrideItemId", out var overrideObj)
+                && overrideObj is string overrideId
+                && !string.IsNullOrEmpty(overrideId))
+            {
+                itemId = overrideId;
+            }
+
             var item = new InventoryItem
             {
                 InstanceId = Guid.NewGuid().ToString(),
-                ItemId = baseEquipment?.Id ?? "unknown",
-                EquipmentTemplateId = baseConfig.Id,
+                ItemId = itemId,            // ← now "leather_pants" for craft_pants_r1
+                EquipmentTemplateId = baseConfig.Id,    // ← always "equip_base"
                 EquipmentType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None,
                 Quantity = 1,
                 Level = level,
@@ -197,6 +205,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
             return item;
         }
+
 
         private void GenerateMainAttributes(InventoryItem item, Rarity rarity, ItemGenerationContext context)
         {

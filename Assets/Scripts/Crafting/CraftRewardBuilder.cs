@@ -89,7 +89,6 @@ namespace IdleDefenseSurvival.Crafting
                 Count = _count,
                 Quality = _quality,
                 Source = _source.ToString(),
-                IsCritical = _isCritical,
                 FixedLevel = _fixedLevel,
                 FixedEnhance = _fixedEnhance,
                 SocketCount = _socketCount
@@ -111,12 +110,6 @@ namespace IdleDefenseSurvival.Crafting
         public static CraftResultEntry Normal(string itemId, int count = 1, int quality = 0)
         {
             return Create().WithItemId(itemId).WithCount(count).WithQuality(quality).WithSource(CraftRewardSource.Normal).Build();
-        }
-
-        public static CraftResultEntry Critical(string itemId, int count = 1, int quality = 0, string variant = "Double")
-        {
-            return Create().WithItemId(itemId).WithCount(count).WithQuality(quality)
-                .WithSource(CraftRewardSource.Critical).AsCritical(true).Build();
         }
 
         public static CraftResultEntry Guaranteed(string itemId, int count = 1, int quality = 0)
@@ -169,12 +162,6 @@ namespace IdleDefenseSurvival.Crafting
             return entry;
         }
 
-        public static CraftResultEntry AsCritical(this CraftResultEntry entry, bool isCritical = true)
-        {
-            entry.IsCritical = isCritical;
-            return entry;
-        }
-
         public static CraftResultEntry WithSource(this CraftResultEntry entry, CraftRewardSource source)
         {
             entry.Source = source.ToString();
@@ -189,7 +176,6 @@ namespace IdleDefenseSurvival.Crafting
                 Count = entry.Count,
                 Quality = entry.Quality,
                 Source = entry.Source,
-                IsCritical = entry.IsCritical,
                 FixedLevel = entry.FixedLevel,
                 FixedEnhance = entry.FixedEnhance,
                 SocketCount = entry.SocketCount

@@ -58,13 +58,13 @@ namespace IdleDefenseSurvival.Items.Generation
         /// <summary>
         /// Generates a random consumable of a specific category.
         /// </summary>
-        public InventoryItem GenerateRandom(ItemCategory category, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
+        public InventoryItem GenerateRandom(ItemCategory category, int tier, int wave, float rarityBoost = 0f, int? seed = null)
         {
             var items = ItemDatabase.Instance?.GetItemsByCategory(category)?.ToList();
             if (items == null || items.Count == 0) return null;
 
             var baseItem = _rng.Choice(items);
-            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, luck, seed)
+            var context = ItemGenerationContext.Drop(tier, wave, rarityBoost, seed)
                 .With(category: category);
 
             return Generate(baseItem, context);

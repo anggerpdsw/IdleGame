@@ -85,8 +85,6 @@ namespace IdleDefenseSurvival.Crafting
         public override void Execute(CraftPipelineContext ctx)
         {
             float successRate = CalculateSuccessRate(ctx);
-            successRate += ctx.SuccessRateBonus;
-            successRate *= ctx.SuccessRateMultiplier;
             successRate = Mathf.Clamp(successRate, 0f, 100f);
 
             if (ctx.Rng.ChancePercent(successRate))
@@ -104,7 +102,6 @@ namespace IdleDefenseSurvival.Crafting
         {
             float rate = ctx.Recipe.BaseSuccessRate;
             rate += ctx.Context.CraftingLevel * ctx.Recipe.SuccessRatePerLevel;
-            rate += ctx.Context.Luck * _config.LuckToSuccessRate;
             return rate;
         }
     }
@@ -121,16 +118,13 @@ namespace IdleDefenseSurvival.Crafting
         public override void Execute(CraftPipelineContext ctx)
         {
             if (!ctx.Success) return;
-
             int count = Mathf.Max(1, ctx.Context?.PlayerStats?.JobCount ?? 1);
-
             ctx.Entries.Add(new CraftResultEntry
             {
                 ItemId = "crafted_equipment", // Placeholder - resolved in CraftRewardService
                 Count = count,
                 Quality = ctx.Recipe.Rarity, // Recipe rarity is the quality tier
                 Source = CraftRewardSource.Normal.ToString(),
-                IsCritical = false,
                 FixedLevel = 0, // Level determined by recipe progression
                 FixedEnhance = 0
             });
@@ -245,13 +239,10 @@ namespace IdleDefenseSurvival.Crafting
         public override void Execute(CraftPipelineContext ctx)
         {
             if (!ctx.Success) return;
-
             long exp = ctx.Recipe.BaseExpReward;
             exp += ctx.Context.CraftingLevel * ctx.Recipe.ExpPerAdditionalUnit;
             exp = (long)(exp * ctx.Context.ExpMultiplier);
             exp = (long)(exp * ctx.ExpMultiplier);
-            exp += (long)ctx.ExpBonus;
-
             ctx.ExpReward = Math.Max(0, exp);
         }
     }
@@ -362,9 +353,9 @@ namespace IdleDefenseSurvival.Crafting
             return new CraftRollResult
             {
                 Success = pipelineCtx.Success,
-                FailureReason = pipelineCtx.FailureReason,
                 Entries = pipelineCtx.Entries,
-                ExpReward = pipelineCtx.ExpReward
+                ExpReward = pipelineCtx.ExpReward, // → belum diapliaksikan saat ini
+                FailureReason = pipelineCtx.FailureReason
             };
         }
 

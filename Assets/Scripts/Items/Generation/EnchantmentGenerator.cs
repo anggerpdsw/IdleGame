@@ -78,12 +78,6 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             float baseChance = _config.BaseChancePerRarity.TryGetValue(rarity, out var c) ? c : 0f;
 
-            // Luck modifier
-            if (context.Luck > 0)
-            {
-                baseChance += context.Luck * 0.0001f; // 0.01% per luck
-            }
-
             // Event modifiers
             if (context.EventModifiers != null)
             {

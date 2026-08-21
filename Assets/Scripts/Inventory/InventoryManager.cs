@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Items;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Manager
@@ -37,6 +38,19 @@ namespace IdleDefenseSurvival.Manager
         public void AddItem(string itemId, long amount)
         {
             if (string.IsNullOrEmpty(itemId) || amount <= 0) return;
+
+            // ---- Guard: equipment must not use this path ----
+            var data = ItemDatabase.Instance?.GetItem(itemId);
+            if (data != null && data.Category == ItemCategory.Equipment)
+            {
+                Debug.LogError(
+                    $"[InventoryManager] AddItem cannot be used for equipment '{itemId}'. " +
+                    "Generated equipment must be added via InventoryService.AddItemInstance(generatedItem) or AddGeneratedItem()."
+                );
+                return;
+            }
+            // ------------------------------------------------
+
             InventoryService.Instance?.AddItem(itemId, (int)amount);
         }
 

@@ -33,14 +33,6 @@ namespace IdleDefenseSurvival.Inventory
         public int Level = 1; // Current level
         public int EnhanceLevel = 0; // Enhancement level (+0 to +20)
 
-        // Advanced progression (runtime only — not persisted)
-        [JsonIgnore] public int LimitBreakCount = 0;
-        [JsonIgnore] public int RefineLevel = 0;
-        [JsonIgnore] public int TranscendLevel = 0;
-        [JsonIgnore] public int EvolutionStage = 0;
-        [JsonIgnore] public bool IsAwakened = false;
-        [JsonIgnore] public bool IsMasterwork = false;
-
         // ============ Durability ============
         public int CurrentDurability = 100;
         public int MaxDurability = 100;
@@ -68,10 +60,8 @@ namespace IdleDefenseSurvival.Inventory
         public long AcquiredTimestamp = 0; // When item was obtained (for Sort by Newest)
 
         // Runtime mirror of EquipmentService state - NOT saved (EquipmentService owns equip state)
-        [JsonIgnore]
-        public bool IsEquipped = false;
-        [JsonIgnore]
-        public EquipmentType EquippedSlot = EquipmentType.None;
+        [JsonIgnore] public bool IsEquipped = false;
+        [JsonIgnore] public EquipmentType EquippedSlot = EquipmentType.None;
 
         // ============ Computed Properties (NOT serialized - [JsonIgnore]) ============
         [JsonIgnore] public bool IsStackable =>
@@ -96,8 +86,7 @@ namespace IdleDefenseSurvival.Inventory
 
             // First try: lookup from ItemDatabase by ItemId
             var itemData = ItemDatabase.Instance.GetItem(ItemId);
-            if (itemData is EquipmentData equip)
-                return equip.EquipmentType;
+            if (itemData is EquipmentData equip) return equip.EquipmentType;
 
             // Second try: infer from ItemId naming pattern (e.g., "cotton_hat" -> Hat)
             if (!string.IsNullOrEmpty(ItemId))
@@ -153,9 +142,7 @@ namespace IdleDefenseSurvival.Inventory
             {
                 clone.Sockets = new SocketData[Sockets.Length];
                 for (int i = 0; i < Sockets.Length; i++)
-                {
                     clone.Sockets[i] = Sockets[i]?.Clone();
-                }
             }
             if (Enchantment != null)
                 clone.Enchantment = Enchantment.Clone();
