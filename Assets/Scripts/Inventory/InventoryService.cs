@@ -847,7 +847,9 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         private static InventoryItem RestoreItem(InventoryItemData data)
         {
-            bool isEquipment = ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(data.ItemId) is EquipmentData;
+            // Equipment identity comes from persisted EquipmentType (crafted items like "cotton_hat"
+            // are NOT in ItemDatabase - only the "equip_base" template is)
+            bool isEquipment = data.EquipmentType.HasValue;
 
             var item = new InventoryItem
             {
@@ -862,7 +864,8 @@ namespace IdleDefenseSurvival.Inventory
                 IsLocked = data.IsLocked,
                 IsNew = data.IsNew,
                 AcquiredTimestamp = data.AcquiredTimestamp,
-                AttributeData = isEquipment ? data.AttributeData : null
+                AttributeData = isEquipment ? data.AttributeData : null,
+                EquipmentType = data.EquipmentType ?? EquipmentType.None
             };
 
             if (isEquipment)

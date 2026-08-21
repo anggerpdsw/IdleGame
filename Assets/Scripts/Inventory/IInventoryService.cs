@@ -381,5 +381,11 @@ public class InventoryItemData
 
     // Serialization helper for nullable EquipmentType
     public bool ShouldSerializeEquipmentType() => EquipmentType.HasValue;
+
+    // KeyId only for stackables (equipment uses InstanceId)
+    public bool ShouldSerializeKeyId() => !EquipmentType.HasValue && !string.IsNullOrEmpty(KeyId);
+
+    // Quantity only for stackables (equipment always Quantity = 1)
+    public bool ShouldSerializeQuantity() => !EquipmentType.HasValue;
 }
 }
