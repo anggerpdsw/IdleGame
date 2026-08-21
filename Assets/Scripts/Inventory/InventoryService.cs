@@ -853,26 +853,25 @@ namespace IdleDefenseSurvival.Inventory
 
             var item = new InventoryItem
             {
-                InstanceId = data.InstanceId,
                 ItemId = data.ItemId,
                 Quantity = data.Quantity,
-                Level = data.Level ?? 1,
-                EnhanceLevel = data.EnhanceLevel ?? 0,
-                CurrentDurability = data.CurrentDurability ?? 0,
-                Enchantment = data.Enchantment,
                 IsFavorite = data.IsFavorite,
                 IsLocked = data.IsLocked,
                 IsNew = data.IsNew,
                 AcquiredTimestamp = data.AcquiredTimestamp,
-                AttributeData = isEquipment ? data.AttributeData : null,
                 EquipmentType = data.EquipmentType ?? EquipmentType.None
             };
 
             if (isEquipment)
             {
                 // ---- Equipment: restore full state ----
-                var equip = ItemDatabase.Instance.GetEquipment(data.ItemId);
-                item.MaxDurability = equip?.MaxDurability ?? 0;
+                var dbEquip = ItemDatabase.Instance.GetEquipment(data.ItemId);
+                item.InstanceId = data.InstanceId;
+                item.Level = data.Level ?? 1;
+                item.EnhanceLevel = data.EnhanceLevel ?? 0;
+                item.Enchantment = data.Enchantment;
+
+                item.MaxDurability = dbEquip?.MaxDurability ?? 0;
                 if (item.MaxDurability > 0 && item.CurrentDurability == 0)
                 {
                     item.CurrentDurability = item.MaxDurability;
@@ -887,6 +886,8 @@ namespace IdleDefenseSurvival.Inventory
                     }
                     item.Sockets = sockets;
                 }
+
+                item.AttributeData = data.AttributeData;
 
                 if (string.IsNullOrEmpty(item.InstanceId))
                     item.InstanceId = Guid.NewGuid().ToString();

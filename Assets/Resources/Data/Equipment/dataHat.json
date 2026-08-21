@@ -1,1 +1,7 @@
-[]
+[{
+    "Id": "cotton_hat",
+    "Name": "Cotton Hat",
+    "Description": "A basic cotton hat stitched with organic glue.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Hat/cotton_hat"
+}]
