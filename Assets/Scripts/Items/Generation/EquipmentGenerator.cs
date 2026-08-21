@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Crafting;
-using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Equipment;
-using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Data;
+using IdleDefenseSurvival.Items.Random;
+using IdleDefenseSurvival.Stats;
+using UnityEngine;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -97,11 +99,8 @@ namespace IdleDefenseSurvival.Items.Generation
             // 6. Create base item with all rarity-based configuration
             var item = CreateBaseItem(baseEquipment, rarity, level, rarityConfig, context);
 
-            // 7. Generate Main Attributes (for crafting, rarity comes from recipe)
-            if (context.Source == ItemSource.Craft)
-            {
-                GenerateMainAttributes(item, rarity, context);
-            }
+            // 7. Generate Main Attributes (for all sources, rarity comes from recipe/forced quality)
+            GenerateMainAttributes(item, rarity, context);
 
             // 8. Generate Secondary Stats (specialization stats like Crit, LifeSteal, etc.)
             var secondaryStats = _statRoll.RollSecondaryStats(baseEquipment, rarity, context);
@@ -156,7 +155,8 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             // For crafting: level is randomized within the rarity's level range
             // Common: 1-10, Rare: 10-15, Epic: 15-20, Legendary: 20-25, Mythic: 25-30, Divine: 30-50
-            var (minLevel, maxLevel) = EquipmentBaseDataRepository.Instance.GetLevelRange(
+            var baseCfg = EquipmentBaseDataRepository.Instance;
+            var (minLevel, maxLevel) = baseCfg.GetLevelRange(
                 (Rarity)Math.Clamp(context.ForcedQuality ?? 1, 1, 6));
 
             if (context.Source == ItemSource.Craft)
@@ -182,12 +182,22 @@ namespace IdleDefenseSurvival.Items.Generation
             {
                 outputItemId = outputId.ToString();
             }
+            // Fallback: if still using base template ID, generate from equipment type in context or baseEquipment
+            if (outputItemId == "equip_base")
+            {
+                var eqType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None;
+                if (eqType != EquipmentType.None)
+                {
+                    outputItemId = eqType.ToString().ToLowerInvariant();
+                }
+            }
 
             var item = new InventoryItem
             {
                 InstanceId = Guid.NewGuid().ToString(),
                 ItemId = outputItemId,
                 EquipmentTemplateId = "equip_base", // Always equip_base as the template source
+                EquipmentType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None, // Persist equipment type
                 Quantity = 1,
                 Level = level,
                 MaxDurability = rarityConfig.MaxDurability,
@@ -213,14 +223,13 @@ namespace IdleDefenseSurvival.Items.Generation
             if (attributes.Length > 0)
             {
                 var mainAttrs = new List<EquipmentAttributeEntry>();
-                var secondAttrs = new List<EquipmentAttributeEntry>();
 
                 foreach (var attr in attributes)
                 {
                     mainAttrs.Add(new EquipmentAttributeEntry(attr.Attribute, attr.BaseValue));
                 }
 
-                item.AttributeData = new EquipmentAttributeData(mainAttrs.ToArray(), secondAttrs.ToArray());
+                item.AttributeData = new EquipmentAttributeData(mainAttrs.ToArray(), Array.Empty<EquipmentAttributeEntry>());
             }
         }
 

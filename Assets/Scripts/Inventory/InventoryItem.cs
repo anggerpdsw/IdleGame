@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using UnityEngine;
@@ -20,7 +21,8 @@ namespace IdleDefenseSurvival.Inventory
         // ============ Identity ============
         public string InstanceId; // Unique instance ID (GUID) — equipment (unique) only; null for stackables
         public string ItemId; // Reference to ItemData/EquipmentData (concrete output ID, e.g. "cotton_hat")
-        public string EquipmentTemplateId; // Reference to base EquipmentData template (e.g. "equip_hat_base")
+        public string EquipmentTemplateId; // Reference to base EquipmentData template (e.g. "equip_base")
+        public EquipmentType EquipmentType = EquipmentType.None; // Persisted equipment slot type (Hat, Armor, etc.)
 
         // ============ Stack Identity ============
         /// <summary>'a'..'z' distinguishing stacks of the same item in different slots. Null = the canonical stack.</summary>
@@ -32,12 +34,12 @@ namespace IdleDefenseSurvival.Inventory
         public int EnhanceLevel = 0; // Enhancement level (+0 to +20)
 
         // Advanced progression (runtime only — not persisted)
-        [Newtonsoft.Json.JsonIgnore] public int LimitBreakCount = 0;
-        [Newtonsoft.Json.JsonIgnore] public int RefineLevel = 0;
-        [Newtonsoft.Json.JsonIgnore] public int TranscendLevel = 0;
-        [Newtonsoft.Json.JsonIgnore] public int EvolutionStage = 0;
-        [Newtonsoft.Json.JsonIgnore] public bool IsAwakened = false;
-        [Newtonsoft.Json.JsonIgnore] public bool IsMasterwork = false;
+        [JsonIgnore] public int LimitBreakCount = 0;
+        [JsonIgnore] public int RefineLevel = 0;
+        [JsonIgnore] public int TranscendLevel = 0;
+        [JsonIgnore] public int EvolutionStage = 0;
+        [JsonIgnore] public bool IsAwakened = false;
+        [JsonIgnore] public bool IsMasterwork = false;
 
         // ============ Durability ============
         public int CurrentDurability = 100;
@@ -50,7 +52,7 @@ namespace IdleDefenseSurvival.Inventory
         public int MaxSockets = 0; // Max sockets from rarity config (derived from Sockets.Length at generation)
 
         // ============ Custom Data (for derived values like sell price) ============
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public Dictionary<string, object> CustomData;
 
         // ============ Enchantment ============
@@ -66,20 +68,76 @@ namespace IdleDefenseSurvival.Inventory
         public long AcquiredTimestamp = 0; // When item was obtained (for Sort by Newest)
 
         // Runtime mirror of EquipmentService state - NOT saved (EquipmentService owns equip state)
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public bool IsEquipped = false;
-        [Newtonsoft.Json.JsonIgnore]
+        [JsonIgnore]
         public EquipmentType EquippedSlot = EquipmentType.None;
 
         // ============ Computed Properties (NOT serialized - [JsonIgnore]) ============
-        [Newtonsoft.Json.JsonIgnore] public bool IsStackable =>
+        [JsonIgnore] public bool IsStackable =>
             ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(ItemId)?.StackSize > 1;
-        [Newtonsoft.Json.JsonIgnore] public bool IsMaxStack => Quantity >= GetMaxStackSize();
-        [Newtonsoft.Json.JsonIgnore] public bool IsBroken => CurrentDurability <= 0;
-        [Newtonsoft.Json.JsonIgnore] public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
-        [Newtonsoft.Json.JsonIgnore] public bool HasSockets => Sockets != null && Sockets.Length > 0;
-        [Newtonsoft.Json.JsonIgnore] public int FilledSocketCount => Sockets?.Count(s => s?.GemId != null) ?? 0;
-        [Newtonsoft.Json.JsonIgnore] public int EmptySocketCount => Sockets?.Count(s => s?.GemId == null) ?? 0;
+        [JsonIgnore] public bool IsMaxStack => Quantity >= GetMaxStackSize();
+        [JsonIgnore] public bool IsBroken => CurrentDurability <= 0;
+        [JsonIgnore] public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
+        [JsonIgnore] public bool HasSockets => Sockets != null && Sockets.Length > 0;
+        [JsonIgnore] public int FilledSocketCount => Sockets?.Count(s => s?.GemId != null) ?? 0;
+        [JsonIgnore] public int EmptySocketCount => Sockets?.Count(s => s?.GemId == null) ?? 0;
+
+        /// <summary>
+        /// Gets the equipment type from the base equipment template.
+        /// For crafted equipment using equip_base, this falls back to equipment type stored in ItemId pattern or EquipmentTemplateId.
+        /// </summary>
+        public EquipmentType GetEquipmentType()
+        {
+            // Direct field value takes precedence – set during generation.
+            if (EquipmentType != EquipmentType.None) return EquipmentType;
+
+            if (ItemDatabase.Instance == null) return EquipmentType.None;
+
+            // First try: lookup from ItemDatabase by ItemId
+            var itemData = ItemDatabase.Instance.GetItem(ItemId);
+            if (itemData is EquipmentData equip)
+                return equip.EquipmentType;
+
+            // Second try: infer from ItemId naming pattern (e.g., "cotton_hat" -> Hat)
+            if (!string.IsNullOrEmpty(ItemId))
+            {
+                var lowerId = ItemId.ToLowerInvariant();
+                if (lowerId.Contains("_hat")) return EquipmentType.Hat;
+                if (lowerId.Contains("_gloves")) return EquipmentType.Gloves;
+                if (lowerId.Contains("_cape")) return EquipmentType.Cape;
+                if (lowerId.Contains("_armor")) return EquipmentType.Armor;
+                if (lowerId.Contains("_belt")) return EquipmentType.Belt;
+                if (lowerId.Contains("_pants")) return EquipmentType.Pants;
+                if (lowerId.Contains("_pendant")) return EquipmentType.Pendant;
+                if (lowerId.Contains("_earring")) return EquipmentType.Earring;
+                if (lowerId.Contains("_bracelet")) return EquipmentType.Bracelet;
+                if (lowerId.Contains("_ring")) return EquipmentType.Ring;
+                if (lowerId.Contains("_shoes")) return EquipmentType.Shoes;
+            }
+
+            // Third try: check EquipmentTemplateId (for backward compatibility with old templates)
+            if (!string.IsNullOrEmpty(EquipmentTemplateId))
+            {
+                var template = ItemDatabase.Instance.GetEquipment(EquipmentTemplateId);
+                if (template != null) return template.EquipmentType;
+
+                var lowerTemplate = EquipmentTemplateId.ToLowerInvariant();
+                if (lowerTemplate.Contains("hat")) return EquipmentType.Hat;
+                if (lowerTemplate.Contains("gloves")) return EquipmentType.Gloves;
+                if (lowerTemplate.Contains("cape")) return EquipmentType.Cape;
+                if (lowerTemplate.Contains("armor")) return EquipmentType.Armor;
+                if (lowerTemplate.Contains("belt")) return EquipmentType.Belt;
+                if (lowerTemplate.Contains("pants")) return EquipmentType.Pants;
+                if (lowerTemplate.Contains("pendant")) return EquipmentType.Pendant;
+                if (lowerTemplate.Contains("earring")) return EquipmentType.Earring;
+                if (lowerTemplate.Contains("bracelet")) return EquipmentType.Bracelet;
+                if (lowerTemplate.Contains("ring")) return EquipmentType.Ring;
+                if (lowerTemplate.Contains("shoes")) return EquipmentType.Shoes;
+            }
+
+            return EquipmentType.None;
+        }
 
         // ============ Methods ============
         public InventoryItem Clone()
@@ -170,26 +228,40 @@ namespace IdleDefenseSurvival.Inventory
     /// GemId/GemLevel/IsLocked/Experience live on the GemInstanceData (GemService owns them).
     /// </summary>
     [Serializable]
-    public class SocketData
+    public class SocketData : ISerializationCallbackReceiver
     {
         /// <summary>0-based index (runtime only — re-derived from array position, never saved).</summary>
-        [Newtonsoft.Json.JsonIgnore] public int SocketIndex;
+        [JsonIgnore] public int SocketIndex;
 
         /// <summary>ID of socketed gem (transient, restored from the persisted GemInstanceData via GemInstanceId).</summary>
-        [Newtonsoft.Json.JsonIgnore] public string GemId;
+        [JsonIgnore] public string GemId { get; set; }
+
         public bool IsUnlocked = true; // Socket unlocked (some only unlock at higher enhance)
 
         /// <summary>InstanceId of the GemInstanceData for this socket. Null = empty socket.</summary>
-        public string GemInstanceId;
+        private string _gemInstanceId;
+        public string GemInstanceId
+        {
+            get => _gemInstanceId;
+            set => _gemInstanceId = string.IsNullOrEmpty(value) ? null : value;
+        }
 
         /// <summary>StackId of the inventory stack the socketed gem came from — unsocket returns gems to their own (split) stack.</summary>
-        [Newtonsoft.Json.JsonIgnore] public string StackId;
+        [JsonIgnore] public string StackId;
 
-        [Newtonsoft.Json.JsonIgnore] public int GemLevel = 1; // runtime; from GemInstanceData
-        [Newtonsoft.Json.JsonIgnore] public bool IsLocked = false; // runtime; anti-destroy guard
+        [JsonIgnore] public int GemLevel = 1; // runtime; from GemInstanceData
+        [JsonIgnore] public bool IsLocked = false; // runtime; anti-destroy guard
 
-        [Newtonsoft.Json.JsonIgnore] // computed, not saved
+        [JsonIgnore] // computed, not saved
         public bool IsEmpty => string.IsNullOrEmpty(GemInstanceId) && string.IsNullOrEmpty(GemId);
+
+        public void OnBeforeSerialize() { }
+
+        public void OnAfterDeserialize()
+        {
+            if (string.IsNullOrEmpty(_gemInstanceId))
+                _gemInstanceId = null;
+        }
 
         public SocketData Clone()
         {

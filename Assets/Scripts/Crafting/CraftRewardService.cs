@@ -184,7 +184,7 @@ namespace IdleDefenseSurvival.Crafting
             if (id.Contains("_earring")) return EquipmentType.Earring;
             if (id.Contains("_bracelet")) return EquipmentType.Bracelet;
             if (id.Contains("_ring")) return EquipmentType.Ring;
-            if (id.Contains("_shoes") || id.Contains("_boots")) return EquipmentType.Shoes;
+            if (id.Contains("_shoes")) return EquipmentType.Shoes;
             return null;
         }
     }
