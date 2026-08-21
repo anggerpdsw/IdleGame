@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Items.Random;
 using Newtonsoft.Json;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Items.Data
 {
+    
     /// <summary>
     /// Base equipment configuration loaded from dataBaseEquipment.json.
     /// Single source of truth for all equipment rarity-based base stats.
@@ -28,10 +30,12 @@ namespace IdleDefenseSurvival.Items.Data
         // 4 = Mythic
         // 5 = Divine
         public int[] MaxLevel = new int[] {10, 15, 20, 25, 30, 50};
-        public int[] MaxDurability = new int[] {100, 200, 300, 400, 500, 1000};
-        public int[] DurabilityLossPerUse = new int[] {1, 3, 5, 7, 11, 13};
-        public long[] RepairCostPerDurability = new long[] {5, 50, 100, 1000, 5000, 10000};
-        public int[] MaxSockets = new int[] {1, 2, 3, 4, 5, 6};
+
+        // Durability ranges (min/max per rarity)
+        public int[] Durability = new int[] {100, 200, 300, 400, 500, 1000};
+        public int[] DurabilityLossPerUse = new int[] {2, 4, 6, 10, 14, 20};
+        public int[] RepairCostPerDurability = new int[] {10, 50, 100, 1000, 5000, 10000};
+        public int[] Sockets = new int[] {1, 2, 3, 4, 5, 6};
 
         /// <summary>
         /// Validates that all rarity arrays contain exactly GameConstants.RARITY_COUNT elements.
@@ -39,45 +43,26 @@ namespace IdleDefenseSurvival.Items.Data
         public bool Validate()
         {
             return MaxLevel?.Length == GameConstants.RARITY_COUNT
-                && MaxDurability?.Length == GameConstants.RARITY_COUNT
+                && Durability?.Length == GameConstants.RARITY_COUNT
                 && DurabilityLossPerUse?.Length == GameConstants.RARITY_COUNT
                 && RepairCostPerDurability?.Length == GameConstants.RARITY_COUNT
-                && MaxSockets?.Length == GameConstants.RARITY_COUNT;
+                && Sockets?.Length == GameConstants.RARITY_COUNT;
         }
 
         /// <summary>
-        /// Gets rarity-specific configuration as a strongly typed struct.
+        /// Gets rarity-specific configuration with random value as a strongly typed struct.
         /// </summary>
         public EquipmentRarityConfig GetRarityConfig(Rarity rarity)
         {
             int index = GetRarityIndex(rarity);
-
             return new EquipmentRarityConfig
             {
-                MaxLevel = MaxLevel[index],
-                MaxDurability = MaxDurability[index],
-                DurabilityLossPerUse = DurabilityLossPerUse[index],
-                RepairCostPerDurability = RepairCostPerDurability[index],
-                MaxSockets = MaxSockets[index]
+                MaxLevel = GetMaxLevel(index),
+                Durability = GetDurability(index),
+                DurabilityLossPerUse = GetDurabilityLossPerUse(index),
+                RepairCostPerDurability = GetRepairCostPerDurability(index),
+                Sockets = GetSockets(index),
             };
-        }
-
-        /// <summary>
-        /// Gets the level range for the specified rarity.
-        ///
-        /// Common:    1 - 10
-        /// Rare:     10 - 15
-        /// Epic:     15 - 20
-        /// Legendary:20 - 25
-        /// Mythic:   25 - 30
-        /// Divine:   30 - 50
-        /// </summary>
-        public (int min, int max) GetLevelRange(Rarity rarity)
-        {
-            int index = GetRarityIndex(rarity);
-            int maxLevel = MaxLevel[index];
-            int minLevel = index == 0 ? 1 : MaxLevel[index - 1];
-            return (minLevel, maxLevel);
         }
 
         private static int GetRarityIndex(Rarity rarity)
@@ -87,22 +72,65 @@ namespace IdleDefenseSurvival.Items.Data
             if (index >= GameConstants.RARITY_COUNT) return GameConstants.RARITY_COUNT - 1;
             return index;
         }
+
+        private int GetMaxLevel(int index)
+        {
+            IRandomProvider _rng = new UnityRandomProvider();
+            int minLevel = 1;
+            if (index > 0) minLevel = MaxLevel[index - 1];
+            return _rng.NextInt(minLevel, MaxLevel[index]);
+        }
+        private int GetDurability(int index)
+        {
+            IRandomProvider _rng = new UnityRandomProvider();
+            int minDurability = Durability[index] / 2;
+            return _rng.NextInt(minDurability, Durability[index] + 1);
+        }
+        private int GetDurabilityLossPerUse(int index)
+        {
+            IRandomProvider _rng = new UnityRandomProvider();
+            int minLossPerUse = DurabilityLossPerUse[index] / 2;
+            return _rng.NextInt(minLossPerUse, DurabilityLossPerUse[index] + 1);
+        }
+        private int GetRepairCostPerDurability(int index)
+        {
+            IRandomProvider _rng = new UnityRandomProvider();
+            int minRepairCost = RepairCostPerDurability[index] / 2;
+            return _rng.NextInt(minRepairCost, RepairCostPerDurability[index] + 1);
+        }
+        private int GetSockets(int index)
+        {
+            IRandomProvider _rng = new UnityRandomProvider();
+            int minSocket = 0;
+            if (index > 1) minSocket = Sockets[index - 2];
+            return _rng.NextInt(minSocket, Sockets[index] + 1);
+        }
+
     }
 
     /// <summary>
-    /// Strongly typed rarity-specific equipment configuration.
+    /// Strongly typed rarity-specific equipment configuration with min/max ranges.
     /// Prevents array-index handling from being scattered throughout the codebase.
     /// </summary>
     [Serializable]
     public struct EquipmentRarityConfig
     {
         public int MaxLevel;
-        public int MaxDurability;
+        // Durability range
+        public int Durability;
+        // Durability loss per use range
         public int DurabilityLossPerUse;
-        public long RepairCostPerDurability;
-        public int MaxSockets;
+        // Repair cost per durability range
+        public int RepairCostPerDurability;
+        // Socket range
+        public int Sockets;
 
-        public bool IsValid => MaxLevel > 0 && MaxDurability > 0 && MaxSockets >= 0;
+        public bool IsValid =>
+            MaxLevel > 0 &&
+            Durability > 0 &&
+            DurabilityLossPerUse >= 0 &&
+            RepairCostPerDurability >= 0 &&
+            Sockets >= 0;
     }
 
     /// <summary>
@@ -226,16 +254,16 @@ namespace IdleDefenseSurvival.Items.Data
             {
                 Id = "equip_base",
                 Name = "Base Equipment",
-                Description = "Base template for all equipment.",
+                Description = "Base template for all equipment. Used by crafting system to generate specific rarity equipment.",
                 Category = ItemCategory.Equipment,
                 SellPrice = 20,
                 StackSize = 1,
                 BaseLevel = 1,
                 MaxLevel = new int[] {10, 15, 20, 25, 30, 50},
-                MaxDurability = new int[] {100, 200, 300, 400, 500, 1000},
-                DurabilityLossPerUse = new int[] {1, 3, 5, 7, 11, 13},
-                RepairCostPerDurability = new long[] {5L, 50L, 100L, 1000L, 5000L, 10000L},
-                MaxSockets = new int[] {1, 2, 3, 4, 5, 6}
+                Durability = new int[] {100, 200, 300, 400, 500, 1000},
+                DurabilityLossPerUse = new int[] {2, 4, 6, 10, 14, 20},
+                RepairCostPerDurability = new int[] {10, 50, 100, 1000, 5000, 10000},
+                Sockets = new int[] {1, 2, 3, 4, 5, 6}
             };
         }
     }

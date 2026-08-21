@@ -69,14 +69,14 @@ namespace IdleDefenseSurvival.Items.Generation
             // Validate rarity is in valid range for crafting
             if (context.Source == ItemSource.Craft && !context.ForcedQuality.HasValue)
             {
-                UnityEngine.Debug.LogWarning($"[EquipmentGenerator] Craft source without forced rarity. Recipe should provide rarity via ForcedQuality.");
+                Debug.LogWarning($"[EquipmentGenerator] Craft source without forced rarity. Recipe should provide rarity via ForcedQuality.");
             }
 
             // 2. Load equip_base (single source of truth for all equipment)
             var baseConfig = EquipmentBaseDataRepository.Instance;
             if (baseConfig == null)
             {
-                UnityEngine.Debug.LogError("[EquipmentGenerator] EquipmentBaseData not loaded.");
+                Debug.LogError("[EquipmentGenerator] EquipmentBaseData not loaded.");
                 return null;
             }
 
@@ -84,7 +84,7 @@ namespace IdleDefenseSurvival.Items.Generation
             var rarityConfig = baseConfig.GetRarityConfig(rarity);
             if (!rarityConfig.IsValid)
             {
-                UnityEngine.Debug.LogError($"[EquipmentGenerator] Invalid rarity config for {rarity}.");
+                Debug.LogError($"[EquipmentGenerator] Invalid rarity config for {rarity}.");
                 return null;
             }
 
@@ -107,8 +107,8 @@ namespace IdleDefenseSurvival.Items.Generation
             if (secondaryStats.Length > 0)
                 ApplySecondaryStats(item, secondaryStats);
 
-            // 9. Generate sockets using MaxSockets from rarity config
-            item.Sockets = _socketGen.GenerateSockets(rarityConfig.MaxSockets, rarity, context);
+            // 9. Generate sockets using rolled MaxSockets from item (respects min/max range)
+            item.Sockets = _socketGen.GenerateSockets(item.MaxSockets, rarity, context);
 
             // 10. Generate affixes
             var affixes = _affixGen.GenerateAffixes(baseEquipment, rarity, context);
@@ -128,7 +128,7 @@ namespace IdleDefenseSurvival.Items.Generation
             var validation = _validator.Validate(item, baseEquipment);
             if (!validation.IsValid)
             {
-                UnityEngine.Debug.LogWarning($"[EquipmentGenerator] Validation failed for {baseEquipment.Id}: {validation}");
+                Debug.LogWarning($"[EquipmentGenerator] Validation failed for {baseEquipment.Id}: {validation}");
             }
 
             return item;
@@ -175,36 +175,28 @@ namespace IdleDefenseSurvival.Items.Generation
 
         private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level, EquipmentRarityConfig rarityConfig, ItemGenerationContext context)
         {
-            string outputItemId = baseEquipment.Id;
-            if (context?.CustomData != null &&
-                context.CustomData.TryGetValue("OverrideItemId", out var outputId) &&
-                outputId != null)
-            {
-                outputItemId = outputId.ToString();
-            }
-            // Fallback: if still using base template ID, generate from equipment type in context or baseEquipment
-            if (outputItemId == "equip_base")
-            {
-                var eqType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None;
-                if (eqType != EquipmentType.None)
-                {
-                    outputItemId = eqType.ToString().ToLowerInvariant();
-                }
-            }
+            // Roll durability, loss per use, repair cost and socket count within rarity ranges.
+            // Using deterministic RNG for reproducibility (same seed yields same result).
+            int rolledDurability = _rng.NextInt(rarityConfig.MinDurability, rarityConfig.MaxDurability + 1);
+            int rolledLoss = _rng.NextInt(rarityConfig.MinDurabilityLossPerUse, rarityConfig.MaxDurabilityLossPerUse + 1);
+            // Repair cost stored as long; cast from int (range fits int in current data).
+            long rolledRepairCost = (long)_rng.NextInt((int)rarityConfig.MinRepairCostPerDurability, (int)rarityConfig.MaxRepairCostPerDurability + 1);
+            int rolledSockets = _rng.NextInt(rarityConfig.MinSockets, rarityConfig.MaxSockets + 1);
 
             var item = new InventoryItem
             {
                 InstanceId = Guid.NewGuid().ToString(),
-                ItemId = outputItemId,
-                EquipmentTemplateId = "equip_base", // Always equip_base as the template source
-                EquipmentType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None, // Persist equipment type
+                ItemId = baseEquipment?.Id ?? "unknown",
+                EquipmentTemplateId = "equip_base",
+                EquipmentType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None,
                 Quantity = 1,
                 Level = level,
-                MaxDurability = rarityConfig.MaxDurability,
-                CurrentDurability = rarityConfig.MaxDurability,
-                DurabilityLossPerUse = rarityConfig.DurabilityLossPerUse,
-                RepairCostPerDurability = rarityConfig.RepairCostPerDurability,
-                MaxSockets = rarityConfig.MaxSockets,
+                MaxDurability = rolledDurability,
+                CurrentDurability = rolledDurability,
+                DurabilityLossPerUse = rolledLoss,
+                RepairCostPerDurability = rolledRepairCost,
+                // Socket generation will respect this count; pass to generator later.
+                MaxSockets = rolledSockets,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 EnhanceLevel = 0
             };
