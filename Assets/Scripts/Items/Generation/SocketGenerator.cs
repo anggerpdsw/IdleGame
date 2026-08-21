@@ -8,8 +8,17 @@ using IdleDefenseSurvival.Items.Random;
 namespace IdleDefenseSurvival.Items.Generation
 {
     /// <summary>
-    /// Generator for equipment sockets.
-    /// Handles socket count, unlock conditions, and special socket types.
+    /// Generates equipment sockets.
+    ///
+    /// Socket rules:
+    /// Common    : 0..1
+    /// Rare      : 0..2
+    /// Epic      : 1..3
+    /// Legendary : 2..4
+    /// Mythic    : 3..5
+    /// Divine    : 4..6
+    ///
+    /// MaxSockets comes from EquipmentBaseData rarity configuration.
     /// </summary>
     public sealed class SocketGenerator
     {
@@ -23,22 +32,22 @@ namespace IdleDefenseSurvival.Items.Generation
         }
 
         /// <summary>
-        /// Generates sockets for an equipment item.
+        /// Generates the actual sockets for an equipment item.
+        /// maxSockets is the maximum socket count defined by rarity configuration.
         /// </summary>
-        public SocketData[] GenerateSockets(EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
+        public SocketData[] GenerateSockets(int maxSockets, Rarity rarity, ItemGenerationContext context)
         {
-            if (baseEquipment.MaxSockets <= 0) return Array.Empty<SocketData>();
-
-            // Rarity ladder caps socket count (design: 0/0/1/1/2/2/3/3).
-            int socketCount = Math.Min(baseEquipment.MaxSockets, RarityMechanicConfig.GetSocketCount(rarity));
+            if (maxSockets <= 0) return Array.Empty<SocketData>();
+            int minSockets = GetMinimumSockets(rarity);
+            // Safety: minimum can never exceed configured maximum.
+            minSockets = Math.Min(minSockets, maxSockets);
+            // Random range is inclusive.
+            int socketCount = _rng.NextInt(minSockets, maxSockets + 1);
             if (socketCount <= 0) return Array.Empty<SocketData>();
-
             var sockets = new SocketData[socketCount];
-
             for (int i = 0; i < socketCount; i++)
             {
-                bool isUnlocked = IsSocketUnlocked(i, baseEquipment, rarity, context);
-
+                bool isUnlocked = IsSocketUnlocked(i, rarity, context);
                 sockets[i] = new SocketData
                 {
                     SocketIndex = i,
@@ -48,43 +57,62 @@ namespace IdleDefenseSurvival.Items.Generation
                     GemLevel = 1
                 };
             }
-
-            // Apply special socket modifiers from events
             ApplyEventModifiers(sockets, context);
-
             return sockets;
         }
 
-        private bool IsSocketUnlocked(int index, EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
+        /// <summary>
+        /// Returns the minimum possible socket count for the rarity.
+        /// Common    = 0
+        /// Rare      = 0
+        /// Epic      = 1
+        /// Legendary = 2
+        /// Mythic    = 3
+        /// Divine    = 4
+        /// </summary>
+        private static int GetMinimumSockets(Rarity rarity)
         {
-            // First socket always unlocked
-            if (index == 0) return true;
-
-            // Check socket rules from SocketConfigData
-            if (baseEquipment.MaxSockets > 0)
+            return rarity switch
             {
-                // Use rarity-based unlock
-                int unlockRarity = _config.SocketUnlockRarity.TryGetValue(index, out var r) ? r : index + 1;
-                if ((int)rarity >= unlockRarity) return true;
+                Rarity.Common => 0,
+                Rarity.Rare => 0,
+                Rarity.Epic => 1,
+                Rarity.Legendary => 2,
+                Rarity.Mythic => 3,
+                Rarity.Divine => 4,
+                _ => 0,
+            };
+        }
 
-                // Use enhance-based unlock
-                int unlockEnhance = _config.SocketUnlockEnhance.TryGetValue(index, out var e) ? e : 0;
-                if (context.FixedEnhance.HasValue && context.FixedEnhance.Value >= unlockEnhance) return true;
-            }
-
+        /// <summary>
+        /// Determines whether a generated socket is unlocked.
+        /// </summary>
+        private bool IsSocketUnlocked(int index, Rarity rarity, ItemGenerationContext context)
+        {
+            // First socket is always unlocked.
+            if (index == 0) return true;
+            // Check rarity-based unlock.
+            int unlockRarity = _config.SocketUnlockRarity.TryGetValue(index, out var rarityRequirement)
+                ? rarityRequirement
+                : index + 1;
+            if ((int)rarity >= unlockRarity) return true;
+            // Check enhance-based unlock.
+            int unlockEnhance =
+                _config.SocketUnlockEnhance.TryGetValue(index, out var enhanceRequirement)
+                    ? enhanceRequirement
+                    : 0;
+            if (context.FixedEnhance.HasValue && context.FixedEnhance.Value >= unlockEnhance)
+                return true;
             return false;
         }
 
         private void ApplyEventModifiers(SocketData[] sockets, ItemGenerationContext context)
         {
             if (context.EventModifiers == null) return;
-
             foreach (var modifier in context.EventModifiers)
             {
                 if (modifier is ISocketModifier socketMod)
-                {
                     socketMod.ModifySockets(sockets, context);
-                }
             }
         }
     }
@@ -111,7 +139,10 @@ namespace IdleDefenseSurvival.Items.Generation
             { 4, 20 }, // 5th socket at +20
         };
 
-        public static SocketGeneratorConfig Default => new();
+        public static SocketGeneratorConfig Default
+        {
+            get { return new SocketGeneratorConfig(); }
+        }
     }
 
     /// <summary>

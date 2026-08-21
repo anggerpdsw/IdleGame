@@ -5,6 +5,7 @@ namespace IdleDefenseSurvival
         public const int CURRENT_SAVE_VERSION = 3; // v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
         public const int MAX_WAVE_PER_TIER = 350;
         public const int BASE_LEVEL = 8903;
+        public const int RARITY_COUNT = 6;
         public const int STARTING_STAT_POINTS = 5;  // Level 1 start
         public const int POINTS_PER_LEVEL = 5;      // Bonus per level-up
         public const string DATE_FORMAT = "yyyy-MM-dd";

@@ -22,16 +22,6 @@ namespace IdleDefenseSurvival.Equipment
             { Rarity.Divine, 6 },
         };
 
-        private static readonly Dictionary<Rarity, int> SocketCounts = new()
-        {
-            { Rarity.Common, 0 },
-            { Rarity.Rare, 1 },
-            { Rarity.Epic, 1 },
-            { Rarity.Legendary, 2 },
-            { Rarity.Mythic, 3 },
-            { Rarity.Divine, 3 },
-        };
-
         private static readonly Dictionary<Rarity, int> PassiveTiers = new()
         {
             { Rarity.Common, 0 },
@@ -44,9 +34,6 @@ namespace IdleDefenseSurvival.Equipment
 
         public static int GetSecondaryCount(Rarity rarity) =>
             SecondaryCounts.TryGetValue(rarity, out var c) ? c : 0;
-
-        public static int GetSocketCount(Rarity rarity) =>
-            SocketCounts.TryGetValue(rarity, out var c) ? c : 0;
 
         public static int GetPassiveTier(Rarity rarity) =>
             PassiveTiers.TryGetValue(rarity, out var c) ? c : 0;

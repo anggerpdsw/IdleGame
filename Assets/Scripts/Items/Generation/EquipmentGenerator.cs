@@ -6,12 +6,17 @@ using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Items.Data;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
     /// <summary>
     /// Generator for equipment items.
-    /// Pipeline: Clone Template → Roll Level → Roll ItemRarity → Generate Sockets → Generate Affix → Generate Secondary → Generate Enchant → Apply Event Modifier → Validate → Return
+    /// Pipeline: Validate input → Resolve rarity → Load equip_base → Resolve rarity config →
+    /// Generate Level → Generate durability config → Create InventoryItem →
+    /// Generate MainAttribute → Generate SecondaryAttribute → Generate Sockets →
+    /// Generate Affixes → Generate Enchantment → Apply Event Modifiers →
+    /// Calculate final derived values → Validate → Return
     /// </summary>
     public sealed class EquipmentGenerator
     {
@@ -41,78 +46,89 @@ namespace IdleDefenseSurvival.Items.Generation
             _enchantGen = enchantGen ?? new EnchantmentGenerator(_rng);
             _affixGen = affixGen ?? new AffixGenerator(_rng);
             _validator = validator ?? new ItemValidator();
-            // Same RNG as the other roll services: attribute rolls are deterministic under a seeded provider (I-11).
             _attributeRoll = attributeRoll ?? new AttributeRollService(_rng);
         }
 
         /// <summary>
-        /// Generates equipment from a specific base template with context.
+        /// Generates equipment from crafting recipe context.
+        /// Uses equip_base as the single template source, with rarity from recipe.
         /// </summary>
         public InventoryItem Generate(EquipmentData baseEquipment, ItemGenerationContext context)
         {
             if (baseEquipment == null) return null;
 
-            // 1. Determine rarity
+            // 1. Resolve rarity
+            // For crafting: rarity MUST come from recipe via context.ForcedQuality
+            // For drops: rarity can be rolled if not forced
             Rarity rarity = context.ForcedQuality.HasValue
-                ? (Rarity)Math.Clamp(context.ForcedQuality.Value, 1, 8)
+                ? (Rarity)Math.Clamp(context.ForcedQuality.Value, 1, 6)
                 : _rarityRoll.RollRarity(context.With(category: ItemCategory.Equipment));
 
-            // 2. Determine level
-            int level = context.FixedLevel ?? CalculateLevel(baseEquipment, context);
+            // Validate rarity is in valid range for crafting
+            if (context.Source == ItemSource.Craft && !context.ForcedQuality.HasValue)
+            {
+                UnityEngine.Debug.LogWarning($"[EquipmentGenerator] Craft source without forced rarity. Recipe should provide rarity via ForcedQuality.");
+            }
 
-            // 3. Create base item
-            var item = CreateBaseItem(baseEquipment, rarity, level, context);
+            // 2. Load equip_base (single source of truth for all equipment)
+            var baseConfig = EquipmentBaseDataRepository.Instance;
+            if (baseConfig == null)
+            {
+                UnityEngine.Debug.LogError("[EquipmentGenerator] EquipmentBaseData not loaded.");
+                return null;
+            }
 
-            // 4. Generate secondary stats
+            // 3. Get rarity-specific configuration
+            var rarityConfig = baseConfig.GetRarityConfig(rarity);
+            if (!rarityConfig.IsValid)
+            {
+                UnityEngine.Debug.LogError($"[EquipmentGenerator] Invalid rarity config for {rarity}.");
+                return null;
+            }
+
+            // 4. Determine level
+            // For crafting: use BaseLevel from equip_base, then random within rarity range
+            // For drops: can use FixedLevel from context or calculate from player/tier/wave
+            int level = context.FixedLevel ?? GenerateLevel(rarityConfig, baseConfig.BaseLevel, context);
+
+            // 5. Clamp level to rarity max
+            level = Math.Clamp(level, 1, rarityConfig.MaxLevel);
+
+            // 6. Create base item with all rarity-based configuration
+            var item = CreateBaseItem(baseEquipment, rarity, level, rarityConfig, context);
+
+            // 7. Generate Main Attributes (for crafting, rarity comes from recipe)
+            if (context.Source == ItemSource.Craft)
+            {
+                GenerateMainAttributes(item, rarity, context);
+            }
+
+            // 8. Generate Secondary Stats (specialization stats like Crit, LifeSteal, etc.)
             var secondaryStats = _statRoll.RollSecondaryStats(baseEquipment, rarity, context);
             if (secondaryStats.Length > 0)
                 ApplySecondaryStats(item, secondaryStats);
 
-            // 4b. Roll main attributes (v3.8 §20) — craft-sourced only; rarity here is
-            // recipe.Rarity via context.ForcedQuality (set by CraftRewardService).
-            if (context.Source == ItemSource.Craft)
-            {
-                var tierConfig = CraftingConfig.Load()
-                    .GetAttributeTierConfig((int)rarity);
+            // 9. Generate sockets using MaxSockets from rarity config
+            item.Sockets = _socketGen.GenerateSockets(rarityConfig.MaxSockets, rarity, context);
 
-                var attributes = _attributeRoll
-                    .RollAttributes(rarity, tierConfig);
-
-                if (attributes.Length > 0)
-                {
-                    // Convert to new EquipmentAttributeData structure
-                    var mainAttrs = new List<EquipmentAttributeEntry>();
-                    var secondAttrs = new List<EquipmentAttributeEntry>();
-
-                    foreach (var attr in attributes)
-                    {
-                        // AttributeRollService only rolls MainAttributes (CON/STR/INT/DEX)
-                        mainAttrs.Add(new EquipmentAttributeEntry(attr.Attribute, attr.BaseValue));
-                    }
-
-                    item.AttributeData = new EquipmentAttributeData(mainAttrs.ToArray(), secondAttrs.ToArray());
-                }
-            }
-
-            // 5. Generate sockets
-            item.Sockets = _socketGen.GenerateSockets(baseEquipment, rarity, context);
-
-            // 6. Generate affixes
+            // 10. Generate affixes
             var affixes = _affixGen.GenerateAffixes(baseEquipment, rarity, context);
             if (affixes.Length > 0)
                 ApplyAffixes(item, affixes);
 
-            // 7. Generate enchantment
+            // 11. Generate enchantment
             item.Enchantment = _enchantGen.GenerateEnchantment(baseEquipment, rarity, level, context);
 
-            // 8. Apply event modifiers
+            // 12. Apply event modifiers
             ApplyEventModifiers(item, baseEquipment, rarity, level, context);
 
-            // 9. Validate
+            // 13. Calculate final derived values (sell price, etc.)
+            CalculateDerivedValues(item, baseConfig, rarityConfig, rarity, level);
+
+            // 14. Validate
             var validation = _validator.Validate(item, baseEquipment);
             if (!validation.IsValid)
             {
-                // Log warning but return item anyway
                 UnityEngine.Debug.LogWarning($"[EquipmentGenerator] Validation failed for {baseEquipment.Id}: {validation}");
             }
 
@@ -120,7 +136,9 @@ namespace IdleDefenseSurvival.Items.Generation
         }
 
         /// <summary>
-        /// Generates random equipment of a specific type.
+        /// Generates random equipment of a specific type (for drops, rewards).
+        /// Uses equipment type to find appropriate base equipment template, but all
+        /// rarity-based stats come from equip_base.
         /// </summary>
         public InventoryItem GenerateRandom(EquipmentType type, int tier, int wave, long luck = 0, float rarityBoost = 0f, int? seed = null)
         {
@@ -134,7 +152,28 @@ namespace IdleDefenseSurvival.Items.Generation
             return Generate(baseEquipment, context);
         }
 
-        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context)
+        private int GenerateLevel(EquipmentRarityConfig rarityConfig, int baseLevel, ItemGenerationContext context)
+        {
+            // For crafting: level is randomized within the rarity's level range
+            // Common: 1-10, Rare: 10-15, Epic: 15-20, Legendary: 20-25, Mythic: 25-30, Divine: 30-50
+            var (minLevel, maxLevel) = EquipmentBaseDataRepository.Instance.GetLevelRange(
+                (Rarity)Math.Clamp(context.ForcedQuality ?? 1, 1, 6));
+
+            if (context.Source == ItemSource.Craft)
+            {
+                // Crafting: random within rarity range, using deterministic RNG
+                return _rng.Range(minLevel, maxLevel + 1); // inclusive max
+            }
+
+            // Drops/rewards: can use old calculation based on player/tier/wave
+            int calculatedLevel = Math.Max(1, context.PlayerLevel + context.CraftingMastery / 5);
+            calculatedLevel += context.Tier * 2;
+            calculatedLevel += context.Wave / 5;
+
+            return Math.Clamp(calculatedLevel, minLevel, maxLevel);
+        }
+
+        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level, EquipmentRarityConfig rarityConfig, ItemGenerationContext context)
         {
             string outputItemId = baseEquipment.Id;
             if (context?.CustomData != null &&
@@ -147,17 +186,15 @@ namespace IdleDefenseSurvival.Items.Generation
             var item = new InventoryItem
             {
                 InstanceId = Guid.NewGuid().ToString(),
-
-                // ID item konkret hasil crafting. Contoh: cotton_hat
                 ItemId = outputItemId,
-
-                // ID template equipment yang menjadi sumber data. Contoh: equip_hat_base
-                EquipmentTemplateId = baseEquipment.Id,
-
+                EquipmentTemplateId = "equip_base", // Always equip_base as the template source
                 Quantity = 1,
-                Level = Math.Clamp(level, 1, baseEquipment.MaxLevel),
-                MaxDurability = baseEquipment.MaxDurability,
-                CurrentDurability = baseEquipment.MaxDurability,
+                Level = level,
+                MaxDurability = rarityConfig.MaxDurability,
+                CurrentDurability = rarityConfig.MaxDurability,
+                DurabilityLossPerUse = rarityConfig.DurabilityLossPerUse,
+                RepairCostPerDurability = rarityConfig.RepairCostPerDurability,
+                MaxSockets = rarityConfig.MaxSockets,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 EnhanceLevel = 0
             };
@@ -165,14 +202,26 @@ namespace IdleDefenseSurvival.Items.Generation
             return item;
         }
 
-        private int CalculateLevel(EquipmentData baseEquipment, ItemGenerationContext context)
+        private void GenerateMainAttributes(InventoryItem item, Rarity rarity, ItemGenerationContext context)
         {
-            int baseLevel = Math.Max(1, context.PlayerLevel + context.CraftingMastery / 5);
-            int tierLevel = context.Tier * 2;
-            int waveLevel = context.Wave / 5;
+            var tierConfig = CraftingConfig.Load()
+                .GetAttributeTierConfig((int)rarity);
 
-            int level = baseLevel + tierLevel + waveLevel;
-            return Math.Clamp(level, 1, baseEquipment.MaxLevel);
+            var attributes = _attributeRoll
+                .RollAttributes(rarity, tierConfig);
+
+            if (attributes.Length > 0)
+            {
+                var mainAttrs = new List<EquipmentAttributeEntry>();
+                var secondAttrs = new List<EquipmentAttributeEntry>();
+
+                foreach (var attr in attributes)
+                {
+                    mainAttrs.Add(new EquipmentAttributeEntry(attr.Attribute, attr.BaseValue));
+                }
+
+                item.AttributeData = new EquipmentAttributeData(mainAttrs.ToArray(), secondAttrs.ToArray());
+            }
         }
 
         private void ApplySecondaryStats(InventoryItem item, CombatStatEntry[] stats)
@@ -181,7 +230,6 @@ namespace IdleDefenseSurvival.Items.Generation
             var secondAttrs = new List<EquipmentAttributeEntry>();
             foreach (var stat in stats)
             {
-                // Map SecondaryStat to MainAttribute enum value (cast from int) for storage
                 var attrEntry = new EquipmentAttributeEntry((MainAttribute)(int)stat.Stat, stat.GetValue(item.Level, item.EnhanceLevel));
                 secondAttrs.Add(attrEntry);
             }
@@ -232,6 +280,36 @@ namespace IdleDefenseSurvival.Items.Generation
                     equipMod.ModifyEquipment(item, baseEquipment, rarity, level, context);
                 }
             }
+        }
+
+        private void CalculateDerivedValues(InventoryItem item, EquipmentBaseData baseConfig, EquipmentRarityConfig rarityConfig, Rarity rarity, int level)
+        {
+            // Sell price: base + rarity modifier + level modifier
+            // Using existing economy formula if available, otherwise simple calculation
+            long baseSellPrice = baseConfig.SellPrice;
+            float rarityMultiplier = GetRaritySellMultiplier(rarity);
+            float levelMultiplier = 1f + (level - 1) * 0.1f;
+
+            // Store in CustomData for runtime access (not a persisted field on InventoryItem)
+            if (item.CustomData == null) item.CustomData = new Dictionary<string, object>();
+            item.CustomData["BaseSellPrice"] = baseSellPrice;
+            item.CustomData["RaritySellMultiplier"] = rarityMultiplier;
+            item.CustomData["LevelSellMultiplier"] = levelMultiplier;
+            item.CustomData["FinalSellPrice"] = (long)(baseSellPrice * rarityMultiplier * levelMultiplier);
+        }
+
+        private float GetRaritySellMultiplier(Rarity rarity)
+        {
+            return rarity switch
+            {
+                Rarity.Common => 1.0f,
+                Rarity.Rare => 2.0f,
+                Rarity.Epic => 4.0f,
+                Rarity.Legendary => 8.0f,
+                Rarity.Mythic => 16.0f,
+                Rarity.Divine => 32.0f,
+                _ => 1.0f
+            };
         }
     }
 

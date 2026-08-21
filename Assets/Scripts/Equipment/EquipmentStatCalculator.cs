@@ -187,19 +187,16 @@ namespace IdleDefenseSurvival.Equipment
                 }
 
             // Main Attributes (STR/CON/INT/DEX) — from itemData.AttributeStats (template)
-            if (itemData.AttributeStats != null)
-                foreach (var attrEntry in itemData.AttributeStats)
-                {
-                    float value = attrEntry.GetValue(item.Level, item.EnhanceLevel);
-                    if (value != 0)
-                        builder.AddAttribute(prefix, attrEntry.Attribute, value);
-                }
-
-            // Main Attributes from item.AttributeData (instance - e.g. STR +6 from equip)
             if (item.AttributeData?.MainAttribute != null)
+            {
                 foreach (var attrEntry in item.AttributeData.MainAttribute)
+                {
                     if (attrEntry.BaseValue != 0f)
-                        builder.AddAttribute(prefix + "_Instance", attrEntry.Attribute, attrEntry.BaseValue);
+                    {
+                        // builder.AddAttribute(prefix, attrEntry.Attribute, attrEntry.BaseValue);
+                    }
+                }
+            }
 
             // Second Attributes from item.AttributeData (specialization stats) — stored as SecondaryStat in Attribute field
             if (item.AttributeData?.SecondAttribute != null)

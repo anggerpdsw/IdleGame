@@ -4,6 +4,7 @@ using System.Linq;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace IdleDefenseSurvival.Inventory
 {
@@ -41,9 +42,16 @@ namespace IdleDefenseSurvival.Inventory
         // ============ Durability ============
         public int CurrentDurability = 100;
         public int MaxDurability = 100;
+        public int DurabilityLossPerUse = 1; // From rarity config
+        public long RepairCostPerDurability = 5; // From rarity config
 
         // ============ Sockets & Gems ============
         public SocketData[] Sockets; // Socket states (can be null/empty)
+        public int MaxSockets = 0; // Max sockets from rarity config (derived from Sockets.Length at generation)
+
+        // ============ Custom Data (for derived values like sell price) ============
+        [Newtonsoft.Json.JsonIgnore]
+        public Dictionary<string, object> CustomData;
 
         // ============ Enchantment ============
         public EnchantmentInstanceData Enchantment; // Current enchantment data
