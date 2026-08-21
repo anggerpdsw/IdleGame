@@ -110,7 +110,7 @@ namespace IdleDefenseSurvival.Items.Data
     /// </summary>
     public static class EquipmentBaseDataRepository
     {
-        private const string RESOURCE_PATH = "Data/Equipment/dataBaseEquipment";
+        private const string RESOURCE_PATH = "Data/Crafting/Equipment/dataBaseEquipment";
         private static EquipmentBaseData _instance;
         private static bool _initialized;
 

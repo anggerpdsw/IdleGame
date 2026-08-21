@@ -4,6 +4,7 @@ using UnityEngine;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Generation;
+using IdleDefenseSurvival.Items.Data;
 
 namespace IdleDefenseSurvival.Crafting
 {
@@ -114,20 +115,30 @@ namespace IdleDefenseSurvival.Crafting
             EquipmentType slot,
             long seed)
         {
-            var db = ItemDatabase.Instance;
-            if (db == null) return null;
-
-            string baseId = $"equip_{slot.ToString().ToLower()}_base";
-            string OutputItemId = recipe.DisplayName.ToLowerInvariant().Replace(" ", "_");  // "Cotton Hat" → "cotton_hat"
-
-            var baseEquip = db.GetEquipment(baseId);
-            if (baseEquip == null)
+            // Unified base configuration from dataBaseEquipment.json (via EquipmentBaseDataRepository).
+            var baseConfig = EquipmentBaseDataRepository.Instance;
+            if (baseConfig == null)
             {
-                Debug.LogError($"[CraftRewardService] Missing base template: {baseId}");
+                Debug.LogError("[CraftRewardService] EquipmentBaseDataRepository not loaded.");
                 return null;
             }
 
-            // v3.8 §20.1 — rarity source of truth: recipe.Rarity (1=Common..6=Divine).
+            // Build a minimal EquipmentData wrapper so EquipmentGenerator can access
+            // EquipmentType and Id. The actual rarity-based stats come from baseConfig.
+            var baseEquip = new EquipmentData
+            {
+                Id = "equip_base",
+                EquipmentType = slot,
+                Category = ItemCategory.Equipment,
+                ItemRarity = (Rarity)recipe.Rarity,
+                SellPrice = baseConfig.SellPrice,
+                StackSize = 1
+            };
+
+            // Output id derived from recipe name (e.g., "Cotton Hat" → "cotton_hat").
+            string OutputItemId = recipe.DisplayName.ToLowerInvariant().Replace(" ", "_");
+
+            // Rarity source of truth: recipe.Rarity (1=Common..6=Divine).
             // EquipmentGenerator expects 0-based quality tier: 0=Common, 1=Rare, ..., 5=Divine.
             int qualityTier = Mathf.Max(0, recipe.Rarity - 1);
             int level = Mathf.Max(1, recipe.RequiredCraftingLevel);
@@ -135,12 +146,9 @@ namespace IdleDefenseSurvival.Crafting
             // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
             var eventModifiers = new List<EventCraftModifier>();
             foreach (var mod in context.ActiveEventModifiers)
-            {
-                if (mod is EventCraftModifier ev)
-                    eventModifiers.Add(ev);
-            }
+                if (mod is EventCraftModifier ev) eventModifiers.Add(ev);
 
-            // Build context via helper — sets Source, EquipmentType, Category, PlayerLevel, ForcedQuality, FixedLevel correctly.
+            // Build generation context – sets Source, EquipmentType, Category, ForcedQuality, FixedLevel, etc.
             var genContext = ItemGenerationContext.Equipment(
                                  equipmentType: slot,
                                  rarity: (Rarity)recipe.Rarity,
@@ -156,7 +164,7 @@ namespace IdleDefenseSurvival.Crafting
                                      { "OverrideItemId", OutputItemId }
                                  });
 
-            // Use injected generator (shares RNG with pipeline) for I-11 determinism.
+            // Run through full equipment pipeline – uses equip_base as template.
             return _itemGenerator.GenerateEquipmentFromBase(baseEquip, genContext);
         }
 

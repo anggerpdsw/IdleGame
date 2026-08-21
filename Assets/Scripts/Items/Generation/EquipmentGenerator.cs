@@ -162,7 +162,7 @@ namespace IdleDefenseSurvival.Items.Generation
             if (context.Source == ItemSource.Craft)
             {
                 // Crafting: random within rarity range, using deterministic RNG
-                return _rng.Range(minLevel, maxLevel + 1); // inclusive max
+                return _rng.NextInt(minLevel, maxLevel + 1); // inclusive max
             }
 
             // Drops/rewards: can use old calculation based on player/tier/wave
