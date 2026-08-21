@@ -15,9 +15,8 @@ namespace IdleDefenseSurvival.Items.Generation
     /// <summary>
     /// Generator for equipment items.
     /// Pipeline: Validate input → Resolve rarity → Load equip_base → Resolve rarity config →
-    /// Generate Level → Generate durability config → Create InventoryItem →
-    /// Generate MainAttribute → Generate SecondaryAttribute → Generate Sockets →
-    /// Generate Affixes → Generate Enchantment → Apply Event Modifiers →
+    /// Generate Level → Create InventoryItem → Generate MainAttribute → Generate SecondaryAttribute
+    /// → Generate Sockets → Generate Affixes → Generate Enchantment → Apply Event Modifiers →
     /// Calculate final derived values → Validate → Return
     /// </summary>
     public sealed class EquipmentGenerator
@@ -44,7 +43,7 @@ namespace IdleDefenseSurvival.Items.Generation
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = rarityRoll ?? new RarityRollService(_rng);
             _statRoll = statRoll ?? new StatRollService(_rng);
-            _socketGen = socketGen ?? new SocketGenerator(_rng);
+            _socketGen = socketGen ?? new SocketGenerator();
             _enchantGen = enchantGen ?? new EnchantmentGenerator(_rng);
             _affixGen = affixGen ?? new AffixGenerator(_rng);
             _validator = validator ?? new ItemValidator();
@@ -80,8 +79,8 @@ namespace IdleDefenseSurvival.Items.Generation
                 return null;
             }
 
-            // 3. Get rarity-specific configuration
-            var rarityConfig = baseConfig.GetRarityConfig(rarity);
+            // 3. Get rarity-specific configuration (already randomised inside EquipmentBaseData)
+            var rarityConfig = baseConfig.GetRarityConfig(rarity, _rng);
             if (!rarityConfig.IsValid)
             {
                 Debug.LogError($"[EquipmentGenerator] Invalid rarity config for {rarity}.");
@@ -89,15 +88,15 @@ namespace IdleDefenseSurvival.Items.Generation
             }
 
             // 4. Determine level
-            // For crafting: use BaseLevel from equip_base, then random within rarity range
+            // For crafting: random within [1, rarityConfig.MaxLevel]
             // For drops: can use FixedLevel from context or calculate from player/tier/wave
             int level = context.FixedLevel ?? GenerateLevel(rarityConfig, baseConfig.BaseLevel, context);
 
             // 5. Clamp level to rarity max
             level = Math.Clamp(level, 1, rarityConfig.MaxLevel);
 
-            // 6. Create base item with all rarity-based configuration
-            var item = CreateBaseItem(baseEquipment, rarity, level, rarityConfig, context);
+            // 6. Create base item with all rarity-based configuration (NO extra RNG)
+            var item = CreateBaseItem(baseEquipment, rarity, level, rarityConfig, baseConfig, context);
 
             // 7. Generate Main Attributes (for all sources, rarity comes from recipe/forced quality)
             GenerateMainAttributes(item, rarity, context);
@@ -107,7 +106,7 @@ namespace IdleDefenseSurvival.Items.Generation
             if (secondaryStats.Length > 0)
                 ApplySecondaryStats(item, secondaryStats);
 
-            // 9. Generate sockets using rolled MaxSockets from item (respects min/max range)
+            // 9. Generate sockets using rolled MaxSockets from item (respects final value from rarityConfig)
             item.Sockets = _socketGen.GenerateSockets(item.MaxSockets, rarity, context);
 
             // 10. Generate affixes
@@ -151,52 +150,47 @@ namespace IdleDefenseSurvival.Items.Generation
             return Generate(baseEquipment, context);
         }
 
+        // --------------------------------------------------------------------
+        // Helper methods
+        // --------------------------------------------------------------------
         private int GenerateLevel(EquipmentRarityConfig rarityConfig, int baseLevel, ItemGenerationContext context)
         {
-            // For crafting: level is randomized within the rarity's level range
-            // Common: 1-10, Rare: 10-15, Epic: 15-20, Legendary: 20-25, Mythic: 25-30, Divine: 30-50
-            var baseCfg = EquipmentBaseDataRepository.Instance;
-            var (minLevel, maxLevel) = baseCfg.GetLevelRange(
-                (Rarity)Math.Clamp(context.ForcedQuality ?? 1, 1, 6));
-
+            // For crafting: random level within [1, rarityConfig.MaxLevel]
+            // Preserve deterministic RNG via _rng.
             if (context.Source == ItemSource.Craft)
-            {
-                // Crafting: random within rarity range, using deterministic RNG
-                return _rng.NextInt(minLevel, maxLevel + 1); // inclusive max
-            }
+                return _rng.NextInt(1, rarityConfig.MaxLevel + 1);
 
-            // Drops/rewards: can use old calculation based on player/tier/wave
+            // Drops/rewards: calculate based on player/tier/wave then clamp.
             int calculatedLevel = Math.Max(1, context.PlayerLevel + context.CraftingMastery / 5);
             calculatedLevel += context.Tier * 2;
             calculatedLevel += context.Wave / 5;
 
-            return Math.Clamp(calculatedLevel, minLevel, maxLevel);
+            return Math.Clamp(calculatedLevel, 1, rarityConfig.MaxLevel);
         }
 
-        private InventoryItem CreateBaseItem(EquipmentData baseEquipment, Rarity rarity, int level, EquipmentRarityConfig rarityConfig, ItemGenerationContext context)
+        private InventoryItem CreateBaseItem(
+            EquipmentData baseEquipment,
+            Rarity rarity,
+            int level,
+            EquipmentRarityConfig rarityConfig,
+            EquipmentBaseData baseConfig,
+            ItemGenerationContext context)
         {
-            // Roll durability, loss per use, repair cost and socket count within rarity ranges.
-            // Using deterministic RNG for reproducibility (same seed yields same result).
-            int rolledDurability = _rng.NextInt(rarityConfig.MinDurability, rarityConfig.MaxDurability + 1);
-            int rolledLoss = _rng.NextInt(rarityConfig.MinDurabilityLossPerUse, rarityConfig.MaxDurabilityLossPerUse + 1);
-            // Repair cost stored as long; cast from int (range fits int in current data).
-            long rolledRepairCost = (long)_rng.NextInt((int)rarityConfig.MinRepairCostPerDurability, (int)rarityConfig.MaxRepairCostPerDurability + 1);
-            int rolledSockets = _rng.NextInt(rarityConfig.MinSockets, rarityConfig.MaxSockets + 1);
-
+            // Directly map rarityConfig fields; NO extra randomisation.
+            // EquipmentBaseData.GetRarityConfig() already rolled these values.
             var item = new InventoryItem
             {
                 InstanceId = Guid.NewGuid().ToString(),
                 ItemId = baseEquipment?.Id ?? "unknown",
-                EquipmentTemplateId = "equip_base",
+                EquipmentTemplateId = baseConfig.Id,
                 EquipmentType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None,
                 Quantity = 1,
                 Level = level,
-                MaxDurability = rolledDurability,
-                CurrentDurability = rolledDurability,
-                DurabilityLossPerUse = rolledLoss,
-                RepairCostPerDurability = rolledRepairCost,
-                // Socket generation will respect this count; pass to generator later.
-                MaxSockets = rolledSockets,
+                MaxDurability = rarityConfig.Durability,
+                CurrentDurability = rarityConfig.Durability,
+                DurabilityLossPerUse = rarityConfig.DurabilityLossPerUse,
+                RepairCostPerDurability = rarityConfig.RepairCostPerDurability,
+                MaxSockets = rarityConfig.Sockets,
                 AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 EnhanceLevel = 0
             };
@@ -206,21 +200,15 @@ namespace IdleDefenseSurvival.Items.Generation
 
         private void GenerateMainAttributes(InventoryItem item, Rarity rarity, ItemGenerationContext context)
         {
-            var tierConfig = CraftingConfig.Load()
-                .GetAttributeTierConfig((int)rarity);
-
-            var attributes = _attributeRoll
-                .RollAttributes(rarity, tierConfig);
-
+            var tierConfig = CraftingConfig.Load().GetAttributeTierConfig((int)rarity);
+            var attributes = _attributeRoll.RollAttributes(rarity, tierConfig);
             if (attributes.Length > 0)
             {
                 var mainAttrs = new List<EquipmentAttributeEntry>();
-
                 foreach (var attr in attributes)
                 {
                     mainAttrs.Add(new EquipmentAttributeEntry(attr.Attribute, attr.BaseValue));
                 }
-
                 item.AttributeData = new EquipmentAttributeData(mainAttrs.ToArray(), Array.Empty<EquipmentAttributeEntry>());
             }
         }
@@ -231,9 +219,11 @@ namespace IdleDefenseSurvival.Items.Generation
             var secondAttrs = new List<EquipmentAttributeEntry>();
             foreach (var stat in stats)
             {
-                var attrEntry = new EquipmentAttributeEntry((MainAttribute)(int)stat.Stat, stat.GetValue(item.Level, item.EnhanceLevel));
+                var attrEntry = new EquipmentAttributeEntry((MainAttribute)(int)stat.Stat,
+                    stat.GetValue(item.Level, item.EnhanceLevel));
                 secondAttrs.Add(attrEntry);
             }
+
             if (item.AttributeData == null)
                 item.AttributeData = new EquipmentAttributeData(Array.Empty<EquipmentAttributeEntry>(), secondAttrs.ToArray());
             else
@@ -250,9 +240,11 @@ namespace IdleDefenseSurvival.Items.Generation
             {
                 if (affix == null) continue;
                 affix.ItemInstanceId = item.InstanceId;
+
                 if (affix.AttributeValues != null)
                     foreach (var (attr, value) in affix.AttributeValues)
                         if (value != 0f) mainAttrs.Add(new EquipmentAttributeEntry(attr, value));
+
                 if (affix.StatValues != null)
                     foreach (var (stat, value) in affix.StatValues)
                         if (stat != SecondaryStat.None && value != 0f)

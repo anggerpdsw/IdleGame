@@ -354,10 +354,18 @@ public class InventoryItemData
     // ---- Equipment-only (unique instances) ----
     public int? Level;
     public int? EnhanceLevel;
-    public int? CurrentDurability; // MaxDurability derived from EquipmentData
+    public int? CurrentDurability;
+    public int? MaxDurability; // Rolled from rarity config (not base template)
+    public int? DurabilityLossPerUse; // From rarity config
+    public long? RepairCostPerDurability; // From rarity config
+    public int? MaxSockets; // From rarity config
+    public string EquipmentTemplateId; // Reference to base EquipmentData template (e.g. "equip_base")
+    public EquipmentType EquipmentType = EquipmentType.None; // Persisted equipment slot type
     public SocketData[] Sockets; // { IsUnlocked, GemInstanceId }
     public EnchantmentInstanceData Enchantment;
     public EquipmentAttributeData AttributeData; // Main + Secondary attributes (BaseValue only)
+    public EquipmentAttributeEntry[] MainAttribute; // Explicit arrays for save-file consumption
+    public EquipmentAttributeEntry[] SecondaryAttribute;
 
     // ---- Non-equipment (stackables/consumables) ----
     public Dictionary<string, object> CustomData; // Rolled affixes/secondaries for non-equipment

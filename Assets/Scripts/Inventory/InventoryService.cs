@@ -719,12 +719,10 @@ namespace IdleDefenseSurvival.Inventory
         }
 
         /// <summary>
-        /// Persists only what the item needs: stackables = identity (ItemId + StackId) + quantity + flags;
-        /// equipment (unique) additionally keep InstanceId + progression/sockets/etc.
-        /// MaxDurability excluded — derived from EquipmentData on load.
-        /// Socketed gems are NOT part of a stack: only their GemInstanceId reference is persisted
-        /// on the equipment socket; the GemInstanceData itself lives in SaveData.SocketedGems
-        /// (GemService.GetSocketedGemsSaveData).
+        /// Persists equipment with full rarity-rolled state:
+        /// MaxDurability, DurabilityLossPerUse, RepairCostPerDurability, MaxSockets,
+        /// EquipmentTemplateId, EquipmentType, and Main/Secondary attributes.
+        /// Stackables persist identity + quantity + flags only.
         /// </summary>
         private static InventoryItemData ToSaveItem(int slotIndex, InventoryItem item)
         {
@@ -741,14 +739,27 @@ namespace IdleDefenseSurvival.Inventory
 
             if (item.IsEquippable())
             {
-                // Unique instance: identity + full state.
+                // Unique instance: identity + full state including rarity-rolled config.
                 data.InstanceId = item.InstanceId;
                 data.Level = item.Level;
                 data.EnhanceLevel = item.EnhanceLevel;
                 data.CurrentDurability = item.CurrentDurability;
+                data.MaxDurability = item.MaxDurability;
+                data.DurabilityLossPerUse = item.DurabilityLossPerUse;
+                data.RepairCostPerDurability = item.RepairCostPerDurability;
+                data.MaxSockets = item.MaxSockets;
+                data.EquipmentTemplateId = item.EquipmentTemplateId;
+                data.EquipmentType = item.EquipmentType;
                 data.Enchantment = item.Enchantment?.Clone();
                 data.Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray();
                 data.AttributeData = item.AttributeData;
+
+                // Explicit arrays for save-file consumers expecting "MainAttribute"/"SecondaryAttribute"
+                if (item.AttributeData != null)
+                {
+                    data.MainAttribute = item.AttributeData.MainAttribute;
+                    data.SecondaryAttribute = item.AttributeData.SecondAttribute;
+                }
             }
             else
             {

@@ -9,25 +9,14 @@ namespace IdleDefenseSurvival.Items.Generation
 {
     /// <summary>
     /// Generates equipment sockets.
-    ///
-    /// Socket rules:
-    /// Common    : 0..1
-    /// Rare      : 0..2
-    /// Epic      : 1..3
-    /// Legendary : 2..4
-    /// Mythic    : 3..5
-    /// Divine    : 4..6
-    ///
     /// MaxSockets comes from EquipmentBaseData rarity configuration.
     /// </summary>
     public sealed class SocketGenerator
     {
-        private readonly IRandomProvider _rng;
         private readonly SocketGeneratorConfig _config;
 
-        public SocketGenerator(IRandomProvider rng, SocketGeneratorConfig config = null)
+        public SocketGenerator(SocketGeneratorConfig config = null)
         {
-            _rng = rng ?? new UnityRandomProvider();
             _config = config ?? SocketGeneratorConfig.Default;
         }
 
@@ -38,14 +27,8 @@ namespace IdleDefenseSurvival.Items.Generation
         public SocketData[] GenerateSockets(int maxSockets, Rarity rarity, ItemGenerationContext context)
         {
             if (maxSockets <= 0) return Array.Empty<SocketData>();
-            int minSockets = GetMinimumSockets(rarity);
-            // Safety: minimum can never exceed configured maximum.
-            minSockets = Math.Min(minSockets, maxSockets);
-            // Random range is inclusive.
-            int socketCount = _rng.NextInt(minSockets, maxSockets + 1);
-            if (socketCount <= 0) return Array.Empty<SocketData>();
-            var sockets = new SocketData[socketCount];
-            for (int i = 0; i < socketCount; i++)
+            var sockets = new SocketData[maxSockets];
+            for (int i = 0; i < maxSockets; i++)
             {
                 bool isUnlocked = IsSocketUnlocked(i, rarity, context);
                 sockets[i] = new SocketData
@@ -59,29 +42,6 @@ namespace IdleDefenseSurvival.Items.Generation
             }
             ApplyEventModifiers(sockets, context);
             return sockets;
-        }
-
-        /// <summary>
-        /// Returns the minimum possible socket count for the rarity.
-        /// Common    = 0
-        /// Rare      = 0
-        /// Epic      = 1
-        /// Legendary = 2
-        /// Mythic    = 3
-        /// Divine    = 4
-        /// </summary>
-        private static int GetMinimumSockets(Rarity rarity)
-        {
-            return rarity switch
-            {
-                Rarity.Common => 0,
-                Rarity.Rare => 0,
-                Rarity.Epic => 1,
-                Rarity.Legendary => 2,
-                Rarity.Mythic => 3,
-                Rarity.Divine => 4,
-                _ => 0,
-            };
         }
 
         /// <summary>

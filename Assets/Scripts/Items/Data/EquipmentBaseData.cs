@@ -51,17 +51,18 @@ namespace IdleDefenseSurvival.Items.Data
 
         /// <summary>
         /// Gets rarity-specific configuration with random value as a strongly typed struct.
+        /// Uses the provided IRandomProvider to keep generation deterministic across the pipeline.
         /// </summary>
-        public EquipmentRarityConfig GetRarityConfig(Rarity rarity)
+        public EquipmentRarityConfig GetRarityConfig(Rarity rarity, IRandomProvider rng)
         {
             int index = GetRarityIndex(rarity);
             return new EquipmentRarityConfig
             {
-                MaxLevel = GetMaxLevel(index),
-                Durability = GetDurability(index),
-                DurabilityLossPerUse = GetDurabilityLossPerUse(index),
-                RepairCostPerDurability = GetRepairCostPerDurability(index),
-                Sockets = GetSockets(index),
+                MaxLevel = GetMaxLevel(index, rng),
+                Durability = GetDurability(index, rng),
+                DurabilityLossPerUse = GetDurabilityLossPerUse(index, rng),
+                RepairCostPerDurability = GetRepairCostPerDurability(index, rng),
+                Sockets = GetSockets(index, rng),
             };
         }
 
@@ -73,37 +74,33 @@ namespace IdleDefenseSurvival.Items.Data
             return index;
         }
 
-        private int GetMaxLevel(int index)
+        // All random rolls now use the provided RNG to keep generation deterministic
+        private int GetMaxLevel(int index, IRandomProvider rng)
         {
-            IRandomProvider _rng = new UnityRandomProvider();
             int minLevel = 1;
             if (index > 0) minLevel = MaxLevel[index - 1];
-            return _rng.NextInt(minLevel, MaxLevel[index]);
+            return rng.NextInt(minLevel, MaxLevel[index]);
         }
-        private int GetDurability(int index)
+        private int GetDurability(int index, IRandomProvider rng)
         {
-            IRandomProvider _rng = new UnityRandomProvider();
             int minDurability = Durability[index] / 2;
-            return _rng.NextInt(minDurability, Durability[index] + 1);
+            return rng.NextInt(minDurability, Durability[index] + 1);
         }
-        private int GetDurabilityLossPerUse(int index)
+        private int GetDurabilityLossPerUse(int index, IRandomProvider rng)
         {
-            IRandomProvider _rng = new UnityRandomProvider();
             int minLossPerUse = DurabilityLossPerUse[index] / 2;
-            return _rng.NextInt(minLossPerUse, DurabilityLossPerUse[index] + 1);
+            return rng.NextInt(minLossPerUse, DurabilityLossPerUse[index] + 1);
         }
-        private int GetRepairCostPerDurability(int index)
+        private int GetRepairCostPerDurability(int index, IRandomProvider rng)
         {
-            IRandomProvider _rng = new UnityRandomProvider();
             int minRepairCost = RepairCostPerDurability[index] / 2;
-            return _rng.NextInt(minRepairCost, RepairCostPerDurability[index] + 1);
+            return rng.NextInt(minRepairCost, RepairCostPerDurability[index] + 1);
         }
-        private int GetSockets(int index)
+        private int GetSockets(int index, IRandomProvider rng)
         {
-            IRandomProvider _rng = new UnityRandomProvider();
             int minSocket = 0;
             if (index > 1) minSocket = Sockets[index - 2];
-            return _rng.NextInt(minSocket, Sockets[index] + 1);
+            return rng.NextInt(minSocket, Sockets[index] + 1);
         }
 
     }

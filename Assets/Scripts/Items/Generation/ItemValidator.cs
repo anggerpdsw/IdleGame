@@ -73,12 +73,12 @@ namespace IdleDefenseSurvival.Items.Generation
                 }
             }
 
-            // Validate Durability (equipment only)
+            // Validate Durability (equipment only) — structural validity, not exact match to base template
             if (baseData is EquipmentData durData && durData.MaxDurability > 0)
             {
-                if (item.MaxDurability != durData.MaxDurability)
+                if (item.MaxDurability <= 0)
                 {
-                    errors.Add($"MaxDurability {item.MaxDurability} doesn't match base {durData.MaxDurability}");
+                    errors.Add("MaxDurability must be positive");
                 }
                 if (item.CurrentDurability > item.MaxDurability)
                 {

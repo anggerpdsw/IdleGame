@@ -59,7 +59,7 @@ namespace IdleDefenseSurvival.Items
             // Initialize services
             _rarityRoll = new RarityRollService(_rng);
             _statRoll = new StatRollService(_rng);
-            _socketGen = new SocketGenerator(_rng);
+            _socketGen = new SocketGenerator();
             _enchantGen = new EnchantmentGenerator(_rng);
             _affixGen = new AffixGenerator(_rng);
             _validator = new ItemValidator();
@@ -247,7 +247,7 @@ namespace IdleDefenseSurvival.Items
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = new RarityRollService(_rng);
             _statRoll = new StatRollService(_rng);
-            _socketGen = new SocketGenerator(_rng);
+            _socketGen = new SocketGenerator();
             _enchantGen = new EnchantmentGenerator(_rng);
             _affixGen = new AffixGenerator(_rng);
             _validator = new ItemValidator();
