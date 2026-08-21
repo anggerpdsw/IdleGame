@@ -29,7 +29,7 @@ namespace IdleDefenseSurvival.Controller
 
             // Apply rarity color to the rarity image
             if (_rarity != null)
-                _rarity.color = GetRarityColor(rarity);
+                _rarity.color = GameColors.GetRarityColor(rarity);
 
             if (_button != null)
             {
@@ -40,20 +40,6 @@ namespace IdleDefenseSurvival.Controller
             {
                 Debug.LogWarning($"[CraftingRecipeEntry] No Button found on {gameObject.name}");
             }
-        }
-
-        public static Color GetRarityColor(Rarity rarity)
-        {
-            return rarity switch
-            {
-                Rarity.Common => GameColors.commonGray,
-                Rarity.Rare => GameColors.rareBlue,
-                Rarity.Epic => GameColors.epicPurple,
-                Rarity.Legendary => GameColors.legendaryOrange,
-                Rarity.Mythic => GameColors.mythicPink,
-                Rarity.Divine => GameColors.divineGold,
-                _ => GameColors.white,
-            };
         }
 
         public void SetAffordable(bool affordable, Color dimColor, Color normalColor)

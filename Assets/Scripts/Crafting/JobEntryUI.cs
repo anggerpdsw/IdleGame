@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Crafting
     public class JobEntryUI : MonoBehaviour
     {
         [Header("UI")]
+        [SerializeField] private Image _rarity;
         [SerializeField] private Image _iconImage;
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private Slider _progressSlider;
@@ -17,10 +18,11 @@ namespace IdleDefenseSurvival.Crafting
         public string JobId { get; private set; }
         private Action<string> _onClaim;
 
-        public void Initialize(string jobId, Sprite icon, string name, float progress, CraftJobStatus status, Action<string> onClaim)
+        public void Initialize(string jobId, Sprite icon, Rarity rarity, string name, float progress, CraftJobStatus status, Action<string> onClaim)
         {
             JobId = jobId;
             _onClaim = onClaim;
+            SetRarity(rarity);
             SetIcon(icon);
             SetRecipeName(name);
             SetProgress(progress);
@@ -57,6 +59,8 @@ namespace IdleDefenseSurvival.Crafting
             _onClaim.Invoke(JobId);
         }
 
+        public void SetRarity(Rarity rarity) 
+            => _rarity.color = GameColors.GetRarityColor(rarity);
         public void SetIcon(Sprite icon) => _iconImage.sprite = icon;
         public void SetRecipeName(string name) => _nameText.text = name;
         public void SetProgress(float p) => _progressSlider.value = p;

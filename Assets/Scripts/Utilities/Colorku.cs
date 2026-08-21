@@ -4,6 +4,20 @@ namespace IdleDefenseSurvival
 {
     public static class GameColors
     {
+        public static Color GetRarityColor(Rarity rarity)
+        {
+            return rarity switch
+            {
+                Rarity.Common => commonGray,
+                Rarity.Rare => rareBlue,
+                Rarity.Epic => epicPurple,
+                Rarity.Legendary => legendaryOrange,
+                Rarity.Mythic => mythicPink,
+                Rarity.Divine => divineGold,
+                _ => white,
+            };
+        }
+
         // ===== Base palette =====
         public static readonly Color gold  = new Color32(255, 215, 0, 255);
         public static readonly Color green  = new Color32(22, 163, 74, 255);

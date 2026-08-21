@@ -34,14 +34,14 @@ namespace IdleDefenseSurvival.Inventory
         public int EnhanceLevel = 0; // Enhancement level (+0 to +20)
 
         // ============ Durability ============
-        public int CurrentDurability = 100;
         public int MaxDurability = 100;
+        public int CurrentDurability = 100;
         public int DurabilityLossPerUse = 1; // From rarity config
         public long RepairCostPerDurability = 5; // From rarity config
 
         // ============ Sockets & Gems ============
-        public SocketData[] Sockets; // Socket states (can be null/empty)
         public int MaxSockets = 0; // Max sockets from rarity config (derived from Sockets.Length at generation)
+        public SocketData[] Sockets; // Socket states (can be null/empty)
 
         // ============ Custom Data (for derived values like sell price) ============
         [JsonIgnore]

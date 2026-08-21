@@ -360,8 +360,8 @@ public class InventoryItemData
     // ---- Equipment-only (unique instances) ----
     public int? Level;
     public int? EnhanceLevel;
-    public int? CurrentDurability;
     public int? MaxDurability; // Rolled from rarity config (not base template)
+    public int? CurrentDurability;
     public int? DurabilityLossPerUse; // From rarity config
     public long? RepairCostPerDurability; // From rarity config
     public int? MaxSockets; // From rarity config

@@ -198,4 +198,13 @@ public static class Utilityku
     {
         return _elements[Random.Range(0, _elements.Length)];
     }
+
+    public static string ToItemId(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+        return System.Text.RegularExpressions.Regex
+            .Replace(name.Trim().ToLowerInvariant(), @"[^a-z0-9]+", "_")
+            .Trim('_');
+    }
+
 }

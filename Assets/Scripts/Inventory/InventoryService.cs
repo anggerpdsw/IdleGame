@@ -753,7 +753,7 @@ namespace IdleDefenseSurvival.Inventory
         /// <summary>
         /// Persists equipment with full rarity-rolled state:
         /// MaxDurability, DurabilityLossPerUse, RepairCostPerDurability, MaxSockets,
-        /// EquipmentTemplateId, EquipmentType, and Main/Secondary attributes.
+        /// EquipmentType, and Main/Secondary attributes.
         /// Stackables persist identity + quantity + flags only.
         /// </summary>
         private static InventoryItemData ToSaveItem(int slotIndex, InventoryItem item)
@@ -775,8 +775,8 @@ namespace IdleDefenseSurvival.Inventory
                 data.InstanceId = item.InstanceId;
                 data.Level = item.Level;
                 data.EnhanceLevel = item.EnhanceLevel;
-                data.CurrentDurability = item.CurrentDurability;
                 data.MaxDurability = item.MaxDurability;
+                data.CurrentDurability = item.CurrentDurability;
                 data.DurabilityLossPerUse = item.DurabilityLossPerUse;
                 data.RepairCostPerDurability = item.RepairCostPerDurability;
                 data.MaxSockets = item.MaxSockets;
@@ -842,7 +842,7 @@ namespace IdleDefenseSurvival.Inventory
 
         /// <summary>
         /// Rebuilds a runtime InventoryItem. Stackables get hardening defaults;
-        /// equipment restores full state and recomputes MaxDurability from EquipmentData.
+        /// equipment restores full state from persisted InventoryItemData (no DB lookup).
         /// Socketed gems get GemInstanceId bound so GemService can rehydrate the instance.
         /// </summary>
         private static InventoryItem RestoreItem(InventoryItemData data)
@@ -864,19 +864,19 @@ namespace IdleDefenseSurvival.Inventory
 
             if (isEquipment)
             {
-                // ---- Equipment: restore full state ----
-                var dbEquip = ItemDatabase.Instance.GetEquipment(data.ItemId);
+                // ---- Equipment: restore full state from saved data (no DB lookup) ----
                 item.InstanceId = data.InstanceId;
                 item.Level = data.Level ?? 1;
                 item.EnhanceLevel = data.EnhanceLevel ?? 0;
                 item.Enchantment = data.Enchantment;
 
-                item.MaxDurability = dbEquip?.MaxDurability ?? 0;
-                if (item.MaxDurability > 0 && item.CurrentDurability == 0)
-                {
-                    item.CurrentDurability = item.MaxDurability;
-                }
+                // ponytail: use persisted durability instead of DB template (crafted items lack DB entry)
+                item.MaxDurability = data.MaxDurability ?? 100;
+                item.CurrentDurability = data.CurrentDurability ?? item.MaxDurability;
+                item.DurabilityLossPerUse = data.DurabilityLossPerUse ?? 1;
+                item.RepairCostPerDurability = data.RepairCostPerDurability ?? 5;
 
+                item.MaxSockets = data.MaxSockets ?? 0;
                 if (data.Sockets != null)
                 {
                     var sockets = data.Sockets.Where(s => s != null && s.IsUnlocked).ToArray();

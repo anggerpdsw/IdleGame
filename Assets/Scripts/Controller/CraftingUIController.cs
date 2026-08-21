@@ -276,13 +276,11 @@ namespace IdleDefenseSurvival.Controller
 
         private Sprite ResolveRecipeIcon(CraftRecipeData recipe)
         {
-            if (recipe == null || ItemDatabase.Instance == null) return null;
-
-            // Deterministic equipment: icon from base template for the equipment slot
-            string baseId = $"equip_{recipe.EquipmentType.ToString().ToLower()}_base";
-            var baseEquip = ItemDatabase.Instance.GetEquipment(baseId);
-            if (baseEquip == null || string.IsNullOrEmpty(baseEquip.IconKey)) return null;
-            return ItemResources.GetItemSource(baseEquip.IconKey);
+            // ex: Equipment/Hat/cotton_hat
+            if (recipe == null) return null;
+            string type = recipe.EquipmentType.ToString();
+            string name = Utilityku.ToItemId(recipe.DisplayName);
+            return ItemResources.GetItemSource($"Equipment/{type}/{name}");
         }
 
         public void OnRecipeSelected(string recipeId)
@@ -543,14 +541,16 @@ namespace IdleDefenseSurvival.Controller
                 if (!entryObj.TryGetComponent<JobEntryUI>(out var entry)) continue;
 
                 Sprite icon = null;
+                Rarity recipeRarity = Rarity.None;
                 string recipeName = job.RecipeId;
-                if (svc.TryGetRecipe(job.RecipeId, out var recipe))
+                if (svc.TryGetRecipe(recipeName, out var recipe))
                 {
                     icon = ResolveRecipeIcon(recipe);
                     recipeName = recipe.DisplayName;
+                    recipeRarity = (Rarity)recipe.Rarity;
                 }
 
-                entry.Initialize(job.JobId, icon, recipeName, job.Progress, job.Status, OnClaimJob);
+                entry.Initialize(job.JobId, icon, recipeRarity, recipeName, job.Progress, job.Status, OnClaimJob);
                 _jobEntries.Add(entry);
             }
         }
