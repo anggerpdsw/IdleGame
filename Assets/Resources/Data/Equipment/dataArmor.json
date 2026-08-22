@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "leather_armor",
+    "Name": "Leather Armor",
+    "Description": "Basic leather armor reinforced with pig iron and cotton thread.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Armor/leather_armor"
+  },
+  {
+    "Id": "reinforced_leather_armor",
+    "Name": "Reinforced Leather Armor",
+    "Description": "Leather armor with high-carbon steel plates and thick thread binding.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Armor/reinforced_leather_armor"
+  },
+  {
+    "Id": "iron_plated_armor",
+    "Name": "Iron-Plated Armor",
+    "Description": "Heavy armor with refined steel plates, silk thread, and coal-forged edges.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Armor/iron_plated_armor"
+  },
+  {
+    "Id": "steel_armor",
+    "Name": "Steel Armor",
+    "Description": "Legendary steel armor with compound thread and anthracite-forged plates.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Armor/steel_armor"
+  },
+  {
+    "Id": "steel_alloy_armor",
+    "Name": "Steel Alloy Armor",
+    "Description": "Mythic armor forged from high alloy steel and azureworm silk lining.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Armor/steel_alloy_armor"
+  },
+  {
+    "Id": "high_alloy_armor",
+    "Name": "High Alloy Armor",
+    "Description": "Divine armor infused with elemental essence, vega string weave, and compound glue.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Armor/high_alloy_armor"
+  }
+]

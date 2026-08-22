@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "quartz_earring",
+    "Name": "Quartz Earring",
+    "Description": "A simple pig iron earring set with rough quartz on cotton thread.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Earring/quartz_earring"
+  },
+  {
+    "Id": "ruby_earring",
+    "Name": "Ruby Earring",
+    "Description": "A high-carbon steel earring set with normal ruby on thick thread.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Earring/ruby_earring"
+  },
+  {
+    "Id": "sapphire_earring",
+    "Name": "Sapphire Earring",
+    "Description": "A refined steel earring set with refined sapphire on silk thread.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Earring/sapphire_earring"
+  },
+  {
+    "Id": "emerald_earring",
+    "Name": "Emerald Earring",
+    "Description": "A steel alloy earring set with rare emerald on compound thread.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Earring/emerald_earring"
+  },
+  {
+    "Id": "diamond_earring",
+    "Name": "Diamond Earring",
+    "Description": "A high alloy steel earring set with legendary diamond on azureworm silk.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Earring/diamond_earring"
+  },
+  {
+    "Id": "vega_earring",
+    "Name": "Vega Earring",
+    "Description": "A divine high alloy steel earring set with mythic sapphire and essence of hope on Vega String.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Earring/vega_earring"
+  }
+]

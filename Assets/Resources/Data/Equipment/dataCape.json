@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "cotton_cape",
+    "Name": "Cotton Cape",
+    "Description": "A simple cotton cape stitched with organic glue.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Cape/cotton_cape"
+  },
+  {
+    "Id": "thick_thread_cape",
+    "Name": "Thick Thread Cape",
+    "Description": "A cape woven from thick thread with concentrated glue.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Cape/thick_thread_cape"
+  },
+  {
+    "Id": "silk_cape",
+    "Name": "Silk Cape",
+    "Description": "A refined cape crafted from silk thread with strong glue.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Cape/silk_cape"
+  },
+  {
+    "Id": "compound_cape",
+    "Name": "Compound Cape",
+    "Description": "A legendary cape woven with compound thread and colored glue.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Cape/compound_cape"
+  },
+  {
+    "Id": "azureworm_cape",
+    "Name": "Azureworm Cape",
+    "Description": "A mythic cape woven from azureworm silk with super glue binding.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Cape/azureworm_cape"
+  },
+  {
+    "Id": "vega_cape",
+    "Name": "Vega Cape",
+    "Description": "A divine cape woven with Vega String and infused with essence of hope.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Cape/vega_cape"
+  }
+]

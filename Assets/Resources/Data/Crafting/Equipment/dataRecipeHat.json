@@ -87,7 +87,7 @@
       "Description": "A legendary hat woven with compound thread and high-grade lumber.",
       "EquipmentType": 1,
       "Rarity": 4,
-      "RequiredBlacksmithLevel": 1,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [{
           "ItemId": "compound_thread",
           "Count": 18

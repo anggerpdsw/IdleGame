@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "leather_gloves",
+    "Name": "Leather Gloves",
+    "Description": "Basic leather gloves crafted from tanned hide and cotton thread.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Gloves/leather_gloves"
+  },
+  {
+    "Id": "reinforced_leather_gloves",
+    "Name": "Reinforced Leather Gloves",
+    "Description": "Leather gloves reinforced with thick thread and stronger glue.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Gloves/reinforced_leather_gloves"
+  },
+  {
+    "Id": "thick_leather_gloves",
+    "Name": "Thick Leather Gloves",
+    "Description": "Heavy leather gloves with silk thread reinforcement.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Gloves/thick_leather_gloves"
+  },
+  {
+    "Id": "silk_lined_gloves",
+    "Name": "Silk-Lined Gloves",
+    "Description": "Leather gloves lined with compound thread for superior dexterity.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Gloves/silk_lined_gloves"
+  },
+  {
+    "Id": "azureworm_gloves",
+    "Name": "Azureworm Gloves",
+    "Description": "Leather gloves woven with Azureworm silk for legendary protection.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Gloves/azureworm_gloves"
+  },
+  {
+    "Id": "vega_gloves",
+    "Name": "Vega Gloves",
+    "Description": "Divine leather gloves woven with Vega String and infused with essence.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Gloves/vega_gloves"
+  }
+]

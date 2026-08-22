@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "leather_belt",
+    "Name": "Leather Belt",
+    "Description": "A basic leather belt with a pig iron buckle.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Belt/leather_belt"
+  },
+  {
+    "Id": "reinforced_leather_belt",
+    "Name": "Reinforced Leather Belt",
+    "Description": "A leather belt with high-carbon steel buckle and thick thread stitching.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Belt/reinforced_leather_belt"
+  },
+  {
+    "Id": "iron_buckle_belt",
+    "Name": "Iron Buckle Belt",
+    "Description": "A belt with refined steel buckle and silk thread embroidery.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Belt/iron_buckle_belt"
+  },
+  {
+    "Id": "steel_buckle_belt",
+    "Name": "Steel Buckle Belt",
+    "Description": "A legendary belt with steel alloy buckle and compound thread weaving.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Belt/steel_buckle_belt"
+  },
+  {
+    "Id": "alloy_belt",
+    "Name": "Alloy Belt",
+    "Description": "A mythic belt forged from high alloy steel with azureworm silk lining.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Belt/alloy_belt"
+  },
+  {
+    "Id": "high_alloy_belt",
+    "Name": "High Alloy Belt",
+    "Description": "A divine belt with high alloy steel buckle and dream of reminiscence inlay.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Belt/high_alloy_belt"
+  }
+]

@@ -1,7 +1,44 @@
-[{
+[
+  {
     "Id": "cotton_hat",
     "Name": "Cotton Hat",
     "Description": "A basic cotton hat stitched with organic glue.",
     "ItemRarity": 1,
     "IconKey": "Equipment/Hat/cotton_hat"
-}]
+  },
+  {
+    "Id": "thick_thread_hat",
+    "Name": "Thick Thread Hat",
+    "Description": "A hat woven from thick thread with concentrated glue.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Hat/thick_thread_hat"
+  },
+  {
+    "Id": "silk_hat",
+    "Name": "Silk Hat",
+    "Description": "A refined hat crafted from silk thread and fine lumber.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Hat/silk_hat"
+  },
+  {
+    "Id": "compound_hat",
+    "Name": "Compound Hat",
+    "Description": "A legendary hat woven with compound thread and high-grade lumber.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Hat/compound_hat"
+  },
+  {
+    "Id": "azureworm_hat",
+    "Name": "Azureworm Hat",
+    "Description": "A mythic hat woven from azureworm silk with super glue binding.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Hat/azureworm_hat"
+  },
+  {
+    "Id": "vega_hat",
+    "Name": "Vega Hat",
+    "Description": "A divine hat woven with Vega String and infused with elemental essence.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Hat/vega_hat"
+  }
+]

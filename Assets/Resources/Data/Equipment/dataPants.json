@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "leather_pants",
+    "Name": "Leather Pants",
+    "Description": "Basic leather pants stitched with cotton thread.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Pants/leather_pants"
+  },
+  {
+    "Id": "reinforced_leather_pants",
+    "Name": "Reinforced Leather Pants",
+    "Description": "Leather pants reinforced with thick thread and stronger glue.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Pants/reinforced_leather_pants"
+  },
+  {
+    "Id": "thick_thread_pants",
+    "Name": "Thick Thread Pants",
+    "Description": "Heavy leather pants with silk thread reinforcement.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Pants/thick_thread_pants"
+  },
+  {
+    "Id": "silk_lined_pants",
+    "Name": "Silk-Lined Pants",
+    "Description": "Leather pants lined with compound thread for legendary comfort.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Pants/silk_lined_pants"
+  },
+  {
+    "Id": "azureworm_pants",
+    "Name": "Azureworm Pants",
+    "Description": "Mythic leather pants woven with azureworm silk.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Pants/azureworm_pants"
+  },
+  {
+    "Id": "vega_pants",
+    "Name": "Vega Pants",
+    "Description": "Divine leather pants with Vega String weave and elemental essence infusion.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Pants/vega_pants"
+  }
+]

@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "pig_iron_pendant",
+    "Name": "Pig Iron Pendant",
+    "Description": "A simple pig iron pendant strung on cotton thread.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Pendant/pig_iron_pendant"
+  },
+  {
+    "Id": "carbon_steel_pendant",
+    "Name": "Carbon Steel Pendant",
+    "Description": "A high-carbon steel pendant on thick thread.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Pendant/carbon_steel_pendant"
+  },
+  {
+    "Id": "refined_steel_pendant",
+    "Name": "Refined Steel Pendant",
+    "Description": "A refined steel pendant with silk thread wrapping.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Pendant/refined_steel_pendant"
+  },
+  {
+    "Id": "steel_alloy_pendant",
+    "Name": "Steel Alloy Pendant",
+    "Description": "A legendary pendant forged from steel alloy with compound thread.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Pendant/steel_alloy_pendant"
+  },
+  {
+    "Id": "high_alloy_pendant",
+    "Name": "High Alloy Pendant",
+    "Description": "A mythic pendant forged from high alloy steel with azureworm silk.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Pendant/high_alloy_pendant"
+  },
+  {
+    "Id": "vega_pendant",
+    "Name": "Vega Pendant",
+    "Description": "A divine pendant forged from high alloy steel with Vega String and elemental essence inlay.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Pendant/vega_pendant"
+  }
+]

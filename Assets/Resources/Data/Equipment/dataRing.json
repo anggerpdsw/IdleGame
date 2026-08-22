@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "quartz_ring",
+    "Name": "Quartz Ring",
+    "Description": "A basic pig iron ring set with rough quartz on cotton thread wrap.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Ring/quartz_ring"
+  },
+  {
+    "Id": "ruby_ring",
+    "Name": "Ruby Ring",
+    "Description": "A high-carbon steel ring set with normal ruby on thick thread.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Ring/ruby_ring"
+  },
+  {
+    "Id": "sapphire_ring",
+    "Name": "Sapphire Ring",
+    "Description": "A refined steel ring set with refined sapphire on silk thread.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Ring/sapphire_ring"
+  },
+  {
+    "Id": "emerald_ring",
+    "Name": "Emerald Ring",
+    "Description": "A steel alloy ring set with rare emerald on compound thread.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Ring/emerald_ring"
+  },
+  {
+    "Id": "diamond_ring",
+    "Name": "Diamond Ring",
+    "Description": "A high alloy steel ring set with legendary diamond on azureworm silk.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Ring/diamond_ring"
+  },
+  {
+    "Id": "vega_ring",
+    "Name": "Vega Ring",
+    "Description": "A divine high alloy steel ring set with mythic ruby and elemental essence on Vega String.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Ring/vega_ring"
+  }
+]

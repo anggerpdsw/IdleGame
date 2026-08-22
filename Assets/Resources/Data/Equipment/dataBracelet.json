@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "quartz_bracelet",
+    "Name": "Quartz Bracelet",
+    "Description": "A basic pig iron bracelet with rough quartz inlays on cotton thread.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Bracelet/quartz_bracelet"
+  },
+  {
+    "Id": "ruby_bracelet",
+    "Name": "Ruby Bracelet",
+    "Description": "A high-carbon steel bracelet with normal ruby inlays on thick thread.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Bracelet/ruby_bracelet"
+  },
+  {
+    "Id": "sapphire_bracelet",
+    "Name": "Sapphire Bracelet",
+    "Description": "A refined steel bracelet with refined sapphire inlays on silk thread.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Bracelet/sapphire_bracelet"
+  },
+  {
+    "Id": "emerald_bracelet",
+    "Name": "Emerald Bracelet",
+    "Description": "A steel alloy bracelet with rare emerald inlays on compound thread.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Bracelet/emerald_bracelet"
+  },
+  {
+    "Id": "diamond_bracelet",
+    "Name": "Diamond Bracelet",
+    "Description": "A high alloy steel bracelet with legendary diamond inlays on azureworm silk.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Bracelet/diamond_bracelet"
+  },
+  {
+    "Id": "vega_bracelet",
+    "Name": "Vega Bracelet",
+    "Description": "A divine high alloy steel bracelet with mythic emerald and dream of reminiscence on Vega String.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Bracelet/vega_bracelet"
+  }
+]

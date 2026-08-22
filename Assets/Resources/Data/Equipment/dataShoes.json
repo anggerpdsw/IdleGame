@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "Id": "leather_shoes",
+    "Name": "Leather Shoes",
+    "Description": "Basic leather shoes stitched with cotton thread and organic glue.",
+    "ItemRarity": 1,
+    "IconKey": "Equipment/Shoes/leather_shoes"
+  },
+  {
+    "Id": "reinforced_leather_shoes",
+    "Name": "Reinforced Leather Shoes",
+    "Description": "Leather shoes reinforced with thick thread and concentrated glue.",
+    "ItemRarity": 2,
+    "IconKey": "Equipment/Shoes/reinforced_leather_shoes"
+  },
+  {
+    "Id": "thick_thread_shoes",
+    "Name": "Thick Thread Shoes",
+    "Description": "Heavy leather shoes with silk thread lacing and strong glue soles.",
+    "ItemRarity": 3,
+    "IconKey": "Equipment/Shoes/thick_thread_shoes"
+  },
+  {
+    "Id": "silk_lined_shoes",
+    "Name": "Silk-Lined Shoes",
+    "Description": "Legendary leather shoes with compound thread weaving and colored glue.",
+    "ItemRarity": 4,
+    "IconKey": "Equipment/Shoes/silk_lined_shoes"
+  },
+  {
+    "Id": "azureworm_shoes",
+    "Name": "Azureworm Shoes",
+    "Description": "Mythic leather shoes with azureworm silk upper and super glue soles.",
+    "ItemRarity": 5,
+    "IconKey": "Equipment/Shoes/azureworm_shoes"
+  },
+  {
+    "Id": "vega_shoes",
+    "Name": "Vega Shoes",
+    "Description": "Divine leather shoes with Vega String weave, compound glue, and elemental essence infusion.",
+    "ItemRarity": 6,
+    "IconKey": "Equipment/Shoes/vega_shoes"
+  }
+]
