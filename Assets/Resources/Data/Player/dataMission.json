@@ -5,8 +5,8 @@
             "description": "Defeat monsters in battle",
             "type": 0,
             "targetId": "",
-            "minCount": 1000,
-            "maxCount": 5000,
+            "minCount": 5000,
+            "maxCount": 100000,
             "reward": {
                 "gold": 500,
                 "gem": 5,
@@ -20,7 +20,7 @@
             "name": "Specialist",
             "description": "Hunt specific monster types",
             "type": 1,
-            "targetId": "thorn_golem",
+            "targetId": "Crystal Cluster",
             "minCount": 500,
             "maxCount": 2500,
             "reward": {

@@ -288,6 +288,7 @@ namespace IdleDefenseSurvival.Manager
                 UpgradeSave(saveData);
 
                 ApplyAllData(saveData);
+                _lastLoadedSaveData = saveData;
                 NotifySaveLoaded();
             }
             catch (Exception e)
@@ -300,6 +301,9 @@ namespace IdleDefenseSurvival.Manager
                 _isLoading = false;
             }
         }
+
+        private SaveData _lastLoadedSaveData;
+        public SaveData LastLoadedSaveData => _lastLoadedSaveData;
 
         private void NotifySaveLoaded()
         {
