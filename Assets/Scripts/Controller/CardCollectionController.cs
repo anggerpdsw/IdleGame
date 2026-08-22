@@ -14,6 +14,7 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addSlotButton;
         [SerializeField] private TextMeshProUGUI _slotMaxCount;
+        [SerializeField] private TextMeshProUGUI _slotMax2;
         [SerializeField] private TextMeshProUGUI _nextSlotCostGem;
         
         private readonly int[] _rollAmounts = { 1, 10, 100 };
@@ -31,6 +32,7 @@ namespace IdleDefenseSurvival.Controller
         {
             _slotMaxCount.text = 
                 $"{CardManager.Instance.EquippedCardCount}/{CardManager.Instance.UnlockedSlotCount}";
+            _slotMax2.text = _slotMaxCount.text;
             
             _nextSlotCostGem.text = 
                 CardManager.Instance.UnlockedSlotCount == CardManager.Instance.MaxSlots 

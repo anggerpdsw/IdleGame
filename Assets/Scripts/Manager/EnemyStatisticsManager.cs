@@ -56,16 +56,15 @@ namespace IdleDefenseSurvival.Manager
         // -------------------------------------------------------------------
         public void Register(EnemyAi enemy)
         {
-            if (enemy == null || _activeEnemies.Contains(enemy)) return;
-            _activeEnemies.Add(enemy);
-            _isDirty = true;
+            if (enemy == null || !_activeEnemies.Add(enemy)) return;
+            MarkDirty();
         }
 
         public void Unregister(EnemyAi enemy)
         {
             if (enemy == null) return;
-            _activeEnemies.Remove(enemy);
-            _isDirty = true;
+            if (_activeEnemies.Remove(enemy))
+                MarkDirty();
         }
 
         // -------------------------------------------------------------------
@@ -96,6 +95,8 @@ namespace IdleDefenseSurvival.Manager
         {
             if (!_notificationPending) return;
             _notificationPending = false;
+            // Hitung cache sebelum memberitahu subscriber
+            EnsureCalculated();
             OnStatisticsChanged?.Invoke();
         }
 
@@ -106,27 +107,21 @@ namespace IdleDefenseSurvival.Manager
         {
             if (!_isDirty) return;
 
-            int count = _activeEnemies.Count;
-            if (count == 0)
-            {
-                ResetCache();
-                _isDirty = false;
-                return;
-            }
-
             float sumHealth = 0f, sumAttack = 0f, sumDefense = 0f, sumSpeed = 0f, sumEvasion = 0f;
             EnemyAi strongest = null;
             EnemyAi weakest = null;
             float maxHealth = float.MinValue;
             float minHealth = float.MaxValue;
-            int bossCount = 0;
+            int validCount = 0, bossCount = 0;
 
             // Single pass over active enemies — O(n), zero allocations
             foreach (var enemy in _activeEnemies)
             {
                 if (enemy == null) continue;
+                if (enemy.CurrentHealth <= 0) continue;
+                validCount++;
 
-                float health = enemy.CurrentHealth; // requires public property or method
+                float health = enemy.CurrentHealth;
                 float attack = enemy.EnemyAttackDamage;
                 float defense = enemy.DefenseAmount;
                 float speed = enemy.MoveSpeed;
@@ -144,14 +139,14 @@ namespace IdleDefenseSurvival.Manager
                 if (enemy.Role == Role.BOSS) bossCount++;
             }
 
-            _cachedAvgHealth = sumHealth / count;
-            _cachedAvgAttack = sumAttack / count;
-            _cachedAvgDefense = sumDefense / count;
-            _cachedAvgSpeed = sumSpeed / count;
-            _cachedAvgEvasion = sumEvasion / count;
+            _cachedAvgHealth = sumHealth / validCount;
+            _cachedAvgAttack = sumAttack / validCount;
+            _cachedAvgDefense = sumDefense / validCount;
+            _cachedAvgSpeed = sumSpeed / validCount;
+            _cachedAvgEvasion = sumEvasion / validCount;
             _cachedStrongest = strongest;
             _cachedWeakest = weakest;
-            _cachedAliveCount = count;
+            _cachedAliveCount = validCount;
             _cachedBossCount = bossCount;
 
             _isDirty = false;

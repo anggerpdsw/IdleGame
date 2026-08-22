@@ -31,5 +31,8 @@ namespace IdleDefenseSurvival.Data
 
         // Crafting system
         public CraftQueueSaveData craftQueue;
+
+        // Mission System
+        public List<MissionInstance> missions = new();
     }
 }

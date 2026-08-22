@@ -21,12 +21,8 @@ namespace IdleDefenseSurvival.Enemy
         [SerializeField] private bool _testMode = false;
         [SerializeField] private Role _testRole = Role.Fighter;
 
-        private EnemyDatabase _enemyDatabase;
+        private EnemyDatabase EnemyDatabase => DatabaseJSONCache.DatabaseEnemy;
         private float _timer;
-        private float _totalWeight;
-
-        private readonly Dictionary<string, GameObject> _enemyPrefabCache = new();
-        private readonly Dictionary<string, Sprite> _enemySpriteCache = new();
 
         // Public properties for WaveManager integration
         public float SpawnInterval
@@ -48,16 +44,13 @@ namespace IdleDefenseSurvival.Enemy
         
         private void Start()
         {
-            LoadEnemyDatabase();
-            BuildCache();
-
             WaveManager.Instance.RegisterSpawner(this);
             WaveManager.Instance.ApplySpawnData();
         }
 
         private void Update()
         {
-            if (_player == null || _enemyDatabase == null) return;
+            if (_player == null || EnemyDatabase == null) return;
             if (WaveManager.Instance.State != WaveState.ActiveWave) return;
 
             _timer += Time.deltaTime;
@@ -98,7 +91,7 @@ namespace IdleDefenseSurvival.Enemy
 
             Vector2 spawnPos = GetSpawnPosition();
 
-            GameObject prefab = GetEnemyPrefab(spawnedEnemy.prefabName);
+            GameObject prefab = EnemyResources.GetEnemyPrefab(spawnedEnemy.prefabName);
 
             if (prefab == null)
             {
@@ -116,13 +109,14 @@ namespace IdleDefenseSurvival.Enemy
                 return;
             }
 
-            if (_enemySpriteCache.TryGetValue(spawnedEnemy.id, out Sprite sprite))
+            Sprite sprite = EnemyResources.GetEnemySprite(spawnedEnemy.id);
+            if (sprite != null)
             {
                 enemyAi.SetSprite(sprite);
             }
-            else
+            else if (_debug)
             {
-                if (_debug) Debug.LogWarning($"Sprite '{spawnedEnemy.id}' not found.");
+                Debug.LogWarning($"[EnemySpawner] Sprite '{spawnedEnemy.id}' not found.");
             }
             
             // Flip berdasarkan posisi player
@@ -133,58 +127,6 @@ namespace IdleDefenseSurvival.Enemy
 
             // Register with statistics service
             EnemyStatisticsManager.Instance?.Register(enemyAi);
-        }
-
-        private void LoadEnemyDatabase()
-        {
-            TextAsset jsonFile = Resources.Load<TextAsset>("Data/dataEnemy");
-            if (jsonFile == null)
-            {
-                if (_debug) Debug.LogError("Failed to load enemy database at Resources/Data/dataEnemy.json");
-                return;
-            }
-
-            _enemyDatabase = JsonConvert.DeserializeObject<EnemyDatabase>(jsonFile.text);
-            if (_enemyDatabase == null || _enemyDatabase.enemies == null || _enemyDatabase.enemies.Length == 0)
-            {
-                if (_debug) Debug.LogError("Enemy database is empty or invalid.");
-                return;
-            }
-
-            _totalWeight = 0f;
-            foreach (var enemy in _enemyDatabase.enemies)
-            {
-                _totalWeight += enemy.spawnWeight;
-            }
-        }
-
-        private void BuildCache()
-        {
-            // Semua sprite individual
-            Sprite[] singleSprites = Resources.LoadAll<Sprite>("Art/Enemy");
-            foreach (var sprite in singleSprites)
-            {
-                if (!_enemySpriteCache.ContainsKey(sprite.name))
-                    _enemySpriteCache.Add(sprite.name, sprite);
-            }
-
-            // Monsterpack
-            Sprite[] monsterPack = Resources.LoadAll<Sprite>("Art/Enemy/Monsterpack");
-            foreach (var sprite in monsterPack)
-            {
-                if (!_enemySpriteCache.ContainsKey(sprite.name))
-                    _enemySpriteCache.Add(sprite.name, sprite);
-            }
-        }
-
-        private GameObject GetEnemyPrefab(string prefabName)
-        {
-            if (_enemyPrefabCache.TryGetValue(prefabName, out GameObject prefab)) return prefab;
-            
-            prefab = Resources.Load<GameObject>($"Enemies/{prefabName}");
-            if (prefab != null) _enemyPrefabCache.Add(prefabName, prefab);
-
-            return prefab;
         }
 
         private Vector2 GetSpawnPosition()
@@ -223,7 +165,7 @@ namespace IdleDefenseSurvival.Enemy
 
         private EnemyData GetRandomEnemy()
         {
-            if (_enemyDatabase == null || _enemyDatabase.enemies.Length == 0) return null;
+            if (EnemyDatabase == null || EnemyDatabase.enemies.Length == 0) return null;
             if (_testMode)
                 return GetRandomEnemyByRole(_testRole);
             return GetRandomEnemyByWeight();
@@ -233,7 +175,7 @@ namespace IdleDefenseSurvival.Enemy
         {
             float totalWeight = 0f;
             // Hitung total weight hanya untuk role yang dipilih.
-            foreach (EnemyData enemy in _enemyDatabase.enemies)
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
             {
                 if (enemy == null) continue;
                 if (enemy.role != role) continue;
@@ -244,7 +186,7 @@ namespace IdleDefenseSurvival.Enemy
             float randomValue = Random.Range(0f, totalWeight);
             float cumulativeWeight = 0f;
 
-            foreach (EnemyData enemy in _enemyDatabase.enemies)
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
             {
                 if (enemy == null) continue;
                 if (enemy.role != role) continue;
@@ -258,19 +200,33 @@ namespace IdleDefenseSurvival.Enemy
 
         private EnemyData GetRandomEnemyByWeight()
         {
-            float randomValue = Random.Range(0f, _totalWeight);
-            float cumulativeWeight = 0f;
-
-            foreach (EnemyData enemy in _enemyDatabase.enemies)
+            if (EnemyDatabase?.enemies == null) return null;
+            int currentWave = WaveManager.Instance.CurrentWave;
+            float totalWeight = 0f;
+            // First pass: calculate weight of eligible enemies only.
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
             {
-                if (enemy == null) continue;
-                if (WaveManager.Instance.CurrentWave <= 15)
-                    if (enemy.role == Role.Caster || enemy.role == Role.Ranger || enemy.role == Role.BOSS)  continue;
-                cumulativeWeight += enemy.spawnWeight;
-                if (randomValue <= cumulativeWeight)
-                    return enemy;
+                if (enemy == null || enemy.spawnWeight <= 0f) continue;
+                if (currentWave <= 15 &&
+                    (enemy.role == Role.Caster ||
+                    enemy.role == Role.Ranger ||
+                    enemy.role == Role.BOSS)) continue;
+                totalWeight += enemy.spawnWeight;
             }
-
+            if (totalWeight <= 0f) return null;
+            float randomValue = Random.Range(0f, totalWeight);
+            float cumulativeWeight = 0f;
+            // Second pass: weighted selection.
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (enemy == null || enemy.spawnWeight <= 0f) continue;
+                if (currentWave <= 15 &&
+                    (enemy.role == Role.Caster ||
+                    enemy.role == Role.Ranger ||
+                    enemy.role == Role.BOSS)) continue;
+                cumulativeWeight += enemy.spawnWeight;
+                if (randomValue <= cumulativeWeight) return enemy;
+            }
             return null;
         }
 

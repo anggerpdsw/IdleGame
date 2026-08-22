@@ -1,6 +1,7 @@
 using System;
 using IdleDefenseSurvival.Core.Interfaces;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Mission;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -101,6 +102,13 @@ namespace IdleDefenseSurvival.Economy
 
             // Catat earning
             SaveManager.Instance?.AddEarn(type, amount);
+
+            // =====================================================
+            // MISSION PROGRESS
+            // Currency sudah benar-benar berhasil ditambahkan.
+            // =====================================================
+            MissionService.Instance?.UpdateProgress(
+                MissionEventType.CurrencyEarned, type.ToString(), amount);
 
             // Fire event (action + UnityEvent)
             RaiseCurrencyChanged(type, oldAmount, newAmount);

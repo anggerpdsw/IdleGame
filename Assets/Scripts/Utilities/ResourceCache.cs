@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using IdleDefenseSurvival.Data;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Core
@@ -14,10 +16,11 @@ namespace IdleDefenseSurvival.Core
 
         public static T Load<T>(string path) where T : Object
         {
-            if (Cache.TryGetValue(path, out var asset))
+            string key = $"{typeof(T).FullName}:{path}";
+            if (Cache.TryGetValue(key, out var asset))
                 return asset as T;
             T loaded = Resources.Load<T>(path);
-            if (loaded != null) Cache[path] = loaded;
+            if (loaded != null) Cache[key] = loaded;
             return loaded;
         }
 
@@ -89,4 +92,53 @@ namespace IdleDefenseSurvival.Core
         public static Sprite GetRewardType(string type)
             => ResourceCache.Load<Sprite>($"Art/Item/{type}");
     }
+
+    public static class EnemyResources
+    {
+        public static Sprite GetEnemySprite(string id)
+        {
+            // First: individual enemy sprites
+            Sprite sprite = ResourceCache.Load<Sprite>($"Art/Enemy/{id}");
+            if (sprite != null) return sprite;
+            // Fallback: Monsterpack spritesheet
+            return ResourceCache.LoadSpriteFromSheet("Art/Enemy/Monsterpack", id);
+        }
+
+        public static GameObject GetEnemyPrefab(string prefabName)
+        {
+            return ResourceCache.Load<GameObject>($"Enemies/{prefabName}");
+        }
+
+    }
+
+    public static class DatabaseJSONCache
+    {
+        private const string DATA_ENEMY = "Data/dataEnemy";
+        private static EnemyDatabase _databaseEnemy;
+        public static EnemyDatabase DatabaseEnemy
+        { get { if (_databaseEnemy == null) LoadEnemy(); return _databaseEnemy; }}
+        private static void LoadEnemy()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_ENEMY);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_ENEMY}.json");
+                return;
+            }
+            var database = JsonConvert.DeserializeObject<EnemyDatabase>(jsonFile.text);
+            if (database == null || database.enemies == null || database.enemies.Length == 0)
+            {
+                Debug.LogError($"Enemy database in {DATA_ENEMY} is empty or invalid.");
+                return;
+            }
+            _databaseEnemy = database;
+        }
+        public static void ClearAll()
+        {
+            _databaseEnemy = null;
+        }
+    }
+    
+
+    
 }

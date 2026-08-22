@@ -28,6 +28,18 @@ namespace IdleDefenseSurvival
     public enum SlowType { Permanent, Temporary, Aura }
 
     /// <summary>
+    /// Mission progress event types for the event system
+    /// </summary>
+    public enum MissionEventType
+    {
+        EnemyKilled = 0,
+        SpecificEnemyKilled = 1,
+        CurrencyEarned = 2,
+        WaveCompleted = 3,
+        BossKilled = 4
+    }
+
+    /// <summary>
     /// Card effect types - separate from SkillType (player stats).
     /// Used for special card behaviors like auras, on-hit effects, etc.
     /// </summary>

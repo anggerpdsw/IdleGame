@@ -11,6 +11,7 @@ namespace IdleDefenseSurvival.Manager
     /// </summary>
     public sealed class AttributeStatLoader : MonoBehaviour
     {
+        [SerializeField] private bool _debug = false;
         private static AttributeStatLoader _instance;
         public static AttributeStatLoader Instance => _instance;
 
@@ -42,7 +43,7 @@ namespace IdleDefenseSurvival.Manager
             LoadMainAttributeProgression();
             LoadSecondaryAttributeProgression();
             IsLoaded = true;
-            Debug.Log("[AttributeStatLoader] Loaded main and secondary attribute progression databases.");
+            if (_debug) Debug.Log("[AttributeStatLoader] Loaded main and secondary attribute progression databases.");
         }
 
         private void LoadMainAttributeProgression()

@@ -13,6 +13,8 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Save;
 using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Mission;
+using System.Linq;
 // ponytail: CraftTransactionJournal removed; re-add when journal feature returns.
 
 namespace IdleDefenseSurvival.Manager
@@ -324,6 +326,7 @@ namespace IdleDefenseSurvival.Manager
             data.dailyReward ??= new DailyRewardSaveData();
             data.cardInventory ??= new CardInventoryData();
             data.inventory ??= new Dictionary<string, long>();
+            data.missions ??= new List<MissionInstance>();
         }
 
         public void DeleteAll()
@@ -646,6 +649,7 @@ namespace IdleDefenseSurvival.Manager
             var inventoryData = InventoryService.Instance != null ? InventoryService.Instance.GetSaveData() : null;
             var equipmentData = EquipmentService.Instance != null ? EquipmentService.Instance.GetSaveData() : null;
             var craftQueue = CraftingManager.Instance != null ? CraftingManager.Instance.GetQueueSaveData() : null;
+            var missions = MissionService.Instance != null ? MissionService.Instance.GetAllMissions().ToList() : new List<MissionInstance>();
 
             return new SaveData
             {
@@ -663,7 +667,8 @@ namespace IdleDefenseSurvival.Manager
                 cardInventory = cardInventory,
                 inventoryData = inventoryData,
                 equipmentData = equipmentData,
-                craftQueue = craftQueue
+                craftQueue = craftQueue,
+                missions = missions
             };
         }
 

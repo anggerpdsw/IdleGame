@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using IdleDefenseSurvival.Mission;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -37,6 +38,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<ModifierManager>();
             EnsureSingleton<PlayerStatsManager>();
             EnsureSingleton<BaseStatLoader>();
+            EnsureSingleton<MissionService>();
             EnsureSingleton<EnemyStatisticsManager>();
             EnsureSingleton<AudioManager>();
             EnsureSingleton<AdvertisingManager>();
@@ -60,21 +62,25 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<CraftingManager>();
             EnsureSingleton<UpgradeService>();
 
+            // Right After SaveData Loaded do this
             if (SaveManager.Instance?.IsSaveLoaded == true) {
                 // Dev: fill inventory once when the save is truly fresh (no save file yet)
                 InventorySampleSeeder.SeedIfEmpty();
             } else {
-                SaveManager.OnSaveLoaded += OnSaveLoaded_SeedIfEmpty;
+                SaveManager.OnSaveLoaded += OnSaveLoaded;
             }
             // Load save data AFTER all managers exist (SaveManager.Start() will handle loading via coroutine)
             IsInitialized = true;
             StartCoroutine(LoadMainMenu());
         }
 
-        private void OnSaveLoaded_SeedIfEmpty()
+        private void OnSaveLoaded()
         {
-            SaveManager.OnSaveLoaded -= OnSaveLoaded_SeedIfEmpty;
+            SaveManager.OnSaveLoaded -= OnSaveLoaded;
             InventorySampleSeeder.SeedIfEmpty();
+
+            // Initialize mission system after save is loaded
+            MissionService.Instance?.Initialize();
         }
 
         private IEnumerator LoadMainMenu()

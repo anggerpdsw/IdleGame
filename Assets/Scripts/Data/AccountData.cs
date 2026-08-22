@@ -9,6 +9,9 @@ namespace IdleDefenseSurvival.Data
         public long currentExp = 0;
         public long totalExp = 0;
 
+        // Mission System
+        public int maxMission = 1;
+
         // Crafting & Blacksmithing
         public int craftingLevel = 1;
         public long craftingCurrentExp = 0;

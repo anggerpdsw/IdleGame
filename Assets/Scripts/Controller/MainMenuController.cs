@@ -3,6 +3,9 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.UI;
 using TMPro;
 using UnityEngine.UI;
+using IdleDefenseSurvival.Mission;
+using IdleDefenseSurvival.Data;
+using System.Linq;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -39,6 +42,7 @@ namespace IdleDefenseSurvival.Controller
         [Header("Mission")]
         [SerializeField] private Button _missionButton;
         [SerializeField] private GameObject _missionBadge;
+        [SerializeField] private DailyRewardUI _missionPanelPrefab;
 
         private void Start()
         {
@@ -57,10 +61,13 @@ namespace IdleDefenseSurvival.Controller
             if (_nextButton != null) _nextButton.onClick.AddListener(OnNextClicked);
             if (_startButton != null) _startButton.onClick.AddListener(OnStartGame);
             if (_dailyButton != null) _dailyButton.onClick.AddListener(OnShowDaily);
-            DailyRewardManager.OnClaimableStateChanged += RefreshBadge;
+            if (_missionButton != null) _missionButton.onClick.AddListener(OnShowMission);
+            DailyRewardManager.OnClaimableStateChanged += RefreshDailyBadge;
             DailyRewardManager.OnInitialized += OnDailyRewardInitialized;
             if (DailyRewardManager.Instance != null && DailyRewardManager.Instance.Service != null)
-                RefreshBadge(DailyRewardManager.Instance.Service.HasClaimableReward);
+                RefreshDailyBadge(DailyRewardManager.Instance.Service.HasClaimableReward);
+
+            SubscribeMissionEvents();
         }
 
         private void OnDisable()
@@ -73,13 +80,57 @@ namespace IdleDefenseSurvival.Controller
             if (_nextButton != null) _nextButton.onClick.RemoveListener(OnNextClicked);
             if (_startButton != null) _startButton.onClick.RemoveListener(OnStartGame);
             if (_dailyButton != null) _dailyButton.onClick.RemoveListener(OnShowDaily);
-            DailyRewardManager.OnClaimableStateChanged -= RefreshBadge;
+            if (_missionButton != null) _missionButton.onClick.RemoveListener(OnShowMission);
+            DailyRewardManager.OnClaimableStateChanged -= RefreshDailyBadge;
             DailyRewardManager.OnInitialized -= OnDailyRewardInitialized;
+
+            UnsubscribeMissionEvents();
 
             SaveManager.OnSaveLoaded -= OnSaveLoaded;
         }
 
-        private void OnDailyRewardInitialized() => RefreshBadge(DailyRewardManager.Instance.Service.HasClaimableReward);
+        private void SubscribeMissionEvents()
+        {
+            var service = MissionService.Instance;
+            if (service == null) return;
+
+            service.OnMissionsChanged += HandleMissionsChanged;
+            service.OnMissionStatusChanged += HandleMissionStatusChanged;
+            service.OnMissionProgressChanged += HandleMissionProgressChanged;
+            UpdateMissionBadge();
+        }
+
+        private void UnsubscribeMissionEvents()
+        {
+            var service = MissionService.Instance;
+            if (service == null) return;
+
+            service.OnMissionsChanged -= HandleMissionsChanged;
+            service.OnMissionStatusChanged -= HandleMissionStatusChanged;
+            service.OnMissionProgressChanged -= HandleMissionProgressChanged;
+        }
+
+        private void HandleMissionsChanged() => UpdateMissionBadge();
+        private void HandleMissionStatusChanged(MissionInstance _) => UpdateMissionBadge();
+        private void HandleMissionProgressChanged(MissionInstance _) => UpdateMissionBadge();
+
+        private void UpdateMissionBadge()
+        {
+            var service = MissionService.Instance;
+            if (service == null)
+            {
+                _missionBadge?.SetActive(false);
+                return;
+            }
+
+            bool show = service.GetAllMissions().Any(m =>
+                m.status == MissionStatus.Active ||
+                (m.status == MissionStatus.Completed && !m.rewardClaimed));
+
+            _missionBadge?.SetActive(show);
+        }
+
+        private void OnDailyRewardInitialized() => RefreshDailyBadge(DailyRewardManager.Instance.Service.HasClaimableReward);
 
         private void OnSaveLoaded() => InitializeTierSelection();
 
@@ -89,7 +140,8 @@ namespace IdleDefenseSurvival.Controller
             RefreshUI();
         }
 
-        private void RefreshBadge(bool visible) => _dailyBadge.SetActive(visible);
+        private void RefreshDailyBadge(bool visible) => _dailyBadge.SetActive(visible);
+        private void RefreshMissionBadge(bool visible) => _missionBadge.SetActive(visible);
 
         private void RefreshUI()
         {
@@ -119,9 +171,8 @@ namespace IdleDefenseSurvival.Controller
         public void OnLoadInventory() => InventoryManager.Instance.OpenInventory();
         public void OnLoadCrafting() => CraftingManager.Instance.OpenCrafting();
         
-        private void OnShowDaily() {
-            UIManager.Instance.ShowPopup(_dailyRewardPanelPrefab);
-        }
+        private void OnShowDaily() => UIManager.Instance.ShowPopup(_dailyRewardPanelPrefab);
+        private void OnShowMission() => UIManager.Instance.ShowPopup(_missionPanelPrefab);
 
         private void OnActiveVIP()
         {

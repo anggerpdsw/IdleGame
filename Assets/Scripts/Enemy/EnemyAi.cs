@@ -10,6 +10,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using System.Collections.Generic;
 using UnityEngine.Pool;
+using IdleDefenseSurvival.Mission;
 
 /// <summary>
 /// Handles basic enemy AI for the auto‑shooter game.
@@ -568,7 +569,7 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public void ReduceMaxHealth(float percent)
         {
-            percent = Mathf.Clamp01(percent);
+            percent = Mathf.Clamp01(percent * 0.01f);
             _maxHealth *= 1f - percent;
             if (_currentHealth > _maxHealth) _currentHealth = _maxHealth;
             _enemyHealthBarManager.UpdateEnemyHealth(this, _currentHealth);
@@ -636,8 +637,34 @@ namespace IdleDefenseSurvival.Enemy
                 _ultimateManager.TrySpawn(UltimateDMG.Cloud.ToString(), transform.position, _playerComponent);
             }
 
+            EnemyKillMission();
+
             // TODO: Add death animation, particle effects, etc.
             Destroy(gameObject);
+        }
+
+        private void EnemyKillMission()
+        {
+            if (EnemyData == null) return;
+
+            var missionService = MissionService.Instance;
+            if (missionService == null) return;
+
+            // Any enemy whose Role == BOSS
+            // counts toward BossKilled missions.
+            if (EnemyData.isBoss)
+            {
+                missionService.UpdateProgress(MissionEventType.BossKilled, EnemyData.id, 1);
+                return;
+            }
+
+            // Generic kill mission:
+            // Any non-boss enemy counts toward generic EnemyKilled missions.
+            missionService.UpdateProgress(MissionEventType.EnemyKilled, EnemyData.id, 1);
+
+            // Specific enemy mission:
+            // "Kill X Goblins", "Kill X Slimes", etc.
+            missionService.UpdateProgress(MissionEventType.SpecificEnemyKilled, EnemyData.id, 1);
         }
 
         /// <summary>

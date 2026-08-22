@@ -1,0 +1,115 @@
+{
+    "missions": [{
+            "id": "kill_monster",
+            "name": "Monster Hunter",
+            "description": "Defeat monsters in battle",
+            "type": 0,
+            "targetId": "",
+            "minCount": 1000,
+            "maxCount": 5000,
+            "reward": {
+                "gold": 500,
+                "gem": 5,
+                "meat": 10
+            },
+            "claimCooldownMinutes": 30,
+            "cancelCooldownMinutes": 15
+        },
+        {
+            "id": "kill_specific_monster",
+            "name": "Specialist",
+            "description": "Hunt specific monster types",
+            "type": 1,
+            "targetId": "thorn_golem",
+            "minCount": 500,
+            "maxCount": 2500,
+            "reward": {
+                "gold": 15000,
+                "gem": 10,
+                "meat": 25
+            },
+            "claimCooldownMinutes": 40,
+            "cancelCooldownMinutes": 20
+        },
+        {
+            "id": "kill_boss",
+            "name": "Boss Slayer",
+            "description": "Defeat powerful boss enemies",
+            "type": 4,
+            "targetId": "BOSS",
+            "minCount": 300,
+            "maxCount": 1000,
+            "reward": {
+                "gold": 20000,
+                "gem": 15,
+                "meat": 50
+            },
+            "claimCooldownMinutes": 60,
+            "cancelCooldownMinutes": 30
+        },
+        {
+            "id": "collect_gold",
+            "name": "Gold Collector",
+            "description": "Accumulate gold through your adventures",
+            "type": 2,
+            "targetId": "Gold",
+            "minCount": 50000,
+            "maxCount": 100000,
+            "reward": {
+                "gold": 10000,
+                "gem": 2,
+                "meat": 20
+            },
+            "claimCooldownMinutes": 45,
+            "cancelCooldownMinutes": 20
+        },
+        {
+            "id": "collect_gem",
+            "name": "Gem Hunter",
+            "description": "Find precious gems",
+            "type": 2,
+            "targetId": "Gem",
+            "minCount": 10,
+            "maxCount": 25,
+            "reward": {
+                "gold": 50000,
+                "gem": 1,
+                "meat": 300
+            },
+            "claimCooldownMinutes": 60,
+            "cancelCooldownMinutes": 30
+        },
+        {
+            "id": "collect_meat",
+            "name": "Butcher",
+            "description": "Collect meat through your adventures",
+            "type": 2,
+            "targetId": "Meat",
+            "minCount": 1250,
+            "maxCount": 5000,
+            "reward": {
+                "gold": 50000,
+                "gem": 3,
+                "meat": 10
+            },
+            "claimCooldownMinutes": 30,
+            "cancelCooldownMinutes": 15
+        },
+        {
+            "id": "complete_waves",
+            "name": "Wave Survivor",
+            "description": "Complete waves of enemies",
+            "type": 3,
+            "targetId": "",
+            "minCount": 250,
+            "maxCount": 600,
+            "reward": {
+                "gold": 3000,
+                "gem": 20,
+                "meat": 30
+            },
+            "claimCooldownMinutes": 45,
+            "cancelCooldownMinutes": 25
+        }
+    ]
+}

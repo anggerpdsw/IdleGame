@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Mission;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -260,6 +261,11 @@ namespace IdleDefenseSurvival.Manager
 
         private void CompleteWave()
         {
+            // =====================================================
+            // 1 WAVE COMPLETED
+            MissionService.Instance?.UpdateProgress(MissionEventType.WaveCompleted, null, 1);
+            // =====================================================
+            
             // Record progress before transitioning to inter‑wave
             SaveManager.Instance.UpdateHighestWave(CurrentTier, CurrentWave);
 
