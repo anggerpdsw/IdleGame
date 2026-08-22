@@ -23,6 +23,7 @@ namespace IdleDefenseSurvival.UI.Inventory
         [SerializeField] private GameObject _newIndicator;
         [SerializeField] private Slider _durabilityBar;
         [SerializeField] private TextMeshProUGUI _levelText;
+        [SerializeField] private GameObject _maxLevelIndicator;
 
         private InventoryUI _parentUI;
         private int _slotIndex;        // UI grid position (0..capacity-1, fixed)
@@ -83,6 +84,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (_favoriteIndicator != null) _favoriteIndicator.SetActive(item.IsFavorite);
             if (_lockedIndicator != null) _lockedIndicator.SetActive(item.IsLocked);
             if (_newIndicator != null) _newIndicator.SetActive(item.IsNew);
+            if (_maxLevelIndicator != null) _maxLevelIndicator.SetActive(item.Level >= item.MaxLevel);
 
             // Durability (for equipment)
             if (_durabilityBar != null)
@@ -104,7 +106,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                 _levelText.text = item.Level > 1 ? $"Lv.{item.Level}" : "";
                 _levelText.enabled = item.Level > 1;
             }
-
+            
             gameObject.name = $"Slot_{_slotIndex}_{item.ItemId}";
         }
 
@@ -124,6 +126,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (_favoriteIndicator != null) _favoriteIndicator.SetActive(false);
             if (_lockedIndicator != null) _lockedIndicator.SetActive(false);
             if (_newIndicator != null) _newIndicator.SetActive(false);
+            if (_maxLevelIndicator != null) _maxLevelIndicator.SetActive(false);
             if (_durabilityBar != null) _durabilityBar.gameObject.SetActive(false);
             if (_levelText != null) _levelText.enabled = false;
 

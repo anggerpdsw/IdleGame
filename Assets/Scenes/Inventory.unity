@@ -467,11 +467,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 187302397}
+  m_Father: {fileID: 1420211878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &32406301
@@ -610,6 +610,7 @@ RectTransform:
   - {fileID: 207122137}
   - {fileID: 1949259223}
   - {fileID: 1371365352}
+  - {fileID: 152973874}
   - {fileID: 191827644}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -636,8 +637,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 1949259222}
   _emptyIndicator: {fileID: 1145608520}
   _durabilityBar: {fileID: 2004767341}
-  _enhanceIndicator: {fileID: 191827643}
-  _enhanceText: {fileID: 152973875}
+  _levelText: {fileID: 152973875}
+  _maxLevelIndicator: {fileID: 191827643}
   _setBonusGlow: {fileID: 1371365351}
   _unlockButton: {fileID: 1949259226}
   _unlockButtonText: {fileID: 833412480}
@@ -1545,11 +1546,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 837660899}
+  m_Father: {fileID: 1951023026}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &134769197
@@ -1682,11 +1683,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 191827644}
+  m_Father: {fileID: 40096004}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &152973875
@@ -2271,7 +2272,7 @@ GameObject:
   - component: {fileID: 187302399}
   - component: {fileID: 187302398}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2288,8 +2289,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 32406300}
+  m_Children: []
   m_Father: {fileID: 1420211878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -2347,7 +2347,7 @@ GameObject:
   - component: {fileID: 191827646}
   - component: {fileID: 191827645}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2364,8 +2364,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 152973874}
+  m_Children: []
   m_Father: {fileID: 40096004}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -2649,6 +2648,7 @@ RectTransform:
   - {fileID: 836130599}
   - {fileID: 717696353}
   - {fileID: 1994943499}
+  - {fileID: 383892860}
   - {fileID: 1292835981}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2675,8 +2675,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 717696352}
   _emptyIndicator: {fileID: 833970763}
   _durabilityBar: {fileID: 2032592198}
-  _enhanceIndicator: {fileID: 1292835980}
-  _enhanceText: {fileID: 383892861}
+  _levelText: {fileID: 383892861}
+  _maxLevelIndicator: {fileID: 1292835980}
   _setBonusGlow: {fileID: 1994943498}
   _unlockButton: {fileID: 717696356}
   _unlockButtonText: {fileID: 997311963}
@@ -2730,7 +2730,7 @@ GameObject:
   - component: {fileID: 241275028}
   - component: {fileID: 241275027}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2747,8 +2747,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1714495972}
+  m_Children: []
   m_Father: {fileID: 1184963351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -2830,6 +2829,7 @@ RectTransform:
   - {fileID: 1347268604}
   - {fileID: 1615916793}
   - {fileID: 118820365}
+  - {fileID: 1634351354}
   - {fileID: 1736282889}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2856,8 +2856,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 1615916792}
   _emptyIndicator: {fileID: 1953071919}
   _durabilityBar: {fileID: 1368600918}
-  _enhanceIndicator: {fileID: 1736282888}
-  _enhanceText: {fileID: 1634351355}
+  _levelText: {fileID: 1634351355}
+  _maxLevelIndicator: {fileID: 1736282888}
   _setBonusGlow: {fileID: 118820364}
   _unlockButton: {fileID: 1615916796}
   _unlockButtonText: {fileID: 1493484807}
@@ -3575,11 +3575,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 574004929}
+  m_Father: {fileID: 1126499677}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &375686474
@@ -3970,11 +3970,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1292835981}
+  m_Father: {fileID: 208714790}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &383892861
@@ -4143,11 +4143,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 583537978}
+  m_Father: {fileID: 759930591}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &441019252
@@ -4790,7 +4790,7 @@ GameObject:
   - component: {fileID: 514822861}
   - component: {fileID: 514822860}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4807,8 +4807,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1558446954}
+  m_Children: []
   m_Father: {fileID: 1085600453}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -5106,7 +5105,7 @@ GameObject:
   - component: {fileID: 534383717}
   - component: {fileID: 534383716}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5123,8 +5122,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1805638604}
+  m_Children: []
   m_Father: {fileID: 549556291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -5206,6 +5204,7 @@ RectTransform:
   - {fileID: 1796600998}
   - {fileID: 2126592310}
   - {fileID: 531871737}
+  - {fileID: 1805638604}
   - {fileID: 534383715}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5232,8 +5231,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 2126592309}
   _emptyIndicator: {fileID: 644686762}
   _durabilityBar: {fileID: 1692520125}
-  _enhanceIndicator: {fileID: 534383714}
-  _enhanceText: {fileID: 1805638605}
+  _levelText: {fileID: 1805638605}
+  _maxLevelIndicator: {fileID: 534383714}
   _setBonusGlow: {fileID: 531871736}
   _unlockButton: {fileID: 2126592313}
   _unlockButtonText: {fileID: 1697920721}
@@ -5448,7 +5447,7 @@ GameObject:
   - component: {fileID: 574004931}
   - component: {fileID: 574004930}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5465,8 +5464,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 375686473}
+  m_Children: []
   m_Father: {fileID: 1126499677}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -5674,7 +5672,7 @@ GameObject:
   - component: {fileID: 583537980}
   - component: {fileID: 583537979}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5691,8 +5689,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 441019251}
+  m_Children: []
   m_Father: {fileID: 759930591}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -5911,6 +5908,7 @@ RectTransform:
   - {fileID: 2074267793}
   - {fileID: 2063302000}
   - {fileID: 1996104561}
+  - {fileID: 1879980747}
   - {fileID: 1636517314}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5937,8 +5935,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 2063301999}
   _emptyIndicator: {fileID: 1736076716}
   _durabilityBar: {fileID: 1040540860}
-  _enhanceIndicator: {fileID: 1636517313}
-  _enhanceText: {fileID: 1879980748}
+  _levelText: {fileID: 1879980748}
+  _maxLevelIndicator: {fileID: 1636517313}
   _setBonusGlow: {fileID: 1996104560}
   _unlockButton: {fileID: 2063302003}
   _unlockButtonText: {fileID: 1348364479}
@@ -7485,6 +7483,7 @@ RectTransform:
   - {fileID: 886126075}
   - {fileID: 1704120514}
   - {fileID: 1821034722}
+  - {fileID: 441019251}
   - {fileID: 583537978}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7511,8 +7510,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 1704120513}
   _emptyIndicator: {fileID: 1814403183}
   _durabilityBar: {fileID: 550199038}
-  _enhanceIndicator: {fileID: 583537977}
-  _enhanceText: {fileID: 441019252}
+  _levelText: {fileID: 441019252}
+  _maxLevelIndicator: {fileID: 583537977}
   _setBonusGlow: {fileID: 1821034721}
   _unlockButton: {fileID: 1704120517}
   _unlockButtonText: {fileID: 1327992186}
@@ -7859,7 +7858,6 @@ MonoBehaviour:
   _equipmentSection: {fileID: 1351705947}
   _equipTypeText: {fileID: 90667219}
   _levelText: {fileID: 158934496}
-  _enhanceText: {fileID: 1510001057}
   _durabilityBar: {fileID: 635776768}
   _durabilityText: {fileID: 1968710309}
   _mainStatsContainer: {fileID: 944530943}
@@ -8668,7 +8666,7 @@ GameObject:
   - component: {fileID: 837660901}
   - component: {fileID: 837660900}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8685,8 +8683,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 134769196}
+  m_Children: []
   m_Father: {fileID: 1951023026}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -10405,6 +10402,7 @@ RectTransform:
   - {fileID: 1242295159}
   - {fileID: 906512790}
   - {fileID: 692009904}
+  - {fileID: 1558446954}
   - {fileID: 514822859}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10431,8 +10429,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 906512789}
   _emptyIndicator: {fileID: 2028121545}
   _durabilityBar: {fileID: 1556580852}
-  _enhanceIndicator: {fileID: 514822858}
-  _enhanceText: {fileID: 1558446955}
+  _levelText: {fileID: 1558446955}
+  _maxLevelIndicator: {fileID: 514822858}
   _setBonusGlow: {fileID: 692009903}
   _unlockButton: {fileID: 906512793}
   _unlockButtonText: {fileID: 801860916}
@@ -10592,6 +10590,7 @@ RectTransform:
   - {fileID: 1657689096}
   - {fileID: 1345508749}
   - {fileID: 1785139780}
+  - {fileID: 375686473}
   - {fileID: 574004929}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10618,8 +10617,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 1345508748}
   _emptyIndicator: {fileID: 641722330}
   _durabilityBar: {fileID: 501073965}
-  _enhanceIndicator: {fileID: 574004928}
-  _enhanceText: {fileID: 375686474}
+  _levelText: {fileID: 375686474}
+  _maxLevelIndicator: {fileID: 574004928}
   _setBonusGlow: {fileID: 1785139779}
   _unlockButton: {fileID: 1345508752}
   _unlockButtonText: {fileID: 1263782103}
@@ -10997,6 +10996,7 @@ RectTransform:
   - {fileID: 575711927}
   - {fileID: 952032587}
   - {fileID: 747599805}
+  - {fileID: 1714495972}
   - {fileID: 241275026}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11061,8 +11061,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 952032586}
   _emptyIndicator: {fileID: 482957598}
   _durabilityBar: {fileID: 897098797}
-  _enhanceIndicator: {fileID: 241275025}
-  _enhanceText: {fileID: 1714495973}
+  _levelText: {fileID: 1714495973}
+  _maxLevelIndicator: {fileID: 241275025}
   _setBonusGlow: {fileID: 747599804}
   _unlockButton: {fileID: 952032590}
   _unlockButtonText: {fileID: 1978271692}
@@ -11682,7 +11682,7 @@ GameObject:
   - component: {fileID: 1292835983}
   - component: {fileID: 1292835982}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11699,8 +11699,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 383892860}
+  m_Children: []
   m_Father: {fileID: 208714790}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -12948,6 +12947,7 @@ RectTransform:
   - {fileID: 1927596795}
   - {fileID: 2121543}
   - {fileID: 1902940892}
+  - {fileID: 32406300}
   - {fileID: 187302397}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -12974,8 +12974,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 2121542}
   _emptyIndicator: {fileID: 1014342921}
   _durabilityBar: {fileID: 48251170}
-  _enhanceIndicator: {fileID: 187302396}
-  _enhanceText: {fileID: 32406301}
+  _levelText: {fileID: 32406301}
+  _maxLevelIndicator: {fileID: 187302396}
   _setBonusGlow: {fileID: 1902940891}
   _unlockButton: {fileID: 2121546}
   _unlockButtonText: {fileID: 812926326}
@@ -14033,11 +14033,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 514822859}
+  m_Father: {fileID: 1085600453}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1558446955
@@ -14986,11 +14986,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1736282889}
+  m_Father: {fileID: 247895335}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1634351355
@@ -15105,7 +15105,7 @@ GameObject:
   - component: {fileID: 1636517316}
   - component: {fileID: 1636517315}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15122,8 +15122,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1879980747}
+  m_Children: []
   m_Father: {fileID: 603075968}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -15806,11 +15805,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 241275026}
+  m_Father: {fileID: 1184963351}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1714495973
@@ -16137,7 +16136,7 @@ GameObject:
   - component: {fileID: 1736282891}
   - component: {fileID: 1736282890}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16154,8 +16153,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1634351354}
+  m_Children: []
   m_Father: {fileID: 247895335}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
@@ -16671,11 +16669,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 534383715}
+  m_Father: {fileID: 549556291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1805638605
@@ -17271,11 +17269,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1636517314}
+  m_Father: {fileID: 603075968}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -80, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1879980748
@@ -17849,6 +17847,7 @@ RectTransform:
   - {fileID: 1562495784}
   - {fileID: 380871401}
   - {fileID: 609755858}
+  - {fileID: 134769196}
   - {fileID: 837660899}
   m_Father: {fileID: 1822532936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -17875,8 +17874,8 @@ MonoBehaviour:
   _lockedOverlay: {fileID: 380871400}
   _emptyIndicator: {fileID: 1681714840}
   _durabilityBar: {fileID: 101417083}
-  _enhanceIndicator: {fileID: 837660898}
-  _enhanceText: {fileID: 134769197}
+  _levelText: {fileID: 134769197}
+  _maxLevelIndicator: {fileID: 837660898}
   _setBonusGlow: {fileID: 609755857}
   _unlockButton: {fileID: 380871404}
   _unlockButtonText: {fileID: 593585029}

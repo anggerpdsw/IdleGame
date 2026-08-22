@@ -7,7 +7,7 @@ namespace IdleDefenseSurvival.UI.Equipment
 {
     /// <summary>
     /// Builds UI view-data for equipment slots.
-    /// All presentation decisions (icon, rarity color, durability text,
+    /// All presentation decisions (icon, rarity color, durability, level text,
     /// set-bonus glow) live here so every equipment UI shares one representation.
     /// </summary>
     public static class EquipmentPresentationService
@@ -61,6 +61,10 @@ namespace IdleDefenseSurvival.UI.Equipment
             data.DurabilityColor = DurabilityService.Instance != null
                 ? DurabilityService.Instance.GetDurabilityColor(source.Item)
                 : DurabilityColorTable.GetColor(data.Durability);
+
+            // Enhance badge
+            data.MaxLevel = source.Item.IsMaxLevel;
+            data.Level = data.Level != string.Empty ? $"Lv.{source.Item.Level}" : string.Empty;
 
             // Set bonus glow
             data.ShowSetBonusGlow = source.SetBonusActive;

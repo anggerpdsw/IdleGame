@@ -82,10 +82,11 @@ namespace IdleDefenseSurvival.Inventory
         public static ItemCategory GetItemCategory(this InventoryItem item)
         {
             if (item == null) return ItemCategory.None;
-            // Equipment identity is determined by EquipmentType (persisted), not DB lookup
-            // because crafted items use generated IDs like "cotton_hat" not in database.
+            // Equipment identified by runtime state, not DB lookup
             if (item.IsEquippable()) return ItemCategory.Equipment;
-            var itemData = item.GetEquipmentData();
+
+            // Non-equipment: query ItemDatabase directly by ItemId (not EquipmentTemplateId)
+            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId);
             return itemData?.Category ?? ItemCategory.None;
         }
 

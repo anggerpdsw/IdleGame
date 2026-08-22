@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Items;
+using IdleDefenseSurvival.Items.Decomposition;
 using IdleDefenseSurvival.Items.Generation;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -99,6 +100,27 @@ namespace IdleDefenseSurvival.Crafting
                     foreach (var recipe in recipes)
                     {
                         if (string.IsNullOrEmpty(recipe.RecipeId)) continue;
+
+                        // Inject decomposed requirements into Ingredients array
+                        var decomposed = DecomposedRequirementResolver.Compute(recipe.Rarity);
+                        if (decomposed.Count > 0)
+                        {
+                            var extra = new List<CraftIngredient>();
+                            foreach (var d in decomposed)
+                            {
+                                extra.Add(new CraftIngredient
+                                {
+                                    ItemId = d.ItemId,
+                                    Count = d.Quantity,
+                                    Consumed = true,
+                                    MinQuality = 0,
+                                    MinLevel = 0
+                                });
+                            }
+                            // Merge: original ingredients + decomposed
+                            recipe.Ingredients = recipe.Ingredients?.Concat(extra).ToArray() ?? extra.ToArray();
+                        }
+                        
                         _allRecipes[recipe.RecipeId] = recipe;
                         totalLoaded++;
 

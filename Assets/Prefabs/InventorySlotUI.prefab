@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9095093613661108520}
   - component: {fileID: 7439766276868558654}
   m_Layer: 5
-  m_Name: Enhanced
+  m_Name: MaxLevel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -406,7 +406,7 @@ MonoBehaviour:
   _newIndicator: {fileID: 8078303301799394324}
   _durabilityBar: {fileID: 2852520938726017014}
   _levelText: {fileID: 6862987505103405981}
-  _enhanceIndicator: {fileID: 407328731804416928}
+  _maxLevelIndicator: {fileID: 407328731804416928}
 --- !u!1 &3759400420001971093
 GameObject:
   m_ObjectHideFlags: 0
@@ -625,14 +625,14 @@ MonoBehaviour:
   m_text: 99
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1037,7 +1037,7 @@ MonoBehaviour:
   m_text: +99
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

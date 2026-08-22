@@ -25,6 +25,9 @@ namespace IdleDefenseSurvival.UI.Equipment
         public Color BorderColor = Color.white;
         public bool ShowBorder;
 
+        public string Level;
+        public bool MaxLevel;
+
         public float Durability;
         public bool ShowDurability;
         public Color DurabilityColor = Color.white;

@@ -74,12 +74,16 @@ namespace IdleDefenseSurvival.UI.Inventory
 
             // Setup tabs
             foreach (var tab in _tabs)
+            {
                 tab.Initialize(this);
+            }
             SetTab(_currentTab);
 
             // Setup info panel
             if (_infoPanel != null)
+            {
                 _infoPanel.Initialize(this);
+            }
 
             _isInitialized = true;
         }
@@ -87,7 +91,9 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void SubscribeEvents()
         {
             if (InventoryService.Instance != null)
+            {
                 InventoryService.Instance.OnInventoryChanged += OnInventoryChanged;
+            }
 
             if (EquipmentService.Instance != null)
             {
@@ -99,7 +105,9 @@ namespace IdleDefenseSurvival.UI.Inventory
         private void UnsubscribeEvents()
         {
             if (InventoryService.Instance != null)
+            {
                 InventoryService.Instance.OnInventoryChanged -= OnInventoryChanged;
+            }
 
             if (EquipmentService.Instance != null)
             {
@@ -110,11 +118,15 @@ namespace IdleDefenseSurvival.UI.Inventory
         #endregion
 
         #region Event Handlers
-        private void OnInventoryChanged(InventoryChangedEventArgs args) 
-            => RefreshUI();
+        private void OnInventoryChanged(InventoryChangedEventArgs args)
+        {
+            RefreshUI();
+        }
 
-        private void OnEquipmentChanged(EquipmentType slot, InventoryItem item) 
-            => RefreshUI();
+        private void OnEquipmentChanged(EquipmentType slot, InventoryItem item)
+        {
+            RefreshUI();
+        }
 
         #endregion
 
@@ -161,9 +173,10 @@ namespace IdleDefenseSurvival.UI.Inventory
                 .ToList();
         }
 
+        // Filter items per active tab. Equipment check uses IsEquippable() to account for crafted items that may not have a database entry but are still equipment.
         private bool TabMatches(InventoryItem item) => _currentTab switch
         {
-            TabType.Equipment => item.GetItemCategory() == ItemCategory.Equipment,
+            TabType.Equipment => item.IsEquippable(),
             TabType.Consumables => item.GetItemCategory() == ItemCategory.Consumable,
             TabType.Materials => item.GetItemCategory() == ItemCategory.Material,
             TabType.Gems => item.GetItemCategory() == ItemCategory.Gem,
@@ -182,7 +195,9 @@ namespace IdleDefenseSurvival.UI.Inventory
         {
             _currentTab = tab;
             foreach (var t in _tabs)
+            {
                 t.SetActive(t.Type == tab);
+            }
             RefreshUI();
         }
 
@@ -247,7 +262,9 @@ namespace IdleDefenseSurvival.UI.Inventory
         public void EndDrag(int targetSlotIndex)
         {
             if (_draggedItem == null) return;
+
             bool success = false;
+
             if (targetSlotIndex >= 0 && targetSlotIndex < _slotUIs.Length)
             {
                 if (targetSlotIndex == _draggedFromSlot)
@@ -270,7 +287,11 @@ namespace IdleDefenseSurvival.UI.Inventory
             ClearDrag();
         }
 
-        public void CancelDrag() => ClearDrag();
+        public void CancelDrag()
+        {
+            ClearDrag();
+        }
+
         private void ClearDrag()
         {
             _draggedItem = null;
