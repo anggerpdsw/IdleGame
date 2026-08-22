@@ -36,6 +36,10 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private GameObject _dailyBadge;
         [SerializeField] private DailyRewardUI _dailyRewardPanelPrefab;
 
+        [Header("Mission")]
+        [SerializeField] private Button _missionButton;
+        [SerializeField] private GameObject _missionBadge;
+
         private void Start()
         {
             InitializeTierSelection();

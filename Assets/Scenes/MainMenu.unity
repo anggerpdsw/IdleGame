@@ -9130,6 +9130,8 @@ MonoBehaviour:
   _dailyButton: {fileID: 791295315}
   _dailyBadge: {fileID: 1938921230}
   _dailyRewardPanelPrefab: {fileID: 6073958065218033244, guid: 3004358b9f75fef4cab7fe64bdce4155, type: 3}
+  _missionButton: {fileID: 719996372}
+  _missionBadge: {fileID: 884245854}
 --- !u!114 &1607642273
 MonoBehaviour:
   m_ObjectHideFlags: 0
