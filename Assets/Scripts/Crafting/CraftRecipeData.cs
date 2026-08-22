@@ -7,8 +7,7 @@ using UnityEngine;
 namespace IdleDefenseSurvival.Crafting
 {
     /// <summary>
-    /// Enhanced craft recipe data with support for multiple result types,
-    /// crafting conditions, and progression integration.
+    /// recipe data with support for multiple result types, crafting conditions, and progression integration.
     /// </summary>
     [Serializable]
     public class CraftRecipeData
@@ -33,7 +32,7 @@ namespace IdleDefenseSurvival.Crafting
         public int RecipeVersion = 1; // v3.5 §8.1 — defaults to 1 when JSON omits the field
 
         // ============ Requirements ============
-        public int RequiredCraftingLevel = 1;
+        public int RequiredBlacksmithLevel = 1;
         public string[] RequiredQuests;
         // ponytail: RequiredTier removed - tier no longer a crafting gate
         // public int RequiredTier = 1;
@@ -103,7 +102,7 @@ namespace IdleDefenseSurvival.Crafting
                 RecipeVersion = source.RecipeVersion,
 
                 // Requirements
-                RequiredCraftingLevel = source.RequiredCraftingLevel,
+                RequiredBlacksmithLevel = source.RequiredBlacksmithLevel,
                 RequiredQuests = source.RequiredQuests ?? Array.Empty<string>(),
                 // RequiredTier removed - tier no longer a crafting gate
                 RequiredRecipes = source.RequiredRecipes ?? Array.Empty<CraftRecipeData>(),
@@ -177,7 +176,6 @@ namespace IdleDefenseSurvival.Crafting
         public string[] SubstituteItemIds;     // Alternative item IDs
         public int MinQuality = 0;             // Minimum quality required (0 = any)
         public int MinLevel = 0;               // Minimum item level required
-        public int MinEnhance = 0;             // Minimum enhance level required
     }
 
     /// <summary>
@@ -192,7 +190,6 @@ namespace IdleDefenseSurvival.Crafting
         public int MinQuality = 0;             // Minimum quality of result
         public int MaxQuality = 0;             // Maximum quality of result
         public int FixedLevel = 0;             // Fixed level (0 = use recipe level)
-        public int FixedEnhance = 0;           // Fixed enhance level
     }
 
     /// <summary>

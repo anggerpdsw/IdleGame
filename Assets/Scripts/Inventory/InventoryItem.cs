@@ -31,7 +31,7 @@ namespace IdleDefenseSurvival.Inventory
         // ============ Runtime State ============
         public int Quantity = 1; // For stackable items
         public int Level = 1; // Current level
-        public int EnhanceLevel = 0; // Enhancement level (+0 to +20)
+        public int MaxLevel = 20; // Maximum level this equipment can reach (from rarity config)
 
         // ============ Durability ============
         public int MaxDurability = 100;
@@ -68,7 +68,7 @@ namespace IdleDefenseSurvival.Inventory
             ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(ItemId)?.StackSize > 1;
         [JsonIgnore] public bool IsMaxStack => Quantity >= GetMaxStackSize();
         [JsonIgnore] public bool IsBroken => CurrentDurability <= 0;
-        [JsonIgnore] public bool CanEnhance => EnhanceLevel < GetMaxEnhanceLevel();
+        [JsonIgnore] public bool IsMaxLevel => Level >= MaxLevel;
         [JsonIgnore] public bool HasSockets => Sockets != null && Sockets.Length > 0;
         [JsonIgnore] public int FilledSocketCount => Sockets?.Count(s => s?.GemId != null) ?? 0;
         [JsonIgnore] public int EmptySocketCount => Sockets?.Count(s => s?.GemId == null) ?? 0;
@@ -155,10 +155,10 @@ namespace IdleDefenseSurvival.Inventory
             return data?.StackSize > 0 ? data.StackSize : 999;
         }
 
-        public int GetMaxEnhanceLevel()
+        public int GetMaxLevel()
         {
             // Will be filled by ItemDatabase lookup
-            return 20; // Default
+            return MaxLevel; // Use instance MaxLevel
         }
 
         public float GetDurabilityPercent() => MaxDurability > 0 ? (float)CurrentDurability / MaxDurability : 0f;
@@ -223,7 +223,7 @@ namespace IdleDefenseSurvival.Inventory
         /// <summary>ID of socketed gem (transient, restored from the persisted GemInstanceData via GemInstanceId).</summary>
         [JsonIgnore] public string GemId { get; set; }
 
-        public bool IsUnlocked = true; // Socket unlocked (some only unlock at higher enhance)
+        public bool IsUnlocked = true; // Socket unlocked (some only unlock at higher level)
 
         /// <summary>InstanceId of the GemInstanceData for this socket. Null = empty socket.</summary>
         private string _gemInstanceId;

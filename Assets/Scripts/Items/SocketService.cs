@@ -70,16 +70,19 @@ namespace IdleDefenseSurvival.Items
         {
             var config = new SocketConfigData
             {
-                MaxSocketsPerItem = 4,
+                MaxSocketsPerItem = 6,
                 CanAddSockets = true,
                 AddSocketCost = new SocketCurrencyCost { CurrencyType = CurrencyType.Gold, Amount = 10000 },
                 MaxAdditionalSockets = 2,
                 SocketRules = new SocketRule[]
                 {
-                    new() { SocketIndex = 0, UnlockEnhanceLevel = 0, AllowAnyGem = true },
-                    new() { SocketIndex = 1, UnlockEnhanceLevel = 5, AllowAnyGem = true },
-                    new() { SocketIndex = 2, UnlockEnhanceLevel = 10, AllowAnyGem = true },
-                    new() { SocketIndex = 3, UnlockEnhanceLevel = 15, AllowAnyGem = true },
+                    new() { SocketIndex = 0, UnlockLevel = 0, AllowAnyGem = true },
+                    new() { SocketIndex = 1, UnlockLevel = 5, AllowAnyGem = true },
+                    new() { SocketIndex = 2, UnlockLevel = 10, AllowAnyGem = true },
+                    new() { SocketIndex = 3, UnlockLevel = 15, AllowAnyGem = true },
+                    new() { SocketIndex = 4, UnlockLevel = 20, AllowAnyGem = true },
+                    new() { SocketIndex = 5, UnlockLevel = 25, AllowAnyGem = true },
+                    new() { SocketIndex = 6, UnlockLevel = 30, AllowAnyGem = true },
                 }
             };
             return config;
@@ -98,7 +101,7 @@ namespace IdleDefenseSurvival.Items
                         _config.SocketRules[i] = new SocketRule
                         {
                             SocketIndex = i,
-                            UnlockEnhanceLevel = i * 5,
+                            UnlockLevel = i * 5,
                             AllowAnyGem = true
                         };
                     }
@@ -109,18 +112,18 @@ namespace IdleDefenseSurvival.Items
 
         #region Socket Unlocking
         /// <summary>
-        /// Checks if a socket is unlocked based on item's enhance level.
+        /// Checks if a socket is unlocked based on item's level.
         /// </summary>
         public bool IsSocketUnlocked(InventoryItem item, int socketIndex)
         {
             if (item?.Sockets == null || socketIndex < 0 || socketIndex >= item.Sockets.Length)
                 return false;
 
-            return _config.IsSocketUnlocked(socketIndex, item.EnhanceLevel);
+            return _config.IsSocketUnlocked(socketIndex, item.Level);
         }
 
         /// <summary>
-        /// Updates all socket unlock states for an item based on its enhance level.
+        /// Updates all socket unlock states for an item based on its level.
         /// </summary>
         public void UpdateSocketStates(InventoryItem item)
         {
@@ -129,7 +132,7 @@ namespace IdleDefenseSurvival.Items
             bool changed = false;
             for (int i = 0; i < item.Sockets.Length; i++)
             {
-                bool shouldUnlock = _config.IsSocketUnlocked(i, item.EnhanceLevel);
+                bool shouldUnlock = _config.IsSocketUnlocked(i, item.Level);
                 if (item.Sockets[i].IsUnlocked != shouldUnlock)
                 {
                     item.Sockets[i].IsUnlocked = shouldUnlock;
@@ -147,7 +150,7 @@ namespace IdleDefenseSurvival.Items
         }
 
         /// <summary>
-        /// Gets the enhance level required to unlock a specific socket index.
+        /// Gets the level required to unlock a specific socket index.
         /// </summary>
         public int GetUnlockRequirement(int socketIndex)
         {
@@ -171,9 +174,9 @@ namespace IdleDefenseSurvival.Items
         }
 
         /// <summary>
-        /// Gets the next socket that will be unlocked and at what enhance level.
+        /// Gets the next socket that will be unlocked and at what level.
         /// </summary>
-        public (int socketIndex, int requiredEnhance) GetNextUnlock(InventoryItem item)
+        public (int socketIndex, int requiredLevel) GetNextUnlock(InventoryItem item)
         {
             if (item?.Sockets == null) return (-1, -1);
 

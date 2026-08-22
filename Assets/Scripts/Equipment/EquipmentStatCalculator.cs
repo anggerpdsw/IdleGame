@@ -28,11 +28,11 @@ namespace IdleDefenseSurvival.Equipment
 
             if (itemData.CombatStats != null)
                 foreach (var statEntry in itemData.CombatStats)
-                    Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Level, item.EnhanceLevel));
+                    Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Level));
 
             if (item.Enchantment?.StatBonuses != null)
                 foreach (var statEntry in item.Enchantment.StatBonuses)
-                    Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Enchantment.Level, 0));
+                    Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Enchantment.Level));
 
             // Gem stats
             if (item.Sockets != null)
@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Equipment
                     var gemStats = Items.GemService.Instance?.GetGemStats(socket.GemId, socket.GemLevel);
                     if (gemStats == null) continue;
                     foreach (var statEntry in gemStats)
-                        Add(bonuses, statEntry.Stat, statEntry.GetValue(socket.GemLevel, 0));
+                        Add(bonuses, statEntry.Stat, statEntry.GetValue(socket.GemLevel));
                 }
             }
 
@@ -64,7 +64,7 @@ namespace IdleDefenseSurvival.Equipment
                 {
                     if (tier.StatBonuses == null) continue;
                     foreach (var statEntry in tier.StatBonuses)
-                        Add(totals, statEntry.Stat, statEntry.GetValue(1, 0));
+                        Add(totals, statEntry.Stat, statEntry.GetValue(1));
                 }
             }
 
@@ -104,7 +104,7 @@ namespace IdleDefenseSurvival.Equipment
             {
                 if (tier.StatBonuses == null) continue;
                 foreach (var statEntry in tier.StatBonuses)
-                    Add(bonuses, statEntry.Stat, statEntry.GetValue(1, 0));
+                    Add(bonuses, statEntry.Stat, statEntry.GetValue(1));
             }
 
             return bonuses;
@@ -119,7 +119,7 @@ namespace IdleDefenseSurvival.Equipment
             // Main Attributes from itemData (ItemDatabase) — base template
             if (itemData.AttributeStats != null)
                 foreach (var attrEntry in itemData.AttributeStats)
-                    AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level, item.EnhanceLevel));
+                    AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level));
 
             // Main Attributes from item.AttributeData (instance data - e.g. equipping gives STR +6)
             if (item.AttributeData?.MainAttribute != null)
@@ -143,7 +143,7 @@ namespace IdleDefenseSurvival.Equipment
                 {
                     if (tier.AttributeBonuses == null) continue;
                     foreach (var attrEntry in tier.AttributeBonuses)
-                        AddAsAttribute(totals, attrEntry.Attribute, attrEntry.GetValue(1, 0));
+                        AddAsAttribute(totals, attrEntry.Attribute, attrEntry.GetValue(1));
                 }
             }
 
@@ -181,7 +181,7 @@ namespace IdleDefenseSurvival.Equipment
             if (itemData.CombatStats != null)
                 foreach (var statEntry in itemData.CombatStats)
                 {
-                    float value = statEntry.GetValue(item.Level, item.EnhanceLevel);
+                    float value = statEntry.GetValue(item.Level);
                     if (value != 0)
                         builder.Add(prefix, statEntry.Stat, statEntry.Mode, value);
                 }
@@ -211,7 +211,7 @@ namespace IdleDefenseSurvival.Equipment
             if (item.Enchantment?.StatBonuses != null)
                 foreach (var statEntry in item.Enchantment.StatBonuses)
                 {
-                    float value = statEntry.GetValue(item.Enchantment.Level, 0);
+                    float value = statEntry.GetValue(item.Enchantment.Level);
                     if (value != 0)
                         builder.Add(prefix + "_Enchant", statEntry.Stat, statEntry.Mode, value);
                 }

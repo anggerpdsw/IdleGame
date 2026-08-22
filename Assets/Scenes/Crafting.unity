@@ -1013,7 +1013,6 @@ MonoBehaviour:
   _equipmentSection: {fileID: 1144778135}
   _equipTypeText: {fileID: 610824469}
   _levelText: {fileID: 1747872256}
-  _enhanceText: {fileID: 938249495}
   _durabilityBar: {fileID: 1169237881}
   _durabilityText: {fileID: 1754527376}
   _mainStatsContainer: {fileID: 1965260145}
@@ -3137,7 +3136,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ResultName
+  m_text: ItemName
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

@@ -96,7 +96,7 @@ namespace IdleDefenseSurvival.Equipment
             if (itemData?.SpecialEffects == null) return Array.Empty<string>();
 
             return itemData.SpecialEffects
-                .Where(e => e.CanActivate(item.Level, item.EnhanceLevel))
+                .Where(e => e.CanActivate(item.Level))
                 .Select(e => e.EffectType.GetDisplayName());
         }
     }

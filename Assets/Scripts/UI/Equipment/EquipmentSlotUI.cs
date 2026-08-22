@@ -29,9 +29,6 @@ namespace IdleDefenseSurvival.UI.Equipment
         [SerializeField] private GameObject _emptyIndicator;
         [Tooltip("Durability bar of the equipped item.")]
         [SerializeField] private Slider _durabilityBar;
-        [Tooltip("Shown when the equipped item has enhancement level > 0.")]
-        [SerializeField] private GameObject _enhanceIndicator;
-        [SerializeField] private TextMeshProUGUI _enhanceText;
         [Tooltip("Highlight when the equipped item's set bonus is active.")]
         [SerializeField] private GameObject _setBonusGlow;
         [Tooltip("Unlock button shown when the slot is locked and unlockable.")]
@@ -110,14 +107,6 @@ namespace IdleDefenseSurvival.UI.Equipment
                     var fill = _durabilityBar.fillRect != null ? _durabilityBar.fillRect.GetComponent<Image>() : null;
                     if (fill != null) fill.color = data.DurabilityColor;
                 }
-            }
-
-            // Enhance badge
-            if (_enhanceIndicator != null)
-            {
-                bool show = occupied && data.ShowEnhance;
-                _enhanceIndicator.SetActive(show);
-                if (_enhanceText != null && show) _enhanceText.text = data.EnhanceText;
             }
 
             gameObject.name = occupied

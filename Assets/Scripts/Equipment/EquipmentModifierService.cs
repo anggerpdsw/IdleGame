@@ -63,7 +63,7 @@ namespace IdleDefenseSurvival.Equipment
                     Stat = skillType,
                     SecondaryStat = statEntry.Stat,
                     Mode = (ModifierMode)statEntry.Mode,
-                    Value = statEntry.GetValue(1, 0),
+                    Value = statEntry.GetValue(1),
                     Permanent = true
                 });
             }

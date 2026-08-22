@@ -84,11 +84,6 @@ namespace IdleDefenseSurvival.Crafting
                 errors.Add($"FixedLevel cannot be negative");
             }
 
-            if (entry.FixedEnhance < 0)
-            {
-                errors.Add($"FixedEnhance cannot be negative");
-            }
-
             if (entry.SocketCount < 0)
             {
                 errors.Add($"SocketCount cannot be negative");
@@ -105,7 +100,6 @@ namespace IdleDefenseSurvival.Crafting
             entry.Quality = Mathf.Clamp(entry.Quality, 0, _config.MaxQualityTier);
             entry.Count = Mathf.Max(1, entry.Count);
             entry.FixedLevel = Mathf.Max(0, entry.FixedLevel);
-            entry.FixedEnhance = Mathf.Max(0, entry.FixedEnhance);
             entry.SocketCount = Mathf.Max(0, entry.SocketCount);
         }
 

@@ -46,10 +46,8 @@ namespace IdleDefenseSurvival.Manager
 
         /// <summary>Current player level.</summary>
         public int Level => Data.level;
-
         /// <summary>EXP accumulated in the current level.</summary>
         public long CurrentExp => Data.currentExp;
-
         /// <summary>Total EXP ever earned (including spent on level‑ups).</summary>
         public long TotalExp => Data.totalExp;
 

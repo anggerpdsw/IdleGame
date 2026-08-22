@@ -59,7 +59,6 @@ namespace IdleDefenseSurvival.Items.Generation
                     Stat = stat,
                     BaseValue = baseValue,
                     ValuePerLevel = baseValue * 0.1f,
-                    ValuePerEnhance = baseValue * 0.05f,
                     Mode = _config.PercentStats.Contains(stat) ? SecondaryStatMode.Percent : SecondaryStatMode.Flat,
                     IsPercent = _config.PercentStats.Contains(stat)
                 };

@@ -51,7 +51,7 @@ namespace IdleDefenseSurvival.Items.Generation
         }
 
         /// <summary>
-        /// Generates equipment from crafting recipe context.
+        /// Generates equipment from blacksmithing recipe context.
         /// Uses equip_base as the single template source, with rarity from recipe.
         /// </summary>
         public InventoryItem Generate(EquipmentData baseEquipment, ItemGenerationContext context)
@@ -59,13 +59,13 @@ namespace IdleDefenseSurvival.Items.Generation
             if (baseEquipment == null) return null;
 
             // 1. Resolve rarity
-            // For crafting: rarity MUST come from recipe via context.ForcedQuality
+            // For blacksmithing: rarity MUST come from recipe via context.ForcedQuality
             // For drops: rarity can be rolled if not forced
             Rarity rarity = context.ForcedQuality.HasValue
                 ? (Rarity)Math.Clamp(context.ForcedQuality.Value, 1, 6)
                 : _rarityRoll.RollRarity(context.With(category: ItemCategory.Equipment));
 
-            // Validate rarity is in valid range for crafting
+            // Validate rarity is in valid range for blacksmithing
             if (context.Source == ItemSource.Craft && !context.ForcedQuality.HasValue)
             {
                 Debug.LogWarning($"[EquipmentGenerator] Craft source without forced rarity. Recipe should provide rarity via ForcedQuality.");
@@ -88,7 +88,7 @@ namespace IdleDefenseSurvival.Items.Generation
             }
 
             // 4. Determine level
-            // For crafting: random within [1, rarityConfig.MaxLevel]
+            // For blacksmithing: random within [1, rarityConfig.MaxLevel]
             // For drops: can use FixedLevel from context or calculate from player/tier/wave
             int level = context.FixedLevel ?? GenerateLevel(rarityConfig, baseConfig.BaseLevel, context);
 
@@ -155,17 +155,17 @@ namespace IdleDefenseSurvival.Items.Generation
         // --------------------------------------------------------------------
         private int GenerateLevel(EquipmentRarityConfig rarityConfig, int baseLevel, ItemGenerationContext context)
         {
-            // For crafting: random level within [1, rarityConfig.MaxLevel]
+            // For blacksmithing: random level within [1, rarityConfig.MaxLevel]
             // Preserve deterministic RNG via _rng.
             if (context.Source == ItemSource.Craft)
-                return _rng.NextInt(1, rarityConfig.MaxLevel + 1);
+                return _rng.NextInt(baseLevel, rarityConfig.MaxLevel + 1);
 
             // Drops/rewards: calculate based on player/tier/wave then clamp.
-            int calculatedLevel = Math.Max(1, context.PlayerLevel + context.CraftingLevel / 5);
+            int calculatedLevel = Math.Max(baseLevel, context.PlayerLevel + context.BlacksmithLevel / 5);
             calculatedLevel += context.Tier * 2;
             calculatedLevel += context.Wave / 5;
 
-            return Math.Clamp(calculatedLevel, 1, rarityConfig.MaxLevel);
+            return Math.Clamp(calculatedLevel, baseLevel, rarityConfig.MaxLevel);
         }
 
         private InventoryItem CreateBaseItem(
@@ -194,13 +194,13 @@ namespace IdleDefenseSurvival.Items.Generation
                 EquipmentType = context?.EquipmentType ?? baseEquipment?.EquipmentType ?? EquipmentType.None,
                 Quantity = 1,
                 Level = level,
+                MaxLevel = rarityConfig.MaxLevel > 0 ? rarityConfig.MaxLevel : 20,
                 MaxDurability = rarityConfig.Durability,
                 CurrentDurability = rarityConfig.Durability,
                 DurabilityLossPerUse = rarityConfig.DurabilityLossPerUse,
                 RepairCostPerDurability = rarityConfig.RepairCostPerDurability,
                 MaxSockets = rarityConfig.Sockets,
-                AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                EnhanceLevel = 0
+                AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
 
             return item;
@@ -229,7 +229,7 @@ namespace IdleDefenseSurvival.Items.Generation
             foreach (var stat in stats)
             {
                 var attrEntry = new EquipmentAttributeEntry((MainAttribute)(int)stat.Stat,
-                    stat.GetValue(item.Level, item.EnhanceLevel));
+                    stat.GetValue(item.Level));
                 secondAttrs.Add(attrEntry);
             }
 

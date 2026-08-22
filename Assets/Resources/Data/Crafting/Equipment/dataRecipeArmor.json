@@ -7,7 +7,7 @@
       "Description": "Basic leather armor reinforced with pig iron and cotton thread.",
       "EquipmentType": 4,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "leather", "Count": 12 },
         { "ItemId": "pig_iron", "Count": 6 },
@@ -24,7 +24,7 @@
       "Description": "Leather armor with high-carbon steel plates and thick thread binding.",
       "EquipmentType": 4,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "leather", "Count": 18 },
         { "ItemId": "high_carbon_steel", "Count": 10 },
@@ -41,7 +41,7 @@
       "Description": "Heavy armor with refined steel plates, silk thread, and coal-forged edges.",
       "EquipmentType": 4,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "leather", "Count": 24 },
         { "ItemId": "refined_steel", "Count": 16 },
@@ -59,7 +59,7 @@
       "Description": "Legendary steel armor with compound thread and anthracite-forged plates.",
       "EquipmentType": 4,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "leather", "Count": 32 },
         { "ItemId": "steel_alloy", "Count": 20 },
@@ -77,7 +77,7 @@
       "Description": "Mythic armor forged from high alloy steel and azureworm silk lining.",
       "EquipmentType": 4,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "leather", "Count": 42 },
         { "ItemId": "high_alloy_steel", "Count": 24 },
@@ -95,7 +95,7 @@
       "Description": "Divine armor infused with elemental essence, vega string weave, and compound glue.",
       "EquipmentType": 4,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "leather", "Count": 54 },
         { "ItemId": "high_alloy_steel", "Count": 30 },

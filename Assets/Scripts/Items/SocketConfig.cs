@@ -20,7 +20,7 @@ namespace IdleDefenseSurvival.Items
         bool CanDestroyGems { get; }
         float GemRemovalGoldCost { get; }
         float GemDestructionReturnRate { get; }
-        bool IsSocketUnlocked(int socketIndex, int enhanceLevel);
+        bool IsSocketUnlocked(int socketIndex, int level);
         int GetUnlockRequirement(int socketIndex);
     }
 
@@ -41,7 +41,7 @@ namespace IdleDefenseSurvival.Items
     public sealed class SocketRule
     {
         public int SocketIndex;
-        public int UnlockEnhanceLevel;
+        public int UnlockLevel;
         public int UnlockPlayerLevel = 1;
         public Rarity MinimumRarity = Rarity.Common;
         public bool AllowAnyGem = true;
@@ -64,7 +64,7 @@ namespace IdleDefenseSurvival.Items
     [Serializable]
     public sealed class SocketConfigData : IReadOnlySocketConfig
     {
-        public int MaxSocketsPerItem = 4;
+        public int MaxSocketsPerItem = 6;
         public SocketRule[] SocketRules = Array.Empty<SocketRule>();
         public bool CanAddSockets = true;
         public SocketCurrencyCost AddSocketCost = new() { CurrencyType = CurrencyType.Gold, Amount = 10000 };
@@ -85,18 +85,18 @@ namespace IdleDefenseSurvival.Items
         float IReadOnlySocketConfig.GemRemovalGoldCost => GemRemovalGoldCost;
         float IReadOnlySocketConfig.GemDestructionReturnRate => GemDestructionReturnRate;
 
-        public bool IsSocketUnlocked(int socketIndex, int enhanceLevel)
+        public bool IsSocketUnlocked(int socketIndex, int level)
         {
             if (SocketRules == null) return false;
             if (socketIndex < 0 || socketIndex >= SocketRules.Length) return false;
-            return enhanceLevel >= SocketRules[socketIndex].UnlockEnhanceLevel;
+            return level >= SocketRules[socketIndex].UnlockLevel;
         }
 
         public int GetUnlockRequirement(int socketIndex)
         {
             if (SocketRules == null) return int.MaxValue;
             if (socketIndex < 0 || socketIndex >= SocketRules.Length) return int.MaxValue;
-            return SocketRules[socketIndex].UnlockEnhanceLevel;
+            return SocketRules[socketIndex].UnlockLevel;
         }
     }
 }

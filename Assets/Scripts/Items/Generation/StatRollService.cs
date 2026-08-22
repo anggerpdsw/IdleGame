@@ -105,7 +105,6 @@ namespace IdleDefenseSurvival.Items.Generation
 
             // Per-level scaling
             float perLevel = finalValue * _config.PerLevelMultiplier;
-            float perEnhance = finalValue * _config.PerEnhanceMultiplier;
 
             // Determine mode (flat vs percent)
             var mode = _config.PercentStats.Contains(stat) ? SecondaryStatMode.Percent : SecondaryStatMode.Flat;
@@ -115,7 +114,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 Stat = stat,
                 BaseValue = finalValue,
                 ValuePerLevel = perLevel,
-                ValuePerEnhance = perEnhance,
                 Mode = mode,
                 IsPercent = mode == SecondaryStatMode.Percent
             };
@@ -166,7 +164,6 @@ namespace IdleDefenseSurvival.Items.Generation
         };
 
         public float PerLevelMultiplier = 0.1f;
-        public float PerEnhanceMultiplier = 0.2f;
 
         public HashSet<SecondaryStat> PercentStats = new()
         {

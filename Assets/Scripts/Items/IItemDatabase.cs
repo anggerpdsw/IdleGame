@@ -46,7 +46,7 @@ namespace IdleDefenseSurvival.Items
 
         // ============ Item Properties ============
         int GetMaxStackSize(string itemId);
-        int GetMaxEnhanceLevel(string itemId);
+        int GetMaxLevel(string itemId);
         int GetMaxLimitBreak(string itemId);
         int GetMaxSockets(string itemId);
         // GemType[] GetAllowedGemTypes(string itemId); // Moved to SocketConfigData.SocketRules

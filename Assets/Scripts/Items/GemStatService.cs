@@ -47,7 +47,7 @@ namespace IdleDefenseSurvival.Items
                 var stats = GetGemStats(socket.GemId, socket.GemLevel);
                 foreach (var statEntry in stats)
                 {
-                    float value = statEntry.GetValue(socket.GemLevel, 0);
+                    float value = statEntry.GetValue(socket.GemLevel);
                     bonuses[statEntry.Stat] = bonuses.TryGetValue(statEntry.Stat, out var current) ? current + value : value;
                 }
             }

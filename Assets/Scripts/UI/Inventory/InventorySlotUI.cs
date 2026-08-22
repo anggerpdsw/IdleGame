@@ -23,7 +23,6 @@ namespace IdleDefenseSurvival.UI.Inventory
         [SerializeField] private GameObject _newIndicator;
         [SerializeField] private Slider _durabilityBar;
         [SerializeField] private TextMeshProUGUI _levelText;
-        [SerializeField] private GameObject _enhanceIndicator;
 
         private InventoryUI _parentUI;
         private int _slotIndex;        // UI grid position (0..capacity-1, fixed)
@@ -99,17 +98,11 @@ namespace IdleDefenseSurvival.UI.Inventory
                 }
             }
 
-            // Level/Enhance
+            // Level
             if (_levelText != null)
             {
                 _levelText.text = item.Level > 1 ? $"Lv.{item.Level}" : "";
                 _levelText.enabled = item.Level > 1;
-            }
-
-            if (_enhanceIndicator != null)
-            {
-                _enhanceIndicator.SetActive(item.EnhanceLevel > 0);
-                // Could show +X text
             }
 
             gameObject.name = $"Slot_{_slotIndex}_{item.ItemId}";
@@ -133,7 +126,6 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (_newIndicator != null) _newIndicator.SetActive(false);
             if (_durabilityBar != null) _durabilityBar.gameObject.SetActive(false);
             if (_levelText != null) _levelText.enabled = false;
-            if (_enhanceIndicator != null) _enhanceIndicator.SetActive(false);
 
             gameObject.name = $"Slot_{_slotIndex}_Empty";
         }

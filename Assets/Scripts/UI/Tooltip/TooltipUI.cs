@@ -57,7 +57,6 @@ namespace IdleDefenseSurvival.UI.Tooltip
         [SerializeField] private GameObject _equipmentSection;
         [SerializeField] private TextMeshProUGUI _equipTypeText;
         [SerializeField] private TextMeshProUGUI _levelText;
-        [SerializeField] private TextMeshProUGUI _enhanceText;
         [SerializeField] private Slider _durabilityBar;
         [SerializeField] private TextMeshProUGUI _durabilityText;
         [SerializeField] private Transform _mainStatsContainer;
@@ -273,12 +272,6 @@ namespace IdleDefenseSurvival.UI.Tooltip
 
             if (_levelText != null)
                 _levelText.text = $"Level {item.Level}/{itemData.MaxLevel}";
-
-            if (_enhanceText != null)
-            {
-                _enhanceText.text = item.EnhanceLevel > 0 ? $"+{item.EnhanceLevel}" : "";
-                _enhanceText.gameObject.SetActive(item.EnhanceLevel > 0);
-            }
 
             if (_durabilityBar != null)
             {

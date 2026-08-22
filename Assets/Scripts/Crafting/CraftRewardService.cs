@@ -94,7 +94,6 @@ namespace IdleDefenseSurvival.Crafting
                 EventModifiers = eventModifiers,
                 ForcedQuality = entry.Quality > 0 ? entry.Quality : -1,
                 FixedLevel = entry.FixedLevel > 0 ? entry.FixedLevel : -1,
-                FixedEnhance = entry.FixedEnhance > 0 ? entry.FixedEnhance : -1
             };
 
             return _itemGenerator.GenerateItem(entry.ItemId, genContext);
@@ -140,7 +139,7 @@ namespace IdleDefenseSurvival.Crafting
             // Rarity source of truth: recipe.Rarity (1=Common..6=Divine).
             // EquipmentGenerator expects 0-based quality tier: 0=Common, 1=Rare, ..., 5=Divine.
             int qualityTier = Mathf.Max(0, recipe.Rarity - 1);
-            int level = Mathf.Max(1, recipe.RequiredCraftingLevel);
+            int level = Mathf.Max(1, recipe.RequiredBlacksmithLevel);
 
             // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
             var eventModifiers = new List<EventCraftModifier>();
@@ -152,7 +151,7 @@ namespace IdleDefenseSurvival.Crafting
                                  equipmentType: slot,
                                  rarity: (Rarity)recipe.Rarity,
                                  level: level,
-                                 tier: recipe.RequiredCraftingLevel)
+                                 tier: recipe.RequiredBlacksmithLevel)
                              .With(
                                  seed: (int)seed,
                                  forcedQuality: qualityTier,

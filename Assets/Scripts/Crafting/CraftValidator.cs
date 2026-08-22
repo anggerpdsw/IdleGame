@@ -42,12 +42,15 @@ namespace IdleDefenseSurvival.Crafting
                 return ValidationResult.Fail("Recipe not unlocked");
             }
 
-            // 3. Check crafting level requirement
-            int playerCraftLevel = GetPlayerCraftLevel();
-            if (playerCraftLevel < recipe.RequiredCraftingLevel)
+            // 3. Check blacksmith level requirement
+            int playerBlacksmithLevel = GetPlayerBlacksmithLevel();
+            if (playerBlacksmithLevel < recipe.RequiredBlacksmithLevel)
             {
-                return ValidationResult.Fail($"Requires crafting level {recipe.RequiredCraftingLevel} (current: {playerCraftLevel})");
+                return ValidationResult.Fail($"Requires blacksmith level {recipe.RequiredBlacksmithLevel} (current: {playerBlacksmithLevel})");
             }
+
+            // Check crafting level for conditions
+            int playerCraftLevel = GetPlayerCraftLevel();
 
             // 4. Tier requirement removed - tier no longer a crafting gate
 
@@ -84,9 +87,9 @@ namespace IdleDefenseSurvival.Crafting
                     int have = _inventory.GetTotalQuantity(ingredient.ItemId);
 
                     // Check quality/level requirements if specified
-                    if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0 || ingredient.MinEnhance > 0)
+                    if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0)
                     {
-                        have = CountQualifiedItems(ingredient.ItemId, ingredient.MinQuality, ingredient.MinLevel, ingredient.MinEnhance);
+                        have = CountQualifiedItems(ingredient.ItemId, ingredient.MinQuality, ingredient.MinLevel);
                     }
 
                     if (have < required)
@@ -146,11 +149,14 @@ namespace IdleDefenseSurvival.Crafting
         }
 
         // ============ Helper Methods ============
+        private int GetPlayerBlacksmithLevel()
+        {
+            return _saveManager?.GetAccountData()?.blacksmithLevel ?? 1;
+        }
+
         private int GetPlayerCraftLevel()
         {
-            // TODO: Integrate with player progression system
-            // For now, return a default or from SaveData
-            return 1;
+            return _saveManager?.GetAccountData()?.craftingLevel ?? 1;
         }
 
         private long GetPlayerLuck()
@@ -165,7 +171,7 @@ namespace IdleDefenseSurvival.Crafting
             return false;
         }
 
-        private int CountQualifiedItems(string itemId, int minQuality, int minLevel, int minEnhance)
+        private int CountQualifiedItems(string itemId, int minQuality, int minLevel)
         {
             var items = _inventory.GetItemsById(itemId);
             int count = 0;
@@ -173,8 +179,7 @@ namespace IdleDefenseSurvival.Crafting
             {
                 bool qualityOk = minQuality <= 0 || item.GetRarity() >= (Rarity)minQuality;
                 bool levelOk = minLevel <= 0 || item.Level >= minLevel;
-                bool enhanceOk = minEnhance <= 0 || item.EnhanceLevel >= minEnhance;
-                if (qualityOk && levelOk && enhanceOk)
+                if (qualityOk && levelOk)
                     count += item.Quantity;
             }
             return count;

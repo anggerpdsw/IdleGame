@@ -125,8 +125,7 @@ namespace IdleDefenseSurvival.Crafting
                 Count = count,
                 Quality = ctx.Recipe.Rarity, // Recipe rarity is the quality tier
                 Source = CraftRewardSource.Normal.ToString(),
-                FixedLevel = 0, // Level determined by recipe progression
-                FixedEnhance = 0
+                FixedLevel = 0 // Level determined by recipe progression
             });
         }
     }

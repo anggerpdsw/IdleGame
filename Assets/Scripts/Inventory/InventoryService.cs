@@ -774,7 +774,7 @@ namespace IdleDefenseSurvival.Inventory
                 // Unique instance: identity + full state including rarity-rolled config.
                 data.InstanceId = item.InstanceId;
                 data.Level = item.Level;
-                data.EnhanceLevel = item.EnhanceLevel;
+                data.MaxLevel = item.MaxLevel;
                 data.MaxDurability = item.MaxDurability;
                 data.CurrentDurability = item.CurrentDurability;
                 data.DurabilityLossPerUse = item.DurabilityLossPerUse;
@@ -867,7 +867,7 @@ namespace IdleDefenseSurvival.Inventory
                 // ---- Equipment: restore full state from saved data (no DB lookup) ----
                 item.InstanceId = data.InstanceId;
                 item.Level = data.Level ?? 1;
-                item.EnhanceLevel = data.EnhanceLevel ?? 0;
+                item.MaxLevel = data.MaxLevel ?? 20;
                 item.Enchantment = data.Enchantment;
 
                 // ponytail: use persisted durability instead of DB template (crafted items lack DB entry)

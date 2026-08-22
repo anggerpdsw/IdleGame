@@ -42,7 +42,7 @@ namespace IdleDefenseSurvival.Crafting
 
         public abstract void Apply(CraftPipelineContext pipelineCtx);
 
-        protected CraftResultEntry CreateEntry(string itemId, int count, int quality, CraftRewardSource source, int fixedLevel = 0, int fixedEnhance = 0)
+        protected CraftResultEntry CreateEntry(string itemId, int count, int quality, CraftRewardSource source, int fixedLevel = 0)
         {
             return new CraftResultEntry
             {
@@ -50,8 +50,7 @@ namespace IdleDefenseSurvival.Crafting
                 Count = count,
                 Quality = quality,
                 Source = source.ToString(),
-                FixedLevel = fixedLevel,
-                FixedEnhance = fixedEnhance
+                FixedLevel = fixedLevel
             };
         }
     }
@@ -267,7 +266,6 @@ namespace IdleDefenseSurvival.Crafting
         public int Quality = 0; // 0 = base, 1-5 = quality tiers
         public string Source;   // CraftRewardSource enum as string for serialization
         public int FixedLevel = 0;
-        public int FixedEnhance = 0;
         public int SocketCount = 0; // Future: sockets on crafted items
     }
 

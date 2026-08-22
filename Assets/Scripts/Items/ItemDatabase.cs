@@ -236,7 +236,7 @@ namespace IdleDefenseSurvival.Items
 
         #region Item Properties
         public int GetMaxStackSize(string itemId) => GetItem(itemId)?.StackSize ?? 1;
-        public int GetMaxEnhanceLevel(string itemId) => GetEquipment(itemId)?.MaxLevel ?? 20;
+        public int GetMaxLevel(string itemId) => GetEquipment(itemId)?.MaxLevel ?? 20;
         public int GetMaxLimitBreak(string itemId) => GetEquipment(itemId)?.MaxLevel ?? 5;
         public int GetMaxSockets(string itemId) => GetEquipment(itemId)?.MaxSockets ?? 0;
         public GemType[] GetAllowedGemTypes(string itemId) => SocketService.Instance?.Config.SocketRules[0]?.AllowedGemTypes ?? Array.Empty<GemType>();
@@ -429,7 +429,6 @@ namespace IdleDefenseSurvival.Items
                 Stat = s.Stat,
                 BaseValue = s.BaseValue * multiplier,
                 ValuePerLevel = s.ValuePerLevel * multiplier,
-                ValuePerEnhance = s.ValuePerEnhance * multiplier,
                 Mode = s.Mode
             }).ToArray();
         }

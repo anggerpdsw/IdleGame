@@ -7,7 +7,7 @@
       "Description": "Basic leather pants stitched with cotton thread.",
       "EquipmentType": 6,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "leather", "Count": 7 },
         { "ItemId": "cotton_thread", "Count": 3 },
@@ -23,7 +23,7 @@
       "Description": "Leather pants reinforced with thick thread and stronger glue.",
       "EquipmentType": 6,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "leather", "Count": 10 },
         { "ItemId": "thick_thread", "Count": 5 },
@@ -39,7 +39,7 @@
       "Description": "Heavy leather pants with silk thread reinforcement.",
       "EquipmentType": 6,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "leather", "Count": 14 },
         { "ItemId": "silk_thread", "Count": 8 },
@@ -55,7 +55,7 @@
       "Description": "Leather pants lined with compound thread for legendary comfort.",
       "EquipmentType": 6,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "leather", "Count": 18 },
         { "ItemId": "compound_thread", "Count": 10 },
@@ -71,7 +71,7 @@
       "Description": "Mythic leather pants woven with azureworm silk.",
       "EquipmentType": 6,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "leather", "Count": 24 },
         { "ItemId": "azureworm_silk", "Count": 14 },
@@ -87,7 +87,7 @@
       "Description": "Divine leather pants with Vega String weave and elemental essence infusion.",
       "EquipmentType": 6,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "leather", "Count": 30 },
         { "ItemId": "vega_string", "Count": 18 },

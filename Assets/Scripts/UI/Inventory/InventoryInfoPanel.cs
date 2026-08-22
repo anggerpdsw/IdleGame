@@ -174,16 +174,15 @@ namespace IdleDefenseSurvival.UI.Inventory
 
             var lines = new List<string>
             {
-                $"Level: {item.Level}"
+                $"Level: {item.Level}",
+                $"Durability: {item.CurrentDurability}/{item.MaxDurability}"
             };
-            if (item.EnhanceLevel > 0) lines.Add($"+{item.EnhanceLevel}");
-            lines.Add($"Durability: {item.CurrentDurability}/{item.MaxDurability}");
 
             if (itemData?.CombatStats != null)
             {
                 foreach (var stat in itemData.CombatStats)
                 {
-                    float value = stat.GetValue(item.Level, item.EnhanceLevel);
+                    float value = stat.GetValue(item.Level);
                     string sign = value >= 0 ? "+" : "";
                     lines.Add($"{stat.Stat.GetDisplayName()}: {sign}{value:F1}");
                 }

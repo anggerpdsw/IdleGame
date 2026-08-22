@@ -41,7 +41,6 @@ namespace IdleDefenseSurvival.Items.Generation
         public string Source;
         public bool IsCritical = false;
         public int FixedLevel = 0;
-        public int FixedEnhance = 0;
     }
 
     public enum CraftCategory
@@ -62,8 +61,6 @@ namespace IdleDefenseSurvival.Items.Generation
         public int MinQuality = 0;
         public int MaxQuality = 0;
         public int FixedLevel = 0;
-        public int FixedEnhance = 0;
-        public float Weight = 1f;
         public bool IsMainResult = false;
     }
 

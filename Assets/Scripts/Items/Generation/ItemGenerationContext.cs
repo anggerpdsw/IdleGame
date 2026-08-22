@@ -18,7 +18,6 @@ namespace IdleDefenseSurvival.Items.Generation
         public IReadOnlyList<EventCraftModifier> EventModifiers { get; set; }
         public int? ForcedQuality { get; set; } = null;
         public int? FixedLevel { get; set; } = null;
-        public int? FixedEnhance { get; set; } = null;
         public int? Seed { get; set; } = null;
         public int Tier { get; set; } = 1;
         public int Wave { get; set; } = 1;
@@ -41,7 +40,6 @@ namespace IdleDefenseSurvival.Items.Generation
             IReadOnlyList<EventCraftModifier> eventModifiers = null,
             int? forcedQuality = null,
             int? fixedLevel = null,
-            int? fixedEnhance = null,
             int? seed = null)
         {
             return new ItemGenerationContext
@@ -54,7 +52,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 EventModifiers = eventModifiers ?? Array.Empty<EventCraftModifier>(),
                 ForcedQuality = forcedQuality,
                 FixedLevel = fixedLevel,
-                FixedEnhance = fixedEnhance,
                 Seed = seed
             };
         }
@@ -151,10 +148,8 @@ namespace IdleDefenseSurvival.Items.Generation
             int? craftingLevel = null,
             int? blacksmithLevel = null,
             IReadOnlyList<EventCraftModifier> eventModifiers = null,
-            long? luck = null,
             int? forcedQuality = null,
             int? fixedLevel = null,
-            int? fixedEnhance = null,
             int? seed = null,
             int? tier = null,
             int? wave = null,
@@ -174,7 +169,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 EventModifiers = eventModifiers ?? EventModifiers,
                 ForcedQuality = forcedQuality ?? ForcedQuality,
                 FixedLevel = fixedLevel ?? FixedLevel,
-                FixedEnhance = fixedEnhance ?? FixedEnhance,
                 Seed = seed ?? Seed,
                 Tier = tier ?? Tier,
                 Wave = wave ?? Wave,

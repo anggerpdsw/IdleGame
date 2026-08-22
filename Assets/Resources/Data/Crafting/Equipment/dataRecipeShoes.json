@@ -7,7 +7,7 @@
       "Description": "Basic leather shoes stitched with cotton thread and organic glue.",
       "EquipmentType": 11,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "leather", "Count": 6 },
         { "ItemId": "cotton_thread", "Count": 3 },
@@ -23,7 +23,7 @@
       "Description": "Leather shoes reinforced with thick thread and concentrated glue.",
       "EquipmentType": 11,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "leather", "Count": 9 },
         { "ItemId": "thick_thread", "Count": 5 },
@@ -39,7 +39,7 @@
       "Description": "Heavy leather shoes with silk thread lacing and strong glue soles.",
       "EquipmentType": 11,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "leather", "Count": 13 },
         { "ItemId": "silk_thread", "Count": 7 },
@@ -55,7 +55,7 @@
       "Description": "Legendary leather shoes with compound thread weaving and colored glue.",
       "EquipmentType": 11,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "leather", "Count": 17 },
         { "ItemId": "compound_thread", "Count": 9 },
@@ -71,7 +71,7 @@
       "Description": "Mythic leather shoes with azureworm silk upper and super glue soles.",
       "EquipmentType": 11,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "leather", "Count": 22 },
         { "ItemId": "azureworm_silk", "Count": 12 },
@@ -87,7 +87,7 @@
       "Description": "Divine leather shoes with Vega String weave, compound glue, and elemental essence infusion.",
       "EquipmentType": 11,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "leather", "Count": 28 },
         { "ItemId": "vega_string", "Count": 15 },

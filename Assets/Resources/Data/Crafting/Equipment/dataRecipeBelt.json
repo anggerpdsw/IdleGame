@@ -7,7 +7,7 @@
       "Description": "A basic leather belt with a pig iron buckle.",
       "EquipmentType": 5,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "leather", "Count": 5 },
         { "ItemId": "pig_iron", "Count": 3 },
@@ -23,7 +23,7 @@
       "Description": "A leather belt with high-carbon steel buckle and thick thread stitching.",
       "EquipmentType": 5,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "leather", "Count": 8 },
         { "ItemId": "high_carbon_steel", "Count": 5 },
@@ -40,7 +40,7 @@
       "Description": "A belt with refined steel buckle and silk thread embroidery.",
       "EquipmentType": 5,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "leather", "Count": 12 },
         { "ItemId": "refined_steel", "Count": 8 },
@@ -57,7 +57,7 @@
       "Description": "A legendary belt with steel alloy buckle and compound thread weaving.",
       "EquipmentType": 5,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "leather", "Count": 16 },
         { "ItemId": "steel_alloy", "Count": 10 },
@@ -74,7 +74,7 @@
       "Description": "A mythic belt forged from high alloy steel with azureworm silk lining.",
       "EquipmentType": 5,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "leather", "Count": 20 },
         { "ItemId": "high_alloy_steel", "Count": 12 },
@@ -91,7 +91,7 @@
       "Description": "A divine belt with high alloy steel buckle and dream of reminiscence inlay.",
       "EquipmentType": 5,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "leather", "Count": 26 },
         { "ItemId": "high_alloy_steel", "Count": 15 },

@@ -289,7 +289,7 @@ namespace IdleDefenseSurvival.Equipment
             {
                 foreach (var statEntry in itemData.CombatStats)
                 {
-                    float value = statEntry.GetValue(item.Level, item.EnhanceLevel);
+                    float value = statEntry.GetValue(item.Level);
                     if (bonuses.ContainsKey(statEntry.Stat))
                         bonuses[statEntry.Stat] += value;
                     else
@@ -329,7 +329,7 @@ namespace IdleDefenseSurvival.Equipment
                         {
                             foreach (var statEntry in gemStats)
                             {
-                                float value = statEntry.GetValue(socket.GemLevel, 0);
+                                float value = statEntry.GetValue(socket.GemLevel);
                                 if (bonuses.ContainsKey(statEntry.Stat))
                                     bonuses[statEntry.Stat] += value;
                                 else
@@ -345,7 +345,7 @@ namespace IdleDefenseSurvival.Equipment
             {
                 foreach (var statEntry in item.Enchantment.StatBonuses)
                 {
-                    float value = statEntry.GetValue(item.Enchantment.Level, 0);
+                    float value = statEntry.GetValue(item.Enchantment.Level);
                     if (bonuses.ContainsKey(statEntry.Stat))
                         bonuses[statEntry.Stat] += value;
                     else
@@ -370,7 +370,7 @@ namespace IdleDefenseSurvival.Equipment
             {
                 foreach (var effectEntry in itemData.SpecialEffects)
                 {
-                    if (effectEntry.CanActivate(item.Level, item.EnhanceLevel))
+                    if (effectEntry.CanActivate(item.Level))
                     {
                         effects.Add(effectEntry.EffectType.GetDisplayName());
                     }

@@ -7,7 +7,7 @@
       "Description": "Basic leather gloves crafted from tanned hide and cotton thread.",
       "EquipmentType": 2,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "leather", "Count": 8 },
         { "ItemId": "cotton_thread", "Count": 3 },
@@ -23,7 +23,7 @@
       "Description": "Leather gloves reinforced with thick thread and stronger glue.",
       "EquipmentType": 2,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "leather", "Count": 12 },
         { "ItemId": "thick_thread", "Count": 5 },
@@ -39,7 +39,7 @@
       "Description": "Heavy leather gloves with silk thread reinforcement.",
       "EquipmentType": 2,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "leather", "Count": 18 },
         { "ItemId": "silk_thread", "Count": 8 },
@@ -55,7 +55,7 @@
       "Description": "Leather gloves lined with compound thread for superior dexterity.",
       "EquipmentType": 2,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "leather", "Count": 24 },
         { "ItemId": "compound_thread", "Count": 12 },
@@ -71,7 +71,7 @@
       "Description": "Leather gloves woven with Azureworm silk for legendary protection.",
       "EquipmentType": 2,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "leather", "Count": 32 },
         { "ItemId": "azureworm_silk", "Count": 16 },
@@ -87,7 +87,7 @@
       "Description": "Divine leather gloves woven with Vega String and infused with essence.",
       "EquipmentType": 2,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "leather", "Count": 40 },
         { "ItemId": "vega_string", "Count": 20 },

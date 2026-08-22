@@ -52,8 +52,7 @@ namespace IdleDefenseSurvival.Crafting
                 {
                     Attribute = kvp.Key,
                     BaseValue = kvp.Value,
-                    ValuePerLevel = 0f,
-                    ValuePerEnhance = 0f
+                    ValuePerLevel = 0f
                 };
             }
             return entries;

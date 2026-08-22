@@ -29,7 +29,7 @@ namespace IdleDefenseSurvival.Inventory
         Lock        = 1 << 3,  // Lock state changed
         Favorite    = 1 << 4,  // Favorite state changed
         Socket      = 1 << 5,  // Socket/gem changed
-        Upgrade     = 1 << 6,  // Enhance/limit break/refine changed
+        Upgrade     = 1 << 6,  // limit break
         Cooldown    = 1 << 7,  // Cooldown changed
         Selection   = 1 << 8,  // Selection state changed
         Tooltip     = 1 << 9,  // Tooltip data changed
@@ -359,7 +359,7 @@ public class InventoryItemData
 
     // ---- Equipment-only (unique instances) ----
     public int? Level;
-    public int? EnhanceLevel;
+    public int? MaxLevel;
     public int? MaxDurability; // Rolled from rarity config (not base template)
     public int? CurrentDurability;
     public int? DurabilityLossPerUse; // From rarity config

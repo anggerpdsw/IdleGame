@@ -316,10 +316,10 @@ namespace IdleDefenseSurvival.Modifiers
             return true;
         }
 
-        protected float CalculateScaledValue(float baseValue, int itemLevel, int enhanceLevel)
+        protected float CalculateScaledValue(float baseValue, int itemLevel)
         {
             // Base scaling - can be overridden
-            return baseValue;
+            return baseValue + (itemLevel - 1) * 0.01f;
         }
     }
 }

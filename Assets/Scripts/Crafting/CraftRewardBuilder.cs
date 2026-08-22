@@ -15,9 +15,7 @@ namespace IdleDefenseSurvival.Crafting
         private int _count = 1;
         private int _quality = 0;
         private CraftRewardSource _source = CraftRewardSource.Normal;
-        private bool _isCritical = false;
         private int _fixedLevel = 0;
-        private int _fixedEnhance = 0;
         private int _socketCount = 0;
 
         private CraftRewardBuilder() { }
@@ -54,21 +52,9 @@ namespace IdleDefenseSurvival.Crafting
             return this;
         }
 
-        public CraftRewardBuilder AsCritical(bool isCritical = true)
-        {
-            _isCritical = isCritical;
-            return this;
-        }
-
         public CraftRewardBuilder WithFixedLevel(int level)
         {
             _fixedLevel = level;
-            return this;
-        }
-
-        public CraftRewardBuilder WithFixedEnhance(int enhance)
-        {
-            _fixedEnhance = enhance;
             return this;
         }
 
@@ -90,7 +76,6 @@ namespace IdleDefenseSurvival.Crafting
                 Quality = _quality,
                 Source = _source.ToString(),
                 FixedLevel = _fixedLevel,
-                FixedEnhance = _fixedEnhance,
                 SocketCount = _socketCount
             };
         }
@@ -140,7 +125,6 @@ namespace IdleDefenseSurvival.Crafting
                 .WithQuality(quality)
                 .WithSource(source)
                 .WithFixedLevel(recipeResult.FixedLevel)
-                .WithFixedEnhance(recipeResult.FixedEnhance)
                 .Build();
         }
     }
@@ -177,7 +161,6 @@ namespace IdleDefenseSurvival.Crafting
                 Quality = entry.Quality,
                 Source = entry.Source,
                 FixedLevel = entry.FixedLevel,
-                FixedEnhance = entry.FixedEnhance,
                 SocketCount = entry.SocketCount
             };
         }

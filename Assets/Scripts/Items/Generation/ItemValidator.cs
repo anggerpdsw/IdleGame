@@ -146,14 +146,10 @@ namespace IdleDefenseSurvival.Items.Generation
                 }
             }
 
-            // Validate EnhanceLevel
-            if (item.EnhanceLevel < 0)
+            // Validate MaxLevel
+            if (item.MaxLevel < 1)
             {
-                errors.Add("EnhanceLevel is negative");
-            }
-            else if (baseData is EquipmentData eq && item.EnhanceLevel > 20) // Default max
-            {
-                errors.Add($"EnhanceLevel {item.EnhanceLevel} exceeds maximum");
+                errors.Add("MaxLevel must be >= 1");
             }
 
             return new ValidationResult

@@ -7,7 +7,7 @@ namespace IdleDefenseSurvival.Manager
 {
     /// <summary>
     /// Loads attribute progression values from JSON databases.
-    /// Single source of truth for ValuePerLevel and ValuePerEnhance for both Main and Secondary attributes.
+    /// Single source of truth for ValuePerLevel for both Main and Secondary attributes.
     /// </summary>
     public sealed class AttributeStatLoader : MonoBehaviour
     {
@@ -134,23 +134,23 @@ namespace IdleDefenseSurvival.Manager
         }
 
         /// <summary>
-        /// Calculates final attribute value from base + level + enhance contributions.
+        /// Calculates final attribute value from base + level contributions.
         /// Uses (Level - 1) * ValuePerLevel + EnhanceLevel * ValuePerEnhance progression.
         /// </summary>
-        public float CalculateFinalValue(MainAttribute attribute, float baseValue, int level, int enhanceLevel)
+        public float CalculateFinalValue(MainAttribute attribute, float baseValue, int level)
         {
             var prog = GetMainProgression(attribute);
-            return baseValue + prog.ValuePerLevel * (level - 1) + prog.ValuePerEnhance * enhanceLevel;
+            return baseValue + prog.ValuePerLevel * (level - 1);
         }
 
         /// <summary>
-        /// Calculates final secondary stat value from base + level + enhance contributions.
+        /// Calculates final secondary stat value from base + level contributions.
         /// Uses (Level - 1) * ValuePerLevel + EnhanceLevel * ValuePerEnhance progression.
         /// </summary>
-        public float CalculateFinalValue(SecondaryStat stat, float baseValue, int level, int enhanceLevel)
+        public float CalculateFinalValue(SecondaryStat stat, float baseValue, int level)
         {
             var prog = GetSecondaryProgression(stat);
-            return baseValue + prog.ValuePerLevel * (level - 1) + prog.ValuePerEnhance * enhanceLevel;
+            return baseValue + prog.ValuePerLevel * (level - 1);
         }
 
         /// <summary>
@@ -160,7 +160,6 @@ namespace IdleDefenseSurvival.Manager
         public struct AttributeProgression
         {
             public float ValuePerLevel;
-            public float ValuePerEnhance;
         }
     }
 }

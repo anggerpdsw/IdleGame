@@ -5,7 +5,7 @@ namespace IdleDefenseSurvival.Equipment
 {
     /// <summary>
     /// Single attribute entry for equipment - stores only instance BaseValue.
-    /// ValuePerLevel and ValuePerEnhance are resolved from database at runtime.
+    /// ValuePerLevel is resolved from database at runtime.
     /// </summary>
     [Serializable]
     public sealed class EquipmentAttributeEntry

@@ -264,7 +264,7 @@ namespace IdleDefenseSurvival.Items
         }
 
         /// <summary>
-        /// Gets the enhance level required to unlock a socket. Delegated to SocketService.
+        /// Gets the level required to unlock a socket. Delegated to SocketService.
         /// </summary>
         public int GetSocketUnlockRequirement(int socketIndex)
         {
@@ -272,7 +272,7 @@ namespace IdleDefenseSurvival.Items
         }
 
         /// <summary>
-        /// Updates socket unlock states based on item's enhance level. Delegated to SocketService.
+        /// Updates socket unlock states based on item's level. Delegated to SocketService.
         /// </summary>
         public void UpdateSocketUnlocks(InventoryItem item)
         {

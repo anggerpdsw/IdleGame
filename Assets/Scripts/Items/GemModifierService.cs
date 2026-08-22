@@ -55,7 +55,7 @@ namespace IdleDefenseSurvival.Items
 
             foreach (var statEntry in gemInstance.Stats)
             {
-                float value = statEntry.GetValue(gemInstance.Level, 0);
+                float value = statEntry.GetValue(gemInstance.Level);
                 if (value == 0) continue;
 
                 // Stat (SkillType) is the ModifierManager lookup key; missing it meant

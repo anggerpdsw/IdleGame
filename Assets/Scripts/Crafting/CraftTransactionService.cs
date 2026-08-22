@@ -77,7 +77,7 @@ namespace IdleDefenseSurvival.Items
                         Rollback();
                         return TransactionResult.Fail($"Failed to reserve {entry.ItemId}: need {entry.Count}, have {have}");
                     }
-                    _reservedMaterials.Add(new ReservedMaterial { ItemId = entry.ItemId, Count = entry.Count, MinQuality = 0, MinLevel = 0, MinEnhance = 0 });
+                    _reservedMaterials.Add(new ReservedMaterial { ItemId = entry.ItemId, Count = entry.Count, MinQuality = 0, MinLevel = 0 });
                 }
             }
 
@@ -177,9 +177,9 @@ namespace IdleDefenseSurvival.Items
                     int required = ingredient.Count * count;
                     int available = _inventory.GetTotalQuantity(ingredient.ItemId);
 
-                    if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0 || ingredient.MinEnhance > 0)
+                    if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0)
                     {
-                        available = CountQualifiedItems(ingredient.ItemId, ingredient.MinQuality, ingredient.MinLevel, ingredient.MinEnhance);
+                        available = CountQualifiedItems(ingredient.ItemId, ingredient.MinQuality, ingredient.MinLevel);
                     }
 
                     if (available < required)
@@ -236,9 +236,9 @@ namespace IdleDefenseSurvival.Items
             // For now, just validate availability. Actual removal happens on Commit.
             int available = _inventory.GetTotalQuantity(itemId);
 
-            if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0 || ingredient.MinEnhance > 0)
+            if (ingredient.MinQuality > 0 || ingredient.MinLevel > 0)
             {
-                available = CountQualifiedItems(itemId, ingredient.MinQuality, ingredient.MinLevel, ingredient.MinEnhance);
+                available = CountQualifiedItems(itemId, ingredient.MinQuality, ingredient.MinLevel);
             }
 
             if (available < count)
@@ -252,13 +252,12 @@ namespace IdleDefenseSurvival.Items
                 Count = count,
                 MinQuality = ingredient.MinQuality,
                 MinLevel = ingredient.MinLevel,
-                MinEnhance = ingredient.MinEnhance
             });
 
             return ReserveResult.Success();
         }
 
-        private int CountQualifiedItems(string itemId, int minQuality, int minLevel, int minEnhance)
+        private int CountQualifiedItems(string itemId, int minQuality, int minLevel)
         {
             var items = _inventory.GetItemsById(itemId);
             int count = 0;
@@ -266,8 +265,7 @@ namespace IdleDefenseSurvival.Items
             {
                 bool qualityOk = minQuality <= 0 || item.GetRarity() >= (Rarity)minQuality;
                 bool levelOk = minLevel <= 0 || item.Level >= minLevel;
-                bool enhanceOk = minEnhance <= 0 || item.EnhanceLevel >= minEnhance;
-                if (qualityOk && levelOk && enhanceOk)
+                if (qualityOk && levelOk)
                     count += item.Quantity;
             }
             return count;
@@ -288,7 +286,6 @@ namespace IdleDefenseSurvival.Items
             public int Count;
             public int MinQuality;
             public int MinLevel;
-            public int MinEnhance;
         }
 
         private struct ReserveResult

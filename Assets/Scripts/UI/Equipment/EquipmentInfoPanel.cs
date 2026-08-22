@@ -41,11 +41,9 @@ namespace IdleDefenseSurvival.UI.Equipment
         [SerializeField] private Slider _durabilityBar;
         [SerializeField] private TextMeshProUGUI _durabilityText;
 
-        [Header("Enhancement")]
+        [Header("Level")]
         [SerializeField] private TextMeshProUGUI _levelText;
-        [SerializeField] private TextMeshProUGUI _enhanceText;
         [SerializeField] private Button _upgradeButton;
-        [SerializeField] private Button _enhanceButton;
 
         [Header("Actions")]
         [SerializeField] private Button _unequipButton;
@@ -65,7 +63,6 @@ namespace IdleDefenseSurvival.UI.Equipment
             _parentUI = parentUI;
 
             if (_upgradeButton != null) _upgradeButton.onClick.AddListener(OnUpgrade);
-            if (_enhanceButton != null) _enhanceButton.onClick.AddListener(OnEnhance);
             if (_unequipButton != null) _unequipButton.onClick.AddListener(OnUnequip);
             if (_repairButton != null) _repairButton.onClick.AddListener(OnRepair);
             if (_socketGemButton != null) _socketGemButton.onClick.AddListener(OnSocketGem);
@@ -115,11 +112,9 @@ namespace IdleDefenseSurvival.UI.Equipment
             if (_equipSlotText != null)
                 _equipSlotText.text = item.GetEquipmentType().GetDisplayName();
 
-            // Level/Enhance
+            // Level
             if (_levelText != null)
                 _levelText.text = $"Lv.{item.Level}";
-            if (_enhanceText != null)
-                _enhanceText.text = item.EnhanceLevel > 0 ? $"+{item.EnhanceLevel}" : "";
 
             // Durability
             if (_durabilityBar != null)
@@ -243,18 +238,12 @@ namespace IdleDefenseSurvival.UI.Equipment
 
         private void UpdateButtons(InventoryItem item)
         {
-            var canEnhance = UpgradeService.Instance?.CanEnhance(item, out _) ?? false;
             var canUpgrade = UpgradeService.Instance?.CanUpgradeLevel(item, out _) ?? false;
 
             if (_upgradeButton != null)
             {
                 _upgradeButton.gameObject.SetActive(canUpgrade);
                 _upgradeButton.interactable = canUpgrade && !item.IsLocked;
-            }
-            if (_enhanceButton != null)
-            {
-                _enhanceButton.gameObject.SetActive(canEnhance);
-                _enhanceButton.interactable = canEnhance && !item.IsLocked;
             }
             if (_unequipButton != null)
                 _unequipButton.interactable = !item.IsLocked;
@@ -273,7 +262,6 @@ namespace IdleDefenseSurvival.UI.Equipment
         }
 
         private void OnUpgrade() => UpgradeService.Instance?.UpgradeLevel(_currentItem);
-        private void OnEnhance() => UpgradeService.Instance?.Enhance(_currentItem);
         private void OnUnequip() => EquipmentService.Instance?.Unequip(_currentItem.EquippedSlot);
         private void OnRepair() => RepairService.Instance?.RepairItem(_currentItem);
         private void OnSocketGem() { /* Open gem selection UI */ }

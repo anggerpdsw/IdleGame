@@ -18,13 +18,6 @@ namespace IdleDefenseSurvival.Items
         // Scaling factors
         public float LevelMultiplier;
         public float RarityMultiplier;
-        public float EnhanceMultiplier;
-        public float LimitBreakMultiplier;
-        public float RefineMultiplier;
-        public float TranscendMultiplier;
-        public float EvolutionMultiplier;
-        public float AwakeningMultiplier;
-        public float MasterworkMultiplier;
         public float MissingPercentMultiplier;
         public float QualityMultiplier;
         public float TierMultiplier;
@@ -38,9 +31,7 @@ namespace IdleDefenseSurvival.Items
         public float CurrentDurabilityPercent;
         public bool IsFree;
 
-        public float TotalMultiplier => LevelMultiplier * RarityMultiplier * EnhanceMultiplier *
-            LimitBreakMultiplier * RefineMultiplier * TranscendMultiplier *
-            EvolutionMultiplier * AwakeningMultiplier * MasterworkMultiplier *
+        public float TotalMultiplier => LevelMultiplier * RarityMultiplier * 
             MissingPercentMultiplier * QualityMultiplier * TierMultiplier *
             StarMultiplier * CorruptionMultiplier * BrokenMultiplier * GlobalGrowth;
 
@@ -67,7 +58,7 @@ namespace IdleDefenseSurvival.Items
         }
 
         /// <summary>
-        /// Calculates repair cost for an item with enhanced formula.
+        /// Calculates repair cost for an item with multiple formula.
         /// </summary>
         public long CalculateRepairCost(InventoryItem item, int durabilityPoints)
         {
@@ -88,33 +79,29 @@ namespace IdleDefenseSurvival.Items
             // 2. ItemRarity scaling
             float rarityMultiplier = itemData.ItemRarity.GetDefaultUpgradeMultiplier();
 
-            // 3. Enhance scaling: +10% per enhance level
-            float enhanceMultiplier = 1f + item.EnhanceLevel * 0.1f;
-
-            // 4. Durability missing % scaling: more missing = slightly higher per-point cost
+            // 3. Durability missing % scaling: more missing = slightly higher per-point cost
             float missingPercent = 1f - item.GetDurabilityPercent();
             float missingMultiplier = 1f + missingPercent * 0.2f; // Up to +20% when fully broken
 
-            // 5. Quality scaling (from item data)
+            // 4. Quality scaling (from item data)
             float qualityMultiplier = itemData.QualityMultiplier > 0 ? itemData.QualityMultiplier : 1f;
 
-            // 6. Item Tier scaling
+            // 5. Item Tier scaling
             float tierMultiplier = 1f + itemData.Tier * 0.1f;
 
-            // 7. Star/Awakening/Transcend/Corruption scalings
+            // 6. Star/Awakening/Transcend/Corruption scalings
             float starMultiplier = 1f + itemData.StarRating * 0.05f;
             float corruptionMultiplier = itemData.CorruptionTier * 0.1f + 1f;
 
-            // 8. Broken state penalty: 2x cost if completely broken
+            // 7. Broken state penalty: 2x cost if completely broken
             float brokenMultiplier = item.IsBroken ? 2f : 1f;
 
-            // 9. Global RepairCostGrowth config
+            // 8. Global RepairCostGrowth config
             float globalGrowth = _config.RepairCostGrowth;
 
             // ===== Total Multiplier =====
             float totalMultiplier = levelMultiplier *
                                    rarityMultiplier *
-                                   enhanceMultiplier *
                                    missingMultiplier *
                                    qualityMultiplier *
                                    tierMultiplier *
@@ -191,7 +178,6 @@ namespace IdleDefenseSurvival.Items
                 BaseCostPerPoint = baseCostPerPoint,
                 LevelMultiplier = 1f + (item.Level - 1) * 0.05f,
                 RarityMultiplier = itemData.ItemRarity.GetDefaultUpgradeMultiplier(),
-                EnhanceMultiplier = 1f + item.EnhanceLevel * 0.1f,
                 MissingPercentMultiplier = 1f + (1f - item.GetDurabilityPercent()) * 0.2f,
                 QualityMultiplier = itemData.QualityMultiplier > 0 ? itemData.QualityMultiplier : 1f,
                 TierMultiplier = 1f + itemData.Tier * 0.1f,

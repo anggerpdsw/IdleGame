@@ -361,7 +361,7 @@ namespace IdleDefenseSurvival.Equipment
 
                 foreach (var effectEntry in itemData.SpecialEffects)
                 {
-                    if (!effectEntry.CanActivate(item.Level, item.EnhanceLevel)) continue;
+                    if (!effectEntry.CanActivate(item.Level)) continue;
                     effects.Add(new ActiveSpecialEffect
                     {
                         EffectType = effectEntry.EffectType,

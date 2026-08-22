@@ -56,12 +56,12 @@ namespace IdleDefenseSurvival.Items.Generation
                 ? rarityRequirement
                 : index + 1;
             if ((int)rarity >= unlockRarity) return true;
-            // Check enhance-based unlock.
-            int unlockEnhance =
-                _config.SocketUnlockEnhance.TryGetValue(index, out var enhanceRequirement)
-                    ? enhanceRequirement
+            // Check level-based unlock.
+            int unlockLevel =
+                _config.SocketUnlockLevel.TryGetValue(index, out var levelRequirement)
+                    ? levelRequirement
                     : 0;
-            if (context.FixedEnhance.HasValue && context.FixedEnhance.Value >= unlockEnhance)
+            if (context.FixedLevel.HasValue && context.FixedLevel.Value >= unlockLevel)
                 return true;
             return false;
         }
@@ -91,12 +91,13 @@ namespace IdleDefenseSurvival.Items.Generation
             { 4, 6 }, // 5th socket at Divine
         };
 
-        public Dictionary<int, int> SocketUnlockEnhance = new()
+        public Dictionary<int, int> SocketUnlockLevel = new()
         {
-            { 1, 5 },  // 2nd socket at +5
-            { 2, 10 }, // 3rd socket at +10
-            { 3, 15 }, // 4th socket at +15
-            { 4, 20 }, // 5th socket at +20
+            { 1, 10 }, // 2nd socket at +10
+            { 2, 15 }, // 3rd socket at +15
+            { 3, 20 }, // 4th socket at +20
+            { 4, 25 }, // 5th socket at +25
+            { 5, 30 }, // 6th socket at +30
         };
 
         public static SocketGeneratorConfig Default

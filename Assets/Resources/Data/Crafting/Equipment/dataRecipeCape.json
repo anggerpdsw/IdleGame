@@ -7,7 +7,7 @@
       "Description": "A simple cotton cape stitched with organic glue.",
       "EquipmentType": 3,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "cotton_thread", "Count": 8 },
         { "ItemId": "organic_glue", "Count": 3 },
@@ -22,7 +22,7 @@
       "Description": "A cape woven from thick thread with concentrated glue.",
       "EquipmentType": 3,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "thick_thread", "Count": 12 },
         { "ItemId": "concentrated_glue", "Count": 4 },
@@ -37,7 +37,7 @@
       "Description": "A refined cape crafted from silk thread with strong glue.",
       "EquipmentType": 3,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "silk_thread", "Count": 16 },
         { "ItemId": "strong_glue", "Count": 5 },
@@ -52,7 +52,7 @@
       "Description": "A legendary cape woven with compound thread and colored glue.",
       "EquipmentType": 3,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "compound_thread", "Count": 20 },
         { "ItemId": "colored_glue", "Count": 6 },
@@ -67,7 +67,7 @@
       "Description": "A mythic cape woven from azureworm silk with super glue binding.",
       "EquipmentType": 3,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "azureworm_silk", "Count": 24 },
         { "ItemId": "super_glue", "Count": 7 },
@@ -82,7 +82,7 @@
       "Description": "A divine cape woven with Vega String and infused with essence of hope.",
       "EquipmentType": 3,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "vega_string", "Count": 28 },
         { "ItemId": "compound_glue", "Count": 9 },

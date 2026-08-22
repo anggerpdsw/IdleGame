@@ -7,7 +7,7 @@
       "Description": "A basic pig iron bracelet with rough quartz inlays on cotton thread.",
       "EquipmentType": 10,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "pig_iron", "Count": 3 },
         { "ItemId": "rough_quartz", "Count": 2 },
@@ -23,7 +23,7 @@
       "Description": "A high-carbon steel bracelet with normal ruby inlays on thick thread.",
       "EquipmentType": 10,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "high_carbon_steel", "Count": 5 },
         { "ItemId": "normal_ruby", "Count": 2 },
@@ -39,7 +39,7 @@
       "Description": "A refined steel bracelet with refined sapphire inlays on silk thread.",
       "EquipmentType": 10,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "refined_steel", "Count": 8 },
         { "ItemId": "refined_sapphire", "Count": 2 },
@@ -55,7 +55,7 @@
       "Description": "A steel alloy bracelet with rare emerald inlays on compound thread.",
       "EquipmentType": 10,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "steel_alloy", "Count": 10 },
         { "ItemId": "rare_emerald", "Count": 2 },
@@ -71,7 +71,7 @@
       "Description": "A high alloy steel bracelet with legendary diamond inlays on azureworm silk.",
       "EquipmentType": 10,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "high_alloy_steel", "Count": 13 },
         { "ItemId": "legendary_diamond", "Count": 2 },
@@ -87,7 +87,7 @@
       "Description": "A divine high alloy steel bracelet with mythic emerald and dream of reminiscence on Vega String.",
       "EquipmentType": 10,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "high_alloy_steel", "Count": 18 },
         { "ItemId": "mythic_emerald", "Count": 2 },

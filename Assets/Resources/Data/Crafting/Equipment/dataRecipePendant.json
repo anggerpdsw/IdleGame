@@ -7,7 +7,7 @@
       "Description": "A simple pig iron pendant strung on cotton thread.",
       "EquipmentType": 7,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "pig_iron", "Count": 4 },
         { "ItemId": "cotton_thread", "Count": 2 },
@@ -22,7 +22,7 @@
       "Description": "A high-carbon steel pendant on thick thread.",
       "EquipmentType": 7,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "high_carbon_steel", "Count": 6 },
         { "ItemId": "thick_thread", "Count": 4 },
@@ -37,7 +37,7 @@
       "Description": "A refined steel pendant with silk thread wrapping.",
       "EquipmentType": 7,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "refined_steel", "Count": 9 },
         { "ItemId": "silk_thread", "Count": 6 },
@@ -52,7 +52,7 @@
       "Description": "A legendary pendant forged from steel alloy with compound thread.",
       "EquipmentType": 7,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "steel_alloy", "Count": 12 },
         { "ItemId": "compound_thread", "Count": 8 },
@@ -67,7 +67,7 @@
       "Description": "A mythic pendant forged from high alloy steel with azureworm silk.",
       "EquipmentType": 7,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "high_alloy_steel", "Count": 14 },
         { "ItemId": "azureworm_silk", "Count": 10 },
@@ -82,7 +82,7 @@
       "Description": "A divine pendant forged from high alloy steel with Vega String and elemental essence inlay.",
       "EquipmentType": 7,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "high_alloy_steel", "Count": 18 },
         { "ItemId": "vega_string", "Count": 12 },

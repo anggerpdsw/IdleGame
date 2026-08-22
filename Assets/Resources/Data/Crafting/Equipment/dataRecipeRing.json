@@ -7,7 +7,7 @@
       "Description": "A basic pig iron ring set with rough quartz on cotton thread wrap.",
       "EquipmentType": 8,
       "Rarity": 1,
-      "RequiredCraftingLevel": 1,
+      "RequiredBlacksmithLevel": 1,
       "Ingredients": [
         { "ItemId": "pig_iron", "Count": 2 },
         { "ItemId": "rough_quartz", "Count": 1 },
@@ -23,7 +23,7 @@
       "Description": "A high-carbon steel ring set with normal ruby on thick thread.",
       "EquipmentType": 8,
       "Rarity": 2,
-      "RequiredCraftingLevel": 5,
+      "RequiredBlacksmithLevel": 5,
       "Ingredients": [
         { "ItemId": "high_carbon_steel", "Count": 4 },
         { "ItemId": "normal_ruby", "Count": 1 },
@@ -39,7 +39,7 @@
       "Description": "A refined steel ring set with refined sapphire on silk thread.",
       "EquipmentType": 8,
       "Rarity": 3,
-      "RequiredCraftingLevel": 10,
+      "RequiredBlacksmithLevel": 10,
       "Ingredients": [
         { "ItemId": "refined_steel", "Count": 6 },
         { "ItemId": "refined_sapphire", "Count": 1 },
@@ -55,7 +55,7 @@
       "Description": "A steel alloy ring set with rare emerald on compound thread.",
       "EquipmentType": 8,
       "Rarity": 4,
-      "RequiredCraftingLevel": 15,
+      "RequiredBlacksmithLevel": 15,
       "Ingredients": [
         { "ItemId": "steel_alloy", "Count": 8 },
         { "ItemId": "rare_emerald", "Count": 1 },
@@ -71,7 +71,7 @@
       "Description": "A high alloy steel ring set with legendary diamond on azureworm silk.",
       "EquipmentType": 8,
       "Rarity": 5,
-      "RequiredCraftingLevel": 20,
+      "RequiredBlacksmithLevel": 20,
       "Ingredients": [
         { "ItemId": "high_alloy_steel", "Count": 10 },
         { "ItemId": "legendary_diamond", "Count": 1 },
@@ -87,7 +87,7 @@
       "Description": "A divine high alloy steel ring set with mythic ruby and elemental essence on Vega String.",
       "EquipmentType": 8,
       "Rarity": 6,
-      "RequiredCraftingLevel": 25,
+      "RequiredBlacksmithLevel": 25,
       "Ingredients": [
         { "ItemId": "high_alloy_steel", "Count": 14 },
         { "ItemId": "mythic_ruby", "Count": 1 },

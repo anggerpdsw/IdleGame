@@ -60,7 +60,7 @@ namespace IdleDefenseSurvival.Equipment
             {
                 foreach (var effectEntry in itemData.SpecialEffects)
                 {
-                    if (!effectEntry.CanActivate(item.Level, item.EnhanceLevel)) continue;
+                    if (!effectEntry.CanActivate(item.Level)) continue;
                     ActivateEffect(item, slot, effectEntry);
                 }
             }
@@ -73,7 +73,7 @@ namespace IdleDefenseSurvival.Equipment
 
         private void ActivateEffect(InventoryItem item, EquipmentType slot, SpecialEffectEntry entry)
         {
-            if (!entry.CanActivate(item.Level, item.EnhanceLevel)) return;
+            if (!entry.CanActivate(item.Level)) return;
 
             var effect = EffectFactory.Create(entry.EffectType, entry, item, slot);
             if (effect == null) return;

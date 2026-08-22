@@ -163,7 +163,7 @@ namespace IdleDefenseSurvival.Items
         public Vector3 EquippedScale = Vector3.one;
 
         // ============ Upgrade ============
-        public UpgradeCurveData UpgradeCurve; // How stats scale with level/enhance
+        public UpgradeCurveData UpgradeCurve; // How stats scale with level
 
         public void InitializeDefaults()
         {
@@ -187,13 +187,12 @@ namespace IdleDefenseSurvival.Items
         public SecondaryStat Stat = SecondaryStat.None;
         public float BaseValue = 0f;
         public float ValuePerLevel = 0f; // Scaling per level
-        public float ValuePerEnhance = 0f; // Scaling per enhance level
         public SecondaryStatMode Mode = SecondaryStatMode.Flat;
         public bool IsPercent = false; // Legacy - use Mode instead
 
-        public float GetValue(int level, int enhanceLevel = 0)
+        public float GetValue(int level)
         {
-            float value = BaseValue + ValuePerLevel * (level - 1) + ValuePerEnhance * enhanceLevel;
+            float value = BaseValue + ValuePerLevel * (level - 1);
             return Mode == SecondaryStatMode.Percent ? value * 0.01f : value;
         }
     }
@@ -226,11 +225,10 @@ namespace IdleDefenseSurvival.Items
         public MainAttribute Attribute = MainAttribute.Constitution;
         public float BaseValue = 0f;
         public float ValuePerLevel = 0f; // Scaling per level
-        public float ValuePerEnhance = 0f; // Scaling per enhance level
 
-        public float GetValue(int level, int enhanceLevel = 0)
+        public float GetValue(int level)
         {
-            return BaseValue + ValuePerLevel * (level - 1) + ValuePerEnhance * enhanceLevel;
+            return BaseValue + ValuePerLevel * (level - 1);
         }
     }
 
@@ -246,11 +244,10 @@ namespace IdleDefenseSurvival.Items
         public float Cooldown = 0f; // Internal cooldown in seconds
         public string[] Conditions; // Additional conditions (JSON)
         public int RequiredLevel = 1; // Minimum item level to activate
-        public int RequiredEnhance = 0; // Minimum enhance level to activate
         public bool IsActive = true; // Can be toggled
 
-        public bool CanActivate(int itemLevel, int enhanceLevel) =>
-            IsActive && itemLevel >= RequiredLevel && enhanceLevel >= RequiredEnhance;
+        public bool CanActivate(int itemLevel) =>
+            IsActive && itemLevel >= RequiredLevel;
     }
 
     /// <summary>
@@ -288,7 +285,6 @@ namespace IdleDefenseSurvival.Items
     public class UpgradeCurveData
     {
         public AnimationCurve LevelCurve = AnimationCurve.Linear(0, 1, 100, 2);
-        public AnimationCurve EnhanceCurve = AnimationCurve.Linear(0, 1, 20, 3);
         public AnimationCurve LimitBreakCurve = AnimationCurve.Linear(0, 1, 5, 5);
         public float RarityMultiplier = 1f;
     }

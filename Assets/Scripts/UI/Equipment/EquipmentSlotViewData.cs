@@ -29,9 +29,6 @@ namespace IdleDefenseSurvival.UI.Equipment
         public bool ShowDurability;
         public Color DurabilityColor = Color.white;
 
-        public bool ShowEnhance;
-        public string EnhanceText = string.Empty;
-
         public bool ShowSetBonusGlow;
 
         // Unlock (poin 10)
