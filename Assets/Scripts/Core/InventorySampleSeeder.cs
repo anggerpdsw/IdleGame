@@ -15,17 +15,17 @@ namespace IdleDefenseSurvival.Core
             var inv = InventoryService.Instance;
             if (inv == null || ItemDatabase.Instance == null || inv.AllItems.Count > 0) return;
 
-            inv.AddItem("potion_hp", 10);
-            inv.AddItem("potion_mp", 11);
-            inv.AddItem("essence_of_hope", 9);
-            inv.AddItem("water", 999);
-            inv.AddItem("compound_thread", 999);
-            inv.AddItem("fine_lumber", 999);
-            inv.AddItem("colored_glue", 999);
-            inv.AddItem("leather", 999);
-            inv.AddItem("disposed_logs", 999);
-            inv.AddItem("organic_glue", 999);
-            inv.AddItem("cotton_thread", 999);
+            inv.AddItem("potion_hp", 100);
+            inv.AddItem("potion_mp", 100);
+            // inv.AddItem("essence_of_hope", 9);
+            // inv.AddItem("water", 999);
+            // inv.AddItem("compound_thread", 999);
+            // inv.AddItem("fine_lumber", 999);
+            // inv.AddItem("colored_glue", 999);
+            // inv.AddItem("leather", 999);
+            // inv.AddItem("disposed_logs", 999);
+            // inv.AddItem("organic_glue", 999);
+            // inv.AddItem("cotton_thread", 999);
         }
     }
 }
