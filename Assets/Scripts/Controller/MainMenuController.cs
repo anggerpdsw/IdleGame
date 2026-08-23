@@ -42,7 +42,7 @@ namespace IdleDefenseSurvival.Controller
         [Header("Mission")]
         [SerializeField] private Button _missionButton;
         [SerializeField] private GameObject _missionBadge;
-        [SerializeField] private DailyRewardUI _missionPanelPrefab;
+        [SerializeField] private MissionUI _missionPanelPrefab;
 
         private void Start()
         {
@@ -116,6 +116,8 @@ namespace IdleDefenseSurvival.Controller
 
         private void UpdateMissionBadge()
         {
+            if (_missionBadge == null) return;
+
             var service = MissionService.Instance;
             if (service == null)
             {
@@ -124,15 +126,21 @@ namespace IdleDefenseSurvival.Controller
             }
 
             bool show = service.GetAllMissions().Any(m =>
-                m.status == MissionStatus.Active ||
-                (m.status == MissionStatus.Completed && !m.rewardClaimed));
+                m.status == MissionStatus.Completed && !m.rewardClaimed);
 
             _missionBadge?.SetActive(show);
         }
 
         private void OnDailyRewardInitialized() => RefreshDailyBadge(DailyRewardManager.Instance.Service.HasClaimableReward);
 
-        private void OnSaveLoaded() => InitializeTierSelection();
+        private void OnSaveLoaded()
+        {
+            InitializeTierSelection();
+            
+            UnsubscribeMissionEvents();
+            SubscribeMissionEvents();
+            UpdateMissionBadge();
+        }
 
         private void InitializeTierSelection()
         {
@@ -140,8 +148,10 @@ namespace IdleDefenseSurvival.Controller
             RefreshUI();
         }
 
-        private void RefreshDailyBadge(bool visible) => _dailyBadge.SetActive(visible);
-        private void RefreshMissionBadge(bool visible) => _missionBadge.SetActive(visible);
+        private void RefreshDailyBadge(bool visible)
+        {
+            if (_dailyBadge != null) _dailyBadge.SetActive(visible);
+        }
 
         private void RefreshUI()
         {

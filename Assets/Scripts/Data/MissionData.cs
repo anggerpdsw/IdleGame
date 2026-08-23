@@ -42,11 +42,6 @@ namespace IdleDefenseSurvival.Data
     }
 
     /// <summary>
-    /// Runtime status of a mission instance
-    /// </summary>
-    public enum MissionStatus { Active, Completed, Claimed, Cancelled }
-
-    /// <summary>
     /// Runtime mission instance - persistent data for a specific mission assigned to a player
     /// </summary>
     [Serializable]

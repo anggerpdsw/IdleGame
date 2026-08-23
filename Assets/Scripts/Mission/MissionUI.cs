@@ -1,59 +1,47 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Reward;
+using IdleDefenseSurvival.Mission;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace IdleDefenseSurvival.UI
 {
+    /// <summary>
+    /// Renders the active mission slots. Slot count tracks
+    /// <see cref="AccountData.maxMission"/> via MissionService — the pool grows
+    /// but never shrinks so the layout stays stable when the cap changes.
+    ///</summary>
     public class MissionUI : MonoBehaviour
     {
-        private const int TotalSlots = GameConstants.REWARD_COUNT;
-
         [SerializeField] private RectTransform _panelRoot;
         [SerializeField] private CanvasGroup _canvasGroup;
         [SerializeField] private TextMeshProUGUI _subtitleLabel;
         [SerializeField] private Transform _slotContainer;
         [SerializeField] private GameObject _slotViewPrefab;
         [SerializeField] private Button _closeButton;
-        private readonly DailyRewardSlot[] _slots = new DailyRewardSlot[TotalSlots];
+        [SerializeField, Tooltip("Soft cap on pool size; additional slots are instantiated as needed.")]
+        private int _initialPoolSize = 1;
 
-        private DailyRewardService Service => DailyRewardManager.Instance?.Service;
+        private readonly List<MissionSlot> _slots = new();
+
+        private MissionService Service => MissionService.Instance;
 
         private void Awake()
         {
-            BuildSlots();
             if (_closeButton != null)
                 _closeButton.onClick.AddListener(Close);
         }
 
-        private void BuildSlots()
-        {
-            if (_slotContainer == null || _slotViewPrefab == null)
-            {
-                Debug.LogError("[DailyRewardUI] Slot container or prefab not assigned");
-                return;
-            }
-
-            for (int i = 0; i < TotalSlots; i++)
-            {
-                if (Instantiate(_slotViewPrefab, _slotContainer).TryGetComponent<DailyRewardSlot>(out var slot))
-                {
-                    slot.Initialize(i);
-                    _slots[i] = slot;
-                }
-                else
-                {
-                    Debug.LogError($"[DailyRewardUI] Slot prefab missing DailyRewardSlot component at index {i}");
-                }
-            }
-        }
-
         private void OnEnable()
         {
+            EnsurePool(Service?.GetMaxMission() ?? Mathf.Max(1, _initialPoolSize));
+            Subscribe();
             RefreshUI();
             PlayEnterAnimation();
             StartCoroutine(CountdownUpdater());
@@ -61,13 +49,74 @@ namespace IdleDefenseSurvival.UI
 
         private void OnDisable()
         {
+            Unsubscribe();
             StopAllCoroutines();
+        }
+
+        private void Subscribe()
+        {
+            if (Service == null) return;
+            Service.OnMissionsChanged += OnMissionsChanged;
+            Service.OnMissionStatusChanged += OnMissionStatusChanged;
+            Service.OnMissionProgressChanged += OnMissionProgressChanged;
+        }
+
+        private void Unsubscribe()
+        {
+            if (Service == null) return;
+            Service.OnMissionsChanged -= OnMissionsChanged;
+            Service.OnMissionStatusChanged -= OnMissionStatusChanged;
+            Service.OnMissionProgressChanged -= OnMissionProgressChanged;
+        }
+
+        private void OnMissionsChanged()
+        {
+            EnsurePool(Service?.GetMaxMission() ?? 0);
+            RefreshUI();
+        }
+
+        private void OnMissionStatusChanged(MissionInstance _) => RefreshUI();
+        private void OnMissionProgressChanged(MissionInstance _) => RefreshUI();
+
+        private void EnsurePool(int desired)
+        {
+            if (_slotContainer == null || _slotViewPrefab == null)
+            {
+                Debug.LogError("[MissionUI] Slot container or prefab not assigned");
+                return;
+            }
+
+            int target = Mathf.Max(0, desired);
+            while (_slots.Count < target)
+            {
+                if (Instantiate(_slotViewPrefab, _slotContainer).TryGetComponent<MissionSlot>(out var slot))
+                {
+                    slot.Initialize(_slots.Count, HandleClaim, HandleCancel);
+                    _slots.Add(slot);
+                }
+                else
+                {
+                    Debug.LogError($"[MissionUI] Slot prefab missing MissionSlot component at index {_slots.Count}");
+                    break;
+                }
+            }
+        }
+
+        private void HandleClaim(int slotIndex, string instanceId)
+        {
+            Service?.ClaimMission(instanceId);
+            Close();
+        }
+
+        private void HandleCancel(int slotIndex, string instanceId)
+        {
+            Service?.CancelMission(instanceId);
+            RefreshUI();
         }
 
         private System.Collections.IEnumerator CountdownUpdater()
         {
             var wait = new WaitForSeconds(1f);
-
             while (true)
             {
                 RefreshUI();
@@ -85,48 +134,80 @@ namespace IdleDefenseSurvival.UI
             if (service == null) return;
 
             var utcNow = DateTime.UtcNow;
-            var state = service.GetState(utcNow);
+            var max = service.GetMaxMission();
 
-            RefreshHeader(state);
-            RefreshSlots(utcNow);
+            RefreshHeader(service);
+            RefreshSlots(service, max);
         }
 
-        private void RefreshHeader(DailyRewardState state)
+        private void RefreshHeader(MissionService service)
         {
-            if (_subtitleLabel != null)
-                _subtitleLabel.text = state == DailyRewardState.CompletedToday
-                    ? "Your streak is complete for today."
-                    : "Claim the next reward to keep the streak alive.";
+            if (_subtitleLabel == null) return;
+            var active = service.GetActiveMissions().Count;
+            int max = service.GetMaxMission();
+            int completed = service.GetAllMissions().Count(m => m.status == MissionStatus.Completed);
+            _subtitleLabel.text = completed > 0
+                ? $"{completed} ready to claim — {active}/{max} active."
+                : $"{active}/{max} missions active.";
         }
 
-        private void RefreshSlots(DateTime utcNow)
+        private void RefreshSlots(MissionService service, int max)
         {
-            var service = Service;
-            if (service == null) return;
+            var missions = service.GetAllMissions();
 
-            var provider = service.RewardProvider;
-            if (provider == null) return;
-
-            for (int i = 0; i < TotalSlots; i++)
+            for (int i = 0; i < _slots.Count; i++)
             {
                 var slot = _slots[i];
                 if (slot == null) continue;
 
-                var reward = provider.GetReward(i);
-                if (reward == null) continue;
+                bool inRange = i < max;
+                if (slot.gameObject.activeSelf != inRange)
+                    slot.gameObject.SetActive(inRange);
+                if (!inRange) continue;
 
-                var slotState = service.GetSlotState(i, utcNow);
-                var iconKey = reward.Type == RewardType.Item && !string.IsNullOrEmpty(reward.Id) ? reward.Id : reward.Type.ToString();
-                var icon = ItemResources.GetItemSource(iconKey);
-                var remaining = Service?.GetRemainingTime(DateTime.UtcNow);
-                slot.Refresh(reward, slotState, i, icon, 
-                    slotState == DailyRewardState.Waiting ? remaining : null);
+                var mission = missions.FirstOrDefault(m => m.slotIndex == i);
+                if (mission == null)
+                {
+                    slot.Refresh(null, null, null);
+                    continue;
+                }
+
+                var template = service.GetTemplate(mission.missionId);
+                slot.Refresh(mission, template, GetMissionIcon(mission, template));
+            }
+        }
+
+        private static Sprite GetMissionIcon(MissionInstance m, MissionTemplate t)
+        {
+            if (t == null) return null;
+
+            switch (t.type)
+            {
+                case MissionEventType.EnemyKilled:
+                case MissionEventType.BossKilled:
+                case MissionEventType.SpecificEnemyKilled:
+                    string enemyId = !string.IsNullOrEmpty(m.targetId) ? m.targetId : t.targetId;
+                    return string.IsNullOrEmpty(enemyId) ? null : EnemyResources.GetEnemySprite(enemyId);
+
+                case MissionEventType.CurrencyEarned:
+                    string currencyId = !string.IsNullOrEmpty(t.targetId) ? t.targetId : "Gold";
+                    return ItemResources.GetItemSource(currencyId);
+
+                case MissionEventType.Blacksmithing:
+                    string eqId = !string.IsNullOrEmpty(m.targetId) ? m.targetId : null;
+                    return string.IsNullOrEmpty(eqId) ? null : ItemResources.GetItemSource($"Equipment/{eqId}");
+
+                case MissionEventType.WaveCompleted:
+                    return null;
+
+                default:
+                    return null;
             }
         }
 
         private void PlayEnterAnimation()
         {
-            if (_panelRoot == null) return;
+            if (_panelRoot == null || _canvasGroup == null) return;
 
             _panelRoot.localScale = Vector3.one * 0.96f;
             _canvasGroup.alpha = 0f;
@@ -134,10 +215,10 @@ namespace IdleDefenseSurvival.UI
             _canvasGroup.DOFade(1f, 0.25f).SetEase(Ease.OutQuad).SetLink(gameObject);
             _panelRoot.DOScale(1f, 0.28f).SetEase(Ease.OutBack).SetLink(gameObject);
 
-            for (int i = 0; i < _slots.Length; i++)
+            for (int i = 0; i < _slots.Count; i++)
             {
                 var slot = _slots[i];
-                if (slot == null || slot.Background == null || slot.Background.rectTransform == null) continue;
+                if (slot == null || slot.Background == null) continue;
 
                 var row = slot.Background.rectTransform;
                 row.localScale = Vector3.one * 0.9f;
@@ -145,13 +226,5 @@ namespace IdleDefenseSurvival.UI
                 row.DOScale(1f, 0.18f).SetEase(Ease.OutBack).SetDelay(delay).SetLink(gameObject);
             }
         }
-
-        private static string GetCountdownText(TimeSpan? remainingTime, DailyRewardState state)
-        {
-            if (state == DailyRewardState.Claimable || remainingTime == null) return string.Empty;
-            if (remainingTime.Value <= TimeSpan.Zero) return "Ready to claim";
-            return $"Next reward in {Utilityku.FormatDuration(remainingTime.Value)}";
-        }
-
     }
 }

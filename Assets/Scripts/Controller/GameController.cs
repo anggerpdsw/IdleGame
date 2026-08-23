@@ -1,5 +1,8 @@
 
+using System.Linq;
+using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Mission;
 using TMPro;
 using UnityEngine;
 
@@ -21,6 +24,9 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private TextMeshProUGUI _avgAttackEnemy;
         [SerializeField] private TextMeshProUGUI _avgDefenseEnemy;
         [SerializeField] private TextMeshProUGUI _avgEvasionEnemy;
+
+        [Header("Mission")]
+        [SerializeField] private GameObject _missionBadge;
 
         private Player.Player _player;
         private PlayerStatsManager _playerStats;
@@ -49,6 +55,8 @@ namespace IdleDefenseSurvival.Controller
                 _player.OnHealthChanged += RefreshPlayerHealth;
                 _player.OnManaChanged += RefreshPlayerMana;
             }
+
+            SubscribeMissionEvents();
         }
 
         private void Unbind()
@@ -60,6 +68,8 @@ namespace IdleDefenseSurvival.Controller
                 _player.OnHealthChanged -= RefreshPlayerHealth;
                 _player.OnManaChanged -= RefreshPlayerMana;
             }
+
+            UnsubscribeMissionEvents();
         }
 
         private void RefreshPlayer()
@@ -107,5 +117,47 @@ namespace IdleDefenseSurvival.Controller
                 return value.ToString("0");
             return value.ToString("F1");
         }
+
+        
+        private void SubscribeMissionEvents()
+        {
+            var service = MissionService.Instance;
+            if (service == null) return;
+
+            service.OnMissionsChanged += HandleMissionsChanged;
+            service.OnMissionStatusChanged += HandleMissionStatusChanged;
+            service.OnMissionProgressChanged += HandleMissionProgressChanged;
+            UpdateMissionBadge();
+        }
+
+        private void UnsubscribeMissionEvents()
+        {
+            var service = MissionService.Instance;
+            if (service == null) return;
+
+            service.OnMissionsChanged -= HandleMissionsChanged;
+            service.OnMissionStatusChanged -= HandleMissionStatusChanged;
+            service.OnMissionProgressChanged -= HandleMissionProgressChanged;
+        }
+
+        private void HandleMissionsChanged() => UpdateMissionBadge();
+        private void HandleMissionStatusChanged(MissionInstance _) => UpdateMissionBadge();
+        private void HandleMissionProgressChanged(MissionInstance _) => UpdateMissionBadge();
+
+        private void UpdateMissionBadge()
+        {
+            var service = MissionService.Instance;
+            if (service == null)
+            {
+                _missionBadge?.SetActive(false);
+                return;
+            }
+
+            bool show = service.GetAllMissions().Any(m =>
+                m.status == MissionStatus.Completed && !m.rewardClaimed);
+
+            _missionBadge?.SetActive(show);
+        }
+
     }
 }

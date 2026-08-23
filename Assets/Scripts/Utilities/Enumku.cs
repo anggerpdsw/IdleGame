@@ -27,6 +27,11 @@ namespace IdleDefenseSurvival
     public enum SlowSource { Card, Cloud, Void, Lightning }
     public enum SlowType { Permanent, Temporary, Aura }
 
+
+    /// <summary>
+    /// Runtime status of a mission instance
+    /// </summary>
+    public enum MissionStatus { Active, Completed, Claimed, Cancelled }
     /// <summary>
     /// Mission progress event types for the event system
     /// </summary>

@@ -11,9 +11,9 @@ namespace IdleDefenseSurvival.Mission
     public class MissionService : MonoBehaviour
     {
         #region Singleton
+        [SerializeField] private bool _debug = false;
         private static MissionService _instance;
         public static MissionService Instance => _instance;
-        [SerializeField] private bool _debug = false;
         private void Awake()
         {
             if (_instance != null && _instance != this) { Destroy(gameObject); return; }
@@ -74,6 +74,7 @@ namespace IdleDefenseSurvival.Mission
             ValidateAndMigrate();
             GenerateMissingMissions();
             SaveMissions();
+            OnMissionsChanged?.Invoke();
             if (_debug) Debug.Log($"[MissionService] Save loaded: {_missions.Count} missions, MaxMission: {_maxMission}");
         }
         #endregion
@@ -82,7 +83,7 @@ namespace IdleDefenseSurvival.Mission
         private void ValidateAndMigrate()
         {
             bool dirty = false;
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             _missions.RemoveAll(m => m == null || string.IsNullOrEmpty(m.instanceId) || string.IsNullOrEmpty(m.missionId));
 
             var seen = new HashSet<string>();
@@ -95,6 +96,9 @@ namespace IdleDefenseSurvival.Mission
                 if (m.slotIndex < 0 || m.slotIndex >= _maxMission) { m.slotIndex = -1; dirty = true; }
             }
             ReassignSlotIndices();
+            int before = _missions.Count;
+            _missions.RemoveAll(m => m.slotIndex == -1);
+            if (_missions.Count != before) dirty = true;
             if (dirty) SaveMissions();
         }
 
@@ -111,7 +115,7 @@ namespace IdleDefenseSurvival.Mission
             int active = _missions.Count(m => m.status == MissionStatus.Active || m.status == MissionStatus.Completed);
             int slots = _maxMission - active;
             if (slots <= 0) return;
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             var used = new HashSet<string>(_missions.Where(m => m.status == MissionStatus.Active || m.status == MissionStatus.Completed).Select(m => m.missionId));
 
             for (int i = 0; i < slots; i++)
@@ -169,6 +173,13 @@ namespace IdleDefenseSurvival.Mission
                         mission.targetId = candidates[UnityEngine.Random.Range(0, candidates.Length)];
                 }
             }
+            else if (tmpl.type == MissionEventType.Blacksmithing)
+            {
+                var eqTypes = Enum.GetValues(typeof(EquipmentType)).Cast<EquipmentType>()
+                    .Where(e => e != EquipmentType.None).ToArray();
+                if (eqTypes.Length > 0)
+                    mission.targetId = eqTypes[UnityEngine.Random.Range(0, eqTypes.Length)].ToString();
+            }
             else mission.targetId = tmpl.targetId;
 
             return mission;
@@ -182,13 +193,14 @@ namespace IdleDefenseSurvival.Mission
 
         private void CheckCooldowns()
         {
-            var now = DateTime.UtcNow;
+            var now = DateTimeOffset.Now;
             bool dirty = false;
-            foreach (var m in _missions)
+            var snapshot = _missions.ToArray();
+            foreach (var m in snapshot)
             {
                 if ((m.status == MissionStatus.Claimed || m.status == MissionStatus.Cancelled) &&
                     !string.IsNullOrEmpty(m.cooldownUntil) &&
-                    DateTime.TryParse(m.cooldownUntil, out var end) && now >= end)
+                    DateTimeOffset.TryParse(m.cooldownUntil, out var end) && now >= end)
                 {
                     GenerateMissionForSlot(m.slotIndex);
                     dirty = true;
@@ -200,7 +212,8 @@ namespace IdleDefenseSurvival.Mission
         private void GenerateMissionForSlot(int slot)
         {
             if (slot < 0 || slot >= _maxMission) return;
-            var now = DateTime.UtcNow;
+            _missions.RemoveAll(m => m.slotIndex == slot);
+            var now = DateTime.Now;
             var used = new HashSet<string>(_missions
                 .Where(m => m.slotIndex != slot && (m.status == MissionStatus.Active || m.status == MissionStatus.Completed))
                 .Select(m => m.missionId));
@@ -217,6 +230,8 @@ namespace IdleDefenseSurvival.Mission
         public IReadOnlyList<MissionInstance> GetActiveMissions() => _missions.Where(m => m.status == MissionStatus.Active || m.status == MissionStatus.Completed).ToList().AsReadOnly();
         public MissionInstance GetMission(string id) => _missions.FirstOrDefault(m => m.instanceId == id);
         public int GetMaxMission() => _maxMission;
+        public MissionTemplate GetTemplate(string id)
+            => string.IsNullOrEmpty(id) ? null : _templateData?.missions?.FirstOrDefault(t => t.id == id);
 
         public void SetMaxMission(int v)
         {
@@ -230,12 +245,12 @@ namespace IdleDefenseSurvival.Mission
         public void UpdateProgress(MissionEventType type, string targetId, long amount)
         {
             if (amount <= 0) return;
-            var now = DateTime.UtcNow;
+            var now = DateTime.Now;
             bool dirty = false;
             foreach (var m in _missions)
             {
                 if (m == null || m.status != MissionStatus.Active) continue;
-                var tmpl = _templateData.missions.FirstOrDefault(t => t.id == m.missionId);
+                var tmpl = GetTemplate(m.missionId);
                 if (tmpl == null) continue;
                 if (!DoesEventMatchMission(type, targetId, tmpl, m)) continue;
 
@@ -248,32 +263,66 @@ namespace IdleDefenseSurvival.Mission
                     m.status = MissionStatus.Completed;
                     m.completedAt = now.ToString("o");
                     OnMissionStatusChanged?.Invoke(m);
+                    OnMissionsChanged?.Invoke();
                 }
             }
             if (dirty) SaveMissions();
         }
 
-        private bool DoesEventMatchMission(MissionEventType ev, string targetId, MissionTemplate tmpl, MissionInstance mission) =>
-            tmpl.type switch
+        private bool DoesEventMatchMission(MissionEventType ev, string tId, MissionTemplate t,
+            MissionInstance m)
+        {
+            if (ev != t.type) return false;
+            return t.type switch
             {
-                MissionEventType.EnemyKilled => ev == MissionEventType.EnemyKilled,
-                MissionEventType.SpecificEnemyKilled => ev == MissionEventType.SpecificEnemyKilled
-                    && !string.IsNullOrEmpty(mission.targetId)
-                    && string.Equals(mission.targetId, targetId, StringComparison.OrdinalIgnoreCase),
-                MissionEventType.BossKilled => ev == MissionEventType.BossKilled,
-                MissionEventType.CurrencyEarned => ev == MissionEventType.CurrencyEarned && tmpl.targetId == targetId,
-                MissionEventType.WaveCompleted => ev == MissionEventType.WaveCompleted,
+                MissionEventType.SpecificEnemyKilled or MissionEventType.Blacksmithing 
+                    => IsTargetMatch(m.targetId, tId),
+                MissionEventType.CurrencyEarned 
+                    => IsTargetMatch(t.targetId, tId),
+                MissionEventType.EnemyKilled or MissionEventType.BossKilled or MissionEventType.WaveCompleted 
+                    => true,
                 _ => false,
             };
+
+        }
+        private static bool IsTargetMatch(string mId, string tId)
+        {
+            return !string.IsNullOrEmpty(mId)
+                && string.Equals(mId, tId, StringComparison.OrdinalIgnoreCase);
+        }
 
         public bool ClaimMission(string id)
         {
             var m = GetMission(id);
             if (m == null || m.status != MissionStatus.Completed || m.rewardClaimed) return false;
-            GiveReward(m.reward);
+
             m.status = MissionStatus.Claimed; m.rewardClaimed = true;
-            m.cooldownUntil = DateTime.UtcNow.AddMinutes(GetClaimCooldown(m)).ToString("o");
-            SaveMissions(); OnMissionStatusChanged?.Invoke(m); OnMissionsChanged?.Invoke(); return true;
+            m.cooldownUntil = DateTimeOffset.Now.AddMinutes(GetClaimCooldown(m)).ToString("o");
+
+            var rewardList = ToRewardData(m.reward);
+            if (rewardList.Count > 0 && RewardManager.Instance != null)
+                RewardManager.Instance.Show(rewardList, () => NotifyClaimed(m));
+            else
+            {
+                GiveReward(m.reward);
+                NotifyClaimed(m);
+            }
+            return true;
+        }
+
+        private void NotifyClaimed(MissionInstance m)
+        {
+            SaveMissions(); OnMissionStatusChanged?.Invoke(m); OnMissionsChanged?.Invoke();
+        }
+
+        private static List<RewardData> ToRewardData(MissionReward r)
+        {
+            var list = new List<RewardData>();
+            if (r == null) return list;
+            if (r.gold > 0) list.Add(new RewardData(RewardType.Gold, r.gold));
+            if (r.gem > 0) list.Add(new RewardData(RewardType.Gem, r.gem));
+            if (r.meat > 0) list.Add(new RewardData(RewardType.Meat, r.meat));
+            return list;
         }
 
         public bool CancelMission(string id)
@@ -281,12 +330,12 @@ namespace IdleDefenseSurvival.Mission
             var m = GetMission(id);
             if (m == null || m.status != MissionStatus.Active) return false;
             m.status = MissionStatus.Cancelled;
-            m.cooldownUntil = DateTime.UtcNow.AddMinutes(GetCancelCooldown(m)).ToString("o");
+            m.cooldownUntil = DateTimeOffset.Now.AddMinutes(GetCancelCooldown(m)).ToString("o");
             SaveMissions(); OnMissionStatusChanged?.Invoke(m); OnMissionsChanged?.Invoke(); return true;
         }
 
-        private int GetClaimCooldown(MissionInstance m) => _templateData.missions.FirstOrDefault(t => t.id == m.missionId)?.claimCooldownMinutes ?? 30;
-        private int GetCancelCooldown(MissionInstance m) => _templateData.missions.FirstOrDefault(t => t.id == m.missionId)?.cancelCooldownMinutes ?? 15;
+        private int GetClaimCooldown(MissionInstance m) => GetTemplate(m.missionId)?.claimCooldownMinutes ?? 30;
+        private int GetCancelCooldown(MissionInstance m) => GetTemplate(m.missionId)?.cancelCooldownMinutes ?? 15;
 
         private void GiveReward(MissionReward r)
         {

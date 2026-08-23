@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Crafting;
+using IdleDefenseSurvival.Mission;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -123,7 +124,7 @@ namespace IdleDefenseSurvival.Manager
             if (!validation.IsSuccess) return null;
             if (!_repository.TryGetRecipe(recipeId, out var recipe)) return null;
 
-            long completionSeed = (long)_rollService.RngProvider.NextInt(1, int.MaxValue);
+            long completionSeed = _rollService.RngProvider.NextInt(1, int.MaxValue);
             long baseTicks = (long)(recipe.BaseCraftTime * TimeSpan.TicksPerSecond);
             long extraTicks = (long)(recipe.TimePerAdditionalUnit * TimeSpan.TicksPerSecond * (count - 1));
             var job = CraftJob.Create(recipeId, count, baseTicks + extraTicks,
@@ -158,6 +159,14 @@ namespace IdleDefenseSurvival.Manager
             }
 
             _queueService.TryStartNextJob();
+
+            // Blacksmithing mission progress: equipment recipe dengan Rarity.Common
+            if (recipe.IsEquipment && recipe.Rarity == (int)Rarity.Common)
+            {
+                MissionService.Instance?.UpdateProgress(
+                    MissionEventType.Blacksmithing, recipe.EquipmentType.ToString(), count);
+            }
+
             return job.JobId;
         }
 
