@@ -146,17 +146,19 @@ namespace IdleDefenseSurvival.Controller
 
         private void UpdateMissionBadge()
         {
+            if (_missionBadge == null) return;
+
             var service = MissionService.Instance;
             if (service == null)
             {
-                _missionBadge?.SetActive(false);
+                _missionBadge.SetActive(false);
                 return;
             }
 
             bool show = service.GetAllMissions().Any(m =>
                 m.status == MissionStatus.Completed && !m.rewardClaimed);
 
-            _missionBadge?.SetActive(show);
+            _missionBadge.SetActive(show);
         }
 
     }

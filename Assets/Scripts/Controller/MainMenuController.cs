@@ -121,14 +121,14 @@ namespace IdleDefenseSurvival.Controller
             var service = MissionService.Instance;
             if (service == null)
             {
-                _missionBadge?.SetActive(false);
+                _missionBadge.SetActive(false);
                 return;
             }
 
             bool show = service.GetAllMissions().Any(m =>
                 m.status == MissionStatus.Completed && !m.rewardClaimed);
 
-            _missionBadge?.SetActive(show);
+            _missionBadge.SetActive(show);
         }
 
         private void OnDailyRewardInitialized() => RefreshDailyBadge(DailyRewardManager.Instance.Service.HasClaimableReward);
@@ -136,7 +136,7 @@ namespace IdleDefenseSurvival.Controller
         private void OnSaveLoaded()
         {
             InitializeTierSelection();
-            
+
             UnsubscribeMissionEvents();
             SubscribeMissionEvents();
             UpdateMissionBadge();

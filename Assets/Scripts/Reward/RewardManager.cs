@@ -31,6 +31,13 @@ namespace IdleDefenseSurvival.Manager
             _popupPrefab = Resources.Load<RewardPopup>(PopupPath);
         }
 
+        private void OnDestroy()
+        {
+            if (_popupInstance != null) Destroy(_popupInstance.gameObject);
+            _popupInstance = null;
+            _onClaim = null;
+        }
+        
         /// <summary>
         /// Show standard rewards (gold, gems, items, etc.)
         /// </summary>
@@ -40,10 +47,27 @@ namespace IdleDefenseSurvival.Manager
             _pendingRewards.Clear();
             _pendingRewards.AddRange(rewards);
 
-            if (_popupInstance == null)
-                _popupInstance = Instantiate(_popupPrefab, UIManager.Instance.PopupRoot, false);
+            GetOrCreatePopup();
 
             _popupInstance.Show(rewards, ClaimRewards);
+        }
+
+        private RewardPopup GetOrCreatePopup()
+        {
+            // Destroy stale instance (parent changed across scene)
+            if (_popupInstance != null)
+            {
+                if (_popupInstance.transform.parent != UIManager.Instance.PopupRoot)
+                    Destroy(_popupInstance.gameObject);
+                else
+                    return _popupInstance;
+            }
+
+            _popupInstance = Instantiate(_popupPrefab, UIManager.Instance.PopupRoot, false);
+            _popupInstance.transform.localScale = Vector3.one;
+            _popupInstance.transform.localPosition = Vector3.zero;
+            _popupInstance.transform.localRotation = Quaternion.identity;
+            return _popupInstance;
         }
 
         /// <summary>
@@ -71,8 +95,7 @@ namespace IdleDefenseSurvival.Manager
                 rewards.Add(reward);
             }
 
-            if (_popupInstance == null)
-                _popupInstance = Instantiate(_popupPrefab, UIManager.Instance.PopupRoot, false);
+            GetOrCreatePopup();
 
             _popupInstance.ShowCardRollResult(result, rewards, ClaimRewards);
         }
@@ -126,5 +149,7 @@ namespace IdleDefenseSurvival.Manager
             if (expReward > 0) WaveManager.Instance.RecordExp(expReward);
             AccountManager.Instance.AddExp(expReward, $"From kill {enemy}");
         }
+
+
     }
 }
