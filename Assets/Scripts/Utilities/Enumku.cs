@@ -36,7 +36,8 @@ namespace IdleDefenseSurvival
         SpecificEnemyKilled = 1,
         CurrencyEarned = 2,
         WaveCompleted = 3,
-        BossKilled = 4
+        BossKilled = 4,
+        Blacksmithing = 5
     }
 
     /// <summary>

@@ -272,7 +272,7 @@ namespace IdleDefenseSurvival.Manager
                         File.Delete(SaveFile);
                     else
                         File.Move(SaveFile, SaveFile + ".corrupt");
-                    Debug.LogWarning("[SaveManager] Save file corrupted or empty - starting fresh save.");
+                    Debug.LogWarning("[SaveManager] Save file corrupted or empty - start with fresh save.");
                     var initialData = new SaveData
                     {
                         currency = GatherCurrency()
@@ -302,6 +302,7 @@ namespace IdleDefenseSurvival.Manager
             }
         }
 
+        // For Mission
         private SaveData _lastLoadedSaveData;
         public SaveData LastLoadedSaveData => _lastLoadedSaveData;
 

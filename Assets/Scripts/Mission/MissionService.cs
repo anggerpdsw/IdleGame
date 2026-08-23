@@ -5,7 +5,6 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Core;
-using Unity.VisualScripting;
 
 namespace IdleDefenseSurvival.Mission
 {
