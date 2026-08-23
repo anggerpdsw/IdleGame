@@ -821,6 +821,7 @@ namespace IdleDefenseSurvival.Inventory
                 foreach (var saveItem in data.Items)
                 {
                     if (saveItem == null || string.IsNullOrEmpty(saveItem.ItemId)) continue;
+                    
                     var item = RestoreItem(saveItem);
                     if (item == null) continue;
                     int targetSlot = saveItem.SlotIndex >= 0 && saveItem.SlotIndex < _slots.Count
@@ -847,6 +848,13 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         private static InventoryItem RestoreItem(InventoryItemData data)
         {
+            // Stackable: must exist in ItemDatabase
+            if (ItemDatabase.Instance == null || !ItemDatabase.Instance.IsValidItemId(data.ItemId))
+            {
+                Debug.LogWarning($"[InventoryService] Dropping orphan '{data.ItemId}' (qty={data.Quantity})");
+                return null; // drop, or push to _graveyard list for recovery
+            }
+            
             // Equipment identity comes from persisted EquipmentType (crafted items like "cotton_hat"
             // are NOT in ItemDatabase - only the "equip_base" template is)
             bool isEquipment = data.EquipmentType.HasValue;
