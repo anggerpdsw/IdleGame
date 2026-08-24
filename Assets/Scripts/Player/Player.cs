@@ -224,10 +224,6 @@ namespace IdleDefenseSurvival.Player
         {
             if (_ultimateManager == null) return;
 
-            // Check AutoCast setting
-            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
-            if (!autoCast) return;
-
             // TrySpawn handles cooldown, active checks, chance, and mana cost
             _ultimateManager.TrySpawn(UltimateDMG.Void.ToString(), transform.position, this);
             _ultimateManager.TrySpawn(UltimateDMG.Root.ToString(), transform.position, this);

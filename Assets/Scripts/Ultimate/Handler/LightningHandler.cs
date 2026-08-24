@@ -43,23 +43,19 @@ namespace IdleDefenseSurvival.Ultimate
         /// </summary>
         public static bool RegisterKill(UltimateData lightningData)
         {
-            if (lightningData == null || !lightningData.GetActive())
-                return false;
-
+            if (lightningData == null || !lightningData.GetActive()) return false;
             _triggerKillCount = lightningData.GetTriggerKillCount(20);
             _killCountSinceLastLightning++;
-
             float progress = (float)_killCountSinceLastLightning / _triggerKillCount;
             OnLightningProgressChanged?.Invoke(Mathf.Clamp01(progress));
-
             if (_killCountSinceLastLightning >= _triggerKillCount)
             {
+                var addStack = UltimateManager.Instance.TryAddStack(UltimateDMG.Lightning.ToString());
                 _killCountSinceLastLightning = 0;
                 OnLightningProgressChanged?.Invoke(0f);
                 OnLightningReady?.Invoke();
                 return true;
             }
-
             return false;
         }
 

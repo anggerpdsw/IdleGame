@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using Newtonsoft.Json;
+using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -58,9 +59,8 @@ namespace IdleDefenseSurvival.Ultimate
 
         // Stack system for chance/kill-count based ultimates
         // Bomb, Tank, Cloud: chance-based stacks
-        // Lightning: kill-count based stacks
+        // Lightning: kill-count tracked by LightningHandler.RegisterKill
         private Dictionary<string, int> _currentStacks = new();
-        private Dictionary<string, int> _killCounters = new(); // For Lightning kill tracking
 
         private void Awake()
         {
@@ -94,7 +94,6 @@ namespace IdleDefenseSurvival.Ultimate
                     _ultimateDatabase[data.id] = data;
                     _lastSpawnTimeMap[data.id] = Time.time; // Initialize cooldown timer
                     _currentStacks[data.id] = 0;
-                    _killCounters[data.id] = 0;
                 }
             }
         }
@@ -177,12 +176,9 @@ namespace IdleDefenseSurvival.Ultimate
         {
             if (!TryGetUltimate(ultimateId, out var data)) return false;
             if (!data.UsesStackSystem) return false;
-
             int maxStack = data.GetCount();
             int currentStack = GetStack(ultimateId);
-
             if (currentStack >= maxStack) return false;
-
             _currentStacks[ultimateId] = currentStack + 1;
             return true;
         }
@@ -200,34 +196,18 @@ namespace IdleDefenseSurvival.Ultimate
             return true;
         }
 
-        /// <summary>
-        /// Called by EnemyAi when an enemy dies (for Lightning kill counter).
-        /// </summary>
-        public void OnEnemyKilled()
-        {
-            if (!TryGetUltimate(UltimateDMG.Lightning.ToString(), out var lightningData)) return;
-            if (!lightningData.GetActive()) return;
-
-            int triggerCount = lightningData.GetTriggerKillCount();
-            int currentKills = _killCounters.TryGetValue(UltimateDMG.Lightning.ToString(), out int kills) ? kills : 0;
-            currentKills++;
-            _killCounters[UltimateDMG.Lightning.ToString()] = currentKills;
-
-            if (currentKills >= triggerCount)
-            {
-                _killCounters[UltimateDMG.Lightning.ToString()] = 0;
-                // Try to add stack (respects max count)
-                TryAddStack(UltimateDMG.Lightning.ToString());
-            }
-        }
-
+        
         /// <summary>
         /// Try to spawn an ultimate by ID (auto-cast path).
-        /// For stack-based ultimates: checks chance, adds stack if successful.
+        /// For stack-based ultimates: consumes existing stacks first, then tries to add via chance/kill-count.
         /// For cooldown-based ultimates: normal spawn logic.
         /// </summary>
         public bool TrySpawn(string ultimateId, Vector3 position, Player.Player player)
         {
+            // Check AutoCast setting
+            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+            if (!autoCast) return false;
+
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
 
@@ -241,7 +221,23 @@ namespace IdleDefenseSurvival.Ultimate
             // Handle stack-based ultimates (Bomb, Tank, Cloud, Lightning)
             if (ultimateData.UsesStackSystem)
             {
-                // Check chance for chance-based ultimates
+                // Flush ALL existing stacks immediately when auto-cast is active.
+                // This ensures switching from manual to auto mode spawns all accumulated stacks at once (e.g., 7 Lightning).
+                int currentStack = GetStack(ultimateId);
+                while (currentStack > 0)
+                {
+                    ConsumeStack(ultimateId);
+                    bool spawned = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
+                    if (spawned)
+                    {
+                        _lastSpawnTimeMap[ultimateId] = Time.time;
+                        player.SpendMana(ultimateData.manaCost);
+                    }
+                    currentStack = GetStack(ultimateId);
+                }
+
+                // No existing stacks: try to generate one via chance/kill-count
+                // Check chance for chance-based ultimates (Bomb, Tank, Cloud)
                 float chance = ultimateData.GetChance();
                 if (chance > 0f)
                 {
@@ -252,27 +248,26 @@ namespace IdleDefenseSurvival.Ultimate
                 // Add stack (respects max count)
                 if (!TryAddStack(ultimateId)) return false;
 
-                // For auto-cast, immediately consume stack and spawn
-                // (Auto-cast uses the stack as a "charge" that fires immediately)
+                // Immediately consume the newly added stack and spawn
                 ConsumeStack(ultimateId);
 
-                bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-                if (success)
+                bool success2 = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
+                if (success2)
                 {
                     _lastSpawnTimeMap[ultimateId] = Time.time;
                     player.SpendMana(ultimateData.manaCost);
                 }
-                return success;
+                return success2;
             }
 
             // Normal cooldown-based ultimates (Void, Root, Fountain, Shockwave)
-            bool success2 = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-            if (success2)
+            bool success3 = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
+            if (success3)
             {
                 _lastSpawnTimeMap[ultimateId] = Time.time;
                 player.SpendMana(ultimateData.manaCost);
             }
-            return success2;
+            return success3;
         }
 
         /// <summary>

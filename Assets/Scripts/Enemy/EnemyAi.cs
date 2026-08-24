@@ -612,11 +612,9 @@ namespace IdleDefenseSurvival.Enemy
             // Register kill for Lightning ultimate trigger (if killed by player or lightning)
             if (_lastDamageSource == UltimateDMG.Player.ToString() || _lastDamageSource == UltimateDMG.Lightning.ToString())
             {
-                UltimateManager.Instance.OnEnemyKilled();
                 var lightningData = _ultimateManager?.GetUltimate(UltimateDMG.Lightning.ToString());
                 if (lightningData != null && LightningHandler.RegisterKill(lightningData))
                 {
-                    
                     // Lightning ready to trigger - spawn it at player position
                     _ultimateManager.TrySpawn(UltimateDMG.Lightning.ToString(), _playerComponent.transform.position, _playerComponent);
                 }
