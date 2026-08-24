@@ -42,6 +42,7 @@ namespace IdleDefenseSurvival.Items
         #region Fields
         private readonly Dictionary<string, ItemData> _items = new();
         private readonly Dictionary<string, EquipmentData> _equipment = new();
+        private readonly Dictionary<string, PotionData> _potion = new();
         private readonly Dictionary<string, GemData> _gems = new();
         private readonly Dictionary<string, SetBonusData> _sets = new();
         private readonly Dictionary<string, AffixData> _affixes = new();
@@ -53,6 +54,7 @@ namespace IdleDefenseSurvival.Items
         public int ItemCount => _items.Count;
         public IReadOnlyDictionary<string, ItemData> AllItems => _items;
         public IReadOnlyDictionary<string, EquipmentData> AllEquipment => _equipment;
+        public IReadOnlyDictionary<string, PotionData> AllPotion => _potion;
         public IReadOnlyDictionary<string, GemData> AllGems => _gems;
         public IReadOnlyDictionary<string, SetBonusData> AllSets => _sets;
         public IReadOnlyDictionary<string, AffixData> AllAffixes => _affixes;
@@ -76,6 +78,7 @@ namespace IdleDefenseSurvival.Items
             {
                 LoadItems();
                 LoadEquipment();
+                LoadPotion();
                 LoadGems();
                 LoadSets();
                 LoadAffixes();
@@ -88,6 +91,7 @@ namespace IdleDefenseSurvival.Items
                     $"[ItemDatabase] Loaded " +
                     $"{_items.Count} items, " +
                     $"{_equipment.Count} equipment, " +
+                    $"{_potion.Count} potion, " +
                     $"{_gems.Count} gems, " +
                     $"{_sets.Count} sets, " +
                     $"{_affixes.Count} affixes"
@@ -123,6 +127,11 @@ namespace IdleDefenseSurvival.Items
             LoadJsonList<EquipmentData>("Data/Equipment/dataEarring", RegisterEquipment);
             LoadJsonList<EquipmentData>("Data/Equipment/dataBracelet", RegisterEquipment);
             LoadJsonList<EquipmentData>("Data/Equipment/dataShoes", RegisterEquipment);
+        }
+        private void LoadPotion()
+        {
+            LoadJsonList<PotionData>("Data/Items/Potion/dataHealthPotion", RegisterPotion);
+            LoadJsonList<PotionData>("Data/Items/Potion/dataManaPotion", RegisterPotion);
         }
         private void LoadGems()
         {
@@ -168,12 +177,14 @@ namespace IdleDefenseSurvival.Items
         #region Lookup
         public ItemData GetItem(string itemId) => _items.TryGetValue(itemId, out var item) ? item : null;
         public EquipmentData GetEquipment(string itemId) => _equipment.TryGetValue(itemId, out var equip) ? equip : null;
+        public PotionData GetPotion(string itemId) => _potion.TryGetValue(itemId, out var potion) ? potion : null;
         public GemData GetGem(string gemId) => _gems.TryGetValue(gemId, out var gem) ? gem : null;
         public SetBonusData GetSet(string setId) => _sets.TryGetValue(setId, out var set) ? set : null;
         public AffixData GetAffix(string affixId) => _affixes.TryGetValue(affixId, out var affix) ? affix : null;
 
         public bool TryGetItem(string itemId, out ItemData item) => _items.TryGetValue(itemId, out item);
         public bool TryGetEquipment(string itemId, out EquipmentData equipment) => _equipment.TryGetValue(itemId, out equipment);
+        public bool TryGetPotion(string itemId, out PotionData potion) => _potion.TryGetValue(itemId, out potion);
         public bool TryGetGem(string gemId, out GemData gem) => _gems.TryGetValue(gemId, out gem);
         public bool TryGetSet(string setId, out SetBonusData set) => _sets.TryGetValue(setId, out set);
         public bool TryGetAffix(string affixId, out AffixData affix) => _affixes.TryGetValue(affixId, out affix);
@@ -204,6 +215,11 @@ namespace IdleDefenseSurvival.Items
         public IReadOnlyList<EquipmentData> GetEquipmentByType(EquipmentType type)
         {
             return _equipment.Values.Where(e => e.EquipmentType == type).ToList();
+        }
+
+        public IReadOnlyList<PotionData> GetPotionByType(PotionType type)
+        {
+            return _potion.Values.Where(e => e.PotionType == type).ToList();
         }
 
         public IReadOnlyList<EquipmentData> GetEquipmentBySlot(EquipmentType slot)
@@ -250,6 +266,7 @@ namespace IdleDefenseSurvival.Items
         #region Validation
         public bool IsValidItemId(string itemId) => _items.ContainsKey(itemId);
         public bool IsEquipment(string itemId) => _equipment.ContainsKey(itemId);
+        public bool IsPotion(string itemId) => _potion.ContainsKey(itemId);
         public bool IsStackable(string itemId) => GetItem(itemId)?.IsStackable ?? false;
         public bool IsConsumable(string itemId)
         {
@@ -271,8 +288,8 @@ namespace IdleDefenseSurvival.Items
                 return;
             }
 
-            if (item is EquipmentData equipData)
-                equipData.InitializeDefaults();
+            if (item is EquipmentData equipData) equipData.InitializeDefaults();
+            if (item is PotionData potionData) potionData.InitializeDefaults();
 
             // Resolve icon from Resources when not set in data (Sprite cannot be stored in JSON)
             if (item.Icon == null && !string.IsNullOrEmpty(item.IconKey))
@@ -280,18 +297,14 @@ namespace IdleDefenseSurvival.Items
 
             _items[item.Id] = item;
 
-            if (item.IsEquipment)
-            {
-                _equipment[item.Id] = item as EquipmentData;
-            }
+            if (item is EquipmentData equipment) _equipment[item.Id] = equipment;
+            if (item is PotionData potion) _potion[item.Id] = potion;
 
             OnItemDataAdded?.Invoke(item.Id);
         }
 
-        public void RegisterEquipment(EquipmentData equipment)
-        {
-            RegisterItem(equipment);
-        }
+        public void RegisterEquipment(EquipmentData equipment) => RegisterItem(equipment);
+        public void RegisterPotion(PotionData potion) => RegisterItem(potion);
 
         public void RegisterGem(GemData gem)
         {

@@ -200,10 +200,25 @@ Important files:
 | `dataWave.json` | Wave duration, difficulty, spawn configuration, progression |
 | `dataUltimate.json` | Ultimate definitions |
 | `dataCard.json` | Card definitions, rarity, scaling, effects |
-| `dataConsumables.json` | consumables |
+| `dataConsumables.json` | consumables (potions etc.) |
 | `dataAttribute.json` | CON/STR/INT/DEX attribute bonuses |
+| `dataAttributeMainValuePerLevel.json` | Main-attribute value per level curve |
+| `dataAttributeSecondValuePerLevel.json` | Secondary-attribute value per level curve |
 | `dataConfigSocket.json` | Socket/gem rules |
-| `other json file` | like the file name purpose |
+| `dataConfigCrafting.json` | Crafting station config |
+| `dataBaseEquipment.json` | Base equipment templates (Crafting/Equipment/) |
+| `dataRecipeHat.json` ... `dataRecipeShoes.json` | Per-slot crafting recipes |
+| `dataAffixes.json` | Affix (prefix/suffix) definitions for equipment rolls |
+| `dataSets.json` | Equipment set bonus definitions |
+| `dataBelt.json` ... `dataShoes.json` | Per-slot equipment definitions |
+| `dataGems.json` | Gem definitions, base stats, upgrade curve |
+| `dataHerbs.json` | Herb definitions (alchemical ingredient) |
+| `dataMinerals.json` | Mineral material definitions |
+| `dataOtherMaterials.json` | Other crafting materials (logs, glue, etc.) |
+| `dataOtherItems.json` | Miscellaneous items (tickets, special items) |
+
+Sibling design-doc folder (`Assets/Resources/Data/Design/`) is the authoritative
+catalog of these JSONs — see §53 Design Documentation Index.
 
 ## 5.3 Design documentation
 
@@ -914,7 +929,7 @@ Primary architecture:
 - `UltimateFactory`
 - individual ultimate handlers.
 
-Current ultimate families include:
+Current ultimate families include (8):
 
 - Void
 - Tank
@@ -1039,9 +1054,10 @@ Important scenes include:
 
 - `Bootstrap.unity`
 - `MainMenu.unity`
-- `MainGame.unity`
+- `Game.unity`
 - `CardCollection.unity`
 - `Inventory.unity`
+- `Crafting.unity`
 
 Persistent services/managers must not accidentally duplicate when changing scenes.
 
@@ -1459,25 +1475,30 @@ If an item is consumed but its effect fails, the item must not silently disappea
 
 | Domain | Main files |
 |---|---|
-| Player | `Scripts/Player/Player.cs`, `PlayerStats.cs`, `StatLoader.cs` |
-| Player stats | `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Modifier/` |
-| Attributes | `dataAttribute.json`, attribute services/modifier pipeline |
+| Player | `Scripts/Player/Player.cs`, `PlayerStats.cs`, `StatLoader.cs`, `PlayerStatsManager.cs` |
+| Attributes | `dataAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataAttributeSecondValuePerLevel.json`; pipeline = `AttributeModifierManager` → `ModifierManager` |
 | Enemy | `Scripts/Enemy/EnemyAi.cs`, `EnemySpawner.cs` |
-| Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/` |
+| Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/` (`IStatusEffect`, `BaseStatusEffect`, `ConcreteStatusEffects`) |
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
 | Wave | `Scripts/Manager/WaveManager.cs`, `dataWave.json` |
-| Cards | `Scripts/Card/`, `dataCard.json` |
-| Equipment | `Scripts/Equipment/`, `Data/Equipment` |
-| Inventory | `Scripts/Inventory/`, `Scripts/Items/`, `Data/Items` |
-| Gems | `Scripts/Items/GemService.cs`, `dataConfigSocket.json` |
-| Crafting | `Scripts/Items/CraftService.cs`, `CraftJob.cs`, recipe data |
-| Economy | `Scripts/Economy/EconomyManager.cs` |
-| Save | `Scripts/Manager/SaveManager.cs`, `Scripts/Data/SaveData.cs` |
-| Daily | `Scripts/Daily/` |
-| Idle | `Scripts/IdleReward/` |
-| Ultimates | `Scripts/Ultimate/`, `dataUltimate.json` |
+| Cards | `Scripts/Card/CardManager.cs`, `CardDatabase`, `CardInventory`, `CardEquipmentService`, `CardRollService`, `CardUpgradeService`, `CardModifierService` |
+| Equipment | `Scripts/Equipment/IEquipmentService.cs` + impl, `AttributeWeightsConfig`, `EquipmentEventDispatcher`, `EquipmentPersistenceService`, `EquipmentSetBonusService`, `EquipmentVisualService`, `EquipmentType`, `SlotIdentityService` |
+| Inventory | `Scripts/Inventory/InventoryService`, `InventoryManager`, `InventoryItem`, `InventoryItemExtensions` |
+| Items | `Scripts/Items/` (sibling to Inventory): `ItemDatabase`, `AutoRepairService`, `DurabilityService`, `RepairService`, `RepairTransactionService`, `GemFactory`, `GemExperienceService`, `GemSocketService`, `GemUpgradeService`, `SocketValidationService`, `DropTable`, `SpecialEffectType`, `DurabilityColorTable`, `Random/*` |
+| Gems | `Scripts/Items/GemService.cs`, `dataConfigSocket.json`, `dataGems.json` |
+| Crafting | `Scripts/Items/CraftService.cs`, `CraftJob`, `CraftContextBuilder`, `CraftCompletionService`, `CraftModifiers`; data in `Crafting/Equipment/dataRecipe*.json` + `dataConfigCrafting.json` |
+| Economy | `Scripts/Economy/EconomyManager.cs`, `CurrencyData` |
+| Save | `Scripts/Manager/SaveManager.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`, `Scripts/Data/SaveData.cs` |
+| Daily | `Scripts/Daily/DailyRewardService`, `DailyRewardManager`, `DailyRewardSaveData`, `DailyRewardSlot`, `DailyRewardUI` |
+| Idle | `Scripts/IdleReward/IdleRewardManager`, `IdleRewardUI`, `IdleRewardData` |
+| Ultimates | `Scripts/Ultimate/` — `UltimateManager`, `UltimateFactory`, per-ultimate handlers (Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave) |
+| Modifier | `Scripts/Modifier/ModifierCalculator.cs`, `Scripts/Modifiers/EffectRegistry.cs`, `Scripts/Manager/AttributeModifierManager.cs` |
+| Stats | `Scripts/Stats/SecondaryStatMode.cs` |
+| Reward | `Scripts/Reward/RewardData.cs`, `RewardManager` (popup/flow), `RewardPopup.cs`, `RewardSlot.cs` |
+| Mission | `Scripts/Mission/` (MissionManager, MissionData, MissionSlot UI, mission progress tracked by event hooks into WaveManager/EnemyAi/Card/etc.) |
+| VIP | `Scripts/Data/VIPData.cs`, integration with `DailyRewardService.IsDailyEnabled` and `IdleRewardManager` bonuses |
 | UI | `Scripts/UI/`, `Scripts/Controller/` |
-| Core | `Scripts/Core/` |
+| Core | `Scripts/Core/` (`BootstrapInitializer`, `CanvasRoot`, `SceneCleanupHandler`, `ServiceLocator`, `Interfaces/*`) |
 
 ---
 
@@ -1621,7 +1642,157 @@ Workflow:
 
 ---
 
-# 45. DEFINITION OF DONE
+# 45. MISSION SYSTEM
+
+Owner: `Scripts/Mission/MissionService.cs` (singleton, `DontDestroyOnLoad`).
+
+Templates load from `Resources/Data/Player/dataMission.json` (parsed via `JsonUtility.FromJson<MissionTemplateData>` in `Awake`). Slots and runtime state are persisted as part of the main `SaveData.missions` list — missions are not a separate domain save.
+
+## 45.1 Event types (`MissionEventType`)
+
+| Type | Trigger | `targetId` semantics |
+|---|---|---|
+| `EnemyKilled` | any non-boss kill | not matched |
+| `BossKilled` | any boss kill | not matched |
+| `SpecificEnemyKilled` | kill of a chosen non-boss enemy | runtime-picked from `DatabaseJSONCache.DatabaseEnemy` (`role != Role.BOSS`); stored on `MissionInstance.targetId` |
+| `CurrencyEarned` | economy reward added | `template.targetId` (`Gold`/`Gem`/`Meat`) |
+| `WaveCompleted` | wave clear | not matched — confirmed in `WaveManager.CompleteWave` |
+| `Blacksmithing` | equipment crafted | runtime-picked from `Enum.GetValues(typeof(EquipmentType))` excluding `None`; stored on `MissionInstance.targetId` |
+
+Routing: callers invoke `MissionService.Instance?.UpdateProgress(MissionEventType type, string targetId, long amount)`. The service matches each active mission whose template type + target match and increments `currentCount` up to `targetCount`. On completion it flips status to `Completed` and stamps `completedAt`.
+
+## 45.2 Slot cap
+
+`MissionService._maxMission` is sourced from `SaveData.account.maxMission` (default `1`, minimum `1`). Public mutation: `SetMaxMission(int)` — clamps ≥ 1, writes through `SaveManager.Instance.GetAccountData()` and calls `GenerateMissingMissions()` + `SaveMissions()`. Cap can grow but should never silently shrink inside `MissionUI.EnsurePool` — slot layout stays stable across cap changes.
+
+## 45.3 Mission lifecycle
+
+```
+Active → Completed → Claimed          (cooldownUntil, default 30 min, template-overridable)
+Active → Cancelled                    (cooldownUntil, default 15 min, template-overridable)
+Claimed/Cancelled → new Active        (when cooldown expires, CheckCooldowns regenerates per slot)
+```
+
+Cooldowns are `DateTimeOffset` strings serialized via `"o"`. `MissionService.Update()` ticks every frame only to check expiry — keep that check cheap.
+
+## 45.4 Reward flow
+
+Claiming goes through `RewardManager.Instance.Show(rewardList, onClose)` when any reward > 0 (popup path); otherwise rewards are granted inline via `ServiceLocator.EconomyService.AddCurrency(...)` with reason `"MissionReward"`. Both paths call `NotifyClaimed` which saves and fires `OnMissionStatusChanged` + `OnMissionsChanged`.
+
+UI may only call `Service.ClaimMission(instanceId)`. Do not give rewards directly from UI or `MissionSlot`.
+
+## 45.5 UI
+
+- `MissionUI` (in `IdleDefenseSurvival.UI` namespace) — pool grows up to `GetMaxMission()`, never shrinks. Subscribes to `OnMissionsChanged`, `OnMissionStatusChanged`, `OnMissionProgressChanged`. Icon resolved per event type via `EnemyResources.GetEnemySprite` or `ItemResources.GetItemSource`.
+- `MissionSlot` — single row, refreshed every 1s while panel is open (countdown timer). Background color: `Completed = green`, `Claimed = gray`, `Cancelled = red`. Button color via `ButtonResources.GetColor("Green"|"Red"|"Grey")`.
+- Enter animation uses DOTween (`SetLink(gameObject)`).
+
+## 45.6 Adding a new mission event type
+
+1. Add value to `MissionEventType` enum.
+2. Update `MissionService.DoesEventMatchMission` switch — return `true` for unconditional types, `IsTargetMatch` for target-keyed types.
+3. Add at least one template row to `dataMission.json` exercising the type.
+4. Find the producer(s) and call `MissionService.Instance?.UpdateProgress(newType, targetId, amount)` at the right hook point.
+5. If the icon is target-keyed, extend `MissionUI.GetMissionIcon` switch.
+6. Verify: fresh save shows the template, save→load preserves instanceId/slotIndex/cooldownUntil, claim routes through `RewardManager`, cancel regenerates after cooldown.
+
+---
+
+# 46. VIP
+
+Owner: `Scripts/Data/VIPData.cs` (plain serializable class).
+
+```csharp
+public class VipData {
+    public bool daily;        // unlocks DailyReward claim-while-Waiting (see DailyRewardService.IsDailyEnabled)
+    public bool maxSpeed;     // raises GameSpeedController max from 5.5x → 7.5x
+    public bool autoCollect;  // reserved for Phase 2 item auto-collect delay
+}
+```
+
+Stored under `SaveData.account.vip` (single `VipData` instance per save — no per-account VIP level/tier model yet).
+
+## 46.1 Integration points (verified live)
+
+| Consumer | Behavior |
+|---|---|
+| `DailyRewardService` (`IsDailyEnabled`) | When `Waiting`, VIP can force state to `Claimable` |
+| `GameSpeedController` | `CheckVIP()` re-clamps `currentSpeed` to the new max on toggle |
+| `CraftContextBuilder` | Reads VIP via context to influence modifier aggregation |
+| `CraftRecipeData` | `JobTag.VIP = 8` reserved for VIP-gated recipes |
+| `SaveManager.IsDailyEnabled` | Pass-through accessor to `_currentVip.daily` |
+
+## 46.2 Extending VIP
+
+1. Add field to `VipData` with default `false`.
+2. Newtsoft round-trip via `SaveManager` handles a new bool field without migration; old saves load with `false`.
+3. Add consumer call site under the right domain owner — never let UI flip VIP state directly. Toggle goes through `SaveManager` or an explicit VIP service.
+4. If the perk gates a feature, surface it in `MainMenuController` (VIP button) as an explicit on/off.
+5. Update §49.1 table.
+
+Avoid numeric VIP levels until design requires progression (YAGNI). The current `bool` model is the source of truth.
+
+---
+
+# 47. EXTENSION MAP
+
+Start by reading the listed owner file, then the matching §39–§44 workflow, then the §37 file map for sibling services.
+
+| If you want to add… | Open first | Then read | Data file |
+|---|---|---|---|
+| a new ultimate | `Scripts/Ultimate/UltimateFactory.cs` | existing handler in `Scripts/Ultimate/` (e.g. `BombHandler`) | `Resources/Data/dataUltimate.json` |
+| a new card | `Scripts/Card/CardRollService.cs` | `CardModifierService` + `CardUpgradeService` | `Resources/Data/dataCard.json` |
+| a new enemy | `Scripts/Enemy/EnemyAi.cs` | `EnemySpawner.cs` (spawn weights), `EnemyStatusEffectController.cs` | `Resources/Data/dataEnemy.json` |
+| a new equipment slot or piece | `Scripts/Equipment/IEquipmentService.cs` | `SlotIdentityService`, `AttributeWeightsConfig` | `Resources/Data/dataBaseEquipment.json` + per-slot JSON |
+| a new affix or set | `Scripts/Items/EquipmentSetBonusService` (or wherever affix roll lives) | equipment persistence path | `Resources/Data/dataAffixes.json` / `dataSets.json` |
+| a new status effect | `Scripts/Enemy/EnemyStatusEffectController.cs` | `Scripts/Enemy/StatusEffects/ConcreteStatusEffects/` | none — code-only |
+| a new socket/gem rule | `Scripts/Items/GemSocketService.cs` + `SocketValidationService.cs` | `GemExperienceService`, `GemUpgradeService` | `Resources/Data/dataConfigSocket.json`, `dataGems.json` |
+| a new crafting recipe | `Scripts/Items/CraftService.cs` | `CraftContextBuilder`, `CraftCompletionService` | `Resources/Data/Player/dataRecipe*.json` + `dataConfigCrafting.json` |
+| a new consumable | `dataConsumables.json` consumer | `Scripts/Item/Items.cs` (`ItemClickManager`) | `Resources/Data/dataConsumables.json` |
+| a new daily reward slot | `Scripts/Daily/DailyRewardService.cs` | `DailyRewardSaveData`, `DailyRewardUI` | `Resources/Data/Player/dataDailyReward.json` (verify path) |
+| a new mission event | `Scripts/Mission/MissionService.cs` | `MissionUI.GetMissionIcon` switch | `Resources/Data/Player/dataMission.json` |
+| a new VIP perk | `Scripts/Data/VIPData.cs` | `SaveManager.IsDailyEnabled`, `GameSpeedController` | none — bool flag |
+| a new save domain | `Scripts/Data/SaveData.cs` | `Scripts/Save/EquipmentSerializer.cs` pattern, `SaveManager.OnSaveLoaded` | none — code-only, requires §52 version bump |
+| a new scene | `Scripts/Core/SceneLoader.cs` + `BootstrapInitializer.cs` | §24 scene list | none — must update §24 |
+
+## 47.1 Save-version bumps
+
+Any non-additive `SaveData` shape change requires:
+
+1. Bump `GameConstants.CURRENT_SAVE_VERSION` in `Scripts/Utilities/Constantku.cs`.
+2. Add migration case in `SaveManager.LoadFromDisk` (or equivalent).
+3. Append the version row to §52 of this document.
+4. Test: load save at `version - 1` → upgrade → reload → confirm shape.
+
+---
+
+# 48. SAVE VERSION LOG
+
+`GameConstants.CURRENT_SAVE_VERSION` is the authoritative version stamp written into every `SaveData`. Source of truth lives in `Scripts/Utilities/Constantku.cs`.
+
+| Version | Date | Schema break | Migration |
+|---|---|---|---|
+| 3 | 2026-08 | flat `Items[]` save; category derived from `ItemId`; slot via `SlotIndex` | see `Scripts/Save/InventorySerializer.cs` and `Scripts/Save/EquipmentSerializer.cs`; old nested save shapes are normalized on load |
+| 2 | prior | per-domain nested save sections | superseded by v3 flat layout |
+| 1 | initial | first shipping save | superseded by v2 |
+
+## 48.1 Reading the version
+
+`SaveData.version` is read by `SaveManager` before deserializing the rest of the payload. If on-disk version is below `CURRENT_SAVE_VERSION`, `SaveManager` runs the appropriate migration path, then writes back at the current version.
+
+If on-disk version is **above** `CURRENT_SAVE_VERSION`, reject the save (do not silently downgrade — data loss). Surface a user-facing recovery flow.
+
+## 48.2 Adding a row
+
+```text
+| <N+1> | <YYYY-MM> | <one-line schema break description> | <migration path summary + key files> |
+```
+
+Update this table in the same commit as the version bump.
+
+---
+
+# 49. DEFINITION OF DONE
 
 A feature is **not done** when the code compiles.
 
@@ -1644,7 +1815,7 @@ A feature is done when:
 
 ---
 
-# 46. AGENT CHECKLIST BEFORE MODIFYING CODE
+# 50. AGENT CHECKLIST BEFORE MODIFYING CODE
 
 Before editing:
 
@@ -1676,7 +1847,7 @@ After editing:
 
 ---
 
-# 47. FINAL PRINCIPLE
+# 51. FINAL PRINCIPLE
 
 The goal is not to produce the most code.
 
@@ -1695,13 +1866,8 @@ The goal is to build a game that can continue growing without becoming a collect
 When uncertain:
 
 > **Find the existing source of truth.**
->
 > **Put the rule in the correct domain.**
->
 > **Keep data separate from behavior.**
->
 > **Keep UI separate from domain logic.**
->
 > **Preserve persistent data.**
->
-> **Document the decision.**
+> **Document the decision to Design.md**

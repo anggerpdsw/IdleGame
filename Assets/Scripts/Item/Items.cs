@@ -22,7 +22,7 @@ namespace IdleDefenseSurvival.Item
         [SerializeField] private CircleCollider2D _collider;
 
         [Header("Spawn Spread Animation")]
-        [SerializeField] private float _targetVisualWorldSize = 0.27f;
+        [SerializeField] private float _targetVisualWorldSize = 0.61f; // view on World
         [SerializeField] private float _spreadRadius = 1.5f;
         [SerializeField] private float _spreadDuration = 0.6f;
         [SerializeField] private AnimationCurve _spreadCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);

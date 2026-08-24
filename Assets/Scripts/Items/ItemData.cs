@@ -178,6 +178,44 @@ namespace IdleDefenseSurvival.Items
         }
     }
 
+    [Serializable]
+    public class PotionData : ItemData
+    {
+        // ============ Potion Effect ============
+        public PotionType PotionType = PotionType.None;
+        /// <summary>
+        /// Percentage of the relevant maximum stat restored.
+        /// Example: 5 = 5%.
+        /// </summary>
+        public float PercentValue = 0f;
+        /// <summary>
+        /// Flat amount restored in addition to PercentValue.
+        /// </summary>
+        public float FlatValue = 0f;
+        /// <summary>
+        /// Duration of the regeneration/healing effect.
+        /// </summary>
+        public float EffectDuration = 0f;
+        /// <summary>
+        /// Cooldown after using the potion.
+        /// </summary>
+        public float Cooldown = 0f;
+        public override string ToString()
+        {
+            return $"{Name} ({PotionType})";
+        }
+        public float CalculateAmount(float maxValue)
+        {
+            return maxValue * (PercentValue * 0.01f) + FlatValue;
+        }
+        public void InitializeDefaults()
+        {
+            Category = ItemCategory.Consumable;
+            Role = ItemRole.Consumable;
+            if (StackSize <= 0) StackSize = 999;
+        }
+    }
+
     /// <summary>
     /// Main stat entry - defines a single main stat with value and scaling.
     /// </summary>

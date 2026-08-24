@@ -1,0 +1,103 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_hp_potion_r1",
+      "DisplayName": "Small Health Potion",
+      "Description": "A simple red herbal potion that restores a small amount of health.",
+      "PotionType": 1,
+      "Rarity": 1,
+      "RequiredAlchemistLevel": 1,
+      "Ingredients": [
+        { "ItemId": "red_berry", "Count": 6 },
+        { "ItemId": "ginger", "Count": 3 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 15.0,
+      "TimePerAdditionalUnit": 15.0
+    },
+    {
+      "RecipeId": "craft_hp_potion_r2",
+      "DisplayName": "Health Potion",
+      "Description": "A refined herbal potion brewed from restorative flowers and medicinal herbs.",
+      "PotionType": 1,
+      "Rarity": 2,
+      "RequiredAlchemistLevel": 5,
+      "Ingredients": [
+        { "ItemId": "hibiscus", "Count": 6 },
+        { "ItemId": "crane_herb", "Count": 5 },
+        { "ItemId": "ginger", "Count": 3 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_hp_potion_r3",
+      "DisplayName": "Greater Health Potion",
+      "Description": "A potent restorative potion made from powerful medicinal roots and regenerative herbs.",
+      "PotionType": 1,
+      "Rarity": 3,
+      "RequiredAlchemistLevel": 10,
+      "Ingredients": [
+        { "ItemId": "tiger_ear_herb", "Count": 8 },
+        { "ItemId": "elecampane", "Count": 6 },
+        { "ItemId": "fleece_flower", "Count": 4 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 40.0,
+      "TimePerAdditionalUnit": 40.0
+    },
+    {
+      "RecipeId": "craft_hp_potion_r4",
+      "DisplayName": "Superior Health Potion",
+      "Description": "A highly concentrated healing potion infused with golden herbs and magical nectar.",
+      "PotionType": 1,
+      "Rarity": 4,
+      "RequiredAlchemistLevel": 15,
+      "Ingredients": [
+        { "ItemId": "golden_herb", "Count": 8 },
+        { "ItemId": "nectar", "Count": 6 },
+        { "ItemId": "salvia_root", "Count": 5 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 60.0,
+      "TimePerAdditionalUnit": 60.0
+    },
+    {
+      "RecipeId": "craft_hp_potion_r5",
+      "DisplayName": "Mythic Health Potion",
+      "Description": "A powerful restorative elixir brewed from rare medicinal ingredients and ox bezoar.",
+      "PotionType": 1,
+      "Rarity": 5,
+      "RequiredAlchemistLevel": 20,
+      "Ingredients": [
+        { "ItemId": "ox_bezoar", "Count": 3 },
+        { "ItemId": "fleece_flower", "Count": 10 },
+        { "ItemId": "golden_herb", "Count": 10 },
+        { "ItemId": "nectar", "Count": 8 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 90.0,
+      "TimePerAdditionalUnit": 90.0
+    },
+    {
+      "RecipeId": "craft_hp_potion_r6",
+      "DisplayName": "Divine Health Elixir",
+      "Description": "A legendary healing elixir containing the purest restorative herbs and concentrated floral essence.",
+      "PotionType": 1,
+      "Rarity": 6,
+      "RequiredAlchemistLevel": 25,
+      "Ingredients": [
+        { "ItemId": "ox_bezoar", "Count": 5 },
+        { "ItemId": "golden_herb", "Count": 14 },
+        { "ItemId": "perfumedew_herb", "Count": 10 },
+        { "ItemId": "nectar", "Count": 12 },
+        { "ItemId": "fleece_flower", "Count": 12 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 120.0,
+      "TimePerAdditionalUnit": 120.0
+    }
+  ]
+}

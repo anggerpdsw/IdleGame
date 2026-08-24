@@ -15,8 +15,8 @@ namespace IdleDefenseSurvival.Core
             var inv = InventoryService.Instance;
             if (inv == null || ItemDatabase.Instance == null || inv.AllItems.Count > 0) return;
 
-            inv.AddItem("potion_hp", 100);
-            inv.AddItem("potion_mp", 100);
+            inv.AddItem("potion_hp_1", 100);
+            inv.AddItem("potion_mp_1", 100);
             // inv.AddItem("essence_of_hope", 9);
             // inv.AddItem("water", 999);
             // inv.AddItem("compound_thread", 999);

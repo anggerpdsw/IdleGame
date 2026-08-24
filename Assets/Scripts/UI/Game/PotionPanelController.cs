@@ -24,8 +24,6 @@ namespace IdleDefenseSurvival.UI.Game
         [SerializeField] private ItemConsumableUI _slotPrefab;
         [Tooltip("Potion slots layout (GridLayoutGroup/HorizontalLayoutGroup, etc.).")]
         [SerializeField] private RectTransform _slotContainer;
-        [Tooltip("Optional — potion 'use' cooldown. Shared across every slot. 0 = no cooldown.")]
-        [SerializeField] private float _defaultCooldown = 5f;
 
         private readonly List<ItemConsumableUI> _slots = new();
         private readonly Dictionary<string, ItemConsumableUI> _slotByItemId = new();
@@ -51,18 +49,11 @@ namespace IdleDefenseSurvival.UI.Game
             // One slot per potion type the player currently owns.
             foreach (var data in db.GetItemsByCategory(ItemCategory.Consumable))
             {
-                if (!IsPotion(data)) continue;
+                if (!db.IsPotion(data.Id)) continue;
                 if (inv.GetTotalQuantity(data.Id) <= 0) continue;
                 CreatePotionSlot(data.Id);
             }
         }
-
-        private static bool IsPotion(ItemData data) =>
-            data != null &&
-                data.Id.StartsWith("potion_", StringComparison.OrdinalIgnoreCase);
-        private static bool IsPotion(InventoryItem item) =>
-            item != null &&
-                item.ItemId.StartsWith("potion_", StringComparison.OrdinalIgnoreCase);
 
         private void OnEnable()
         {
@@ -102,12 +93,12 @@ namespace IdleDefenseSurvival.UI.Game
                 RefreshAll();
                 return;
             }
-            if (!IsPotion(args.Item)) return;
+            if (!ItemDatabase.Instance.IsPotion(args.Item.ItemId)) return;
             RefreshPotionSlot(args.Item.ItemId);
         }
         private void HandleItemQuantityChanged(InventoryItem item, int _)
         {
-            if (!IsPotion(item)) return;
+            if (!ItemDatabase.Instance.IsPotion(item.ItemId)) return;
             RefreshPotionSlot(item.ItemId);
         }
 
@@ -141,8 +132,8 @@ namespace IdleDefenseSurvival.UI.Game
         {
             var db = ItemDatabase.Instance;
             if (db == null) return;
-            var data = db.GetItem(itemId);
-            if (!IsPotion(data)) return;
+            var data = db.GetPotion(itemId);
+            if (!db.IsPotion(itemId)) return;
             var slotObject = _slotPrefab != null
                 ? Instantiate(_slotPrefab.gameObject, _slotContainer)
                 : new GameObject($"Potion_{itemId}", typeof(RectTransform));
@@ -156,7 +147,8 @@ namespace IdleDefenseSurvival.UI.Game
             slot.SetQuantity(quantity);
             if (_remainingCooldown.TryGetValue(itemId, out var remaining))
             {
-                float fill = _defaultCooldown > 0f ? remaining / _defaultCooldown : 0f;
+                float cooldown = GetCooldown(data);
+                float fill = cooldown > 0f ? remaining / cooldown : 0f;
                 slot.SetCooldown(fill);
             }
         }
@@ -187,8 +179,9 @@ namespace IdleDefenseSurvival.UI.Game
                 return;
             if (!ApplyEffect(itemId)) return;
             if (inv.RemoveItemById(itemId, 1) <= 0) return;
-            if (_defaultCooldown > 0f)
-                _remainingCooldown[itemId] = _defaultCooldown;
+            var potion = GetPotion(itemId);
+            float cd = GetCooldown(potion);
+            if (cd > 0f) _remainingCooldown[itemId] = cd;
             UpdateCooldownVisuals();
         }
 
@@ -199,41 +192,62 @@ namespace IdleDefenseSurvival.UI.Game
             {
                 if (_slotByItemId.TryGetValue(itemId, out var slot))
                 {
-                    float fill = _defaultCooldown > 0f ? remaining / _defaultCooldown : 0f;
+                    var potion = GetPotion(itemId);
+                    float cd = GetCooldown(potion);
+                    float fill = cd > 0f ? remaining / cd : 0f;
                     slot.SetCooldown(fill);
                 }
             }
         }
 
-        /// <summary>Runs the potion described by its ItemData. Returns false on any usable-fail (no target / conflict).</summary>
+        private static PotionData GetPotion(string itemId)
+            => ItemDatabase.Instance?.GetPotion(itemId);
+        private static float GetCooldown(PotionData potion)
+            => Mathf.Max(0f, potion?.Cooldown ?? 0f);
+        /// <summary>
+        /// Runs the potion effect described by its item ID.
+        /// Returns false when the item cannot be used.
+        /// </summary>
         private bool ApplyEffect(string itemId)
         {
-            return itemId switch
+            if (string.IsNullOrEmpty(itemId)) return false;
+            var potion = GetPotion(itemId);
+            if (potion == null) return false;
+            return ApplyPotion(potion);
+        }
+
+        private bool ApplyPotion(PotionData potion)
+        {
+            if (potion == null) return false;
+            return potion.PotionType switch
             {
-                "potion_ap" => CleanDebuff(),
-                "potion_hp" => Heal(),
-                "potion_mp" => GainMana(),
-                "potion_sp" => RestoreStamina(),
-                _           => false
+                PotionType.Health => ApplyHealthPotion(potion),
+                PotionType.Mana => ApplyManaPotion(potion),
+                PotionType.Stamina => RestoreStamina(),
+                PotionType.DebuffCleanse => CleanDebuff(),
+                _ => false
             };
+        }
+
+        private bool ApplyHealthPotion(PotionData potion)
+        {
+            float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
+            float amount = potion.CalculateAmount(maxHealth);
+            PlayerClass.Instance.StartHealOverTime(amount, potion.EffectDuration);
+            return true;
+        }
+        private bool ApplyManaPotion(PotionData potion)
+        {
+            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
+            float amount = potion.CalculateAmount(maxMana);
+            PlayerClass.Instance.StartManaOverTime(amount,potion.EffectDuration);
+            return true;
         }
 
         private bool CleanDebuff()
         {
             // Player doesn't have a debuff system yet. Don't consume item.
             return false;
-        }
-
-        private bool Heal()
-        {
-            PlayerClass.Instance.StartHealOverTime(500f, 10f);
-            return true;
-        }
-
-        private bool GainMana()
-        {
-            PlayerClass.Instance.StartManaOverTime(500f, 10f);
-            return true;
         }
 
         private static bool RestoreStamina()
@@ -248,19 +262,24 @@ namespace IdleDefenseSurvival.UI.Game
             if (_remainingCooldown.Count == 0) return;
             foreach (var itemId in _remainingCooldown.Keys.ToList())
             {
-                _remainingCooldown[itemId] -= Time.deltaTime;
-                if (_remainingCooldown[itemId] <= 0f)
+                float remaining = _remainingCooldown[itemId] - Time.deltaTime;
+                if (remaining <= 0f)
                 {
                     _remainingCooldown.Remove(itemId);
-                    if (_slotByItemId.TryGetValue(itemId, out var slot))
-                        slot.SetCooldown(0f);
+                    if (_slotByItemId.TryGetValue(itemId, out var slot)) slot.SetCooldown(0f);
                     continue;
                 }
-                if (_slotByItemId.TryGetValue(itemId, out var activeSlot))
+                _remainingCooldown[itemId] = remaining;
+                if (!_slotByItemId.TryGetValue(itemId, out var activeSlot)) continue;
+                var potion = GetPotion(itemId);
+                if (potion == null)
                 {
-                    float fill = _remainingCooldown[itemId] / _defaultCooldown;
-                    activeSlot.SetCooldown(fill);
+                    activeSlot.SetCooldown(0f);
+                    continue;
                 }
+                float cooldown = GetCooldown(potion);
+                float fill = cooldown > 0f ? Mathf.Clamp01(remaining / cooldown) : 0f;
+                activeSlot.SetCooldown(fill);
             }
         }
     }

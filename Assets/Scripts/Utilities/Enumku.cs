@@ -227,6 +227,18 @@ namespace IdleDefenseSurvival
     }
 
     /// <summary>
+    /// Each potion item has one PotionType that determines what it is.
+    /// </summary>
+    public enum PotionType
+    {
+        None = 0,
+        Health = 1,
+        Mana = 2,
+        Stamina = 3,
+        DebuffCleanse = 4
+    }
+
+    /// <summary>
     /// Secondary stats - specialization layer from equipment (the ~20% build identity).
     /// Core power comes from MainAttribute (CON/STR/INT/DEX) via derived SkillTypes,
     /// and SkillType feeds combat. SecondaryStat is pure specialization (build identity).

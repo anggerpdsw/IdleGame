@@ -117,7 +117,7 @@ MonoBehaviour:
   _visual: {fileID: 7108447942075128878}
   _spriteRenderer: {fileID: 7640368824467551570}
   _collider: {fileID: 1900880941053755793}
-  _targetVisualWorldSize: 0.27
+  _targetVisualWorldSize: 0.61
   _spreadRadius: 1.5
   _spreadDuration: 0.6
   _spreadCurve:

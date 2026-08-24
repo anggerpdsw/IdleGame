@@ -1,0 +1,103 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_mp_potion_r1",
+      "DisplayName": "Small Mana Potion",
+      "Description": "A simple blue herbal potion that restores a small amount of mana.",
+      "PotionType": 2,
+      "Rarity": 1,
+      "RequiredAlchemistLevel": 1,
+      "Ingredients": [
+        { "ItemId": "nectar", "Count": 4 },
+        { "ItemId": "tulip", "Count": 5 },
+        { "ItemId": "water", "Count": 10 }
+      ],
+      "BaseCraftTime": 15.0,
+      "TimePerAdditionalUnit": 15.0
+    },
+    {
+      "RecipeId": "craft_mp_potion_r2",
+      "DisplayName": "Mana Potion",
+      "Description": "A refined mana tonic infused with fragrant herbs and concentrated floral essence.",
+      "PotionType": 2,
+      "Rarity": 2,
+      "RequiredAlchemistLevel": 5,
+      "Ingredients": [
+        { "ItemId": "perfumedew_herb", "Count": 5 },
+        { "ItemId": "hibiscus", "Count": 6 },
+        { "ItemId": "nectar", "Count": 4 },
+        { "ItemId": "water", "Count": 20 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_mp_potion_r3",
+      "DisplayName": "Greater Mana Potion",
+      "Description": "A concentrated mana potion brewed with aromatic fungi and herbs rich in natural energy.",
+      "PotionType": 2,
+      "Rarity": 3,
+      "RequiredAlchemistLevel": 10,
+      "Ingredients": [
+        { "ItemId": "scented_fungus", "Count": 7 },
+        { "ItemId": "longen_herb", "Count": 7 },
+        { "ItemId": "perfumedew_herb", "Count": 5 },
+        { "ItemId": "water", "Count": 30 }
+      ],
+      "BaseCraftTime": 40.0,
+      "TimePerAdditionalUnit": 40.0
+    },
+    {
+      "RecipeId": "craft_mp_potion_r4",
+      "DisplayName": "Superior Mana Potion",
+      "Description": "A powerful mana elixir containing enchanted elderwood essence and concentrated nectar.",
+      "PotionType": 2,
+      "Rarity": 4,
+      "RequiredAlchemistLevel": 15,
+      "Ingredients": [
+        { "ItemId": "elderwood", "Count": 6 },
+        { "ItemId": "nectar", "Count": 8 },
+        { "ItemId": "perfumedew_herb", "Count": 7 },
+        { "ItemId": "water", "Count": 50 }
+      ],
+      "BaseCraftTime": 60.0,
+      "TimePerAdditionalUnit": 60.0
+    },
+    {
+      "RecipeId": "craft_mp_potion_r5",
+      "DisplayName": "Mythic Mana Potion",
+      "Description": "A highly concentrated mana elixir created from rare magical woods and unusual alchemical herbs.",
+      "PotionType": 2,
+      "Rarity": 5,
+      "RequiredAlchemistLevel": 20,
+      "Ingredients": [
+        { "ItemId": "ligumaloes_wood", "Count": 6 },
+        { "ItemId": "worm_sprouts", "Count": 8 },
+        { "ItemId": "elderwood", "Count": 8 },
+        { "ItemId": "nectar", "Count": 10 },
+        { "ItemId": "water", "Count": 80 }
+      ],
+      "BaseCraftTime": 90.0,
+      "TimePerAdditionalUnit": 90.0
+    },
+    {
+      "RecipeId": "craft_mp_potion_r6",
+      "DisplayName": "Divine Mana Elixir",
+      "Description": "A supreme mana elixir distilled from magical wood, aromatic herbs, and pure concentrated nectar.",
+      "PotionType": 2,
+      "Rarity": 6,
+      "RequiredAlchemistLevel": 25,
+      "Ingredients": [
+        { "ItemId": "elderwood", "Count": 10 },
+        { "ItemId": "ligumaloes_wood", "Count": 10 },
+        { "ItemId": "perfumedew_herb", "Count": 14 },
+        { "ItemId": "nectar", "Count": 14 },
+        { "ItemId": "scented_fungus", "Count": 10 },
+        { "ItemId": "water", "Count": 120 }
+      ],
+      "BaseCraftTime": 120.0,
+      "TimePerAdditionalUnit": 120.0
+    }
+  ]
+}

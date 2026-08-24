@@ -15,32 +15,24 @@
     "ItemRarity": 1,
     "IconKey": "Potion/potion/ap",
     "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "potion_hp",
-    "Name": "Health Potion",
-    "Description": "Restores 500 Health Points over 10s when used. Cooldown in 5s.",
-    "Category": 2,
-    "ItemRarity": 1,
-    "IconKey": "Potion/potion/hp",
-    "SellPrice": 10,
-    "StackSize": 999
-}, {
-    "Id": "potion_mp",
-    "Name": "Mana Potion",
-    "Description": "Restores 500 Mana Points over 10s when used. Cooldown in 5s.",
-    "Category": 2,
-    "ItemRarity": 1,
-    "IconKey": "Potion/potion/mp",
-    "SellPrice": 10,
-    "StackSize": 999
+    "StackSize": 999,
+    "PotionType": 4,
+    "PercentValue": 100,
+    "FlatValue": 0,
+    "EffectDuration": 1,
+    "Cooldown": 15
 }, {
     "Id": "potion_sp",
     "Name": "Stamina Potion",
-    "Description": "Restores 500 Stamina Points over 10s when used. Cooldown in 5s.",
+    "Description": "Restores 5% Max Stamina + 100 Stamina Points over 10s when used. Cooldown in 5s.",
     "Category": 2,
     "ItemRarity": 1,
     "IconKey": "Potion/potion/sp",
     "SellPrice": 10,
-    "StackSize": 999
+    "StackSize": 999,
+    "PotionType": 3,
+    "PercentValue": 5,
+    "FlatValue": 100,
+    "EffectDuration": 10,
+    "Cooldown": 5
 }]
