@@ -13,9 +13,10 @@ namespace IdleDefenseSurvival.Ultimate
     /// 2. Registering ultimate handlers
     /// 3. Providing data lookup
     /// 4. Delegating spawning to handlers via UltimateFactory
-    /// 
+    /// 5. Stack management for chance/kill-count based ultimates (Bomb, Tank, Cloud, Lightning)
+    ///
     /// Separates concerns:
-    /// - Manager: data + trigger logic (cooldown, chance)
+    /// - Manager: data + trigger logic (cooldown, chance, stacks)
     /// - Factory: handler registry + instance creation
     /// - Handlers: individual ultimate spawn logic
     /// - Instances: individual ultimate runtime behavior
@@ -55,6 +56,12 @@ namespace IdleDefenseSurvival.Ultimate
         private Dictionary<string, UltimateData> _ultimateDatabase = new();
         private Dictionary<string, float> _lastSpawnTimeMap = new(); // For cooldown tracking
 
+        // Stack system for chance/kill-count based ultimates
+        // Bomb, Tank, Cloud: chance-based stacks
+        // Lightning: kill-count based stacks
+        private Dictionary<string, int> _currentStacks = new();
+        private Dictionary<string, int> _killCounters = new(); // For Lightning kill tracking
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -86,6 +93,8 @@ namespace IdleDefenseSurvival.Ultimate
                 {
                     _ultimateDatabase[data.id] = data;
                     _lastSpawnTimeMap[data.id] = Time.time; // Initialize cooldown timer
+                    _currentStacks[data.id] = 0;
+                    _killCounters[data.id] = 0;
                 }
             }
         }
@@ -139,12 +148,83 @@ namespace IdleDefenseSurvival.Ultimate
         }
 
         // -------------------------------------------------------------------
-        // Public API: Spawning with Trigger Logic
+        // Stack System API
         // -------------------------------------------------------------------
 
         /// <summary>
-        /// Try to spawn an ultimate by ID.
-        /// Handles: active check, cooldown, chance, then delegates to factory.
+        /// Get current stack count for an ultimate.
+        /// </summary>
+        public int GetStack(string ultimateId)
+        {
+            return _currentStacks.TryGetValue(ultimateId, out int stack) ? stack : 0;
+        }
+
+        /// <summary>
+        /// Get max stack count for an ultimate (from data).
+        /// </summary>
+        public int GetMaxStack(string ultimateId)
+        {
+            if (TryGetUltimate(ultimateId, out var data))
+                return data.GetCount();
+            return 1;
+        }
+
+        /// <summary>
+        /// Try to add a stack (for auto-cast chance/kill triggers).
+        /// Returns true if stack was added.
+        /// </summary>
+        public bool TryAddStack(string ultimateId)
+        {
+            if (!TryGetUltimate(ultimateId, out var data)) return false;
+            if (!data.UsesStackSystem) return false;
+
+            int maxStack = data.GetCount();
+            int currentStack = GetStack(ultimateId);
+
+            if (currentStack >= maxStack) return false;
+
+            _currentStacks[ultimateId] = currentStack + 1;
+            return true;
+        }
+
+        /// <summary>
+        /// Consume a stack for manual cast.
+        /// Returns true if stack was consumed.
+        /// </summary>
+        public bool ConsumeStack(string ultimateId)
+        {
+            if (!_currentStacks.TryGetValue(ultimateId, out int currentStack)) return false;
+            if (currentStack <= 0) return false;
+
+            _currentStacks[ultimateId] = currentStack - 1;
+            return true;
+        }
+
+        /// <summary>
+        /// Called by EnemyAi when an enemy dies (for Lightning kill counter).
+        /// </summary>
+        public void OnEnemyKilled()
+        {
+            if (!TryGetUltimate(UltimateDMG.Lightning.ToString(), out var lightningData)) return;
+            if (!lightningData.GetActive()) return;
+
+            int triggerCount = lightningData.GetTriggerKillCount();
+            int currentKills = _killCounters.TryGetValue(UltimateDMG.Lightning.ToString(), out int kills) ? kills : 0;
+            currentKills++;
+            _killCounters[UltimateDMG.Lightning.ToString()] = currentKills;
+
+            if (currentKills >= triggerCount)
+            {
+                _killCounters[UltimateDMG.Lightning.ToString()] = 0;
+                // Try to add stack (respects max count)
+                TryAddStack(UltimateDMG.Lightning.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Try to spawn an ultimate by ID (auto-cast path).
+        /// For stack-based ultimates: checks chance, adds stack if successful.
+        /// For cooldown-based ultimates: normal spawn logic.
         /// </summary>
         public bool TrySpawn(string ultimateId, Vector3 position, Player.Player player)
         {
@@ -155,44 +235,71 @@ namespace IdleDefenseSurvival.Ultimate
             float cooldown = ultimateData.GetCooldown();
             if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
 
-            // Check chance (unless cooldown is active for this ultimate)
-            float chance = ultimateData.GetChance();
-            if (chance > 0f && !Utilityku.Chance(chance)) return false;
-
             // Check mana cost
             if (!player.CanAfford(ultimateData.manaCost)) return false;
 
-            // Delegate to factory
-            bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-            // Update cooldown timer
-            if (success)
+            // Handle stack-based ultimates (Bomb, Tank, Cloud, Lightning)
+            if (ultimateData.UsesStackSystem)
+            {
+                // Check chance for chance-based ultimates
+                float chance = ultimateData.GetChance();
+                if (chance > 0f)
+                {
+                    if (!Utilityku.Chance(chance)) return false;
+                }
+                // For Lightning, chance is 0 but triggerKillCount handles it via OnEnemyKilled
+
+                // Add stack (respects max count)
+                if (!TryAddStack(ultimateId)) return false;
+
+                // For auto-cast, immediately consume stack and spawn
+                // (Auto-cast uses the stack as a "charge" that fires immediately)
+                ConsumeStack(ultimateId);
+
+                bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
+                if (success)
+                {
+                    _lastSpawnTimeMap[ultimateId] = Time.time;
+                    player.SpendMana(ultimateData.manaCost);
+                }
+                return success;
+            }
+
+            // Normal cooldown-based ultimates (Void, Root, Fountain, Shockwave)
+            bool success2 = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
+            if (success2)
             {
                 _lastSpawnTimeMap[ultimateId] = Time.time;
                 player.SpendMana(ultimateData.manaCost);
             }
-
-            return success;
+            return success2;
         }
 
         /// <summary>
         /// Manual cast entry point for user click.
-        /// Bypasses chance check but still respects active, cooldown, and mana cost.
+        /// Consumes a stack if available, bypasses chance check.
+        /// Still respects active, cooldown, and mana cost.
         /// </summary>
         public bool TrySpawnManual(string ultimateId, Vector3 position, Player.Player player)
         {
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
 
-            // Check cooldown (Lightning uses triggerKillCount instead of cooldown)
+            // Check cooldown (Lightning has no cooldown)
             float cooldown = ultimateData.GetCooldown();
             if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
 
             // Check mana cost
             if (!player.CanAfford(ultimateData.manaCost)) return false;
 
+            // For stack-based ultimates: must have stack to cast
+            if (ultimateData.UsesStackSystem)
+            {
+                if (!ConsumeStack(ultimateId)) return false;
+            }
+
             // Delegate to factory
             bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-            // Update cooldown timer
             if (success)
             {
                 _lastSpawnTimeMap[ultimateId] = Time.time;

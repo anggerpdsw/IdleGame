@@ -22,6 +22,7 @@ namespace IdleDefenseSurvival.UI.Game
             UltimateID = ultimateId;
             if (_icon == null) _icon = GetComponent<Image>();
             if (_cooldownText == null) _cooldownText = GetComponentInChildren<TextMeshProUGUI>(true);
+            if (_stackText == null) _stackText = GetComponentInChildren<TextMeshProUGUI>(true);
             if (_button == null) _button = GetComponent<Button>();
 
             // Ensure icon is set up for radial fill
@@ -34,6 +35,13 @@ namespace IdleDefenseSurvival.UI.Game
                 _icon.fillAmount = 1f; // Full = ready
 
                 _icon.sprite = PlayerResources.GetUltimateSource(UltimateID);
+            }
+
+            // Hide stack text initially
+            if (_stackText != null)
+            {
+                _stackText.enabled = false;
+                _stackText.text = "";
             }
         }
 
@@ -53,7 +61,7 @@ namespace IdleDefenseSurvival.UI.Game
             fillAmount = Mathf.Clamp01(fillAmount);
             // Invert: 1 = ready (full), 0 = on cooldown (empty)
             if (_icon != null)
-                _icon.fillAmount = 1f - fillAmount; 
+                _icon.fillAmount = 1f - fillAmount;
             if (_cooldownText != null)
             {
                 if (fillAmount > 0f)
@@ -75,6 +83,26 @@ namespace IdleDefenseSurvival.UI.Game
 
             if (_button != null)
                 _button.interactable = fillAmount <= 0f;
+        }
+
+        /// <summary>
+        /// Sets the stack count display.
+        /// Shows "xN" when count > 0, hides when 0.
+        /// </summary>
+        public void SetStack(int count)
+        {
+            if (_stackText == null) return;
+
+            if (count > 0)
+            {
+                _stackText.text = $"x{count}";
+                _stackText.enabled = true;
+            }
+            else
+            {
+                _stackText.text = "";
+                _stackText.enabled = false;
+            }
         }
     }
 }

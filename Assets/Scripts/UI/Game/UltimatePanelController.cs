@@ -9,9 +9,9 @@ using IdleDefenseSurvival.Player;
 namespace IdleDefenseSurvival.UI.Game
 {
     /// <summary>
-    /// Controls the ultimate ability panel showing available ultimates with cooldowns.
+    /// Controls the ultimate ability panel showing available ultimates with cooldowns and stacks.
     /// Supports both auto-cast (when AutoCastUltimate setting is on) and manual cast (user clicks button).
-    /// Cooldowns are read directly from UltimateManager (single source of truth).
+    /// Cooldowns and stacks are read directly from UltimateManager (single source of truth).
     /// </summary>
     public class UltimatePanelController : MonoBehaviour
     {
@@ -66,7 +66,7 @@ namespace IdleDefenseSurvival.UI.Game
             if (_manualCastOverlay != null)
             {
                 bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
-                _manualCastOverlay.SetActive(!autoCast);
+                _manualCastOverlay.SetActive(autoCast);
             }
         }
 
@@ -108,8 +108,8 @@ namespace IdleDefenseSurvival.UI.Game
             _slots.Add(slot);
             _slotByUltimateId[ultimateId] = slot;
 
-            // Initialize cooldown visual from UltimateManager
-            UpdateSlotCooldown(ultimateId);
+            // Initialize visuals from UltimateManager
+            UpdateSlotVisuals(ultimateId);
         }
 
         private void OnUltimateClicked(string ultimateId)
@@ -122,7 +122,7 @@ namespace IdleDefenseSurvival.UI.Game
             if (player == null) return;
 
             player.ManualCastUltimate(ultimateId);
-            // UltimateManager handles cooldown internally; just refresh visual next frame
+            // UltimateManager handles cooldown/stack internally; refresh visual next frame
         }
 
         private void RefreshAll()
@@ -139,7 +139,7 @@ namespace IdleDefenseSurvival.UI.Game
                 }
             }
 
-            UpdateAllSlotCooldowns();
+            UpdateAllSlotVisuals();
             UpdateAllSlotInteractable();
         }
 
@@ -155,43 +155,85 @@ namespace IdleDefenseSurvival.UI.Game
         {
             if (slot == null) return;
 
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
+            if (!ultimateManager.TryGetUltimate(slot.UltimateID, out var ultimateData)) return;
+
             bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+
             // When auto-cast is on, buttons are non-interactable (visual only)
-            // When auto-cast is off, buttons are interactable if off cooldown
+            if (autoCast)
+            {
+                if (slot.Button != null)
+                    slot.Button.interactable = false;
+                return;
+            }
+
+            // When auto-cast is off:
+            // - For cooldown-based ultimates: interactable when off cooldown
+            // - For stack-based ultimates: interactable when has stacks AND off cooldown
             if (slot.Button != null)
             {
-                slot.Button.interactable = !autoCast && slot.IsReady;
+                bool hasStack = true;
+                if (ultimateData.UsesStackSystem)
+                {
+                    int stack = ultimateManager.GetStack(slot.UltimateID);
+                    hasStack = stack > 0;
+                }
+
+                bool offCooldown = true;
+                float cooldown = ultimateData.GetCooldown();
+                if (cooldown > 0f)
+                {
+                    float remaining = ultimateManager.GetCooldownRemaining(slot.UltimateID);
+                    offCooldown = remaining <= 0f;
+                }
+
+                slot.Button.interactable = hasStack && offCooldown;
             }
         }
 
-        /// <summary>Updates cooldown for a single slot from UltimateManager.</summary>
-        private void UpdateSlotCooldown(string ultimateId)
+        /// <summary>Updates both cooldown and stack visuals for a single slot.</summary>
+        private void UpdateSlotVisuals(string ultimateId)
         {
             var ultimateManager = UltimateManager.Instance;
             if (ultimateManager == null) return;
             if (!_slotByUltimateId.TryGetValue(ultimateId, out var slot)) return;
             if (!ultimateManager.TryGetUltimate(ultimateId, out var ultimateData)) return;
 
+            // Update cooldown
             float cooldown = ultimateData.GetCooldown();
-            if (cooldown <= 0f)
+            if (cooldown > 0f)
+            {
+                float remaining = ultimateManager.GetCooldownRemaining(ultimateId);
+                float fill = remaining > 0f ? remaining / cooldown : 0f;
+                slot.SetCooldown(fill);
+            }
+            else
             {
                 slot.SetCooldown(0f);
-                return;
             }
 
-            float remaining = ultimateManager.GetCooldownRemaining(ultimateId);
-            float fill = remaining > 0f ? remaining / cooldown : 0f;
-            slot.SetCooldown(fill);
+            // Update stack
+            if (ultimateData.UsesStackSystem)
+            {
+                int stack = ultimateManager.GetStack(ultimateId);
+                slot.SetStack(stack);
+            }
+            else
+            {
+                slot.SetStack(0);
+            }
         }
 
-        private void UpdateAllSlotCooldowns()
+        private void UpdateAllSlotVisuals()
         {
             var ultimateManager = UltimateManager.Instance;
             if (ultimateManager == null) return;
 
             foreach (var ultimateId in _slotByUltimateId.Keys)
             {
-                UpdateSlotCooldown(ultimateId);
+                UpdateSlotVisuals(ultimateId);
             }
         }
 
@@ -200,10 +242,10 @@ namespace IdleDefenseSurvival.UI.Game
             var ultimateManager = UltimateManager.Instance;
             if (ultimateManager == null) return;
 
-            // Read cooldown from UltimateManager every frame (single source of truth)
+            // Read cooldown and stack from UltimateManager every frame (single source of truth)
             foreach (var ultimateId in _slotByUltimateId.Keys)
             {
-                UpdateSlotCooldown(ultimateId);
+                UpdateSlotVisuals(ultimateId);
             }
         }
 

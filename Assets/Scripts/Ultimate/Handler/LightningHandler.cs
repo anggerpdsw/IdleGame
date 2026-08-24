@@ -46,7 +46,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (lightningData == null || !lightningData.GetActive())
                 return false;
 
-            _triggerKillCount = lightningData.GetTriggerKilLCount(20);
+            _triggerKillCount = lightningData.GetTriggerKillCount(20);
             _killCountSinceLastLightning++;
 
             float progress = (float)_killCountSinceLastLightning / _triggerKillCount;

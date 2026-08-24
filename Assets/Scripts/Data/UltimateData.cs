@@ -19,7 +19,7 @@ namespace IdleDefenseSurvival.Data
         /// <summary>Probability (0-100) to trigger the ultimate per attack / per check.</summary>
         public float chance;
         public int triggerKillCount;
-        /// <summary>Maximum number of active instances of this ultimate.</summary>
+        /// <summary>Maximum number of active instances / stacks of this ultimate.</summary>
         public int count;
         /// <summary>Time between activations (for ultimates that use a cooldown like Shockwave).</summary>
         public float cooldown;
@@ -41,7 +41,7 @@ namespace IdleDefenseSurvival.Data
 
         public bool GetActive() => active;
         public float GetChance() => chance;
-        public int GetTriggerKilLCount(int fallback = 20) => triggerKillCount > 0 ? triggerKillCount : fallback;
+        public int GetTriggerKillCount(int fallback = 20) => triggerKillCount > 0 ? triggerKillCount : fallback;
         public int GetCount(int fallback = 1) => count > 0 ? count : fallback;
         public float GetCooldown(float fallback = 1f) => cooldown > 0f ? cooldown : fallback;
         public float GetDuration(float fallback = 0f) => duration > 0f ? duration : fallback;
@@ -52,9 +52,13 @@ namespace IdleDefenseSurvival.Data
         public float GetDefenseBreak(float fallback = 0f) => defenseBreak > 0f ? defenseBreak : fallback;
         public float GetHealthBreak(float fallback = 0f) => healthBreak > 0f ? healthBreak : fallback;
         public Element GetElement(Element fallback = Element.None) => element == Element.None ? fallback : element;
-        
+
+        /// <summary>
+        /// Whether this ultimate uses a stack system (chance-based or kill-count based).
+        /// </summary>
+        public bool UsesStackSystem => chance > 0f || triggerKillCount > 0;
     }
-    
+
     [Serializable]
     public class UltimateWrapper
     {
