@@ -1792,7 +1792,21 @@ Update this table in the same commit as the version bump.
 
 ---
 
-# 49. DEFINITION OF DONE
+# 54. CLOSING HANDOFF
+
+When a feature, refactor, or extension lands in this project, the canonical handoff sequence is:
+
+1. §51 Extension Map → pick the owner file for the domain you touched.
+2. §39–§44 workflow → follow the per-domain workflow (ultimate / card / enemy / equipment / status / consumable / mission / etc.).
+3. §52 Save Version Log → if `SaveData` shape changed, bump `CURRENT_SAVE_VERSION` and append a row.
+4. §53 Design Documentation Index → if you authored or rewrote a design doc, register it here.
+5. Test against §45 Definition of Done and §46 Agent Checklist before considering the change complete.
+
+# I., # II., and # III. below are the final closing commands for this document.
+
+---
+
+# I. DEFINITION OF DONE
 
 A feature is **not done** when the code compiles.
 
@@ -1815,7 +1829,7 @@ A feature is done when:
 
 ---
 
-# 50. AGENT CHECKLIST BEFORE MODIFYING CODE
+# II. AGENT CHECKLIST BEFORE MODIFYING CODE
 
 Before editing:
 
@@ -1835,7 +1849,7 @@ Before editing:
 After editing:
 
 ```text
-[ ] Compile errors checked
+[ ] Manual Compile errors checked
 [ ] Existing consumers checked
 [ ] Save/load checked if applicable
 [ ] Duplicate events checked
@@ -1847,7 +1861,7 @@ After editing:
 
 ---
 
-# 51. FINAL PRINCIPLE
+# III. FINAL PRINCIPLE
 
 The goal is not to produce the most code.
 
