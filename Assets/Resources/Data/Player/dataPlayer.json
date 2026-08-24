@@ -130,7 +130,7 @@
         "displayName": "Mana Points"
       },
       "manaRegen": {
-        "baseValue": 0.2,
+        "baseValue": 1.1,
         "description": "Mana regenerated per second",
         "displayName": "Mana Regeneration"
       }

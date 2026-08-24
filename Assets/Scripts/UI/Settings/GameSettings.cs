@@ -16,6 +16,7 @@ namespace IdleDefenseSurvival.UI
         public bool ShowCriticalText = true;
         public bool ShowHealPopup = true;
         public bool ShowEnemyHealthBar = true;
+        public bool AutoCastUltimate = true;
         public bool ShowFPS = false;
         public float PopupDuration = 1.5f;
 
@@ -47,6 +48,7 @@ namespace IdleDefenseSurvival.UI
             // UI
             ShowDamagePopup = true;
             ShowEnemyHealthBar = true;
+            AutoCastUltimate = true;
             ShowCriticalText = true;
             ShowHealPopup = true;
             ShowFPS = false;

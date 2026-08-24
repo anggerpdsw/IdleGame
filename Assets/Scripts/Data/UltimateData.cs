@@ -14,6 +14,8 @@ namespace IdleDefenseSurvival.Data
         public string id;
         /// <summary>Need to be active before can use.</summary>
         public bool active;
+        /// <summary>Need mana to cast an ultimate.</summary>
+        public float manaCost;
         /// <summary>Probability (0-100) to trigger the ultimate per attack / per check.</summary>
         public float chance;
         public int triggerKillCount;

@@ -19,6 +19,7 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private Toggle _criticalTextToggle;
         [SerializeField] private Toggle _healPopupToggle;
         [SerializeField] private Toggle _enemyHealthBarToggle;
+        [SerializeField] private Toggle _autoCastUltimate;
         [SerializeField] private Slider _popupDurationSlider;
 
         [Header("Audio Settings")]
@@ -68,6 +69,7 @@ namespace IdleDefenseSurvival.UI
             // UI Settings
             if (_damagePopupToggle != null) _damagePopupToggle.isOn = _settings.ShowDamagePopup;
             if (_enemyHealthBarToggle != null) _enemyHealthBarToggle.isOn = _settings.ShowEnemyHealthBar;
+            if (_autoCastUltimate != null) _autoCastUltimate.isOn = _settings.AutoCastUltimate;
             if (_criticalTextToggle != null) _criticalTextToggle.isOn = _settings.ShowCriticalText;
             if (_healPopupToggle != null) _healPopupToggle.isOn = _settings.ShowHealPopup;
             if (_popupDurationSlider != null) _popupDurationSlider.value = _settings.PopupDuration;
@@ -100,6 +102,8 @@ namespace IdleDefenseSurvival.UI
                 _settings.DamagePopupChanged += v => _damagePopupToggle.isOn = v;
             if (_enemyHealthBarToggle != null)
                 _settings.EnemyHealthBarChanged += v => _enemyHealthBarToggle.isOn = v;
+            if (_autoCastUltimate != null)
+                _settings.AutoCastUltimateChanged += v => _autoCastUltimate.isOn = v;
             if (_criticalTextToggle != null)
                 _settings.CriticalTextChanged += v => _criticalTextToggle.isOn = v;
             if (_healPopupToggle != null)
@@ -143,6 +147,8 @@ namespace IdleDefenseSurvival.UI
                 _damagePopupToggle.onValueChanged.AddListener(v => _settings.ShowDamagePopup = v);
             if (_enemyHealthBarToggle != null)
                 _enemyHealthBarToggle.onValueChanged.AddListener(v => _settings.ShowEnemyHealthBar = v);
+            if (_autoCastUltimate != null)
+                _autoCastUltimate.onValueChanged.AddListener(v => _settings.AutoCastUltimate = v);
             if (_criticalTextToggle != null)
                 _criticalTextToggle.onValueChanged.AddListener(v => _settings.ShowCriticalText = v);
             if (_healPopupToggle != null)

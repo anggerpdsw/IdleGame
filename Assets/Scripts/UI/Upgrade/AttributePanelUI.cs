@@ -132,14 +132,14 @@ namespace IdleDefenseSurvival.UI.Upgrade
             var account = AccountManager.Instance;
             if (account == null) return;
 
-            int attributeValue = account.GetAttributeValue(attr);
+            int attributeValue = account.GetAttributeValue(attr) - GameConstants.STARTING_STAT_POINTS;
             var bonuses = AttributeService.GetBonuses(attr);
 
             var sb = new StringBuilder();
             // Header
             sb.AppendLine($"<b><color=#FFD700>{attr.GetDisplayName()}</color></b>");
             // Total effect
-            sb.AppendLine("<b>Current Effects:</b>");
+            sb.AppendLine("<b>Current Status:</b>");
             foreach (var bonus in bonuses) 
             {
                 float totalFlat = bonus.Flat * attributeValue;

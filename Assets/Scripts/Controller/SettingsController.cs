@@ -33,6 +33,7 @@ namespace IdleDefenseSurvival.Controller
         // ================================================================
         public event Action<bool> DamagePopupChanged;
         public event Action<bool> EnemyHealthBarChanged;
+        public event Action<bool> AutoCastUltimateChanged;
         public event Action<bool> CriticalTextChanged;
         public event Action<bool> HealPopupChanged;
         public event Action<bool> ShowFPSChanged;
@@ -103,6 +104,12 @@ namespace IdleDefenseSurvival.Controller
         {
             get => _settings.ShowEnemyHealthBar;
             set => SetProperty(ref _settings.ShowEnemyHealthBar, value, nameof(ShowEnemyHealthBar), EnemyHealthBarChanged);
+        }
+
+        public bool AutoCastUltimate
+        {
+            get => _settings.AutoCastUltimate;
+            set => SetProperty(ref _settings.AutoCastUltimate, value, nameof(AutoCastUltimate), AutoCastUltimateChanged);
         }
 
         public bool ShowFPS
@@ -234,6 +241,7 @@ namespace IdleDefenseSurvival.Controller
             // UI Settings
             _settings.ShowDamagePopup = PlayerPrefs.GetInt(nameof(ShowDamagePopup), 1) == 1;
             _settings.ShowEnemyHealthBar = PlayerPrefs.GetInt(nameof(ShowEnemyHealthBar), 1) == 1;
+            _settings.AutoCastUltimate = PlayerPrefs.GetInt(nameof(AutoCastUltimate), 1) == 1;
             _settings.ShowCriticalText = PlayerPrefs.GetInt(nameof(ShowCriticalText), 1) == 1;
             _settings.ShowHealPopup = PlayerPrefs.GetInt(nameof(ShowHealPopup), 1) == 1;
             _settings.ShowFPS = PlayerPrefs.GetInt(nameof(ShowFPS), 0) == 1;
@@ -317,6 +325,7 @@ namespace IdleDefenseSurvival.Controller
             // UI
             DamagePopupChanged?.Invoke(_settings.ShowDamagePopup);
             EnemyHealthBarChanged?.Invoke(_settings.ShowEnemyHealthBar);
+            AutoCastUltimateChanged?.Invoke(_settings.AutoCastUltimate);
             CriticalTextChanged?.Invoke(_settings.ShowCriticalText);
             HealPopupChanged?.Invoke(_settings.ShowHealPopup);
             ShowFPSChanged?.Invoke(_settings.ShowFPS);
@@ -368,6 +377,7 @@ namespace IdleDefenseSurvival.Controller
             // UI
             SaveSetting(nameof(ShowDamagePopup), _settings.ShowDamagePopup);
             SaveSetting(nameof(ShowEnemyHealthBar), _settings.ShowEnemyHealthBar);
+            SaveSetting(nameof(AutoCastUltimate), _settings.AutoCastUltimate);
             SaveSetting(nameof(ShowCriticalText), _settings.ShowCriticalText);
             SaveSetting(nameof(ShowHealPopup), _settings.ShowHealPopup);
             SaveSetting(nameof(ShowFPS), _settings.ShowFPS);
