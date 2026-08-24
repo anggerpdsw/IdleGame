@@ -345,6 +345,11 @@ namespace IdleDefenseSurvival.Equipment
         public Dictionary<SecondaryStat, float> GetTotalStatBonuses() =>
             EquipmentStatCalculator.GetTotalStatBonuses(ItemDatabase.Instance, _equippedItems, _setPieceCounts);
 
+        public float GetAttributeBonus(MainAttribute attribute) =>
+            EquipmentStatCalculator
+                .GetTotalAttributeBonuses(ItemDatabase.Instance, _equippedItems, _setPieceCounts)
+                .GetValueOrDefault(attribute, 0f);
+
         public Dictionary<SecondaryStat, float> GetSlotStatBonuses(EquipmentType slot) =>
             _equippedItems.TryGetValue(slot, out var item)
                 ? EquipmentStatCalculator.GetItemStatBonuses(item)

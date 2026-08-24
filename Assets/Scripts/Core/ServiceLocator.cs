@@ -14,7 +14,7 @@ namespace IdleDefenseSurvival.Core
         public static IEconomyService EconomyService => EconomyManager.Instance;
         public static IAudioService AudioService => AudioManager.Instance;
         public static IAdsService AdsService => AdvertisingManager.Instance;
-        public static IAnalyticsService AnalyticsService => (IAnalyticsService)AnalyticsManager.Instance;
+        public static IAnalyticsService AnalyticsService => AnalyticsManager.Instance;
         // GameManager does not have an interface; expose the concrete instance for direct use.
         public static GameManager Manager => GameManager.Instance;
     }

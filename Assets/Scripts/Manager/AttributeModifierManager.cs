@@ -111,6 +111,8 @@ namespace IdleDefenseSurvival.Manager
             Collect(MainAttribute.Dexterity, _dexterity, modifiers);
 
             ModifierManager.Instance.SetSource(ModifierSource.AccountLevel, modifiers);
+            // existing bridge; or add an OnAttributeChanged.Invoke() alias
+            AccountManager.Instance?.NotifyDataLoaded();
         }
 
         private void Collect(MainAttribute attr, float total, List<StatModifier> modifiers)

@@ -242,7 +242,7 @@ namespace IdleDefenseSurvival.Enemy
         {
             int tier = WaveManager.Instance.CurrentTier;
             // Base reward grows steadily with tier.
-            float baseGold = 1f + tier * 2.5f;
+            float baseGold = 0.5f + tier * 2.5f;
             // Health contributes, but with diminishing returns.
             float hpBonus = Mathf.Pow(enemyHealth, 0.35f);
             // Additional tier scaling.
@@ -256,7 +256,7 @@ namespace IdleDefenseSurvival.Enemy
             float equipGoldGain = PlayerStatsManager.Instance.GetStat(SkillType.GoldGain);
             rawGold *= 1f + equipGoldGain / 100f;
 
-            rawGold *= 0.5f;
+            rawGold *= 0.25f;
             return (long)System.Math.Max(1, Mathf.Floor(rawGold));
         }
 

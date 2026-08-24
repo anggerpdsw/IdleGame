@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
-using IdleDefenseSurvival;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Equipment;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -136,18 +136,18 @@ namespace IdleDefenseSurvival.Manager
         /// Number of attribute points allocated by the player.
         /// Does not include external bonuses.
         /// </summary>
-        public int GetAttributeAllocated(MainAttribute attribute)
+        private int GetAttributeRaw(MainAttribute attribute) => attribute switch
         {
-            int value = attribute switch
-            {
-                MainAttribute.Constitution => Data.constitution,
-                MainAttribute.Strength => Data.strength,
-                MainAttribute.Intelligence => Data.intelligence,
-                MainAttribute.Dexterity => Data.dexterity,
-                _ => 0
-            };
-            return Mathf.Max(0, value - GameConstants.STARTING_STAT_POINTS);
-        }
+            MainAttribute.Constitution  => Data.constitution,
+            MainAttribute.Strength      => Data.strength,
+            MainAttribute.Intelligence  => Data.intelligence,
+            MainAttribute.Dexterity     => Data.dexterity,
+            _ => 0
+        };
+
+        public int GetAttributeAllocated(MainAttribute attribute)
+            => Mathf.Max(0, GetAttributeRaw(attribute) - GameConstants.STARTING_STAT_POINTS);
+
 
         /// <summary>
         /// External bonus added from equipment, set bonuses,
@@ -171,21 +171,12 @@ namespace IdleDefenseSurvival.Manager
             return baseValue + allocated + bonus;
         }
 
-        public float GetBonusValue(MainAttribute attribute) => attribute switch
+        public float GetBonusValue(MainAttribute attribute)
         {
-            MainAttribute.Constitution => _constitution -
-                GetAttributeAllocated(MainAttribute.Constitution),
-
-            MainAttribute.Strength => _strength -
-                GetAttributeAllocated(MainAttribute.Strength),
-
-            MainAttribute.Intelligence => _intelligence -
-                GetAttributeAllocated(MainAttribute.Intelligence),
-
-            MainAttribute.Dexterity => _dexterity -
-                GetAttributeAllocated(MainAttribute.Dexterity),
-            _ => 0f
-        };
+            var equip = EquipmentService.Instance;
+            if (equip == null) return 0f;
+            return equip.GetAttributeBonus(attribute);
+        }
 
         /// <summary>
         /// Spend one unspent point on an attribute.

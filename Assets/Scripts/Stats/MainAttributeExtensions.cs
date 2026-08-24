@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace IdleDefenseSurvival.Stats
 {
     /// <summary>
@@ -24,13 +22,6 @@ namespace IdleDefenseSurvival.Stats
             MainAttribute.Dexterity => "DEX",
             _ => "?"
         };
-
-        public static void AddAsAttribute(Dictionary<MainAttribute, float> dict, MainAttribute attr, float value)
-        {
-            if (value == 0f) return;
-            dict.TryGetValue(attr, out float current);
-            dict[attr] = current + value;
-        }
 
     }
 }
