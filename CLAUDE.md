@@ -468,19 +468,23 @@ Equipment supports:
 
 ## 10.1 Current conceptual equipment slots
 
-The intended equipment model uses these slot identities:
+The intended equipment model uses these slot identities (verified from `EquipmentTypeExtensions.GetDisplayName`):
 
-- Hat
-- Gloves
-- Cape
-- Armor
-- Belt
-- Pants
-- Pendant
-- Ring
-- Earring
-- Bracelet
-- Shoes
+| Index | Slot | Type enum value |
+|---|---|---|
+| 0 | Hat | `EquipmentType.Hat` |
+| 1 | Gloves | `EquipmentType.Gloves` |
+| 2 | Cape | `EquipmentType.Cape` |
+| 3 | Armor | `EquipmentType.Armor` |
+| 4 | Belt | `EquipmentType.Belt` |
+| 5 | Pants | `EquipmentType.Pants` |
+| 6 | Pendant | `EquipmentType.Pendant` |
+| 7 | Ring | `EquipmentType.Ring` |
+| 8 | Earring | `EquipmentType.Earring` |
+| 9 | Bracelet | `EquipmentType.Bracelet` |
+| 10 | Shoes | `EquipmentType.Shoes` |
+
+Total: **11 slots**. `GetIndex()` returns `(int)type - 1` (zero-based array access).
 
 Do not introduce alternate slot names such as:
 
@@ -690,25 +694,57 @@ Core components include:
 
 ## 14.1 Rarities
 
-Current rarity model:
+Current rarity model (`dataCard.json`, verified) — **six** tiers:
 
 - Common
 - Rare
 - Epic
 - Legendary
 - Mythic
+- **Divine** (rarest; multiplier `0.006` — extreme outlier tier)
+
+Weight/multiplier values per rarity (verified):
+
+| Rarity | Multiplier |
+|---|---|
+| Common | `1000.0` |
+| Rare | `300.0` |
+| Epic | `80.0` |
+| Legendary | `15.0` |
+| Mythic | `1.0` |
+| Divine | `0.006` |
+
+Pity thresholds (verified in `dataCard.json`):
+
+| Rarity | Pity count |
+|---|---|
+| Epic | 51 |
+| Legendary | 153 |
+| Mythic | 505 |
+
+Divine has no pity threshold — its base multiplier already produces very low pull rates.
 
 ## 14.2 Card leveling
 
 Duplicate cards increase card level.
 
-Current progression is designed around duplicate requirements:
+Current progression (`CardUpgradeService.cs`, verified):
 
-`1, 2, 4, 7, 11, 19, 31, 47, 69, 99`
+```
+Lv1→Lv2 : 2
+Lv2→Lv3 : 4
+Lv3→Lv4 : 7
+Lv4→Lv5 : 11
+Lv5→Lv6 : 19
+Lv6→Lv7 : 31
+Lv7→Lv8 : 47
+Lv8→Lv9 : 69
+Lv9→Lv10: 99
+```
 
 Cumulative duplicates required through level 10:
 
-`290`
+`289`
 
 Do not change this progression without updating the relevant design/balance document.
 
@@ -716,7 +752,12 @@ Do not change this progression without updating the relevant design/balance docu
 
 Card equipment has a defined maximum slot count.
 
-The actual authoritative value must be taken from the current `CardEquipmentService` / project data rather than copied from stale documentation.
+Verified values (`Constantku.cs`):
+
+- `CARD_START_SLOT = 1`
+- `CARD_MAX_SLOT = 19`
+
+`CARD_SLOT_EXPANSION_COSTS[]` is a cost curve array, length-gated in code. Do not invent new slot costs — add a row to the array.
 
 ## 14.4 Card effects
 
@@ -742,17 +783,22 @@ Do not implement special card behavior inside generic UI classes.
 
 The roll cost is a balance value and must come from the current implementation/data.
 
-Known design target from previous development:
+Verified (`Constantku.cs`, `CardRollService.cs`):
 
-- 1x = 20 gems
-- 10x = 190 gems
-- 100x = 1800 gems
+- 1x = 20 gems (`ROLL1X_GEM_COST`)
+- 10x = 190 gems (`ROLL10X_GEM_COST`)
+- 100x = 1800 gems (`ROLL100X_GEM_COST`)
 
-If the current code/data differs, verify which is authoritative before changing anything.
+**Bundle calculation** (`CalculateRollGemCost(int amount)`): integer-divides amount into hundreds/tens/singles:
 
-Roll calculation should preserve the intended bundled-discount behavior rather than naïvely doing:
+```csharp
+hundreds = amount / 100
+tens     = (amount % 100) / 10
+singles  = amount % 10
+total    = hundreds * 1800 + tens * 190 + singles * 20
+```
 
-`amount * singleCost`.
+This is **not** `amount * 20`. Preserves the bundled-discount tier behavior.
 
 ## 14.6 CardRoll item
 
@@ -905,13 +951,15 @@ The current design uses:
 - reward scaling;
 - victory/defeat handling.
 
-Known design target:
+Verified values (`Constantku.cs`, `WaveManager.cs`):
 
-- wave duration: 30 seconds
-- inter-wave duration: 10 seconds
-- maximum wave: 350
+- `MAX_WAVE_PER_TIER = 350`
+- `CurrentWave` clamped to `[1, _maxWave]` — `WaveManager.cs:79`
+- Inter-wave duration and active-wave duration read from `_interWaveDuration` / `_waveDuration` fields, scaled by `ProgressionSpeed`
+- Difficulty scaling uses `Utilityku.WaveMultiplier(DecayCount, CurrentWave, _maxWave)` — see `Utilityku.cs` for the formula; do not duplicate the curve anywhere else
+- Wave progress fraction `GetWaveProgressMultiplier()` = `Clamp01((CurrentWave - 1) / (_maxWave - 1))` — used by reward/difficulty interpolation
 
-After the maximum wave:
+After wave `_maxWave` (350):
 
 - the tier progresses;
 - wave numbering resets according to the current progression design;
@@ -929,7 +977,7 @@ Primary architecture:
 - `UltimateFactory`
 - individual ultimate handlers.
 
-Current ultimate families include (8):
+Current ultimate families include (8) — registered via `UltimateFactory.RegisterHandler(...)` from `UltimateManager.Awake`:
 
 - Void
 - Tank
@@ -939,6 +987,8 @@ Current ultimate families include (8):
 - Cloud
 - Lightning
 - Shockwave
+
+`UltimateFactory` itself is a static registry of `(string id → IUltimateHandler)` plus an active-count map. Handlers live under `Scripts/Ultimate/` and implement `IUltimateHandler` (interface file). When adding a handler, also append the `ultimateId` to `dataUltimate.json` and any spawn-trigger condition in `UltimateManager`.
 
 Each ultimate may define:
 
@@ -1473,32 +1523,42 @@ If an item is consumed but its effect fails, the item must not silently disappea
 
 # 37. KEY FILES
 
+Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-relative.
+
 | Domain | Main files |
 |---|---|
-| Player | `Scripts/Player/Player.cs`, `PlayerStats.cs`, `StatLoader.cs`, `PlayerStatsManager.cs` |
-| Attributes | `dataAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataAttributeSecondValuePerLevel.json`; pipeline = `AttributeModifierManager` → `ModifierManager` |
-| Enemy | `Scripts/Enemy/EnemyAi.cs`, `EnemySpawner.cs` |
-| Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/` (`IStatusEffect`, `BaseStatusEffect`, `ConcreteStatusEffects`) |
+| Player | `Scripts/Player/Player.cs`, `Scripts/Player/PlayerStats.cs`, `Scripts/Player/AuraCollider.cs`, `Scripts/Player/AttributeService.cs`; managers: `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Manager/BaseStatLoader.cs`, `Scripts/Manager/AttributeStatLoader.cs` |
+| Attributes | `Assets/Resources/Data/Player/dataAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataAttributeSecondValuePerLevel.json`; pipeline = `Scripts/Manager/AttributeModifierManager.cs` → `Scripts/Modifier/ModifierCalculator.cs` |
+| Enemy | `Scripts/Enemy/EnemyAi.cs`, `Scripts/Enemy/EnemySpawner.cs`, `Scripts/Enemy/EnemyData.cs`; stats aggregation: `Scripts/Manager/EnemyStatisticsManager.cs` |
+| Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/IStatusEffect.cs`, `BaseStatusEffect.cs`, `ConcreteStatusEffects.cs` |
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
-| Wave | `Scripts/Manager/WaveManager.cs`, `dataWave.json` |
-| Cards | `Scripts/Card/CardManager.cs`, `CardDatabase`, `CardInventory`, `CardEquipmentService`, `CardRollService`, `CardUpgradeService`, `CardModifierService` |
-| Equipment | `Scripts/Equipment/IEquipmentService.cs` + impl, `AttributeWeightsConfig`, `EquipmentEventDispatcher`, `EquipmentPersistenceService`, `EquipmentSetBonusService`, `EquipmentVisualService`, `EquipmentType`, `SlotIdentityService` |
-| Inventory | `Scripts/Inventory/InventoryService`, `InventoryManager`, `InventoryItem`, `InventoryItemExtensions` |
-| Items | `Scripts/Items/` (sibling to Inventory): `ItemDatabase`, `AutoRepairService`, `DurabilityService`, `RepairService`, `RepairTransactionService`, `GemFactory`, `GemExperienceService`, `GemSocketService`, `GemUpgradeService`, `SocketValidationService`, `DropTable`, `SpecialEffectType`, `DurabilityColorTable`, `Random/*` |
-| Gems | `Scripts/Items/GemService.cs`, `dataConfigSocket.json`, `dataGems.json` |
-| Crafting | `Scripts/Items/CraftService.cs`, `CraftJob`, `CraftContextBuilder`, `CraftCompletionService`, `CraftModifiers`; data in `Crafting/Equipment/dataRecipe*.json` + `dataConfigCrafting.json` |
-| Economy | `Scripts/Economy/EconomyManager.cs`, `CurrencyData` |
-| Save | `Scripts/Manager/SaveManager.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`, `Scripts/Data/SaveData.cs` |
-| Daily | `Scripts/Daily/DailyRewardService`, `DailyRewardManager`, `DailyRewardSaveData`, `DailyRewardSlot`, `DailyRewardUI` |
-| Idle | `Scripts/IdleReward/IdleRewardManager`, `IdleRewardUI`, `IdleRewardData` |
-| Ultimates | `Scripts/Ultimate/` — `UltimateManager`, `UltimateFactory`, per-ultimate handlers (Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave) |
-| Modifier | `Scripts/Modifier/ModifierCalculator.cs`, `Scripts/Modifiers/EffectRegistry.cs`, `Scripts/Manager/AttributeModifierManager.cs` |
-| Stats | `Scripts/Stats/SecondaryStatMode.cs` |
-| Reward | `Scripts/Reward/RewardData.cs`, `RewardManager` (popup/flow), `RewardPopup.cs`, `RewardSlot.cs` |
-| Mission | `Scripts/Mission/` (MissionManager, MissionData, MissionSlot UI, mission progress tracked by event hooks into WaveManager/EnemyAi/Card/etc.) |
-| VIP | `Scripts/Data/VIPData.cs`, integration with `DailyRewardService.IsDailyEnabled` and `IdleRewardManager` bonuses |
-| UI | `Scripts/UI/`, `Scripts/Controller/` |
-| Core | `Scripts/Core/` (`BootstrapInitializer`, `CanvasRoot`, `SceneCleanupHandler`, `ServiceLocator`, `Interfaces/*`) |
+| Wave | `Scripts/Manager/WaveManager.cs`, `Assets/Resources/Data/dataWave.json` |
+| Cards | `Scripts/Card/CardManager.cs` (UI façade), `Scripts/Manager/CardManager.cs`, services in `Scripts/Card/`: `CardDatabase`, `CardInventory`, `CardEquipmentService`, `CardRollService`, `CardUpgradeService`, `CardModifierService`, `VirtualCardInventorySnapshot` |
+| Equipment | One entry-point: `Scripts/Equipment/IEquipmentService.cs` + `EquipmentService.cs`. Sub-services live in `Scripts/Equipment/`: `EquipmentSlotService`, `EquipmentPersistenceService`, `EquipmentDurabilityService`, `EquipmentAutoEquipService`, `EquipmentComparisonService`, `EquipmentComparer`, `EquipmentEffectService`, `EquipmentModifierService`, `EquipmentSetBonusService`, `EquipmentEventDispatcher`, `EquipmentVisualService`, `EquipmentStatCalculator`, `EquipmentAttributeData`, `AttributeWeightsConfig`, `RarityMechanicConfig`, `SlotIdentityService`, `EquipmentType` |
+| Inventory | `Scripts/Inventory/InventoryService.cs` + `IInventoryService`, `InventoryManager.cs`, `InventoryItem.cs`, `InventoryItemExtensions.cs`; category/state enums: `Scripts/Item/ItemCategory.cs`, `Scripts/Item/ItemState.cs` |
+| Items (gem/repair/drop/random) | `Scripts/Items/`: `DropTable.cs`, `AutoRepairService.cs`, `DurabilityService.cs`, `DurabilityColorTable.cs`, `RepairService.cs`, `RepairTransactionService.cs`, `IRepairCostProvider.cs`, `GemFactory.cs`, `GemExperienceService.cs`, `GemSocketService.cs`, `GemUpgradeService.cs`, `SocketValidationService.cs`, `SpecialEffectType.cs`, `Random/IRandomProvider.cs`, `Random/SeedRandomProvider.cs`, `Random/UnityRandomProvider.cs` |
+| Gems | `Scripts/Items/GemFactory.cs` + `GemExperienceService.cs` + `GemSocketService.cs` + `GemUpgradeService.cs`; data: `Assets/Resources/Data/Gems/dataGems.json`, `dataConfigSocket.json` |
+| Crafting (own domain) | `Scripts/Crafting/CraftingManager.cs` is the entry point. Pipeline files in `Scripts/Crafting/`: `CraftRollService.cs`, `CraftValidator.cs`, `CraftRecipeValidationRunner.cs`, `CraftCostResolver.cs`, `CraftTransactionService.cs`, `CraftContextBuilder.cs`, `CraftPipeline.cs`, `CraftResultValidator.cs`, `CraftRewardBuilder.cs`, `CraftRewardService.cs`, `CraftCompletionService.cs`, `CraftPersistenceService.cs`, `CraftQueueService.cs`, `CraftModifiers.cs`, `CraftRecipeData.cs`, `CraftRecipeRepository.cs`, `CraftingConfig.cs`, `CraftData.cs`, `CraftJob.cs`, `AttributeRollService.cs`. UI: `Scripts/Crafting/JobEntryUI.cs`, `Scripts/Controller/CraftingController.cs`, `CraftingUIController.cs`, `CraftingRecipeEntry.cs`. Data: `Assets/Resources/Data/Crafting/dataConfigCrafting.json`, `Crafting/Equipment/dataBaseEquipment.json`, per-slot `Crafting/Equipment/dataRecipeHat.json` … `dataRecipeShoes.json`, `Crafting/Potion/dataRecipeHealthPotion.json`, `dataRecipeManaPotion.json`. **There is no `Scripts/Items/CraftService.cs`** — the file map in old CLAUDE.md is wrong. |
+| Potion (consumable subtypes) | `Assets/Resources/Data/Items/Potion/dataHealthPotion.json`, `dataManaPotion.json`; consumed via `Scripts/UI/Game/ItemConsumableUI.cs` |
+| Economy | `Scripts/Economy/EconomyManager.cs`, `Scripts/Economy/CurrencyData.cs`, `Scripts/Core/Interfaces/IEconomyService.cs` |
+| Save | `Scripts/Manager/SaveManager.cs` (root), `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`; constants: `Scripts/Utilities/Constantku.cs` (`CURRENT_SAVE_VERSION = 3`) |
+| Daily | `Scripts/Daily/DailyRewardService.cs` (logic), `DailyRewardManager.cs`, `DailyRewardSaveData.cs`, `DailyRewardSlot.cs`, `DailyRewardUI.cs` |
+| Idle | `Scripts/IdleReward/IdleRewardManager.cs`, `IdleRewardUI.cs`, `IdleRewardData.cs` |
+| Ultimates | `Scripts/Ultimate/UltimateManager.cs` (registration host), `UltimateFactory.cs` (static registry), `IUltimateHandler.cs` (interface). 8 handler ids registered from `UltimateManager.Awake`: Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave. Definitions: `Assets/Resources/Data/Player/dataUltimate.json`. **There is no `Scripts/Ultimate/<Name>Handler.cs` per-ultimate file** — handlers are wired through `UltimateFactory` and `dataUltimate.json`; treat the 8 names as handler keys, not filenames. |
+| Modifier / effect registry | `Scripts/Modifier/ModifierCalculator.cs`, `Scripts/Modifiers/EffectRegistry.cs`, `Scripts/Manager/AttributeModifierManager.cs`, `Scripts/Player/AttributeService.cs` |
+| Stats | `Scripts/Stats/SecondaryStatMode.cs` (secondary-stat computation mode) |
+| Reward | `Scripts/Reward/RewardData.cs`, `RewardManager.cs`, `RewardPopup.cs`, `RewardSlot.cs`; UI: `Scripts/UI/.../RewardUI/*` |
+| Drop bag (post-combat pickup) | `Scripts/Manager/DropBag.cs`, `Scripts/Manager/DropBagManager.cs`; hooked from enemy death; backed by `Scripts/Items/DropTable.cs` |
+| Mission | `Scripts/Mission/MissionService.cs` (singleton, DontDestroyOnLoad), `MissionUI.cs`, `MissionSlot.cs`. Templates: `Assets/Resources/Data/Player/dataMission.json` |
+| Account | `Scripts/Manager/AccountManager.cs` (wraps `SaveManager.GetAccountData`) |
+| VIP | `Scripts/Data/VIPData.cs`; integrated via `DailyRewardService.IsDailyEnabled`, `GameSpeedController`, `CraftContextBuilder` |
+| Analytics | `Scripts/Manager/AnalyticsManager.cs`, `Scripts/Core/Interfaces/IAnalyticsService.cs` |
+| Audio | `Scripts/Manager/AudioManager.cs`, `Scripts/Core/Interfaces/IAudioService.cs` |
+| Advertising | `Scripts/Manager/AdvertisingManager.cs`, `Scripts/Core/Interfaces/IAdsService.cs` |
+| Game speed | `Scripts/Controller/GameSpeedController.cs` |
+| UI | `Scripts/UI/` (per-domain panels), `Scripts/Controller/` (scene controllers: `MainMenuController`, `GameController`, `BootstrapController`, `SettingsController`, `VictoryController`, `InventoryController`, `CardCollectionController`, `CraftingController` + `CraftingUIController` + `CraftingRecipeEntry`, `GameSpeedController`) |
+| Core / boot | `Scripts/Core/BootstrapInitializer.cs`, `CanvasRoot.cs`, `SceneCleanupHandler.cs`, `ServiceLocator.cs`, `Interfaces/*` |
+| Utilities | `Scripts/Utilities/Constantku.cs`, `Utilityku.cs`, `Colorku.cs`, `ResourceCache.cs`, `Enumku.cs` |
 
 ---
 
@@ -1521,6 +1581,7 @@ Assets/
 │   ├── Card/
 │   ├── Controller/
 │   ├── Core/
+│   ├── Crafting/
 │   ├── Daily/
 │   ├── Data/
 │   ├── Economy/
@@ -1531,12 +1592,16 @@ Assets/
 │   ├── Item/
 │   ├── Items/
 │   ├── Manager/
+│   ├── Mission/
 │   ├── Modifier/
+│   ├── Modifiers/         ← plural; effect registry + Buff/EquipmentEffect types
 │   ├── Player/
 │   ├── Reward/
+│   ├── Save/              ← EquipmentSerializer, InventorySerializer, CustomDataConverter
+│   ├── Stats/             ← SecondaryStat, MainAttributeExtensions, SecondaryStatMode, mapping extensions
 │   ├── UI/
 │   ├── Ultimate/
-│   └── VisualScripting/
+│   └── Utilities/         ← Constantku, Utilityku, Colorku, ResourceCache, Enumku
 ├── Settings/
 └── InputSystem_Actions.inputactions
 ```
@@ -1755,6 +1820,29 @@ Start by reading the listed owner file, then the matching §39–§44 workflow, 
 | a new save domain | `Scripts/Data/SaveData.cs` | `Scripts/Save/EquipmentSerializer.cs` pattern, `SaveManager.OnSaveLoaded` | none — code-only, requires §52 version bump |
 | a new scene | `Scripts/Core/SceneLoader.cs` + `BootstrapInitializer.cs` | §24 scene list | none — must update §24 |
 
+## 47.2 New / emerging domains (not in §47 table)
+
+These domains exist in the codebase but were not in the original extension table. Use the same read-first rule: open the listed owner, then sibling services, then JSON.
+
+| If you want to add… | Open first | Then read | Data file |
+|---|---|---|---|
+| a crafting pipeline stage / new station | `Scripts/Crafting/CraftingManager.cs` | `CraftPipeline.cs`, `CraftRollService.cs`, `CraftValidator.cs`, `CraftTransactionService.cs`, `CraftRewardService.cs`, `CraftPersistenceService.cs`, `CraftContextBuilder.cs` | `Assets/Resources/Data/Crafting/dataConfigCrafting.json`, `Crafting/Equipment/dataRecipe*.json`, `Crafting/Potion/dataRecipe*.json` |
+| a new potion / consumable subtype | `Scripts/UI/Game/ItemConsumableUI.cs` (consumer) | `Scripts/Inventory/InventoryService.cs`, `Scripts/Item/ItemCategory.cs` | `Assets/Resources/Data/Items/Potion/dataHealthPotion.json`, `dataManaPotion.json`, `dataConsumables.json` |
+| a new drop-bag entry / drop rule | `Scripts/Manager/DropBagManager.cs` | `Scripts/Manager/DropBag.cs`, `Scripts/Items/DropTable.cs` | none — code + `Random/*` providers; tie to enemy death in `EnemyAi` |
+| a new equipment sub-service (durability/auto-equip/comparison/effect) | `Scripts/Equipment/IEquipmentService.cs` | the matching `Equipment*Service.cs` (Durability / AutoEquip / Comparison / Effect / Modifier), `EquipmentStatCalculator.cs`, `EquipmentAttributeData.cs`, `RarityMechanicConfig.cs` | `Assets/Resources/Data/Equipment/dataAffixes.json`, `dataSets.json`, per-slot `dataHat.json`…`dataShoes.json`, `dataBaseEquipment.json` |
+| a new rarity tier (e.g. above Mythic, like Divine) | `Scripts/Equipment/RarityMechanicConfig.cs` | `EquipmentEffect.cs`, `EffectRegistry.cs` (in `Scripts/Modifiers/`) | `Assets/Resources/Data/Equipment/dataAffixes.json`, `dataSets.json` |
+| a new buff / equipment effect type | `Scripts/Modifiers/EffectRegistry.cs` | `Scripts/Modifiers/Buff.cs`, `Scripts/Modifiers/EquipmentEffect.cs`, `Scripts/Modifier/ModifierCalculator.cs` | none — register through `EffectRegistry`; route final value through `ModifierCalculator` |
+| an attribute roll variant | `Scripts/Crafting/AttributeRollService.cs` | `Scripts/Equipment/AttributeWeightsConfig.cs`, `Scripts/Stats/MainAttributeExtensions.cs`, `Scripts/Stats/SecondaryStat.cs`, `Scripts/Stats/SecondaryStatMode.cs`, `Scripts/Stats/SecondaryStatMappingExtensions.cs` | `Assets/Resources/Data/Player/dataAttribute.json`, `dataAttributeMainValuePerLevel.json`, `dataAttributeSecondValuePerLevel.json` |
+| account progression / profile field | `Scripts/Manager/AccountManager.cs` | `Scripts/Data/SaveData.cs` (account sub-section), `Scripts/Manager/SaveManager.cs` (`GetAccountData`) | none — code-only, requires §48 version bump if shape changes |
+| a new analytics event | `Scripts/Manager/AnalyticsManager.cs` | `Scripts/Core/Interfaces/IAnalyticsService.cs`, `Scripts/Core/ServiceLocator.cs` | none — define event name + payload schema in `AnalyticsManager` |
+| a new audio cue / BGM layer | `Scripts/Manager/AudioManager.cs` | `Scripts/Core/Interfaces/IAudioService.cs` | none — AudioClip assets, mixer groups, channel priority in `AudioManager` |
+| an ad placement hook | `Scripts/Manager/AdvertisingManager.cs` | `Scripts/Core/Interfaces/IAdsService.cs` | none — provider-specific ad unit ids in `AdvertisingManager` |
+| a new game-speed tier (e.g. VIP unlock) | `Scripts/Controller/GameSpeedController.cs` | `Scripts/Data/VIPData.cs`, `Scripts/Manager/SaveManager.cs` (`_currentVip.maxSpeed`) | none — step values + max in `GameSpeedController`, gated by VIP bool |
+| a random-source policy (seeded vs Unity) | `Scripts/Items/Random/IRandomProvider.cs` | `UnityRandomProvider.cs`, `SeedRandomProvider.cs` | none — plug into services that take `IRandomProvider` |
+| a new scene | `Scripts/Core/SceneLoader.cs` + `BootstrapInitializer.cs` | §24 scene list, `SceneCleanupHandler.cs` | none — must update §24, register load entry in `BootstrapInitializer` |
+| a new global service | `Scripts/Core/ServiceLocator.cs` | §35 service list, the matching interface in `Scripts/Core/Interfaces/` | depends on service |
+| inventory serialization variant | `Scripts/Save/InventorySerializer.cs` | `EquipmentSerializer.cs`, `CustomDataConverter.cs` (Newtonsoft contract) | none — if `SaveData.Items[]` shape changes, bump version (§47.1) |
+
 ## 47.1 Save-version bumps
 
 Any non-additive `SaveData` shape change requires:
@@ -1801,6 +1889,183 @@ When a feature, refactor, or extension lands in this project, the canonical hand
 3. §52 Save Version Log → if `SaveData` shape changed, bump `CURRENT_SAVE_VERSION` and append a row.
 4. §53 Design Documentation Index → if you authored or rewrote a design doc, register it here.
 5. Test against §45 Definition of Done and §46 Agent Checklist before considering the change complete.
+
+---
+
+# 55. KEY SCRIPTS FOR FUTURE EXPANSION
+
+Domain → owner file → sibling services → JSON. Read owner first, always.
+
+## 55.1 Persistence backbone
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Save/load | `Scripts/Manager/SaveManager.cs` | `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`, `Scripts/Save/CustomDataConverter.cs` | none — code-only; bump `Constantku.CURRENT_SAVE_VERSION` on shape change |
+| Boot/ServiceLocator | `Scripts/Core/BootstrapInitializer.cs` | `Scripts/Core/ServiceLocator.cs`, `Scripts/Core/SceneLoader.cs`, `Scripts/Core/SceneCleanupHandler.cs`, `Scripts/Core/CanvasRoot.cs` | none |
+| Account field | `Scripts/Manager/AccountManager.cs` | `SaveData.account.*` sub-section, `SaveManager.GetAccountData()` | none |
+
+If the new feature survives restart: append to `SaveData`, write serializer if new collection, register save callback in `SaveManager`. If shape changes → §47.1 + §48.
+
+## 55.2 Stat / modifier pipeline (single source of truth)
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Final player stats | `Scripts/Player/PlayerStats.cs` | `Scripts/Player/AttributeService.cs`, `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Manager/AttributeModifierManager.cs`, `Scripts/Manager/BaseStatLoader.cs`, `Scripts/Manager/AttributeStatLoader.cs` | none |
+| Modifier math | `Scripts/Modifier/ModifierCalculator.cs` | `Scripts/Modifiers/EffectRegistry.cs`, `Scripts/Modifiers/Buff.cs`, `Scripts/Modifiers/EquipmentEffect.cs` | none |
+| Attribute → secondary stat | `Scripts/Stats/SecondaryStat.cs` | `Scripts/Stats/SecondaryStatMode.cs`, `Scripts/Stats/MainAttributeExtensions.cs`, `Scripts/Stats/SecondaryStatMappingExtensions.cs` | `Player/dataAttribute.json`, `dataAttributeMainValuePerLevel.json`, `dataAttributeSecondValuePerLevel.json` |
+
+New modifiers must register in `EffectRegistry` and feed through `ModifierCalculator`. Never rebuild final stats in UI.
+
+## 55.3 Equipment pipeline (11 slots)
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Equip/unequip/swap | `Scripts/Equipment/IEquipmentService.cs` + `EquipmentService.cs` | `EquipmentSlotService`, `EquipmentEventDispatcher` | none |
+| Persistence | `EquipmentPersistenceService.cs` | `Scripts/Save/EquipmentSerializer.cs` | none |
+| Durability | `EquipmentDurabilityService.cs` | `Scripts/Items/DurabilityService.cs`, `AutoRepairService.cs`, `RepairService.cs`, `RepairTransactionService.cs`, `Items/DurabilityColorTable.cs`, `Items/IRepairCostProvider.cs` | per-slot `dataHat.json`…`dataShoes.json`, `dataBaseEquipment.json` |
+| Auto-equip | `EquipmentAutoEquipService.cs` | `EquipmentComparer.cs`, `EquipmentComparisonService.cs` | per-slot JSON |
+| Effect roll / affix | `EquipmentEffectService.cs` | `EquipmentModifierService.cs`, `EquipmentStatCalculator.cs`, `EquipmentAttributeData.cs`, `AttributeWeightsConfig.cs`, `RarityMechanicConfig.cs` | `dataAffixes.json`, `dataSets.json` |
+| Set bonus | `EquipmentSetBonusService.cs` | `EquipmentEffect.cs` (Modifiers/) | `dataSets.json` |
+| Visual | `EquipmentVisualService.cs` | `EquipmentType.cs` + `SlotIdentityService.cs` | none |
+| Slot identity | `SlotIdentityService.cs` | `EquipmentType.cs`, `EquipmentTypeExtensions.cs` | none |
+
+## 55.4 Cards (roll → inventory → upgrade → equip → effect)
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Roll cost | `Scripts/Card/CardRollService.cs` | `Constantku.cs` (`ROLL1X/10X/100X_GEM_COST`) | `Card/dataCard.json` |
+| Roll item vs gem | `CardRollService.cs` (gem path) | `Scripts/Inventory/InventoryService.cs` (`CardRoll` item path), `Scripts/Item/ItemCategory.cs` | `dataCard.json`, `dataConsumables.json` |
+| Inventory | `CardInventory.cs` | `VirtualCardInventorySnapshot.cs` (snapshot for UI) | none |
+| Duplicate → level | `CardUpgradeService.cs` | constants in `Constantku.cs` | none — curve `[2,4,7,11,19,31,47,69,99]` |
+| Equip | `CardEquipmentService.cs` | `Constantku.cs` (`CARD_MAX_SLOT=19`) | none |
+| Stat effect | `CardModifierService.cs` | `Scripts/Modifiers/EffectRegistry.cs` | `dataCard.json` |
+| UI façade | `Scripts/Manager/CardManager.cs` | `Scripts/UI/CardCollection/CardCollectionUI.cs`, `CardRollButtonUI.cs`, `CardLevelValueItemUI.cs`, `Scripts/Controller/CardCollectionController.cs` | none |
+
+## 55.5 Crafting (single domain, multi-stage pipeline)
+
+Owner: `Scripts/Crafting/CraftingManager.cs`.
+
+Pipeline order (do not reorder without §45 docs):
+CraftRollService
+↓
+CraftValidator + CraftRecipeValidationRunner
+↓
+CraftCostResolver
+↓
+CraftTransactionService   (consume materials from InventoryService)
+↓
+CraftPipeline
+↓
+CraftResultValidator
+↓
+CraftRewardBuilder → CraftRewardService
+↓
+CraftPersistenceService + CraftCompletionService
+↓
+CraftQueueService (timed jobs)
+
+
+Sibling services:
+- `CraftContextBuilder.cs` — builds `CraftContext` for VIP/attribute aggregation.
+- `CraftModifiers.cs` — output modifier roll helpers.
+- `CraftData.cs`, `CraftJob.cs`, `CraftingConfig.cs` — DTO/config.
+- `CraftRecipeRepository.cs`, `CraftRecipeData.cs` — recipe lookup.
+- `AttributeRollService.cs` — secondary/attribute roll during craft.
+
+Data files:
+- `Crafting/dataConfigCrafting.json`
+- `Crafting/Equipment/dataBaseEquipment.json`
+- `Crafting/Equipment/dataRecipe{Hat,Gloves,Cape,Armor,Belt,Pants,Pendant,Ring,Earring,Bracelet,Shoes}.json`
+- `Crafting/Potion/dataRecipe{HealthPotion,ManaPotion}.json`
+
+UI: `Scripts/Crafting/JobEntryUI.cs`, `Scripts/Controller/CraftingController.cs`, `CraftingUIController.cs`, `CraftingRecipeEntry.cs`.
+
+## 55.6 Combat pipeline
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Player attack | `Scripts/Player/Player.cs` | `PlayerStats.cs`, `AuraCollider.cs` | `Player/dataPlayer.json` |
+| Projectile | `Scripts/Player/Projectile.cs` | `Scripts/Manager/ProjectilePool.cs` | `Player/dataPlayer.json` |
+| Enemy | `Scripts/Enemy/EnemyAi.cs` | `EnemySpawner.cs`, `EnemyData.cs`, `EnemyStatisticsManager.cs` | `dataEnemy.json` |
+| Status | `Scripts/Enemy/EnemyStatusEffectController.cs` | `Scripts/Enemy/StatusEffects/IStatusEffect.cs`, `BaseStatusEffect.cs`, `ConcreteStatusEffects.cs` | none |
+| Wave | `Scripts/Manager/WaveManager.cs` | `Utilityku.WaveMultiplier` (single source), `dataWave.json` (`MAX_WAVE_PER_TIER=350`) | `dataWave.json` |
+
+## 55.7 Ultimates (8 keys, not 8 files)
+
+Owner: `Scripts/Ultimate/UltimateManager.cs`.
+Registry: `Scripts/Ultimate/UltimateFactory.cs` (static).
+Interface: `Scripts/Ultimate/IUltimateHandler.cs`.
+
+Handler ids (registered from `UltimateManager.Awake`):
+Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave.
+
+To add a new ultimate: add `ultimateId` to `dataUltimate.json`, append registration line in `UltimateManager.Awake`, implement `IUltimateHandler` (file may live in any subdirectory — there is no per-handler file naming convention).
+
+## 55.8 Reward / economy
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Currency | `Scripts/Economy/EconomyManager.cs` | `Scripts/Economy/CurrencyData.cs`, `Scripts/Core/Interfaces/IEconomyService.cs` | none |
+| Reward popup | `Scripts/Reward/RewardManager.cs` | `RewardData.cs`, `RewardPopup.cs`, `RewardSlot.cs` | none |
+| Daily | `Scripts/Daily/DailyRewardService.cs` | `DailyRewardManager.cs`, `DailyRewardSaveData.cs`, `DailyRewardData.cs`, `DailyRewardSlot.cs`, `DailyRewardUI.cs` | `Player/dataMission.json` (verify path) |
+| Idle | `Scripts/IdleReward/IdleRewardManager.cs` | `IdleRewardUI.cs`, `IdleRewardData.cs` | none |
+| VIP | `Scripts/Data/VIPData.cs` | `SaveManager.IsDailyEnabled`, `GameSpeedController.CheckVIP`, `CraftContextBuilder` | none — bool flags |
+| Drop bag | `Scripts/Manager/DropBagManager.cs` | `DropBag.cs`, `Scripts/Items/DropTable.cs`, `Scripts/Items/Random/IRandomProvider.cs` | none |
+
+## 55.9 Mission system
+
+Owner: `Scripts/Mission/MissionService.cs` (singleton, `DontDestroyOnLoad`).
+Templates: `Assets/Resources/Data/Player/dataMission.json`.
+UI: `Scripts/Mission/MissionUI.cs`, `MissionSlot.cs`.
+
+To add a new event type: enum → `MissionService.DoesEventMatchMission` switch → template row → producer hook → icon in `MissionUI.GetMissionIcon`. See §45.6.
+
+## 55.10 Inventory
+
+Owner: `Scripts/Inventory/InventoryService.cs` (`IInventoryService`).
+Siblings: `InventoryManager.cs`, `InventoryItem.cs`, `InventoryItemExtensions.cs`.
+Enums: `Scripts/Item/ItemCategory.cs`, `Scripts/Item/ItemState.cs`.
+
+Persistence: `Scripts/Save/InventorySerializer.cs` (flat `Items[]`, see §48 v3).
+
+To add a new item category: extend `ItemCategory`, update `InventorySerializer`, update `CustomDataConverter` if the converter references the enum, bump `CURRENT_SAVE_VERSION` only if shape changes.
+
+## 55.11 Consoles / cross-cutting
+
+| Concern | Owner | Sibling services | Data file |
+|---|---|---|---|
+| Game speed | `Scripts/Controller/GameSpeedController.cs` | `VIPData.maxSpeed` | none |
+| Settings | `Scripts/Controller/SettingsController.cs` | `Scripts/UI/Settings/GameSettings.cs` | none |
+| Victory | `Scripts/Controller/VictoryController.cs` | `WaveManager`, `Data/VictoryData.cs` | none |
+| Audio | `Scripts/Manager/AudioManager.cs` | `Scripts/Core/Interfaces/IAudioService.cs` | AudioClip assets |
+| Analytics | `Scripts/Manager/AnalyticsManager.cs` | `Scripts/Core/Interfaces/IAnalyticsService.cs` | none |
+| Ads | `Scripts/Manager/AdvertisingManager.cs` | `Scripts/Core/Interfaces/IAdsService.cs` | provider-specific |
+| Damage popup | `Scripts/UI/DamagePopup/DamagePopup.cs` | `DamagePopupPool.cs`, `Scripts/Manager/DamagePopupManager.cs`, `Scripts/Data/DamagePopupData.cs` | none |
+| Camera | `Scripts/Camera/CameraFollow.cs`, `Scripts/Camera/BackgroundScaler.cs` | none | none |
+
+## 55.12 Read-first checklist (use before any new feature)
+
+1. Identify domain from §28.
+2. Open the owner file in §55.x table — read top 100 lines.
+3. Open sibling services listed in that row.
+4. Open the JSON data file.
+5. If persistent: read `SaveData` shape, decide if version bump is needed (§47.1).
+6. If modifier: read `ModifierCalculator` + `EffectRegistry`, plan registration.
+7. UI work: read §25 (UI never owns logic).
+8. Tests: pure formulas → EditMode; interactions → PlayMode.
+
+## 55.13 Forbidden shortcuts (do not, even when convenient)
+
+- Adding a new singleton before checking `ServiceLocator` and existing managers (§34).
+- Putting gameplay logic in a UI controller (§25).
+- Hardcoding balance values that should live in JSON (§5).
+- Re-implementing equipment stat aggregation in UI/tooltips (§10.3).
+- Building a second status-effect implementation outside `StatusEffects/` (§18).
+- Using display `Name` as save key or logic key (§6).
+- Adding caching without invalidating on modifier change (§13.2).
+- Skipping §47.1 + §48 when `SaveData` shape changes.
+
+---
 
 # I., # II., and # III. below are the final closing commands for this document.
 
