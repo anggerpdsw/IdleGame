@@ -1,11 +1,10 @@
-using IdleDefenseSurvival.Core;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Manager
 {
     /// <summary>
     /// Simple game configuration manager. Holds constants and tunable values
-    /// that are shared between scenes. Can be persisted in SaveData if needed.
+    /// that are shared between scenes.
     /// </summary>
     public class ManaManager : MonoBehaviour
     {

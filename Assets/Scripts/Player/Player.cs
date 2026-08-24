@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
 using System;
+using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -215,14 +216,19 @@ namespace IdleDefenseSurvival.Player
         }
 
         /// <summary>
-        /// Try to trigger a shockwave using the new modular system.
+        /// Try to trigger ultimates using the new modular system.
         /// Delegates to UltimateManager.TrySpawn() which handles cooldown and chance.
+        /// Only auto-casts when AutoCastUltimate setting is enabled.
         /// </summary>
         private void TryTriggerUltimateWithCooldown()
         {
             if (_ultimateManager == null) return;
 
-            // TrySpawn handles cooldown and active checks
+            // Check AutoCast setting
+            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+            if (!autoCast) return;
+
+            // TrySpawn handles cooldown, active checks, chance, and mana cost
             _ultimateManager.TrySpawn(UltimateDMG.Void.ToString(), transform.position, this);
             _ultimateManager.TrySpawn(UltimateDMG.Root.ToString(), transform.position, this);
             _ultimateManager.TrySpawn(UltimateDMG.Fountain.ToString(), transform.position, this);
@@ -230,6 +236,16 @@ namespace IdleDefenseSurvival.Player
 
             // Lightning is triggered by kill count in EnemyAi, not cooldown/chance
             // Do not call TrySpawn here - it's handled when enemies die
+        }
+
+        /// <summary>
+        /// Manually cast an ultimate by ID (bypasses chance check, respects cooldown & mana).
+        /// Called from UltimatePanelController when user clicks the ultimate button.
+        /// </summary>
+        public bool ManualCastUltimate(string ultimateId)
+        {
+            if (_ultimateManager == null) return false;
+            return _ultimateManager.TrySpawnManual(ultimateId, transform.position, this);
         }
 
         private void TryRegeneration()

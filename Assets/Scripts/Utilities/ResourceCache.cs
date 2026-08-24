@@ -83,8 +83,8 @@ namespace IdleDefenseSurvival.Core
     
     public static class PlayerResources
     {
-        public static Sprite GetDamageSource(string id)
-            => ResourceCache.Load<Sprite>($"Art/Player/{id}");
+        public static Sprite GetUltimateSource(string ultimateID)
+            => ResourceCache.Load<Sprite>($"Art/Player/{ultimateID}");
     }
     
     public static class RewardResources

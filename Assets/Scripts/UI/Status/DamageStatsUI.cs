@@ -120,7 +120,7 @@ namespace IdleDefenseSurvival.UI
 
                 // Update icon sprite if exists
                 Image icon = iconTransform != null ? iconTransform.GetComponent<Image>() : null;
-                if (icon != null) icon.sprite = PlayerResources.GetDamageSource(source);
+                if (icon != null) icon.sprite = PlayerResources.GetUltimateSource(source);
 
                 // Update label text
                 TextMeshProUGUI label = labelTransform != null ? labelTransform.GetComponent<TextMeshProUGUI>() : null;

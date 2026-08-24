@@ -159,10 +159,45 @@ namespace IdleDefenseSurvival.Ultimate
             float chance = ultimateData.GetChance();
             if (chance > 0f && !Utilityku.Chance(chance)) return false;
 
+            // Check mana cost
+            if (!player.CanAfford(ultimateData.manaCost)) return false;
+
             // Delegate to factory
             bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
             // Update cooldown timer
-            if (success) _lastSpawnTimeMap[ultimateId] = Time.time;
+            if (success)
+            {
+                _lastSpawnTimeMap[ultimateId] = Time.time;
+                player.SpendMana(ultimateData.manaCost);
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        /// Manual cast entry point for user click.
+        /// Bypasses chance check but still respects active, cooldown, and mana cost.
+        /// </summary>
+        public bool TrySpawnManual(string ultimateId, Vector3 position, Player.Player player)
+        {
+            if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
+            if (!ultimateData.GetActive()) return false;
+
+            // Check cooldown (Lightning uses triggerKillCount instead of cooldown)
+            float cooldown = ultimateData.GetCooldown();
+            if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
+
+            // Check mana cost
+            if (!player.CanAfford(ultimateData.manaCost)) return false;
+
+            // Delegate to factory
+            bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
+            // Update cooldown timer
+            if (success)
+            {
+                _lastSpawnTimeMap[ultimateId] = Time.time;
+                player.SpendMana(ultimateData.manaCost);
+            }
 
             return success;
         }

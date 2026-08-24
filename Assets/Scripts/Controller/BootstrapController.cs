@@ -59,6 +59,7 @@ namespace IdleDefenseSurvival.Core
             // If the save has not loaded yet, AttributeModifierManager re-applies on OnSaveLoaded.
             EnsureSingleton<AttributeModifierManager>();
             EnsureSingleton<GameManager>();
+            EnsureSingleton<ManaManager>();
             EnsureSingleton<CraftingManager>();
             EnsureSingleton<UpgradeService>();
 

@@ -40,6 +40,7 @@ namespace IdleDefenseSurvival.Player
 
         public void UpdateColliderState()
         {
+            if (_collider == null) return;
             float oldRadius = _collider.radius;
             bool anyAuraActive = CardModifierService.HasAuraEffect();
 

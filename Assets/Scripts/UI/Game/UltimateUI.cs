@@ -1,24 +1,27 @@
 using System;
+using IdleDefenseSurvival.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.UI.Game
 {
     public class UltimateUI : MonoBehaviour
     {
         [SerializeField] private Image _icon;
-        [SerializeField] private TextMeshProUGUI _cooldown;
+        [SerializeField] private TextMeshProUGUI _cooldownText;
+        [SerializeField] private TextMeshProUGUI _stackText;
         [SerializeField] private Button _button;
 
         public string UltimateID { get; private set; }
+        public Button Button => _button;
+        public bool IsReady => _button != null && _button.interactable;
 
-        public void Initialize(string ultimateID)
+        public void Initialize(string ultimateId)
         {
-            UltimateID = ultimateID;
+            UltimateID = ultimateId;
             if (_icon == null) _icon = GetComponent<Image>();
-            if (_cooldown == null) _cooldown = GetComponentInChildren<TextMeshProUGUI>(true);
+            if (_cooldownText == null) _cooldownText = GetComponentInChildren<TextMeshProUGUI>(true);
             if (_button == null) _button = GetComponent<Button>();
 
             // Ensure icon is set up for radial fill
@@ -29,6 +32,8 @@ namespace IdleDefenseSurvival.UI.Game
                 _icon.fillOrigin = (int)Image.Origin360.Top;
                 _icon.fillClockwise = true;
                 _icon.fillAmount = 1f; // Full = ready
+
+                _icon.sprite = PlayerResources.GetUltimateSource(UltimateID);
             }
         }
 
@@ -40,13 +45,34 @@ namespace IdleDefenseSurvival.UI.Game
         }
 
         /// <summary>
-        /// Sets cooldown radial fill (0 = ready, 1 = full cooldown). 
+        /// Sets cooldown radial fill (0 = ready, 1 = full cooldown).
         /// Also blocks interaction during cooldown.
         /// </summary>
         public void SetCooldown(float fillAmount)
         {
+            fillAmount = Mathf.Clamp01(fillAmount);
+            // Invert: 1 = ready (full), 0 = on cooldown (empty)
             if (_icon != null)
-                _icon.fillAmount = 1f - fillAmount; // Invert: 1 = ready (full), 0 = on cooldown (empty)
+                _icon.fillAmount = 1f - fillAmount; 
+            if (_cooldownText != null)
+            {
+                if (fillAmount > 0f)
+                {
+                    var ultimateManager = Ultimate.UltimateManager.Instance;
+                    if (ultimateManager != null && ultimateManager.TryGetUltimate(UltimateID, out var data))
+                    {
+                        float cooldown = data.GetCooldown();
+                        float remaining = cooldown * fillAmount;
+                        _cooldownText.text = $"{remaining:F1}s";
+                        _cooldownText.enabled = true;
+                    }
+                }
+                else
+                {
+                    _cooldownText.enabled = false;
+                }
+            }
+
             if (_button != null)
                 _button.interactable = fillAmount <= 0f;
         }

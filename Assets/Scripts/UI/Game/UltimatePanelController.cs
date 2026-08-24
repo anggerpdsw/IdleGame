@@ -1,273 +1,217 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Manager;
-using PlayerClass = IdleDefenseSurvival.Player.Player;
+using IdleDefenseSurvival.Ultimate;
+using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Controller;
+using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.UI.Game
 {
+    /// <summary>
+    /// Controls the ultimate ability panel showing available ultimates with cooldowns.
+    /// Supports both auto-cast (when AutoCastUltimate setting is on) and manual cast (user clicks button).
+    /// Cooldowns are read directly from UltimateManager (single source of truth).
+    /// </summary>
     public class UltimatePanelController : MonoBehaviour
     {
+        [Header("UI References")]
         [SerializeField] private UltimateUI _slotPrefab;
         [SerializeField] private RectTransform _slotContainer;
+        [SerializeField] private GameObject _manualCastOverlay; // Optional: shows "Auto-cast OFF" hint
 
         private readonly List<UltimateUI> _slots = new();
-        private readonly Dictionary<string, UltimateUI> _slotByUltimateID = new();
-        private readonly Dictionary<string, float> _remainingCooldown = new();
+        private readonly Dictionary<string, UltimateUI> _slotByUltimateId = new();
         private bool _isInitialized;
 
         private void Start()
         {
             Initialize();
+            SubscribeToSettings();
             RefreshAll();
         }
 
-        /// <summary>Builds the visible potion slots for the items the player owns.</summary>
-        public void Initialize()
+        private void Initialize()
         {
             if (_isInitialized) return;
             _isInitialized = true;
 
-            var inv = InventoryService.Instance;
-            var db = ItemDatabase.Instance;
-            if (inv == null || db == null) return;
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
 
-            // One slot per potion type the player currently owns.
-            foreach (var data in db.GetItemsByCategory(ItemCategory.Consumable))
+            // Create a slot for each registered ultimate
+            foreach (var ultimateId in ultimateManager.GetAllUltimateIds())
             {
-                if (!db.IsPotion(data.Id)) continue;
-                if (inv.GetTotalQuantity(data.Id) <= 0) continue;
-                CreatePotionSlot(data.Id);
+                CreateUltimateSlot(ultimateId);
+            }
+        }
+
+        private void SubscribeToSettings()
+        {
+            if (SettingsController.Instance != null)
+            {
+                SettingsController.Instance.AutoCastUltimateChanged += OnAutoCastChanged;
+                UpdateManualCastOverlay();
+            }
+        }
+
+        private void OnAutoCastChanged(bool autoCast)
+        {
+            UpdateManualCastOverlay();
+            UpdateAllSlotInteractable();
+        }
+
+        private void UpdateManualCastOverlay()
+        {
+            if (_manualCastOverlay != null)
+            {
+                bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+                _manualCastOverlay.SetActive(!autoCast);
             }
         }
 
         private void OnEnable()
         {
-            Subscribe();
-            if (_isInitialized) RefreshAll();
+            if (_isInitialized)
+            {
+                SubscribeToSettings();
+                RefreshAll();
+            }
         }
 
         private void OnDisable()
         {
-            Unsubscribe();
-        }
-
-        private void Subscribe()
-        {
-            var inv = InventoryService.Instance;
-            if (inv != null)
+            if (SettingsController.Instance != null)
             {
-                inv.OnInventoryChanged += HandleInventoryChanged;
-                inv.OnItemQuantityChanged += HandleItemQuantityChanged;
+                SettingsController.Instance.AutoCastUltimateChanged -= OnAutoCastChanged;
             }
         }
 
-        private void Unsubscribe()
+        private void CreateUltimateSlot(string ultimateId)
         {
-            var inv = InventoryService.Instance;
-            if (inv != null)
-            {
-                inv.OnInventoryChanged -= HandleInventoryChanged;
-                inv.OnItemQuantityChanged -= HandleItemQuantityChanged;
-            }
-        }
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
 
-        private void HandleInventoryChanged(InventoryChangedEventArgs args)
-        {
-            if (args.Item == null)
-            {
-                RefreshAll();
-                return;
-            }
-            if (!ItemDatabase.Instance.IsPotion(args.Item.ItemId)) return;
-            RefreshPotionSlot(args.Item.ItemId);
-        }
-        private void HandleItemQuantityChanged(InventoryItem item, int _)
-        {
-            if (!ItemDatabase.Instance.IsPotion(item.ItemId)) return;
-            RefreshPotionSlot(item.ItemId);
-        }
+            if (!ultimateManager.TryGetUltimate(ultimateId, out var ultimateData)) return;
 
-        /// <summary>Rebuilds the slot list from the inventory (new potion type or last one used up).</summary>
-        private void RefreshPotionSlot(string itemId)
-        {
-            var inv = InventoryService.Instance;
-            var db = ItemDatabase.Instance;
-            if (inv == null || db == null) return;
-            int quantity = inv.GetTotalQuantity(itemId);
-            if (quantity <= 0)
-            {
-                RemovePotionSlot(itemId);
-                return;
-            }
-            if (_slotByUltimateID.TryGetValue(itemId, out var existingSlot))
-            {
-                existingSlot.SetQuantity(quantity);
-                return;
-            }
-            CreatePotionSlot(itemId);
-        }
-        private void RemovePotionSlot(string itemId)
-        {
-            if (!_slotByUltimateID.TryGetValue(itemId, out var slot)) return;
-            _slotByUltimateID.Remove(itemId);
-            _slots.Remove(slot);
-            if (slot != null) Destroy(slot.gameObject);
-        }
-        private void CreatePotionSlot(string itemId)
-        {
-            var db = ItemDatabase.Instance;
-            if (db == null) return;
-            var data = db.GetPotion(itemId);
-            if (!db.IsPotion(itemId)) return;
             var slotObject = _slotPrefab != null
                 ? Instantiate(_slotPrefab.gameObject, _slotContainer)
-                : new GameObject($"Potion_{itemId}", typeof(RectTransform));
+                : new GameObject($"Ultimate_{ultimateId}", typeof(RectTransform));
+
             if (!slotObject.TryGetComponent<UltimateUI>(out var slot))
                 slot = slotObject.AddComponent<UltimateUI>();
-            slot.Initialize(itemId);
-            slot.BindClick(() => UsePotion(itemId));
+
+            slot.Initialize(ultimateId);
+            slot.BindClick(() => OnUltimateClicked(ultimateId));
+            slot.name = ultimateId;
+
             _slots.Add(slot);
-            _slotByUltimateID[itemId] = slot;
-            int quantity = InventoryService.Instance.GetTotalQuantity(itemId);
-            slot.SetQuantity(quantity);
-            if (_remainingCooldown.TryGetValue(itemId, out var remaining))
-            {
-                float cooldown = GetCooldown(data);
-                float fill = cooldown > 0f ? remaining / cooldown : 0f;
-                slot.SetCooldown(fill);
-            }
+            _slotByUltimateId[ultimateId] = slot;
+
+            // Initialize cooldown visual from UltimateManager
+            UpdateSlotCooldown(ultimateId);
         }
 
-        /// <summary>Refreshes every slot's quantity from the inventory.</summary>
+        private void OnUltimateClicked(string ultimateId)
+        {
+            // Only allow manual cast when AutoCastUltimate is OFF
+            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+            if (autoCast) return;
+
+            var player = Player.Player.Instance;
+            if (player == null) return;
+
+            player.ManualCastUltimate(ultimateId);
+            // UltimateManager handles cooldown internally; just refresh visual next frame
+        }
+
         private void RefreshAll()
         {
-            var inv = InventoryService.Instance;
-            if (inv == null) return;
-            foreach (var itemId in _slotByUltimateID.Keys.ToList())
-            {
-                int quantity = inv.GetTotalQuantity(itemId);
-                if (quantity <= 0) 
-                    RemovePotionSlot(itemId);
-                else if (_slotByUltimateID.TryGetValue(itemId, out var slot))
-                    slot.SetQuantity(quantity);
-            }
-            UpdateCooldownVisuals();
-        }
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
 
-        /// <summary>Uses one copy of the potion + starts its cooldown timer.</summary>
-        private void UsePotion(string itemId)
-        {
-            var inv = InventoryService.Instance;
-            if (inv == null) return;
-            if (inv.GetTotalQuantity(itemId) <= 0) return;
-            if (_remainingCooldown.TryGetValue(itemId, out var remaining) && remaining > 0f)
-                return;
-            if (!ApplyEffect(itemId)) return;
-            if (inv.RemoveItemById(itemId, 1) <= 0) return;
-            var potion = GetPotion(itemId);
-            float cd = GetCooldown(potion);
-            if (cd > 0f) _remainingCooldown[itemId] = cd;
-            UpdateCooldownVisuals();
-        }
-
-        /// <summary>Applies visual cooldown state (radial fill + block click) for all tracked potions.</summary>
-        private void UpdateCooldownVisuals()
-        {
-            foreach (var (itemId, remaining) in _remainingCooldown)
+            // Ensure all ultimates have slots
+            foreach (var ultimateId in ultimateManager.GetAllUltimateIds())
             {
-                if (_slotByUltimateID.TryGetValue(itemId, out var slot))
+                if (!_slotByUltimateId.ContainsKey(ultimateId))
                 {
-                    var potion = GetPotion(itemId);
-                    float cd = GetCooldown(potion);
-                    float fill = cd > 0f ? remaining / cd : 0f;
-                    slot.SetCooldown(fill);
+                    CreateUltimateSlot(ultimateId);
                 }
             }
+
+            UpdateAllSlotCooldowns();
+            UpdateAllSlotInteractable();
         }
 
-        private static PotionData GetPotion(string itemId)
-            => ItemDatabase.Instance?.GetPotion(itemId);
-        private static float GetCooldown(PotionData potion)
-            => Mathf.Max(0f, potion?.Cooldown ?? 0f);
-        /// <summary>
-        /// Runs the potion effect described by its item ID.
-        /// Returns false when the item cannot be used.
-        /// </summary>
-        private bool ApplyEffect(string itemId)
+        private void UpdateAllSlotInteractable()
         {
-            if (string.IsNullOrEmpty(itemId)) return false;
-            var potion = GetPotion(itemId);
-            if (potion == null) return false;
-            return ApplyPotion(potion);
-        }
-
-        private bool ApplyPotion(PotionData potion)
-        {
-            if (potion == null) return false;
-            return potion.PotionType switch
+            foreach (var slot in _slots)
             {
-                PotionType.Health => ApplyHealthPotion(potion),
-                PotionType.Mana => ApplyManaPotion(potion),
-                PotionType.Stamina => RestoreStamina(),
-                PotionType.DebuffCleanse => CleanDebuff(),
-                _ => false
-            };
+                UpdateSlotInteractable(slot);
+            }
         }
 
-        private bool ApplyHealthPotion(PotionData potion)
+        private void UpdateSlotInteractable(UltimateUI slot)
         {
-            float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-            float amount = potion.CalculateAmount(maxHealth);
-            PlayerClass.Instance.StartHealOverTime(amount, potion.EffectDuration);
-            return true;
-        }
-        private bool ApplyManaPotion(PotionData potion)
-        {
-            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
-            float amount = potion.CalculateAmount(maxMana);
-            PlayerClass.Instance.StartManaOverTime(amount,potion.EffectDuration);
-            return true;
+            if (slot == null) return;
+
+            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+            // When auto-cast is on, buttons are non-interactable (visual only)
+            // When auto-cast is off, buttons are interactable if off cooldown
+            if (slot.Button != null)
+            {
+                slot.Button.interactable = !autoCast && slot.IsReady;
+            }
         }
 
-        private bool CleanDebuff()
+        /// <summary>Updates cooldown for a single slot from UltimateManager.</summary>
+        private void UpdateSlotCooldown(string ultimateId)
         {
-            // Player doesn't have a debuff system yet. Don't consume item.
-            return false;
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
+            if (!_slotByUltimateId.TryGetValue(ultimateId, out var slot)) return;
+            if (!ultimateManager.TryGetUltimate(ultimateId, out var ultimateData)) return;
+
+            float cooldown = ultimateData.GetCooldown();
+            if (cooldown <= 0f)
+            {
+                slot.SetCooldown(0f);
+                return;
+            }
+
+            float remaining = ultimateManager.GetCooldownRemaining(ultimateId);
+            float fill = remaining > 0f ? remaining / cooldown : 0f;
+            slot.SetCooldown(fill);
         }
 
-        private static bool RestoreStamina()
+        private void UpdateAllSlotCooldowns()
         {
-            // Player doesn't have a stamina system yet. Don't consume item.
-            return false;
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
+
+            foreach (var ultimateId in _slotByUltimateId.Keys)
+            {
+                UpdateSlotCooldown(ultimateId);
+            }
         }
 
-        /// <summary>Visual cooldown: updates radial fill on icon while timer runs.</summary>
         private void Update()
         {
-            if (_remainingCooldown.Count == 0) return;
-            foreach (var itemId in _remainingCooldown.Keys.ToList())
+            var ultimateManager = UltimateManager.Instance;
+            if (ultimateManager == null) return;
+
+            // Read cooldown from UltimateManager every frame (single source of truth)
+            foreach (var ultimateId in _slotByUltimateId.Keys)
             {
-                float remaining = _remainingCooldown[itemId] - Time.deltaTime;
-                if (remaining <= 0f)
-                {
-                    _remainingCooldown.Remove(itemId);
-                    if (_slotByUltimateID.TryGetValue(itemId, out var slot)) slot.SetCooldown(0f);
-                    continue;
-                }
-                _remainingCooldown[itemId] = remaining;
-                if (!_slotByUltimateID.TryGetValue(itemId, out var activeSlot)) continue;
-                var potion = GetPotion(itemId);
-                if (potion == null)
-                {
-                    activeSlot.SetCooldown(0f);
-                    continue;
-                }
-                float cooldown = GetCooldown(potion);
-                float fill = cooldown > 0f ? Mathf.Clamp01(remaining / cooldown) : 0f;
-                activeSlot.SetCooldown(fill);
+                UpdateSlotCooldown(ultimateId);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (SettingsController.Instance != null)
+            {
+                SettingsController.Instance.AutoCastUltimateChanged -= OnAutoCastChanged;
             }
         }
     }
