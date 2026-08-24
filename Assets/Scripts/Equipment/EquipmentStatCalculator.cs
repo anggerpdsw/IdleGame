@@ -119,12 +119,12 @@ namespace IdleDefenseSurvival.Equipment
             // Main Attributes from itemData (ItemDatabase) — base template
             if (itemData.AttributeStats != null)
                 foreach (var attrEntry in itemData.AttributeStats)
-                    AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level));
+                    MainAttributeExtensions.AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.GetValue(item.Level));
 
             // Main Attributes from item.AttributeData (instance data - e.g. equipping gives STR +6)
             if (item.AttributeData?.MainAttribute != null)
                 foreach (var attrEntry in item.AttributeData.MainAttribute)
-                    AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.BaseValue);
+                    MainAttributeExtensions.AddAsAttribute(bonuses, attrEntry.Attribute, attrEntry.BaseValue);
 
             return bonuses;
         }
@@ -143,7 +143,7 @@ namespace IdleDefenseSurvival.Equipment
                 {
                     if (tier.AttributeBonuses == null) continue;
                     foreach (var attrEntry in tier.AttributeBonuses)
-                        AddAsAttribute(totals, attrEntry.Attribute, attrEntry.GetValue(1));
+                        MainAttributeExtensions.AddAsAttribute(totals, attrEntry.Attribute, attrEntry.GetValue(1));
                 }
             }
 
@@ -159,12 +159,12 @@ namespace IdleDefenseSurvival.Equipment
             foreach (var item in equippedItems.Values)
             {
                 foreach (var (attr, value) in GetItemAttributeBonuses(item))
-                    AddAsAttribute(totals, attr, value);
+                    MainAttributeExtensions.AddAsAttribute(totals, attr, value);
             }
 
             var setBonuses = GetSetAttributeBonuses(db, setPieceCounts);
             foreach (var (attr, value) in setBonuses)
-                AddAsAttribute(totals, attr, value);
+                MainAttributeExtensions.AddAsAttribute(totals, attr, value);
 
             return totals;
         }
@@ -185,18 +185,6 @@ namespace IdleDefenseSurvival.Equipment
                     if (value != 0)
                         builder.Add(prefix, statEntry.Stat, statEntry.Mode, value);
                 }
-
-            // Main Attributes (STR/CON/INT/DEX) — from itemData.AttributeStats (template)
-            if (item.AttributeData?.MainAttribute != null)
-            {
-                foreach (var attrEntry in item.AttributeData.MainAttribute)
-                {
-                    if (attrEntry.BaseValue != 0f)
-                    {
-                        // builder.AddAttribute(prefix, attrEntry.Attribute, attrEntry.BaseValue);
-                    }
-                }
-            }
 
             // Second Attributes from item.AttributeData (specialization stats) — stored as SecondaryStat in Attribute field
             if (item.AttributeData?.SecondAttribute != null)
@@ -225,13 +213,6 @@ namespace IdleDefenseSurvival.Equipment
             if (stat == SecondaryStat.None || value == 0f) return;
             dict.TryGetValue(stat, out float current);
             dict[stat] = current + value;
-        }
-
-        private static void AddAsAttribute(Dictionary<MainAttribute, float> dict, MainAttribute attr, float value)
-        {
-            if (value == 0f) return;
-            dict.TryGetValue(attr, out float current);
-            dict[attr] = current + value;
         }
 
         private sealed class ModifierBuilder

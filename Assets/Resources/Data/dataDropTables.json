@@ -1,0 +1,65 @@
+{
+  "Tables": [
+    {
+      "TableId": "post_wave_bonus",
+      "TableName": "Post-Wave Bonus Roll",
+      "GlobalWeight": 1.0,
+      "Conditions": [
+        { "ConditionType": "Tier", "Parameter": "", "MinValue": 1, "MaxValue": 99 }
+      ],
+      "Entries": [
+        { "ItemId": "CardRoll",              "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "SkinShard",             "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 4.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_None",    "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 12.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Metal",   "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Wood",    "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Fire",    "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Water",   "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Earth",   "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Lightning","MinCount": 1, "MaxCount": 1, "MinTier": 2, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Wind",    "MinCount": 1, "MaxCount": 1, "MinTier": 2, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "gem_ruby",              "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 18.0, "MinLevel": 1, "MaxLevel": 3, "MinRarity": 1, "MaxRarity": 2 },
+        { "ItemId": "gem_sapphire",          "MinCount": 1, "MaxCount": 1, "MinTier": 2, "Weight": 10.0, "MinLevel": 1, "MaxLevel": 3, "MinRarity": 2, "MaxRarity": 3 },
+        { "ItemId": "gem_emerald",           "MinCount": 1, "MaxCount": 1, "MinTier": 3, "Weight": 4.0,  "MinLevel": 1, "MaxLevel": 3, "MinRarity": 2, "MaxRarity": 3 },
+        { "ItemId": "stone_dust",            "MinCount": 1, "MaxCount": 3, "MinTier": 1, "Weight": 8.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "organic_glue",          "MinCount": 1, "MaxCount": 2, "MinTier": 1, "Weight": 8.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "rock",                  "MinCount": 1, "MaxCount": 3, "MinTier": 1, "Weight": 12.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 }
+      ]
+    },
+    {
+      "TableId": "chest_tier_1",
+      "TableName": "Tier-1 Chest",
+      "GlobalWeight": 1.0,
+      "Conditions": [
+        { "ConditionType": "Tier", "Parameter": "", "MinValue": 1, "MaxValue": 3 }
+      ],
+      "Entries": [
+        { "ItemId": "CardRoll",              "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 2.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_None",    "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 14.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "gem_ruby",              "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 30.0, "MinLevel": 1, "MaxLevel": 2, "MinRarity": 1, "MaxRarity": 2 },
+        { "ItemId": "gem_sapphire",          "MinCount": 1, "MaxCount": 1, "MinTier": 2, "Weight": 8.0,  "MinLevel": 1, "MaxLevel": 2, "MinRarity": 2, "MaxRarity": 3 },
+        { "ItemId": "rock",                  "MinCount": 2, "MaxCount": 5, "MinTier": 1, "Weight": 20.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "iron_dust",             "MinCount": 1, "MaxCount": 3, "MinTier": 1, "Weight": 14.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "cotton_thread",         "MinCount": 1, "MaxCount": 2, "MinTier": 1, "Weight": 12.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 }
+      ]
+    },
+    {
+      "TableId": "chest_tier_4_boss",
+      "TableName": "Endgame Boss Chest",
+      "GlobalWeight": 1.0,
+      "Conditions": [
+        { "ConditionType": "Tier", "Parameter": "", "MinValue": 4, "MaxValue": 99 }
+      ],
+      "Entries": [
+        { "ItemId": "CardRoll",               "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 4.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "SkinShard",              "MinCount": 1, "MaxCount": 3, "MinTier": 1, "Weight": 6.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Lightning","MinCount": 1, "MaxCount": 2, "MinTier": 1, "Weight": 8.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "UltimateStone_Wind",     "MinCount": 1, "MaxCount": 2, "MinTier": 1, "Weight": 8.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "gem_emerald",            "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 18.0, "MinLevel": 1, "MaxLevel": 3, "MinRarity": 2, "MaxRarity": 3 },
+        { "ItemId": "gem_topaz",              "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 4.0,  "MinLevel": 1, "MaxLevel": 3, "MinRarity": 3, "MaxRarity": 4 },
+        { "ItemId": "extruded_charcoal",      "MinCount": 1, "MaxCount": 2, "MinTier": 1, "Weight": 12.0, "MinLevel": 1, "MaxLevel": 1, "MinRarity": 1, "MaxRarity": 1 },
+        { "ItemId": "mythic_ruby",            "MinCount": 1, "MaxCount": 1, "MinTier": 1, "Weight": 2.0,  "MinLevel": 1, "MaxLevel": 1, "MinRarity": 6, "MaxRarity": 6 }
+      ]
+    }
+  ]
+}

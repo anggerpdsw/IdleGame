@@ -1043,42 +1043,61 @@ Every currency mutation must consider:
 
 Daily Reward is a **7-reward sequence within one day**, not merely a conventional 7-day login streak.
 
-Current intended behavior:
+Verified constants (`Scripts/Utilities/Constantku.cs`):
 
-- all 7 rewards can be claimed on the same day;
-- claims are sequential;
-- a 5-minute cooldown exists between claims;
-- cooldown persistence uses `DateTime.UtcNow`;
-- after reward 7 is claimed, the system enters `Completed Today`;
-- buttons remain disabled until the next daily reset.
+- `REWARD_COUNT = 7`
+- `COOLDOWN_MINUTES = 5`
+- `DAILY_GOLD_REWARD = 10_000`     ← doc lama menulis 100.000; angka sebenarnya **10.000**
+- `DAILY_MEAT_REWARD = 500`         ← doc lama menulis 1.000; angka sebenarnya **500**
+- `DAILY_EXP_REWARD = 2_500`        ← doc lama menulis 3.000; angka sebenarnya **2.500**
+- `DATE_FORMAT = "yyyy-MM-dd"` (string compare for daily reset)
 
-Reward concepts:
+Behavior (`Scripts/Daily/DailyRewardService.cs`):
 
-1. Gold
-2. Gem
-3. Meat
-4. Free Card Roll item
-5. EXP
-6. Ultimate Stone
-7. Skin Shard
+- All 7 rewards claimable in one day, sequential.
+- 5-minute cooldown between claims (`utcNow.AddMinutes(COOLDOWN_MINUTES)` stored in `nextUnlockUtcTicks`).
+- Daily reset via `lastResetDate` string compare on every `EnsureReset(utcNow)`.
+- After reward 7: `completedToday = true`, all buttons disabled until reset.
+- VIP: `SaveManager.Instance.IsDailyEnabled()` forces `Waiting → Claimable` in `GetState`.
 
-Important reward scaling rules previously established:
+Reward contents (`Scripts/Daily/DailyRewardData.cs`, `DailyRewardProvider.GetReward(index)`):
 
-- Gold uses `HighestGoldEarned` from passed tiers, minimum 100,000.
-- Meat uses `HighestMeatEarned` from passed tiers, minimum 1,000.
-- EXP uses half of `HighestExpEarned` from passed tiers, minimum 3,000.
-- Free Card Roll must be added to Inventory as an accumulatable item.
-- Skin Shard contributes toward the permanent skin exchange target.
+| # | Type | Source | Amount rule |
+|---|---|---|---|
+| 0 | Gold | `EconomyManager.AddCurrency(Gold, amount, "Daily reward")` | `Math.Max(DAILY_GOLD_REWARD, SaveManager.GetHighestGoldEarned())` |
+| 1 | Gem | `EconomyManager.AddCurrency(Gem, 11, …)` | **hardcoded `11`** |
+| 2 | Meat | `EconomyManager.AddCurrency(Meat, amount, …)` | `Math.Max(DAILY_MEAT_REWARD, SaveManager.GetHighestMeatEarned())` |
+| 3 | Item | `InventoryManager.AddItem("CardRoll", 1)` | accumulatable free-roll ticket |
+| 4 | EXP | `AccountManager.AddExp(amount, …)` | `Math.Max(DAILY_EXP_REWARD, HighestExpEarned / 2 * tier)` |
+| 5 | Item | `InventoryManager.AddItem("UltimateStone", 3)` then roll N variants | **3 random UltimateStones** |
+| 6 | Item | `InventoryManager.AddItem("SkinShard", 1)` | permanent skin exchange progress |
 
-## Persistence requirement
+UltimateStone reward rolls from 8 variants (`DailyRewardService.cs:15-25`):
 
-The current reward index, claim timestamps, completion state, and required reset state must survive:
+```
+UltimateStone_None
+UltimateStone_Metal
+UltimateStone_Wood
+UltimateStone_Fire
+UltimateStone_Water
+UltimateStone_Earth
+UltimateStone_Lightning
+UltimateStone_Wind
+```
 
-- scene changes;
-- application close;
-- application restart.
+Each `count` pick rolls independently: `UnityEngine.Random.Range(0, variants.Length)`. If non-`None` is desired, gate the reward provider or the inventory accept rule — current code has **no** filter for `_None`, so the roll can yield a no-op token.
 
-Never calculate claim eligibility solely from UI state.
+### Persistence requirement
+
+`DailyRewardSaveData` (`Scripts/Daily/DailyRewardSaveData.cs`):
+
+- `currentRewardIndex` (0..7)
+- `nextUnlockUtcTicks` (`DateTime.UtcNow.Ticks` for next claim)
+- `completedToday` (bool)
+- `lastResetDate` (`"yyyy-MM-dd"`)
+- `claimedToday` (counter, mostly informational)
+
+Must survive scene changes / app close / app restart. Eligibility is never derived from UI state — `DailyRewardService.GetState(utcNow)` is the source of truth.
 
 ---
 
@@ -1086,15 +1105,57 @@ Never calculate claim eligibility solely from UI state.
 
 Idle rewards calculate offline progression.
 
-The system may accumulate:
+## 23.1 Verified scope
 
-- Gold
-- Meat
-- EXP
+Idle reward currently grants **only Gold + Meat**. EXP is not part of the offline calculation (see `IdleRewardManager` public surface: `GoldReward`, `MeatReward`, `CanClaim`, `Progress` — no EXP property).
 
-Offline calculations must use persisted timestamps and authoritative progression data.
+## 23.2 Owner files
 
-Do not rely on the scene remaining alive to preserve idle state.
+- `Scripts/IdleReward/IdleRewardManager.cs` (singleton MonoBehaviour, DontDestroyOnLoad)
+- `Scripts/IdleReward/IdleRewardData.cs` (persisted via `SaveManager.GetIdleRewardData()`)
+- `Scripts/IdleReward/IdleRewardUI.cs` (display only)
+
+## 23.3 Persistence (`IdleRewardData`)
+
+```csharp
+public long lastClaimUtcTicks = DateTime.UtcNow.Ticks;  // UTC ticks
+public int  maxDurationSeconds = 4 * 3600;              // 4h cap on offline accumulation
+public int  minimumClaimSeconds = 600;                  // 10 min before claim available
+public float rewardMultiplier = 1f;
+```
+
+`GetAccumulatedSeconds()` returns `min((UtcNow - lastClaim).TotalSeconds, maxDurationSeconds)`. The 4h cap means a player offline 24h still gets only 4h worth.
+
+## 23.4 Gold formula (verified `IdleRewardManager.CalculateGoldReward`)
+
+```text
+totalWaveProgress = (highestTier - 1) * MAX_WAVE_PER_TIER + highestWaveInTier
+waveMultiplier   = 1.0 + totalWaveProgress / MAX_WAVE_PER_TIER
+tierMultiplier   = 1.35^(highestTier - 1)
+goldPerMinute    = 15.0 * tierMultiplier * waveMultiplier
+minutes          = GetAccumulatedSeconds() / 60
+gold             = round(goldPerMinute * minutes * rewardMultiplier)
+```
+
+`highestTier` and `highestWaveInTier` come from `SaveManager.GetHighestUnlockedTier()` + `SaveManager.GetHighestWave(tier)`. These are the player's record, not current state.
+
+## 23.5 Meat formula
+
+`MeatReward = roundToInt(GoldReward / 30)`. No separate scaling.
+
+## 23.6 Claim semantics
+
+- `IsClaimAvailable()` ⇒ `GetAccumulatedSeconds() >= minimumClaimSeconds` (10 min).
+- `Progress` UI bar ⇒ `GetAccumulatedSeconds() / minimumClaimSeconds`.
+- `ResetCount()` stamps `lastClaimUtcTicks = UtcNow.Ticks` then `SaveManager.SaveAll()`. **It does not grant the reward** — grant happens at the UI/claim call site, not here. Do not assume `ResetCount` pays out.
+
+## 23.7 VIP / multipliers
+
+`rewardMultiplier` defaults to `1.0`. If VIP integration exists in `IdleRewardManager`, check the current file before assuming — older docs reference a VIP multiplier but the current field is a single scalar and no VIP write is visible in the read-first scan.
+
+## 23.8 Persistence requirement
+
+The data is owned by `SaveManager.GetIdleRewardData()`. Do not rely on the scene staying alive. The `IdleRewardManager` itself is DontDestroyOnLoad, but the data survives via `SaveData.idleReward.*` regardless of whether the manager instance is alive.
 
 ---
 
@@ -1924,7 +1985,7 @@ New modifiers must register in `EffectRegistry` and feed through `ModifierCalcul
 | Persistence | `EquipmentPersistenceService.cs` | `Scripts/Save/EquipmentSerializer.cs` | none |
 | Durability | `EquipmentDurabilityService.cs` | `Scripts/Items/DurabilityService.cs`, `AutoRepairService.cs`, `RepairService.cs`, `RepairTransactionService.cs`, `Items/DurabilityColorTable.cs`, `Items/IRepairCostProvider.cs` | per-slot `dataHat.json`…`dataShoes.json`, `dataBaseEquipment.json` |
 | Auto-equip | `EquipmentAutoEquipService.cs` | `EquipmentComparer.cs`, `EquipmentComparisonService.cs` | per-slot JSON |
-| Effect roll / affix | `EquipmentEffectService.cs` | `EquipmentModifierService.cs`, `EquipmentStatCalculator.cs`, `EquipmentAttributeData.cs`, `AttributeWeightsConfig.cs`, `RarityMechanicConfig.cs` | `dataAffixes.json`, `dataSets.json` |
+| Effect roll / affix | `EquipmentEffectService.cs` | `EquipmentModifierService.cs`, `EquipmentStatCalculator.cs`, `EquipmentAttributeData.cs`, `AttributeWeightsConfig.cs`, entry "Effect roll/affix" pakai `RarityMechanicConfig.cs` | `dataAffixes.json`, `dataSets.json` |
 | Set bonus | `EquipmentSetBonusService.cs` | `EquipmentEffect.cs` (Modifiers/) | `dataSets.json` |
 | Visual | `EquipmentVisualService.cs` | `EquipmentType.cs` + `SlotIdentityService.cs` | none |
 | Slot identity | `SlotIdentityService.cs` | `EquipmentType.cs`, `EquipmentTypeExtensions.cs` | none |
