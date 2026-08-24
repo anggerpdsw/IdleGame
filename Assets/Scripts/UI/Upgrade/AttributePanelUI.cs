@@ -38,8 +38,12 @@ namespace IdleDefenseSurvival.UI.Upgrade
             public Button plusButton;
         }
 
-        private readonly MainAttribute[] _order =
-            { MainAttribute.Constitution, MainAttribute.Strength, MainAttribute.Intelligence, MainAttribute.Dexterity };
+        private readonly MainAttribute[] _order = { 
+            MainAttribute.Constitution, 
+            MainAttribute.Strength, 
+            MainAttribute.Intelligence, 
+            MainAttribute.Dexterity 
+        };
 
         private Coroutine _bindRoutine;
 
@@ -61,8 +65,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
         private IEnumerator BindAccount()
         {
             // Wait until AccountManager has been created.
-            while (AccountManager.Instance == null)
-                yield return null;
+            while (AccountManager.Instance == null) yield return null;
             var account = AccountManager.Instance;
             account.OnDataLoaded += Refresh;
             account.OnAttributeChanged += Refresh;
@@ -100,11 +103,15 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 if (row == null) continue;
 
                 var attr = _order[i];
-                if (row.nameText != null)
+                if (row.nameText != null) row.nameText.text = attr.GetShortName();
+                if (row.valueText != null)
                 {
-                    row.nameText.text = attr.GetShortName();
+                    int bonus = account.GetAttributeBonus(attr);
+                    int total = account.GetAttributeValue(attr);
+                    row.valueText.text = total.ToString();
+                    bool hasExternalBonus = bonus != 0;
+                    row.valueText.color = hasExternalBonus ? GameColors.green : GameColors.white;
                 }
-                if (row.valueText != null) row.valueText.text = account.GetAttributeValue(attr).ToString();
 
                 if (row.plusButton != null)
                 {
@@ -138,19 +145,19 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 float totalFlat = bonus.Flat * attributeValue;
                 float totalPercent = bonus.Percent * attributeValue;
                 AttributeBonusData totalBonus = new(bonus.Stat, totalFlat, totalPercent);
-                sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {valueStat(totalBonus)}");
+                sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {ValueStat(totalBonus)}");
             }
             // Per point
             sb.AppendLine();
             sb.AppendLine("<b>Per Point:</b>");
             foreach (var bonus in bonuses)
-                sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {valueStat(bonus)}");
+                sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {ValueStat(bonus)}");
             var mouse = Pointer.current != null
                 ? (Vector3)Pointer.current.position.ReadValue()
                 : screenPosition;
             tooltip.ShowText(sb.ToString(), mouse);
         }
-        private string valueStat(AttributeBonusData bonus)
+        private string ValueStat(AttributeBonusData bonus)
         {
             return Mathf.Abs(bonus.Percent) > 0.000001f
                     ? $"+{bonus.Percent:P2}"

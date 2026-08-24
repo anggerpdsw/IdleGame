@@ -127,30 +127,72 @@ namespace IdleDefenseSurvival.Manager
         #endregion
 
         #region Attribute Allocation
-
-        /// <summary>Current unspent attribute points.</summary>
+        /// <summary>
+        /// Current unspent attribute points.
+        /// </summary>
         public int UnspentStatPoints => Data.unspentStatPoints;
 
         /// <summary>
-        /// Current total value of an attribute = base + allocated points.
+        /// Number of attribute points allocated by the player.
+        /// Does not include external bonuses.
         /// </summary>
-        public int GetAttributeValue(MainAttribute attribute) => attribute switch
+        public int GetAttributeAllocated(MainAttribute attribute)
         {
-            MainAttribute.Constitution => Data.constitution,
-            MainAttribute.Strength => Data.strength,
-            MainAttribute.Intelligence => Data.intelligence,
-            MainAttribute.Dexterity => Data.dexterity,
-            _ => 0
+            int value = attribute switch
+            {
+                MainAttribute.Constitution => Data.constitution,
+                MainAttribute.Strength => Data.strength,
+                MainAttribute.Intelligence => Data.intelligence,
+                MainAttribute.Dexterity => Data.dexterity,
+                _ => 0
+            };
+            return Mathf.Max(0, value - GameConstants.STARTING_STAT_POINTS);
+        }
+
+        /// <summary>
+        /// External bonus added from equipment, set bonuses,
+        /// buffs, passive effects, or other attribute modifier systems.
+        /// Does not include the player's allocated attribute points.
+        /// </summary>
+        public int GetAttributeBonus(MainAttribute attribute)
+        {
+            return Mathf.RoundToInt(GetBonusValue(attribute));
+        }
+
+        /// <summary>
+        /// Total main attribute currently obtained by the player.
+        /// Total = Base + Allocated Points + External Bonuses.
+        /// </summary>
+        public int GetAttributeValue(MainAttribute attribute)
+        {
+            int baseValue = GameConstants.STARTING_STAT_POINTS;
+            int allocated = GetAttributeAllocated(attribute);
+            int bonus = GetAttributeBonus(attribute);
+            return baseValue + allocated + bonus;
+        }
+
+        public float GetBonusValue(MainAttribute attribute) => attribute switch
+        {
+            MainAttribute.Constitution => _constitution -
+                GetAttributeAllocated(MainAttribute.Constitution),
+
+            MainAttribute.Strength => _strength -
+                GetAttributeAllocated(MainAttribute.Strength),
+
+            MainAttribute.Intelligence => _intelligence -
+                GetAttributeAllocated(MainAttribute.Intelligence),
+
+            MainAttribute.Dexterity => _dexterity -
+                GetAttributeAllocated(MainAttribute.Dexterity),
+            _ => 0f
         };
 
         /// <summary>
         /// Spend one unspent point on an attribute.
-        /// Re-applies attribute modifiers immediately.
         /// </summary>
         public bool SpendPoint(MainAttribute attribute)
         {
             if (Data.unspentStatPoints <= 0) return false;
-
             switch (attribute)
             {
                 case MainAttribute.Constitution: Data.constitution++; break;
@@ -159,11 +201,8 @@ namespace IdleDefenseSurvival.Manager
                 case MainAttribute.Dexterity: Data.dexterity++; break;
                 default: return false;
             }
-
             Data.unspentStatPoints--;
-            // Notify systems immediately.
             OnAttributeChanged?.Invoke();
-            // Persist after runtime state is updated.
             SaveManager.Instance.SaveAll();
             return true;
         }
