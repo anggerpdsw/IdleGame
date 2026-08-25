@@ -61,6 +61,8 @@ namespace IdleDefenseSurvival.Ultimate
         // Bomb, Tank, Cloud: chance-based stacks
         // Lightning: kill-count tracked by LightningHandler.RegisterKill
         private Dictionary<string, int> _currentStacks = new();
+        // Position queue per ultimate (FIFO - first stack in = first position out)
+        private Dictionary<string, List<Vector3>> _stackPositions = new();
 
         private void Awake()
         {
@@ -131,7 +133,8 @@ namespace IdleDefenseSurvival.Ultimate
                 {
                     _ultimateDatabase[data.id] = data;
                     _lastSpawnTimeMap[data.id] = Time.time;
-                    _currentStacks[data.id] = 0;
+                    _currentStacks[data.id] = 0;    
+                    _stackPositions[data.id] = new List<Vector3>();
                 }
             }
         }
@@ -184,10 +187,10 @@ namespace IdleDefenseSurvival.Ultimate
         }
 
         /// <summary>
-        /// Try to add a stack directly (used by Lightning kill-count).
+        /// Try to add a stack directly with its spawn position.
         /// Does NOT roll chance. Returns true if stack was added.
         /// </summary>
-        public bool TryAddStack(string ultimateId)
+        public bool TryAddStack(string ultimateId, Vector3 position)
         {
             if (!TryGetUltimate(ultimateId, out var data)) return false;
             if (!data.UsesStackSystem) return false;
@@ -195,18 +198,23 @@ namespace IdleDefenseSurvival.Ultimate
             int currentStack = GetStack(ultimateId);
             if (currentStack >= maxStack) return false;
             _currentStacks[ultimateId] = currentStack + 1;
+            _stackPositions[ultimateId].Add(position);  // ← store position spawn
             return true;
         }
 
         /// <summary>
         /// Consume a READY stack for casting.
+        /// Remove the first stored position (FIFO) when a stack is consumed.
         /// Returns true if stack was consumed.
         /// </summary>
-        public bool ConsumeStack(string ultimateId)
+        public bool ConsumeThenRemoveStack(string ultimateId)
         {
-            if (!_currentStacks.TryGetValue(ultimateId, out int currentStack)) return false;
+            if (!_currentStacks.TryGetValue(ultimateId, out int currentStack)) 
+                return false;
             if (currentStack <= 0) return false;
             _currentStacks[ultimateId] = currentStack - 1;
+            if (_stackPositions.TryGetValue(ultimateId, out var list) 
+                && list.Count > 0) list.RemoveAt(0);
             return true;
         }
 
@@ -229,7 +237,9 @@ namespace IdleDefenseSurvival.Ultimate
             if (GetStack(ultimateId) >= maxStack) return false;
             // Roll chance stack
             if (!Utilityku.Chance(chance)) return false;
-            if (!TryAddStack(ultimateId)) return false;
+            // Store the actual spawn position (enemy position for Bomb/Cloud)
+            Vector3 spawnPos = overridePosition ?? player.transform.position;
+            if (!TryAddStack(ultimateId, spawnPos)) return false;
             // Auto cast check here
             HandleAutoCast(ultimateId, player, overridePosition);
             return true;
@@ -250,7 +260,9 @@ namespace IdleDefenseSurvival.Ultimate
             // Check stack
             int maxStack = GetMaxStack(ultimateId);
             if (GetStack(ultimateId) >= maxStack) return false;
-            if (!TryAddStack(ultimateId)) return false;
+            // Lightning spawns at player (no enemy position)
+            Vector3 spawnPos = player.transform.position;
+            if (!TryAddStack(ultimateId, spawnPos)) return false;
             // Auto cast check here
             HandleAutoCast(ultimateId, player);
             return true;
@@ -266,6 +278,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return;
             // Keep the stack READY until the player has enough mana.
             if (!player.CanAfford(ultimateData.manaCost)) return;
+            // TryCastReady will use the stored position (just added above)
             Vector3 position = overridePosition ?? GetSpawnPosition(ultimateId, player);
             TryCastReady(ultimateId, position, player);
         }
@@ -276,11 +289,8 @@ namespace IdleDefenseSurvival.Ultimate
         /// </summary>
         private Vector3 GetSpawnPosition(string ultimateId, Player.Player player)
         {
-            if (ultimateId == UltimateDMG.Tank.ToString())
-            {
-                if (player.TryGetTankSpawnPosition(out Vector3 spawnPos))
-                    return spawnPos;
-            }
+            if (_stackPositions.TryGetValue(ultimateId, out var list) 
+                && list.Count > 0) return list[0];
             return player.transform.position;
         }
 
@@ -306,21 +316,59 @@ namespace IdleDefenseSurvival.Ultimate
             if (ultimateData.UsesStackSystem)
             {
                 if (GetStack(ultimateId) <= 0) return false;
-                // Spawn first, then consume stack on success
-                if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData))
-                    return false;
-                if (!ConsumeStack(ultimateId)) return false;
+                // Use stored position (FIFO) - auto-cast consumes the one just added
+                Vector3 spawnPos = GetNextStackPosition(ultimateId, player);
+                if (!UltimateFactory.TrySpawn(ultimateData.id, player, spawnPos, ultimateData)) return false;
+                if (!ConsumeThenRemoveStack(ultimateId)) return false;
             }
-            // Cooldown-based ultimates (Void, Root, Fountain, Shockwave): no stack needed
             else
             {
-                if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData))
-                    return false;
+                // Cooldown-based ultimates (Void, Root, Fountain, Shockwave)
+                // No stack needed
+                if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData)) return false;
             }
 
             _lastSpawnTimeMap[ultimateId] = Time.time;
             player.SpendMana(ultimateData.manaCost);
             return true;
+        }
+
+        /// <summary>
+        /// Cast all ready stacks for an ultimate.
+        /// Uses stored positions in FIFO order. Respects mana, cooldown per cast.
+        /// </summary>
+        public bool TryCastAllReadyStacks(string ultimateId, Player.Player player)
+        {
+            if (player == null) return false;
+            if (!TryGetUltimate(ultimateId, out var data)) return false;
+            if (!data.GetActive()) return false;
+            // cooldown-only ultimates use single cast
+            if (!data.UsesStackSystem) {
+                TrySpawnManual(ultimateId, player.transform.position, player);
+                return false;
+            }
+            bool anyCast = false;
+            while (GetStack(ultimateId) > 0)
+            {
+                if (!player.CanAfford(data.manaCost)) break;
+                if (data.GetCooldown() > 0f && !IsOffCooldown(ultimateId, data.GetCooldown())) break;
+                Vector3 pos = GetNextStackPosition(ultimateId, player);
+                if (!TryCastReady(ultimateId, pos, player)) break;
+                ConsumeThenRemoveStack(ultimateId);
+                anyCast = true;
+            }
+            return anyCast;
+        }
+
+        /// <summary>
+        /// Get next stored position (FIFO). Falls back to player position if empty.
+        /// </summary>
+        private Vector3 GetNextStackPosition(string ultimateId, Player.Player player)
+        {
+            if (_stackPositions.TryGetValue(ultimateId, out var list) 
+                && list.Count > 0) return list[0];
+            // Fallback - should not happen if stack > 0
+            return player != null ? player.transform.position : Vector3.zero;
         }
 
         /// <summary>
@@ -337,15 +385,14 @@ namespace IdleDefenseSurvival.Ultimate
         /// Manual cast path: attempts to cast a READY stack.
         /// Called by UI when user clicks an ultimate button.
         /// </summary>
-        public bool TrySpawnManual(string ultimateId, Vector3 position, Player.Player player)
-            => TryCastReady(ultimateId, position, player);
+        public bool TrySpawnManual(string ultimateId, Vector3 position, Player.Player player) => TryCastReady(ultimateId, position, player);
 
         /// <summary>
         /// Attempts to cast all currently READY stacks while
         /// cooldown and mana requirements allow.
         /// Used when mana regenerates to sufficient amount.
         /// </summary>
-        public void TryCastReadyStacks(string ultimateId, Player.Player player)
+        public void TryCastReadyStacks(string ultimateId, Player.Player player, Vector3 position)
         {
             if (player == null || !IsAutoCastEnabled()) return;
             while (GetStack(ultimateId) > 0)
@@ -353,7 +400,6 @@ namespace IdleDefenseSurvival.Ultimate
                 if (!TryGetUltimate(ultimateId, out var ultimateData)) break;
                 if (!player.CanAfford(ultimateData.manaCost)) break;
                 if (ultimateData.GetCooldown() > 0f && !IsOffCooldown(ultimateId, ultimateData.GetCooldown())) break;
-                Vector3 position = GetSpawnPosition(ultimateId, player);
                 if (!TryCastReady(ultimateId, position, player)) break;
             }
         }
@@ -394,8 +440,9 @@ namespace IdleDefenseSurvival.Ultimate
             if (!IsAutoCastEnabled() || player == null) return;
             foreach (var ultimateId in _currentStacks.Keys.ToList())
             {
-                if (GetStack(ultimateId) > 0)
-                    TryCastReadyStacks(ultimateId, player);
+                if (!_stackPositions.TryGetValue(ultimateId, out var list)) return;
+                if (GetStack(ultimateId) > 0 && list.Count > 0)
+                    TryCastReadyStacks(ultimateId, player, list[0]);
             }
         }
     }

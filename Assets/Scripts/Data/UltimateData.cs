@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Data
         public float GetChance() => chance;
         public int GetTriggerKillCount(int fallback = 20) => triggerKillCount > 0 ? triggerKillCount : fallback;
         public int GetCount(int fallback = 1) => count > 0 ? count : fallback;
-        public float GetCooldown(float fallback = 1f) => cooldown > 0f ? cooldown : fallback;
+        public float GetCooldown(float fallback = 0f) => cooldown > 0f ? cooldown : fallback;
         public float GetDuration(float fallback = 0f) => duration > 0f ? duration : fallback;
         public float GetDamageMultiplier(float fallback = 1f) => damageMultiplier > 0f ? damageMultiplier : fallback;
         public float GetKnockbackMultiplier(float fallback = 2f) => knockbackMultiplier > 0f ? knockbackMultiplier : fallback;

@@ -443,16 +443,16 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public bool ManualCastUltimate(string ultimateId)
         {
-            if (_ultimateManager == null || string.IsNullOrEmpty(ultimateId)) return false;
-            // Tank must spawn on the player's attack-range boundary.
-            string tank = UltimateDMG.Tank.ToString();
-            if (ultimateId == tank)
-            {
-                if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return false;
-                return _ultimateManager.TrySpawnManual(ultimateId, spawnPos, this);
-            }
-            // Other ultimates spawn at the player's position.
-            return _ultimateManager.TrySpawnManual(ultimateId, transform.position, this);
+            if (_ultimateManager == null || string.IsNullOrEmpty(ultimateId)) 
+                return false;
+            // Tank has special spawn position (attack range boundary)
+            // if (ultimateId == UltimateDMG.Tank.ToString())
+            // {
+            //     if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return false;
+            //     return _ultimateManager.TrySpawnManual(ultimateId, spawnPos, this);
+            // }
+            // Stack-based ultimates (Bomb, Cloud, Lightning): cast all ready stacks
+            return _ultimateManager.TryCastAllReadyStacks(ultimateId, this);
         }
 
         /// <summary>
@@ -473,7 +473,8 @@ namespace IdleDefenseSurvival.Player
             _activeTanks.RemoveAll(tank => tank == null);
 
             // Try to generate a stack via chance roll
-            _ultimateManager.TryGenerateStack(ultimateId, this);
+            if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return;
+            _ultimateManager.TryGenerateStack(ultimateId, this, spawnPos);
 
             // Auto Cast: if enabled and mana permits, TryGenerateStack already handles auto-cast
             // No additional logic needed here - UltimateManager handles it internally
