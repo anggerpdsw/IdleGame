@@ -6,11 +6,9 @@ using IdleDefenseSurvival.Ultimate;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
-using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
 using System;
-using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -458,21 +456,27 @@ namespace IdleDefenseSurvival.Player
         }
 
         /// <summary>
-        /// Requests an automatic Tank spawn through UltimateManager.
-        /// UltimateManager is responsible for checking the ultimate's
-        /// active state, auto-cast setting, cooldown, chance, mana,
-        /// and other ultimate requirements.
+        /// Attempts to generate one Tank Ultimate stack via chance roll.
+        /// Tank's chance determines whether a new stack is generated.
+        /// Auto Cast only determines whether the generated stack is
+        /// immediately consumed and spawned.
         /// </summary>
         public void SpawnTank()
         {
             if (_ultimateManager == null) return;
-            string tank = UltimateDMG.Tank.ToString();
-            if (!_ultimateManager.TryGetUltimate(tank, out _)) return;
+            string ultimateId = UltimateDMG.Tank.ToString();
+
+            if (!_ultimateManager.TryGetUltimate(ultimateId, out _))
+                return;
+
             // Remove destroyed Tank references before checking positions.
             _activeTanks.RemoveAll(tank => tank == null);
-            // Tank requires a valid position on the player's attack-range boundary.
-            if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return;
-            _ultimateManager.TrySpawn(tank, spawnPos, this);
+
+            // Try to generate a stack via chance roll
+            _ultimateManager.TryGenerateStack(ultimateId, this);
+
+            // Auto Cast: if enabled and mana permits, TryGenerateStack already handles auto-cast
+            // No additional logic needed here - UltimateManager handles it internally
         }
 
         /// <summary>
@@ -481,7 +485,7 @@ namespace IdleDefenseSurvival.Player
         /// from the player. The Tank's own AttackRange is only used to
         /// determine the minimum spacing from existing Tanks.
         /// </summary>
-        private bool TryGetTankSpawnPosition(out Vector3 spawnPos)
+        public bool TryGetTankSpawnPosition(out Vector3 spawnPos)
         {
             spawnPos = default;
             if (PlayerStatsManager.Instance == null) return false;

@@ -40,12 +40,12 @@ namespace IdleDefenseSurvival.Ultimate
 
         /// <summary>
         /// Call when an enemy is killed to track progress toward lightning trigger.
-        /// Returns true if lightning should trigger now (kill count reached threshold).
+        /// Returns true if lightning stack was generated (kill count reached threshold).
         /// </summary>
         public static bool RegisterKill()
         {
-            string UltimateId = UltimateDMG.Lightning.ToString();
-            var lightningData = UltimateManager.Instance?.GetUltimate(UltimateId);
+            string ultimateId = UltimateDMG.Lightning.ToString();
+            var lightningData = UltimateManager.Instance?.GetUltimate(ultimateId);
 
             if (lightningData == null || !lightningData.GetActive()) return false;
             _triggerKillCount = lightningData.GetTriggerKillCount(20);
@@ -53,18 +53,21 @@ namespace IdleDefenseSurvival.Ultimate
             float progress = (float)_killCountSinceLastLightning / _triggerKillCount;
             OnLightningProgressChanged?.Invoke(Mathf.Clamp01(progress));
 
-            bool spawnUltimate = false;
+            bool stackGenerated = false;
             if (_killCountSinceLastLightning >= _triggerKillCount)
             {
-                var addStack = UltimateManager.Instance?.TryAddStack(UltimateId);
                 _killCountSinceLastLightning = 0;
                 OnLightningProgressChanged?.Invoke(0f);
                 OnLightningReady?.Invoke();
 
-                // Check AutoCast setting
-                spawnUltimate = SettingsController.Instance != null && !SettingsController.Instance.AutoCastUltimate;
+                // Generate stack via UltimateManager (handles auto-cast internally)
+                var player = Player.Player.Instance;
+                if (player != null)
+                {
+                    stackGenerated = UltimateManager.Instance?.TryGenerateTriggerStack(ultimateId, player) ?? false;
+                }
             }
-            return spawnUltimate;
+            return stackGenerated;
         }
 
         public bool TrySpawn(Player.Player player, Vector3 position, UltimateData ultimateData)

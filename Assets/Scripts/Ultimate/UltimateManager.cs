@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Controller;
+using System.Linq;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -15,11 +16,11 @@ namespace IdleDefenseSurvival.Ultimate
     /// 4. Delegating spawning to handlers via UltimateFactory
     /// 5. Stack management for chance/kill-count based ultimates (Bomb, Tank, Cloud, Lightning)
     ///
-    /// Separates concerns:
-    /// - Manager: data + trigger logic (cooldown, chance, stacks)
-    /// - Factory: handler registry + instance creation
-    /// - Handlers: individual ultimate spawn logic
-    /// - Instances: individual ultimate runtime behavior
+    /// Architecture:
+    /// - TryGenerateStack(): chance roll → add stack → mark READY → HandleAutoCast
+    /// - TryCastReady(): cooldown + mana check → consume stack → FactoryTrySpawn
+    /// - TrySpawn(): auto-cast path → TryCastReady
+    /// - TrySpawnManual(): manual click path → TryCastReady
     /// </summary>
     public class UltimateManager : MonoBehaviour
     {
@@ -54,7 +55,7 @@ namespace IdleDefenseSurvival.Ultimate
         // Data & Tracking
         // -------------------------------------------------------------------
         private Dictionary<string, UltimateData> _ultimateDatabase = new();
-        private Dictionary<string, float> _lastSpawnTimeMap = new(); // For cooldown tracking
+        private Dictionary<string, float> _lastSpawnTimeMap = new();
 
         // Stack system for chance/kill-count based ultimates
         // Bomb, Tank, Cloud: chance-based stacks
@@ -75,6 +76,44 @@ namespace IdleDefenseSurvival.Ultimate
             RegisterHandlers();
         }
 
+        private void Start()
+        {
+            // Player is in Game scene, UltimateManager is in Bootstrap (DontDestroyOnLoad).
+            // Persistent coroutine tracks Player.Instance across scene transitions.
+            StartCoroutine(TrackPlayerManaChanges());
+        }
+
+        private System.Collections.IEnumerator TrackPlayerManaChanges()
+        {
+            Player.Player currentPlayer = null;
+
+            while (true)
+            {
+                // Wait for Player to exist (first load or after MainMenu)
+                yield return new WaitUntil(() => Player.Player.Instance != null);
+
+                // If Player instance changed (scene reload), unsubscribe old
+                if (currentPlayer != null && currentPlayer != Player.Player.Instance)
+                    currentPlayer.OnManaChanged -= OnManaChanged;
+
+                currentPlayer = Player.Player.Instance;
+                currentPlayer.OnManaChanged += OnManaChanged;
+
+                // Wait until this Player instance is destroyed (scene unload)
+                yield return new WaitUntil(() => Player.Player.Instance == null || Player.Player.Instance != currentPlayer);
+
+                // Unsubscribe from destroyed instance
+                currentPlayer.OnManaChanged -= OnManaChanged;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            // Cleanup on Bootstrap reload or app quit
+            if (Player.Player.Instance != null)
+                Player.Player.Instance.OnManaChanged -= OnManaChanged;
+        }
+
         private void LoadUltimateDatabase()
         {
             TextAsset ultimateJson = Resources.Load<TextAsset>("Data/Player/dataUltimate");
@@ -91,7 +130,7 @@ namespace IdleDefenseSurvival.Ultimate
                 foreach (var data in wrapper.ultimate)
                 {
                     _ultimateDatabase[data.id] = data;
-                    _lastSpawnTimeMap[data.id] = Time.time; // Initialize cooldown timer
+                    _lastSpawnTimeMap[data.id] = Time.time;
                     _currentStacks[data.id] = 0;
                 }
             }
@@ -124,51 +163,29 @@ namespace IdleDefenseSurvival.Ultimate
         // -------------------------------------------------------------------
         // Public API: Data Lookup
         // -------------------------------------------------------------------
-
-        /// <summary>
-        /// Get ultimate data by ID.
-        /// Returns null if not found (logs error).
-        /// </summary>
         public UltimateData GetUltimate(string id)
         {
             if (_ultimateDatabase.TryGetValue(id, out var data)) return data;
             Debug.LogError($"[UltimateManager] Ultimate data not found for id: {id}");
             return null;
         }
-
-        /// <summary>
-        /// Try to get ultimate data by ID (safe).
-        /// </summary>
         public bool TryGetUltimate(string id, out UltimateData data)
-        {
-            return _ultimateDatabase.TryGetValue(id, out data);
-        }
+            => _ultimateDatabase.TryGetValue(id, out data);
 
         // -------------------------------------------------------------------
         // Stack System API
         // -------------------------------------------------------------------
-
-        /// <summary>
-        /// Get current stack count for an ultimate.
-        /// </summary>
         public int GetStack(string ultimateId)
-        {
-            return _currentStacks.TryGetValue(ultimateId, out int stack) ? stack : 0;
-        }
-
-        /// <summary>
-        /// Get max stack count for an ultimate (from data).
-        /// </summary>
+            => _currentStacks.TryGetValue(ultimateId, out int stack) ? stack : 0;
         public int GetMaxStack(string ultimateId)
         {
-            if (TryGetUltimate(ultimateId, out var data))
-                return data.GetCount();
+            if (TryGetUltimate(ultimateId, out var data)) return data.GetCount();
             return 1;
         }
 
         /// <summary>
-        /// Try to add a stack (for auto-cast chance/kill triggers).
-        /// Returns true if stack was added.
+        /// Try to add a stack directly (used by Lightning kill-count).
+        /// Does NOT roll chance. Returns true if stack was added.
         /// </summary>
         public bool TryAddStack(string ultimateId)
         {
@@ -182,154 +199,164 @@ namespace IdleDefenseSurvival.Ultimate
         }
 
         /// <summary>
-        /// Consume a stack for manual cast.
+        /// Consume a READY stack for casting.
         /// Returns true if stack was consumed.
         /// </summary>
         public bool ConsumeStack(string ultimateId)
         {
             if (!_currentStacks.TryGetValue(ultimateId, out int currentStack)) return false;
             if (currentStack <= 0) return false;
-
             _currentStacks[ultimateId] = currentStack - 1;
             return true;
         }
-        
+
         /// <summary>
-        /// Try to spawn an ultimate by ID.
-        /// For stack-based ultimates: flushes all existing stacks, then generates new stacks via chance while mana permits.
-        /// For cooldown-based ultimates: normal spawn logic.
-        /// Caller is responsible for checking AutoCast setting (for auto-cast path).
+        /// Generate one Ultimate stack via chance roll.
+        /// For chance-based ultimates (Bomb, Tank, Cloud).
+        /// After adding stack, attempts auto-cast if enabled.
+        /// </summary>
+        public bool TryGenerateStack(string ultimateId, Player.Player player)
+        {
+            if (player == null) return false;
+            if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
+            if (!ultimateData.GetActive()) return false;
+            if (!ultimateData.UsesStackSystem) return false;
+            // For chance-based ultimates only
+            float chance = ultimateData.GetChance();
+            if (chance <= 0f) return false;
+            // Check stack
+            int maxStack = GetMaxStack(ultimateId);
+            if (GetStack(ultimateId) >= maxStack) return false;
+            // Roll chance stack
+            if (!Utilityku.Chance(chance)) return false;
+            if (!TryAddStack(ultimateId)) return false;
+            // Auto cast check here
+            HandleAutoCast(ultimateId, player);
+            return true;
+        }
+
+        /// <summary>
+        /// Generate a stack directly without chance roll (for Lightning kill-count).
+        /// After adding stack, attempts auto-cast if enabled.
+        /// </summary>
+        public bool TryGenerateTriggerStack(string ultimateId, Player.Player player)
+        {
+            if (player == null) return false;
+            if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
+            if (!ultimateData.GetActive()) return false;
+            if (!ultimateData.UsesStackSystem) return false;
+            // Lightning uses triggerKillCount, not chance
+            if (ultimateData.GetTriggerKillCount() <= 0) return false;
+            // Check stack
+            int maxStack = GetMaxStack(ultimateId);
+            if (GetStack(ultimateId) >= maxStack) return false;
+            if (!TryAddStack(ultimateId)) return false;
+            // Auto cast check here
+            HandleAutoCast(ultimateId, player);
+            return true;
+        }
+
+        /// <summary>
+        /// Automatically casts a newly generated Ultimate stack
+        /// when Auto Cast is enabled.
+        /// </summary>
+        private void HandleAutoCast(string ultimateId, Player.Player player)
+        {
+            if (!IsAutoCastEnabled()) return;
+            if (!TryGetUltimate(ultimateId, out var ultimateData)) return;
+            // Keep the stack READY until the player has enough mana.
+            if (!player.CanAfford(ultimateData.manaCost)) return;
+            Vector3 position = GetSpawnPosition(ultimateId, player);
+            TryCastReady(ultimateId, position, player);
+        }
+
+        /// <summary>
+        /// Gets the spawn position for an ultimate.
+        /// Override for special positioning (e.g., Tank).
+        /// </summary>
+        private Vector3 GetSpawnPosition(string ultimateId, Player.Player player)
+        {
+            if (ultimateId == UltimateDMG.Tank.ToString())
+            {
+                if (player.TryGetTankSpawnPosition(out Vector3 spawnPos))
+                    return spawnPos;
+            }
+            return player.transform.position;
+        }
+
+        /// <summary>
+        /// Casts one READY stack of an Ultimate.
+        /// Does not perform a chance roll. The stack must already exist.
+        /// Cooldown and mana requirements are still respected.
+        /// The stack is consumed only after the actual spawn succeeds.
+        /// </summary>
+        public bool TryCastReady(string ultimateId, Vector3 position, Player.Player player)
+        {
+            if (player == null) return false;
+            if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
+            if (!ultimateData.GetActive()) return false;
+            if (!ultimateData.UsesStackSystem) return false;
+            if (GetStack(ultimateId) <= 0) return false;
+            float cooldown = ultimateData.GetCooldown();
+            if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
+            if (!player.CanAfford(ultimateData.manaCost)) return false;
+            // Spawn first, then consume stack on success
+            if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData))
+                return false;
+            if (!ConsumeStack(ultimateId)) return false;
+            _lastSpawnTimeMap[ultimateId] = Time.time;
+            player.SpendMana(ultimateData.manaCost);
+            return true;
+        }
+
+        /// <summary>
+        /// Auto-cast path: attempts to cast a READY stack.
+        /// Only used when AutoCastUltimate setting is ON.
         /// </summary>
         public bool TrySpawn(string ultimateId, Vector3 position, Player.Player player)
         {
-            // Check AutoCast setting
-            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
-            if (!autoCast) return false;
-
-            if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
-            if (!ultimateData.GetActive()) return false;
-
-            // Check cooldown (Lightning uses triggerKillCount instead of cooldown)
-            float cooldown = ultimateData.GetCooldown();
-            if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
-
-            // Check mana cost
-            if (!player.CanAfford(ultimateData.manaCost)) return false;
-
-            bool anySpawned = false;
-            // Handle stack-based ultimates (Bomb, Tank, Cloud, Lightning)
-            if (ultimateData.UsesStackSystem)
-            {
-                // 1. Flush ALL existing stacks immediately (manual click or switching to auto)
-                int currentStack = GetStack(ultimateId);
-                while (currentStack > 0 && player.CanAfford(ultimateData.manaCost))
-                {
-                    ConsumeStack(ultimateId);
-                    anySpawned = FactoryTrySpawn(player, position, ultimateData);
-                    currentStack = GetStack(ultimateId);
-                }
-
-                // 2. For chance-based ultimates (Bomb, Tank, Cloud): keep rolling chance while mana permits
-                // Lightning has chance = 0, so this loop won't execute for it (kill-count handled separately)
-                float chance = ultimateData.GetChance();
-                int maxStack = GetMaxStack(ultimateId);
-                while (chance > 0f && player.CanAfford(ultimateData.manaCost) && GetStack(ultimateId) < maxStack)
-                {
-                    if (!Utilityku.Chance(chance)) break; // Chance failed
-                    if (!TryAddStack(ultimateId)) break; // Max stack reached
-                    ConsumeStack(ultimateId);
-                    anySpawned = FactoryTrySpawn(player, position, ultimateData);
-                }
-
-                return anySpawned;
-            }
-
-            // Normal cooldown-based ultimates (Void, Root, Fountain, Shockwave)
-            return FactoryTrySpawn(player, position, ultimateData);
+            if (!IsAutoCastEnabled()) return false;
+            return TryCastReady(ultimateId, position, player);
         }
 
         /// <summary>
-        /// Manual cast entry point for user click.
-        /// For chance-based stack ultimates (Bomb, Tank, Cloud): rolls chance → adds stack → consumes & spawns.
-        /// For Lightning (kill-count): must have stack from RegisterKill → consumes & spawns.
-        /// Bypasses chance check for Lightning (chance is 0).
-        /// Still respects active, cooldown, and mana cost.
+        /// Manual cast path: attempts to cast a READY stack.
+        /// Called by UI when user clicks an ultimate button.
         /// </summary>
         public bool TrySpawnManual(string ultimateId, Vector3 position, Player.Player player)
-        {
-            if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
-            if (!ultimateData.GetActive()) return false;
-
-            // Check cooldown (Lightning has no cooldown)
-            float cooldown = ultimateData.GetCooldown();
-            if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
-
-            // Check mana cost
-            if (!player.CanAfford(ultimateData.manaCost)) return false;
-
-            // Handle stack-based ultimates (Bomb, Tank, Cloud, Lightning)
-            if (ultimateData.UsesStackSystem)
-            {
-                if (GetStack(ultimateId) > 0)
-                {
-                    // Has existing stack (from manual chance rolls or Lightning kill-count)
-                    // Consume one and spawn
-                    if (!ConsumeStack(ultimateId)) return false;
-                }
-                else
-                {
-                    // No stack: for chance-based (Bomb, Tank, Cloud), roll chance to add one
-                    float chance = ultimateData.GetChance();
-                    if (chance > 0f)
-                    {
-                        if (!Utilityku.Chance(chance)) return false; // chance failed → no stack, no spawn
-                        if (!TryAddStack(ultimateId)) return false; // max stack reached
-                        // Consume the newly added stack
-                        ConsumeStack(ultimateId);
-                    }
-                    else
-                    {
-                        // Lightning has chance = 0, requires kill-count stack from RegisterKill
-                        // No stack available → cannot cast
-                        return false;
-                    }
-                }
-            }
-
-            // Delegate to factory
-            return FactoryTrySpawn(player, position, ultimateData);
-        }
-
-        private bool FactoryTrySpawn(Player.Player pl, Vector3 po, UltimateData ud)
-        {
-            if (UltimateFactory.TrySpawn(ud.id, pl, po, ud))
-            {
-                _lastSpawnTimeMap[ud.id] = Time.time;
-                pl.SpendMana(ud.manaCost);
-                return true;
-            }
-            return false;
-        }
+            => TryCastReady(ultimateId, position, player);
 
         /// <summary>
-        /// Check if an ultimate is off cooldown.
+        /// Attempts to cast all currently READY stacks while
+        /// cooldown and mana requirements allow.
+        /// Used when mana regenerates to sufficient amount.
         /// </summary>
+        public void TryCastReadyStacks(string ultimateId, Player.Player player)
+        {
+            if (player == null || !IsAutoCastEnabled()) return;
+            while (GetStack(ultimateId) > 0)
+            {
+                if (!TryGetUltimate(ultimateId, out var ultimateData)) break;
+                if (!player.CanAfford(ultimateData.manaCost)) break;
+                if (ultimateData.GetCooldown() > 0f && !IsOffCooldown(ultimateId, ultimateData.GetCooldown())) break;
+                Vector3 position = GetSpawnPosition(ultimateId, player);
+                if (!TryCastReady(ultimateId, position, player)) break;
+            }
+        }
+
         private bool IsOffCooldown(string ultimateId, float cooldown)
         {
             if (!_lastSpawnTimeMap.TryGetValue(ultimateId, out float lastTime)) return true;
-
             return Time.time - lastTime >= cooldown;
         }
 
-        /// <summary>
-        /// Get the time until an ultimate is off cooldown.
-        /// Returns 0 if already off cooldown.
-        /// </summary>
+        private bool IsAutoCastEnabled()
+            => SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+
         public float GetCooldownRemaining(string ultimateId)
         {
             if (!TryGetUltimate(ultimateId, out var data)) return 0f;
             if (!_lastSpawnTimeMap.TryGetValue(ultimateId, out float lastTime)) return 0f;
-
             float elapsed = Time.time - lastTime;
             float cooldown = data.GetCooldown();
             return Mathf.Max(0f, cooldown - elapsed);
@@ -338,21 +365,24 @@ namespace IdleDefenseSurvival.Ultimate
         // -------------------------------------------------------------------
         // Public API: Utility
         // -------------------------------------------------------------------
-
-        /// <summary>
-        /// Get all registered ultimate IDs from factory.
-        /// </summary>
         public IReadOnlyCollection<string> GetAllUltimateIds()
-        {
-            return UltimateFactory.GetAllUltimateIds();
-        }
+            => UltimateFactory.GetAllUltimateIds();
+        public int GetActiveCount(string ultimateId)
+            => UltimateFactory.GetActiveCount(ultimateId);
 
         /// <summary>
-        /// Get active count for an ultimate from factory.
+        /// Called when player's mana changes (e.g., mana regen tick).
+        /// Checks if any ready ultimates can now be auto-cast.
         /// </summary>
-        public int GetActiveCount(string ultimateId)
+        public void OnManaChanged()
         {
-            return UltimateFactory.GetActiveCount(ultimateId);
+            var player = Player.Player.Instance;
+            if (!IsAutoCastEnabled() || player == null) return;
+            foreach (var ultimateId in _currentStacks.Keys.ToList())
+            {
+                if (GetStack(ultimateId) > 0)
+                    TryCastReadyStacks(ultimateId, player);
+            }
         }
     }
 }
