@@ -224,11 +224,16 @@ namespace IdleDefenseSurvival.Player
         {
             if (_ultimateManager == null) return;
 
+            // Check AutoCast setting
+            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+            if (!autoCast) return;
+
             // TrySpawn handles cooldown, active checks, chance, and mana cost
-            _ultimateManager.TrySpawn(UltimateDMG.Void.ToString(), transform.position, this);
-            _ultimateManager.TrySpawn(UltimateDMG.Root.ToString(), transform.position, this);
-            _ultimateManager.TrySpawn(UltimateDMG.Fountain.ToString(), transform.position, this);
-            _ultimateManager.TrySpawn(UltimateDMG.Shockwave.ToString(), transform.position, this);
+            var pos = transform.position;
+            _ultimateManager.TrySpawn(UltimateDMG.Void.ToString(), pos, this);
+            _ultimateManager.TrySpawn(UltimateDMG.Root.ToString(), pos, this);
+            _ultimateManager.TrySpawn(UltimateDMG.Fountain.ToString(), pos, this);
+            _ultimateManager.TrySpawn(UltimateDMG.Shockwave.ToString(), pos, this);
 
             // Lightning is triggered by kill count in EnemyAi, not cooldown/chance
             // Do not call TrySpawn here - it's handled when enemies die

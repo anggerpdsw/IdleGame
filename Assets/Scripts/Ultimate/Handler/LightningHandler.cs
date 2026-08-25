@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -20,7 +21,7 @@ namespace IdleDefenseSurvival.Ultimate
 
         // Static kill counter shared across all instances
         private static int _killCountSinceLastLightning = 0;
-        private static int _triggerKillCount = 20;
+        private static int _triggerKillCount = 0;
 
         public static event Action<float> OnLightningProgressChanged;
         public static event Action OnLightningReady;
@@ -41,22 +42,29 @@ namespace IdleDefenseSurvival.Ultimate
         /// Call when an enemy is killed to track progress toward lightning trigger.
         /// Returns true if lightning should trigger now (kill count reached threshold).
         /// </summary>
-        public static bool RegisterKill(UltimateData lightningData)
+        public static bool RegisterKill()
         {
+            string UltimateId = UltimateDMG.Lightning.ToString();
+            var lightningData = UltimateManager.Instance?.GetUltimate(UltimateId);
+
             if (lightningData == null || !lightningData.GetActive()) return false;
             _triggerKillCount = lightningData.GetTriggerKillCount(20);
             _killCountSinceLastLightning++;
             float progress = (float)_killCountSinceLastLightning / _triggerKillCount;
             OnLightningProgressChanged?.Invoke(Mathf.Clamp01(progress));
+
+            bool spawnUltimate = false;
             if (_killCountSinceLastLightning >= _triggerKillCount)
             {
-                var addStack = UltimateManager.Instance.TryAddStack(UltimateDMG.Lightning.ToString());
+                var addStack = UltimateManager.Instance?.TryAddStack(UltimateId);
                 _killCountSinceLastLightning = 0;
                 OnLightningProgressChanged?.Invoke(0f);
                 OnLightningReady?.Invoke();
-                return true;
+
+                // Check AutoCast setting
+                spawnUltimate = SettingsController.Instance != null && !SettingsController.Instance.AutoCastUltimate;
             }
-            return false;
+            return spawnUltimate;
         }
 
         public bool TrySpawn(Player.Player player, Vector3 position, UltimateData ultimateData)

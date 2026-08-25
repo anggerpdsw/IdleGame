@@ -1,9 +1,7 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using Newtonsoft.Json;
-using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -133,7 +131,6 @@ namespace IdleDefenseSurvival.Ultimate
         public UltimateData GetUltimate(string id)
         {
             if (_ultimateDatabase.TryGetValue(id, out var data)) return data;
-
             Debug.LogError($"[UltimateManager] Ultimate data not found for id: {id}");
             return null;
         }
@@ -198,16 +195,13 @@ namespace IdleDefenseSurvival.Ultimate
 
         
         /// <summary>
-        /// Try to spawn an ultimate by ID (auto-cast path).
-        /// For stack-based ultimates: consumes existing stacks first, then tries to add via chance/kill-count.
+        /// Try to spawn an ultimate by ID.
+        /// For stack-based ultimates: flushes all existing stacks, then generates new stacks via chance while mana permits.
         /// For cooldown-based ultimates: normal spawn logic.
+        /// Caller is responsible for checking AutoCast setting (for auto-cast path).
         /// </summary>
         public bool TrySpawn(string ultimateId, Vector3 position, Player.Player player)
         {
-            // Check AutoCast setting
-            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
-            if (!autoCast) return false;
-
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
 
@@ -218,61 +212,43 @@ namespace IdleDefenseSurvival.Ultimate
             // Check mana cost
             if (!player.CanAfford(ultimateData.manaCost)) return false;
 
+            bool anySpawned = false;
             // Handle stack-based ultimates (Bomb, Tank, Cloud, Lightning)
             if (ultimateData.UsesStackSystem)
             {
-                // Flush ALL existing stacks immediately when auto-cast is active.
-                // This ensures switching from manual to auto mode spawns all accumulated stacks at once (e.g., 7 Lightning).
+                // 1. Flush ALL existing stacks immediately (manual click or switching to auto)
                 int currentStack = GetStack(ultimateId);
-                while (currentStack > 0)
+                while (currentStack > 0 && player.CanAfford(ultimateData.manaCost))
                 {
                     ConsumeStack(ultimateId);
-                    bool spawned = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-                    if (spawned)
-                    {
-                        _lastSpawnTimeMap[ultimateId] = Time.time;
-                        player.SpendMana(ultimateData.manaCost);
-                    }
+                    anySpawned = FactoryTrySpawn(player, position, ultimateData);
                     currentStack = GetStack(ultimateId);
                 }
 
-                // No existing stacks: try to generate one via chance/kill-count
-                // Check chance for chance-based ultimates (Bomb, Tank, Cloud)
+                // 2. For chance-based ultimates (Bomb, Tank, Cloud): keep rolling chance while mana permits
+                // Lightning has chance = 0, so this loop won't execute for it (kill-count handled separately)
                 float chance = ultimateData.GetChance();
-                if (chance > 0f)
+                int maxStack = GetMaxStack(ultimateId);
+                while (chance > 0f && player.CanAfford(ultimateData.manaCost) && GetStack(ultimateId) < maxStack)
                 {
-                    if (!Utilityku.Chance(chance)) return false;
+                    if (!Utilityku.Chance(chance)) break; // Chance failed
+                    if (!TryAddStack(ultimateId)) break; // Max stack reached
+                    ConsumeStack(ultimateId);
+                    anySpawned = FactoryTrySpawn(player, position, ultimateData);
                 }
-                // For Lightning, chance is 0 but triggerKillCount handles it via OnEnemyKilled
 
-                // Add stack (respects max count)
-                if (!TryAddStack(ultimateId)) return false;
-
-                // Immediately consume the newly added stack and spawn
-                ConsumeStack(ultimateId);
-
-                bool success2 = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-                if (success2)
-                {
-                    _lastSpawnTimeMap[ultimateId] = Time.time;
-                    player.SpendMana(ultimateData.manaCost);
-                }
-                return success2;
+                return anySpawned;
             }
 
             // Normal cooldown-based ultimates (Void, Root, Fountain, Shockwave)
-            bool success3 = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-            if (success3)
-            {
-                _lastSpawnTimeMap[ultimateId] = Time.time;
-                player.SpendMana(ultimateData.manaCost);
-            }
-            return success3;
+            return FactoryTrySpawn(player, position, ultimateData);
         }
 
         /// <summary>
         /// Manual cast entry point for user click.
-        /// Consumes a stack if available, bypasses chance check.
+        /// For chance-based stack ultimates (Bomb, Tank, Cloud): rolls chance → adds stack → consumes & spawns.
+        /// For Lightning (kill-count): must have stack from RegisterKill → consumes & spawns.
+        /// Bypasses chance check for Lightning (chance is 0).
         /// Still respects active, cooldown, and mana cost.
         /// </summary>
         public bool TrySpawnManual(string ultimateId, Vector3 position, Player.Player player)
@@ -287,21 +263,48 @@ namespace IdleDefenseSurvival.Ultimate
             // Check mana cost
             if (!player.CanAfford(ultimateData.manaCost)) return false;
 
-            // For stack-based ultimates: must have stack to cast
+            // Handle stack-based ultimates (Bomb, Tank, Cloud, Lightning)
             if (ultimateData.UsesStackSystem)
             {
-                if (!ConsumeStack(ultimateId)) return false;
+                if (GetStack(ultimateId) > 0)
+                {
+                    // Has existing stack (from manual chance rolls or Lightning kill-count)
+                    // Consume one and spawn
+                    if (!ConsumeStack(ultimateId)) return false;
+                }
+                else
+                {
+                    // No stack: for chance-based (Bomb, Tank, Cloud), roll chance to add one
+                    float chance = ultimateData.GetChance();
+                    if (chance > 0f)
+                    {
+                        if (!Utilityku.Chance(chance)) return false; // chance failed → no stack, no spawn
+                        if (!TryAddStack(ultimateId)) return false; // max stack reached
+                        // Consume the newly added stack
+                        ConsumeStack(ultimateId);
+                    }
+                    else
+                    {
+                        // Lightning has chance = 0, requires kill-count stack from RegisterKill
+                        // No stack available → cannot cast
+                        return false;
+                    }
+                }
             }
 
             // Delegate to factory
-            bool success = UltimateFactory.TrySpawn(ultimateId, player, position, ultimateData);
-            if (success)
-            {
-                _lastSpawnTimeMap[ultimateId] = Time.time;
-                player.SpendMana(ultimateData.manaCost);
-            }
+            return FactoryTrySpawn(player, position, ultimateData);
+        }
 
-            return success;
+        private bool FactoryTrySpawn(Player.Player pl, Vector3 po, UltimateData ud)
+        {
+            if (UltimateFactory.TrySpawn(ud.id, pl, po, ud))
+            {
+                _lastSpawnTimeMap[ud.id] = Time.time;
+                pl.SpendMana(ud.manaCost);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>

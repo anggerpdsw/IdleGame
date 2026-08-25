@@ -609,15 +609,24 @@ namespace IdleDefenseSurvival.Enemy
             // Record kill in save system with damage source
             RecordEnemyKill(_lastDamageSource);
 
+            string player = UltimateDMG.Player.ToString();
+            string lightning = UltimateDMG.Lightning.ToString();
+            string cloud = UltimateDMG.Cloud.ToString();
+
             // Register kill for Lightning ultimate trigger (if killed by player or lightning)
-            if (_lastDamageSource == UltimateDMG.Player.ToString() || _lastDamageSource == UltimateDMG.Lightning.ToString())
+            if (_lastDamageSource == player || _lastDamageSource == lightning)
             {
-                var lightningData = _ultimateManager?.GetUltimate(UltimateDMG.Lightning.ToString());
-                if (lightningData != null && LightningHandler.RegisterKill(lightningData))
+                if (LightningHandler.RegisterKill())
                 {
                     // Lightning ready to trigger - spawn it at player position
-                    _ultimateManager.TrySpawn(UltimateDMG.Lightning.ToString(), _playerComponent.transform.position, _playerComponent);
+                    _ultimateManager.TrySpawn(lightning, _playerComponent.transform.position, _playerComponent);
                 }
+            }
+
+            // Try to spawn toxic death cloud at death position (if killed by player or cloud)
+            if (_lastDamageSource == player || _lastDamageSource == cloud)
+            {
+                _ultimateManager.TrySpawn(cloud, transform.position, _playerComponent);
             }
 
             // Unregister dari manager
@@ -628,14 +637,6 @@ namespace IdleDefenseSurvival.Enemy
 
             DropRewards();
             DropItemDrops();
-
-            // Try to spawn ultimate at enemy death position ONLY if killed by player
-            // (not by bomb explosion, to prevent chain explosions)
-            if ((_lastDamageSource == UltimateDMG.Player.ToString() || _lastDamageSource == UltimateDMG.Cloud.ToString()) && _ultimateManager != null && _playerComponent != null)
-            {
-                // Try to spawn toxic death cloud at death position
-                _ultimateManager.TrySpawn(UltimateDMG.Cloud.ToString(), transform.position, _playerComponent);
-            }
 
             EnemyKillMission();
 
