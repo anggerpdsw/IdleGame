@@ -36,7 +36,7 @@ namespace IdleDefenseSurvival.Ultimate
 
         private void SpawnOne(Player.Player player, Vector3 spawnPos, UltimateData ultimateData)
         {
-            GameObject voidObj = Instantiate(_voidPrefab, spawnPos, Quaternion.identity, player.transform);
+            GameObject voidObj = Instantiate(_voidPrefab, spawnPos, Quaternion.identity, UIManager.Instance.UltimateRoot);
             if (voidObj == null) return;
 
             if (!voidObj.TryGetComponent(out VoidInstance voidInstance))

@@ -5,15 +5,16 @@ namespace IdleDefenseSurvival.Manager
     [RequireComponent(typeof(Canvas))]
     public class CanvasRoot : MonoBehaviour
     {
+        [SerializeField] private Canvas canvas;
         [SerializeField] private Transform popupRoot;
-        [SerializeField] private Transform overlayRoot;
+        [SerializeField] private Transform ultimateRoot;
         [SerializeField] private Transform toastRoot;
         [SerializeField] private Transform dropRoot;
 
         private void Start()
         {
             UIManager.Instance.
-                RegisterCanvas(GetComponent<Canvas>(), popupRoot, overlayRoot, toastRoot, dropRoot);
+                RegisterCanvas(canvas, popupRoot, ultimateRoot, toastRoot, dropRoot);
         }
     }
 }

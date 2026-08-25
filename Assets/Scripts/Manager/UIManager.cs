@@ -15,7 +15,7 @@ namespace IdleDefenseSurvival.Manager
         [Header("Current Scene UI")]
         [SerializeField] private Canvas _canvas;
         [SerializeField] private Transform _popupRoot;
-        [SerializeField] private Transform _overlayRoot;
+        [SerializeField] private Transform _ultimateRoot;
         [SerializeField] private Transform _toastRoot;
         [SerializeField] private Transform _dropRoot;
 
@@ -23,7 +23,7 @@ namespace IdleDefenseSurvival.Manager
 
         public Canvas Canvas => _canvas;
         public Transform PopupRoot => _popupRoot;
-        public Transform OverlayRoot => _overlayRoot;
+        public Transform UltimateRoot => _ultimateRoot;
         public Transform ToastRoot => _toastRoot;
         public Transform DropRoot => _dropRoot;
 
@@ -43,11 +43,11 @@ namespace IdleDefenseSurvival.Manager
         /// Called by CanvasRoot every scene.
         /// </summary>
         public void RegisterCanvas(
-            Canvas canvas, Transform popupRoot, Transform overlayRoot, Transform toastRoot, Transform dropRoot)
+            Canvas canvas, Transform popupRoot, Transform ultimateRoot, Transform toastRoot, Transform dropRoot)
         {
             _canvas = canvas;
             _popupRoot = popupRoot;
-            _overlayRoot = overlayRoot;
+            _ultimateRoot = ultimateRoot;
             _toastRoot = toastRoot;
             _dropRoot = dropRoot;
 

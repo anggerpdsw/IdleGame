@@ -13,7 +13,7 @@
         {
             "id": "Tank",
             "active": true,
-            "manaCost": 15,
+            "manaCost": 23,
             "chance": 11,
             "count": 4,
             "duration": 15.7,
@@ -31,7 +31,7 @@
         {
             "id": "Bomb",
             "active": true,
-            "manaCost": 20,
+            "manaCost": 22,
             "chance": 73,
             "count": 5,
             "duration": 13.5,
@@ -42,7 +42,7 @@
         {
             "id": "Fountain",
             "active": true,
-            "manaCost": 35,
+            "manaCost": 25,
             "cooldown": 39.63,
             "count": 7,
             "duration": 8.1,
@@ -64,9 +64,10 @@
         {
             "id": "Lightning",
             "active": true,
-            "manaCost": 67,
+            "manaCost": 57,
             "triggerKillCount": 5,
-            "count": 7,
+            "count": 3,
+            "chain": 7,
             "damageMultiplier": 2.3,
             "stuntMultiplier": 2.1,
             "defenseBreak": 0.22,
@@ -75,7 +76,7 @@
         {
             "id": "Shockwave",
             "active": true,
-            "manaCost": 50,
+            "manaCost": 51,
             "cooldown": 110,
             "damageMultiplier": 3.3,
             "knockbackMultiplier": 2.2,

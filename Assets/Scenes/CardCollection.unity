@@ -37,7 +37,6 @@ RectTransform:
   - {fileID: 297026273}
   - {fileID: 1845409689}
   - {fileID: 744100028}
-  - {fileID: 1322836269}
   m_Father: {fileID: 2116089660}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1408,7 +1407,7 @@ GameObject:
   m_Component:
   - component: {fileID: 602060592}
   m_Layer: 5
-  m_Name: OverlayRoot
+  m_Name: UltimateRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2795,7 +2794,7 @@ RectTransform:
   - {fileID: 602060592}
   - {fileID: 766122751}
   - {fileID: 1807092765}
-  m_Father: {fileID: -910002999}
+  m_Father: {fileID: 2116089660}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4849,6 +4848,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: -910002999}
+  - {fileID: 1322836269}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4868,8 +4868,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b995e429953254b45afb305d2428a564, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Manager.CanvasRoot
+  canvas: {fileID: 2116089659}
   popupRoot: {fileID: 716895231}
-  overlayRoot: {fileID: 602060592}
+  ultimateRoot: {fileID: 602060592}
   toastRoot: {fileID: 766122751}
   dropRoot: {fileID: 1807092765}
 --- !u!1 &2121416731

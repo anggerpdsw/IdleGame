@@ -1,5 +1,6 @@
 using UnityEngine;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -32,7 +33,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (activeCount >= ultimateData.GetCount()) return false;
 
             // Try to instantiate
-            GameObject bombObj = Instantiate(_bombPrefab, position, Quaternion.identity, player.transform);
+            GameObject bombObj = Instantiate(_bombPrefab, position, Quaternion.identity, UIManager.Instance.UltimateRoot);
             if (bombObj == null) return false;
 
             // Initialize bomb instance

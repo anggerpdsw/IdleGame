@@ -39,7 +39,7 @@ namespace IdleDefenseSurvival.Ultimate
 
         private void SpawnOne(Player.Player player, Vector3 spawnPos, UltimateData ultimateData)
         {
-            GameObject fountainObj = Instantiate(_fountainPrefab, spawnPos, Quaternion.identity, player.transform);
+            GameObject fountainObj = Instantiate(_fountainPrefab, spawnPos, Quaternion.identity, UIManager.Instance.UltimateRoot);
             if (fountainObj == null) return;
 
             if (!fountainObj.TryGetComponent(out FountainInstance fountainInstance))

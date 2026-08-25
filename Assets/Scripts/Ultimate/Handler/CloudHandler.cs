@@ -1,5 +1,6 @@
 using UnityEngine;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -23,7 +24,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (activeCount >= ultimateData.GetCount()) return false;
 
             // Try to instantiate
-            GameObject cloudObj = Instantiate(_cloudPrefab, position, Quaternion.identity, player.transform);
+            GameObject cloudObj = Instantiate(_cloudPrefab, position, Quaternion.identity, UIManager.Instance.UltimateRoot);
             if (cloudObj == null) return false;
 
             // Initialize cloud instance

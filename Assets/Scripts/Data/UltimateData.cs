@@ -21,6 +21,7 @@ namespace IdleDefenseSurvival.Data
         public int triggerKillCount;
         /// <summary>Maximum number of active instances / stacks of this ultimate.</summary>
         public int count;
+        public int chain;
         /// <summary>Time between activations (for ultimates that use a cooldown like Shockwave).</summary>
         public float cooldown;
         /// <summary>Lifetime of the ultimate in seconds.</summary>
@@ -43,6 +44,7 @@ namespace IdleDefenseSurvival.Data
         public float GetChance() => chance;
         public int GetTriggerKillCount(int fallback = 20) => triggerKillCount > 0 ? triggerKillCount : fallback;
         public int GetCount(int fallback = 1) => count > 0 ? count : fallback;
+        public int GetChain(int fallback = 0) => chain > 0 ? chain : fallback;
         public float GetCooldown(float fallback = 0f) => cooldown > 0f ? cooldown : fallback;
         public float GetDuration(float fallback = 0f) => duration > 0f ? duration : fallback;
         public float GetDamageMultiplier(float fallback = 1f) => damageMultiplier > 0f ? damageMultiplier : fallback;

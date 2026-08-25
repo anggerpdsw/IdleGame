@@ -86,7 +86,7 @@ namespace IdleDefenseSurvival.Ultimate
         public void Initialize(Player.Player player, UltimateData lightningData)
         {
             _player = player;
-            _maxChains = lightningData.GetCount(6);
+            _maxChains = lightningData.GetChain(7);
             _chainDelay = 0.05f;
             _chainWait = new WaitForSeconds(_chainDelay);
 

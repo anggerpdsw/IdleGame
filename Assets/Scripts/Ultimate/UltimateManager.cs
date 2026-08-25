@@ -183,8 +183,7 @@ namespace IdleDefenseSurvival.Ultimate
         public int GetMaxStack(string ultimateId)
         {
             if (!TryGetUltimate(ultimateId, out var data)) return 1;
-            int activeCount = UltimateFactory.GetActiveCount(ultimateId);
-            return Mathf.Max(0, data.GetCount() - activeCount);
+            return data.GetCount();
         }
         private int GetTotalUsage(string ultimateId)
         {
@@ -193,6 +192,7 @@ namespace IdleDefenseSurvival.Ultimate
             return active + ready;
         }
 
+        private const float MIN_STACK_DISTANCE = 2f;
         /// <summary>
         /// Try to add a stack directly with its spawn position.
         /// Does NOT roll chance.
@@ -202,11 +202,20 @@ namespace IdleDefenseSurvival.Ultimate
         {
             if (!TryGetUltimate(ultimateId, out var data)) return false;
             if (!data.UsesStackSystem) return false;
+
+            if (ultimateId == UltimateDMG.Bomb.ToString() 
+                || ultimateId == UltimateDMG.Cloud.ToString())
+                if (_stackPositions.TryGetValue(ultimateId, out var existingList))
+                    foreach (var pos in existingList)
+                        if (Vector3.Distance(pos, position) < MIN_STACK_DISTANCE)
+                            return false;
+
             int maxStack = GetMaxStack(ultimateId);
             int totalUsage = GetTotalUsage(ultimateId);
             if (totalUsage >= maxStack) return false;
+
             _currentStacks[ultimateId] = GetStack(ultimateId) + 1;
-            _stackPositions[ultimateId].Add(position);  // ← store position spawn
+            _stackPositions[ultimateId].Add(position);
             return true;
         }
 
