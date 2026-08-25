@@ -285,25 +285,39 @@ namespace IdleDefenseSurvival.Ultimate
         }
 
         /// <summary>
-        /// Casts one READY stack of an Ultimate.
-        /// Does not perform a chance roll. The stack must already exist.
-        /// Cooldown and mana requirements are still respected.
-        /// The stack is consumed only after the actual spawn succeeds.
+        /// Casts an Ultimate (stack-based or cooldown-based).
+        /// For stack-based ultimates: requires a READY stack, consumes it on success.
+        /// For cooldown-based ultimates: no stack required, just cooldown + mana.
+        /// Does not perform a chance roll. Stack must already exist (for stack ultimates).
+        /// Cooldown and mana requirements are always respected.
         /// </summary>
         public bool TryCastReady(string ultimateId, Vector3 position, Player.Player player)
         {
             if (player == null) return false;
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
-            if (!ultimateData.UsesStackSystem) return false;
-            if (GetStack(ultimateId) <= 0) return false;
+
             float cooldown = ultimateData.GetCooldown();
             if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
+
             if (!player.CanAfford(ultimateData.manaCost)) return false;
-            // Spawn first, then consume stack on success
-            if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData))
-                return false;
-            if (!ConsumeStack(ultimateId)) return false;
+
+            // Stack-based ultimates (Bomb, Tank, Cloud, Lightning): require READY stack
+            if (ultimateData.UsesStackSystem)
+            {
+                if (GetStack(ultimateId) <= 0) return false;
+                // Spawn first, then consume stack on success
+                if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData))
+                    return false;
+                if (!ConsumeStack(ultimateId)) return false;
+            }
+            // Cooldown-based ultimates (Void, Root, Fountain, Shockwave): no stack needed
+            else
+            {
+                if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData))
+                    return false;
+            }
+
             _lastSpawnTimeMap[ultimateId] = Time.time;
             player.SpendMana(ultimateData.manaCost);
             return true;
