@@ -182,22 +182,30 @@ namespace IdleDefenseSurvival.Ultimate
             => _currentStacks.TryGetValue(ultimateId, out int stack) ? stack : 0;
         public int GetMaxStack(string ultimateId)
         {
-            if (TryGetUltimate(ultimateId, out var data)) return data.GetCount();
-            return 1;
+            if (!TryGetUltimate(ultimateId, out var data)) return 1;
+            int activeCount = UltimateFactory.GetActiveCount(ultimateId);
+            return Mathf.Max(0, data.GetCount() - activeCount);
+        }
+        private int GetTotalUsage(string ultimateId)
+        {
+            int active = UltimateFactory.GetActiveCount(ultimateId);
+            int ready = GetStack(ultimateId);
+            return active + ready;
         }
 
         /// <summary>
         /// Try to add a stack directly with its spawn position.
-        /// Does NOT roll chance. Returns true if stack was added.
+        /// Does NOT roll chance.
+        /// Returns true only if total usage (active + ready) stays within ultimate's count limit.
         /// </summary>
         public bool TryAddStack(string ultimateId, Vector3 position)
         {
             if (!TryGetUltimate(ultimateId, out var data)) return false;
             if (!data.UsesStackSystem) return false;
-            int maxStack = data.GetCount();
-            int currentStack = GetStack(ultimateId);
-            if (currentStack >= maxStack) return false;
-            _currentStacks[ultimateId] = currentStack + 1;
+            int maxStack = GetMaxStack(ultimateId);
+            int totalUsage = GetTotalUsage(ultimateId);
+            if (totalUsage >= maxStack) return false;
+            _currentStacks[ultimateId] = GetStack(ultimateId) + 1;
             _stackPositions[ultimateId].Add(position);  // ← store position spawn
             return true;
         }
@@ -232,9 +240,6 @@ namespace IdleDefenseSurvival.Ultimate
             // For chance-based ultimates only
             float chance = ultimateData.GetChance();
             if (chance <= 0f) return false;
-            // Check stack
-            int maxStack = GetMaxStack(ultimateId);
-            if (GetStack(ultimateId) >= maxStack) return false;
             // Roll chance stack
             if (!Utilityku.Chance(chance)) return false;
             // Store the actual spawn position (enemy position for Bomb/Cloud)
@@ -257,9 +262,6 @@ namespace IdleDefenseSurvival.Ultimate
             if (!ultimateData.UsesStackSystem) return false;
             // Lightning uses triggerKillCount, not chance
             if (ultimateData.GetTriggerKillCount() <= 0) return false;
-            // Check stack
-            int maxStack = GetMaxStack(ultimateId);
-            if (GetStack(ultimateId) >= maxStack) return false;
             // Lightning spawns at player (no enemy position)
             Vector3 spawnPos = player.transform.position;
             if (!TryAddStack(ultimateId, spawnPos)) return false;
@@ -354,7 +356,6 @@ namespace IdleDefenseSurvival.Ultimate
                 if (data.GetCooldown() > 0f && !IsOffCooldown(ultimateId, data.GetCooldown())) break;
                 Vector3 pos = GetNextStackPosition(ultimateId, player);
                 if (!TryCastReady(ultimateId, pos, player)) break;
-                ConsumeThenRemoveStack(ultimateId);
                 anyCast = true;
             }
             return anyCast;
