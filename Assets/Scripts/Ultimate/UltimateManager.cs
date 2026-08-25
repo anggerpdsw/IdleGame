@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using Newtonsoft.Json;
+using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -192,7 +193,6 @@ namespace IdleDefenseSurvival.Ultimate
             _currentStacks[ultimateId] = currentStack - 1;
             return true;
         }
-
         
         /// <summary>
         /// Try to spawn an ultimate by ID.
@@ -202,6 +202,10 @@ namespace IdleDefenseSurvival.Ultimate
         /// </summary>
         public bool TrySpawn(string ultimateId, Vector3 position, Player.Player player)
         {
+            // Check AutoCast setting
+            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
+            if (!autoCast) return false;
+
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
 

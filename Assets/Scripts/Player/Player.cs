@@ -224,10 +224,6 @@ namespace IdleDefenseSurvival.Player
         {
             if (_ultimateManager == null) return;
 
-            // Check AutoCast setting
-            bool autoCast = SettingsController.Instance != null && SettingsController.Instance.AutoCastUltimate;
-            if (!autoCast) return;
-
             // TrySpawn handles cooldown, active checks, chance, and mana cost
             var pos = transform.position;
             _ultimateManager.TrySpawn(UltimateDMG.Void.ToString(), pos, this);
@@ -237,16 +233,6 @@ namespace IdleDefenseSurvival.Player
 
             // Lightning is triggered by kill count in EnemyAi, not cooldown/chance
             // Do not call TrySpawn here - it's handled when enemies die
-        }
-
-        /// <summary>
-        /// Manually cast an ultimate by ID (bypasses chance check, respects cooldown & mana).
-        /// Called from UltimatePanelController when user clicks the ultimate button.
-        /// </summary>
-        public bool ManualCastUltimate(string ultimateId)
-        {
-            if (_ultimateManager == null) return false;
-            return _ultimateManager.TrySpawnManual(ultimateId, transform.position, this);
         }
 
         private void TryRegeneration()
@@ -421,106 +407,136 @@ namespace IdleDefenseSurvival.Player
         private void UpdateShieldVisual()
         {
             if (_shieldRenderer == null) return;
-
             bool hasShield = _currentShield > 0;
             _shieldRenderer.enabled = hasShield;
+            if (!hasShield) return;
 
-            if (hasShield)
+            float shieldPercent = _maxShield > 0 ? _currentShield / _maxShield : 0f;
+
+            // Height (0 - 0.5)
+            float yScale = Mathf.Lerp(0f, 0.5f, shieldPercent);
+            _shieldRenderer.transform.localScale = new Vector3(1f, yScale, 1f);
+
+            Color color = GameColors.red;
+
+            if (shieldPercent > 0.75f)
             {
-                float shieldPercent = _maxShield > 0 ? _currentShield / _maxShield : 0f;
-
-                // Height (0 - 0.5)
-                float yScale = Mathf.Lerp(0f, 0.5f, shieldPercent);
-                _shieldRenderer.transform.localScale = new Vector3(1f, yScale, 1f);
-
-                Color color;
-
-                if (shieldPercent > 0.75f)
-                {
-                    // Yellow -> Green
-                    float t = Mathf.InverseLerp(0.75f, 1f, shieldPercent);
-                    color = Color.Lerp(GameColors.yellow, GameColors.green, t);
-                }
-                else if (shieldPercent > 0.3f)
-                {
-                    // Red -> Yellow
-                    float t = Mathf.InverseLerp(0.3f, 0.75f, shieldPercent);
-                    color = Color.Lerp(GameColors.red, GameColors.yellow, t);
-                }
-                else
-                {
-                    color = GameColors.red;
-                }
-
-                color.a = Mathf.Lerp(0.3f, 0.7f, shieldPercent);
-                _shieldRenderer.color = color;
+                // Yellow -> Green
+                float t = Mathf.InverseLerp(0.75f, 1f, shieldPercent);
+                color = Color.Lerp(GameColors.yellow, GameColors.green, t);
             }
+            else if (shieldPercent > 0.3f)
+            {
+                // Red -> Yellow
+                float t = Mathf.InverseLerp(0.3f, 0.75f, shieldPercent);
+                color = Color.Lerp(GameColors.red, GameColors.yellow, t);
+            }
+
+            color.a = Mathf.Lerp(0.3f, 0.7f, shieldPercent);
+            _shieldRenderer.color = color;
         }
 
         /// <summary>
-        /// Spawn a single tank at a valid position using the new modular system.
-        /// Tank spawning logic is delegated to TankHandler via UltimateManager.
+        /// Manually casts an ultimate by ID.
+        /// Manual casting bypasses chance checks but still respects
+        /// cooldown and mana requirements through UltimateManager.
+        /// Called by UltimatePanelController when the user presses
+        /// an ultimate button.
+        /// </summary>
+        public bool ManualCastUltimate(string ultimateId)
+        {
+            if (_ultimateManager == null || string.IsNullOrEmpty(ultimateId)) return false;
+            // Tank must spawn on the player's attack-range boundary.
+            string tank = UltimateDMG.Tank.ToString();
+            if (ultimateId == tank)
+            {
+                if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return false;
+                return _ultimateManager.TrySpawnManual(ultimateId, spawnPos, this);
+            }
+            // Other ultimates spawn at the player's position.
+            return _ultimateManager.TrySpawnManual(ultimateId, transform.position, this);
+        }
+
+        /// <summary>
+        /// Requests an automatic Tank spawn through UltimateManager.
+        /// UltimateManager is responsible for checking the ultimate's
+        /// active state, auto-cast setting, cooldown, chance, mana,
+        /// and other ultimate requirements.
         /// </summary>
         public void SpawnTank()
         {
             if (_ultimateManager == null) return;
-            if (!_ultimateManager.TryGetUltimate(UltimateDMG.Tank.ToString(), out var tankData)) return;
-
-            // Clean up destroyed tanks from the list
-            _activeTanks.RemoveAll(t => t == null);
-
-            // Calculate tank attack range for position validation
-            float tankAttackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * 0.75f;
-
-            // Find a valid spawn position at the attack range boundary
-            Vector2 spawnPos = FindValidSpawnPosition(tankAttackRange);
-            if (spawnPos == Vector2.zero) return;
-
-            // Delegate to UltimateManager which uses TankHandler to spawn
-            // TankHandler handles: active count, chance, instantiation, initialization
-            _ultimateManager.TrySpawn(UltimateDMG.Tank.ToString(), (Vector3)spawnPos, this);
+            string tank = UltimateDMG.Tank.ToString();
+            if (!_ultimateManager.TryGetUltimate(tank, out _)) return;
+            // Remove destroyed Tank references before checking positions.
+            _activeTanks.RemoveAll(tank => tank == null);
+            // Tank requires a valid position on the player's attack-range boundary.
+            if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return;
+            _ultimateManager.TrySpawn(tank, spawnPos, this);
         }
 
         /// <summary>
-        /// Find a valid spawn position on the attack range boundary.
-        /// Position must maintain minimum distance from other tanks (sum of attack ranges).
+        /// Attempts to find a valid spawn position for a Tank.
+        /// The player's AttackRange determines the distance of the Tank
+        /// from the player. The Tank's own AttackRange is only used to
+        /// determine the minimum spacing from existing Tanks.
         /// </summary>
-        private Vector2 FindValidSpawnPosition(float tankAttackRange)
+        private bool TryGetTankSpawnPosition(out Vector3 spawnPos)
         {
-            const int maxAttempts = 10;
+            spawnPos = default;
+            if (PlayerStatsManager.Instance == null) return false;
+            float playerAR = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
+            if (playerAR <= 0f) return false;
+            // Tank AttackRange is used only for spacing between Tanks.
+            float tankAR = playerAR * 0.75f;
+            if (!TryFindValidSpawnPosition(playerAR, tankAR, out Vector2 position))
+                return false;
+            spawnPos = position;
+            return true;
+        }
 
-            for (int attempt = 0; attempt < maxAttempts; attempt++)
+        /// <summary>
+        /// Attempts to find a valid Tank spawn position.
+        /// playerAR:
+        ///     Determines where the Tank is spawned around the player.
+        /// tankAR:
+        ///     Determines the minimum spacing between the new Tank
+        ///     and existing Tanks.
+        /// </summary>
+        private bool TryFindValidSpawnPosition(float playerAR, float tankAR, out Vector2 spawnPos)
+        {
+            const int MaxAttempts = 20;
+            spawnPos = default;
+            for (int attempt = 0; attempt < MaxAttempts; attempt++)
             {
-                // Random direction from player
+                // Generate a random direction around the player.
                 Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
-
-                // Random position on the attack range boundary
-                Vector2 candidatePos = (Vector2)transform.position + randomDir * PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
-
-                // Check if position maintains minimum distance from all other active tanks
-                bool isValid = true;
-                foreach (TankInstance existingTank in _activeTanks)
-                {
-                    if (existingTank == null) continue;
-
-                    float distanceToExistingTank = Vector2.Distance(candidatePos, (Vector2)existingTank.transform.position);
-
-                    // Minimum distance = sum of both tank attack ranges
-                    // This ensures attack range circles don't overlap
-                    float minDistance = tankAttackRange + existingTank.TankAttackRange;
-
-                    if (distanceToExistingTank < minDistance)
-                    {
-                        isValid = false;
-                        break;
-                    }
-                }
-
-                if (isValid) return candidatePos;
+                // Spawn exactly on the player's AttackRange boundary.
+                Vector2 candidatePosition = (Vector2)transform.position + randomDir * playerAR;
+                if (!IsValidTankSpawnPosition(candidatePosition, tankAR)) continue;
+                spawnPos = candidatePosition;
+                return true;
             }
+            return false;
+        }
 
-            // No valid position found after max attempts
-            return Vector2.zero;
+        /// <summary>
+        /// Determines whether the specified position maintains sufficient
+        /// spacing from all active Tanks.
+        /// The minimum distance is the sum of the new Tank's AttackRange
+        /// and the existing Tank's AttackRange.
+        /// </summary>
+        private bool IsValidTankSpawnPosition(Vector2 candidatePosition, float tankAR)
+        {
+            foreach (TankInstance existingTank in _activeTanks)
+            {
+                if (existingTank == null) continue;
+                float distanceToExistingTank = Vector2.Distance(candidatePosition, (Vector2)existingTank.transform.position);
+                float minimumDistance = tankAR + existingTank.TankAttackRange;
+                // Attack ranges must not overlap.
+                if (distanceToExistingTank < minimumDistance) return false;
+            }
+            return true;
         }
 
         /// <summary>
