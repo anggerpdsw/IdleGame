@@ -215,7 +215,7 @@ namespace IdleDefenseSurvival.Ultimate
         /// For chance-based ultimates (Bomb, Tank, Cloud).
         /// After adding stack, attempts auto-cast if enabled.
         /// </summary>
-        public bool TryGenerateStack(string ultimateId, Player.Player player)
+        public bool TryGenerateStack(string ultimateId, Player.Player player, Vector3? overridePosition = null)
         {
             if (player == null) return false;
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
@@ -231,7 +231,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (!Utilityku.Chance(chance)) return false;
             if (!TryAddStack(ultimateId)) return false;
             // Auto cast check here
-            HandleAutoCast(ultimateId, player);
+            HandleAutoCast(ultimateId, player, overridePosition);
             return true;
         }
 
@@ -260,13 +260,13 @@ namespace IdleDefenseSurvival.Ultimate
         /// Automatically casts a newly generated Ultimate stack
         /// when Auto Cast is enabled.
         /// </summary>
-        private void HandleAutoCast(string ultimateId, Player.Player player)
+        private void HandleAutoCast(string ultimateId, Player.Player player, Vector3? overridePosition = null)
         {
             if (!IsAutoCastEnabled()) return;
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return;
             // Keep the stack READY until the player has enough mana.
             if (!player.CanAfford(ultimateData.manaCost)) return;
-            Vector3 position = GetSpawnPosition(ultimateId, player);
+            Vector3 position = overridePosition ?? GetSpawnPosition(ultimateId, player);
             TryCastReady(ultimateId, position, player);
         }
 

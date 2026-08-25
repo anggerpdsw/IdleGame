@@ -22,10 +22,6 @@ namespace IdleDefenseSurvival.Ultimate
             int activeCount = UltimateFactory.GetActiveCount(UltimateId);
             if (activeCount >= ultimateData.GetCount()) return false;
 
-            // Only check chance when under limit to prevent burst stacking
-            if (activeCount < ultimateData.GetCount() && !Utilityku.Chance(ultimateData.GetChance()))
-                return false;
-
             // Try to instantiate
             GameObject cloudObj = Instantiate(_cloudPrefab, position, Quaternion.identity, player.transform);
             if (cloudObj == null) return false;
@@ -38,6 +34,10 @@ namespace IdleDefenseSurvival.Ultimate
             }
 
             cloudInstance.Initialize(player, ultimateData);
+
+            // Flip sprite if needed
+            if (cloudObj.TryGetComponent(out SpriteRenderer sr))
+                sr.flipX = position.x < player.transform.position.x;
 
             // Track active count
             UltimateFactory.IncrementActiveCount(UltimateId);

@@ -31,9 +31,6 @@ namespace IdleDefenseSurvival.Ultimate
             int activeCount = UltimateFactory.GetActiveCount(UltimateId);
             if (activeCount >= ultimateData.GetCount()) return false;
 
-            // Check chance
-            if (!Utilityku.Chance(ultimateData.GetChance())) return false;
-
             // Try to instantiate
             GameObject bombObj = Instantiate(_bombPrefab, position, Quaternion.identity, player.transform);
             if (bombObj == null) return false;

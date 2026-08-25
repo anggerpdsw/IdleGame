@@ -428,7 +428,7 @@ namespace IdleDefenseSurvival.Player
                         }
 
                         _player.SpawnTank();
-                        UltimateManager.Instance.TrySpawn(UltimateDMG.Bomb.ToString(), transform.position, _player);
+                        UltimateManager.Instance.TryGenerateStack(UltimateDMG.Bomb.ToString(), _player, enemy.transform.position);
                     }
                 }
             }

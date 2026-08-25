@@ -626,7 +626,7 @@ namespace IdleDefenseSurvival.Enemy
             // Try to spawn toxic death cloud at death position (if killed by player or cloud)
             if (_lastDamageSource == player || _lastDamageSource == cloud)
             {
-                _ultimateManager.TrySpawn(cloud, transform.position, _playerComponent);
+                _ultimateManager.TryGenerateStack(cloud, _playerComponent, transform.position);
             }
 
             // Unregister dari manager
