@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Data;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Controller;
 using System.Linq;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -118,18 +119,11 @@ namespace IdleDefenseSurvival.Ultimate
 
         private void LoadUltimateDatabase()
         {
-            TextAsset ultimateJson = Resources.Load<TextAsset>("Data/Player/dataUltimate");
-            if (ultimateJson == null)
-            {
-                Debug.LogError("[UltimateManager] Ultimate data file not found at Resources/Data/dataUltimate.json!");
-                return;
-            }
-
-            var wrapper = JsonConvert.DeserializeObject<UltimateWrapper>(ultimateJson.text);
-            if (wrapper?.ultimate != null)
+            UltimateDatabase _database = DatabaseJSONCache.DatabaseUltimate;
+            if (_database?.ultimate != null)
             {
                 _ultimateDatabase = new Dictionary<string, UltimateData>();
-                foreach (var data in wrapper.ultimate)
+                foreach (var data in _database.ultimate)
                 {
                     _ultimateDatabase[data.id] = data;
                     _lastSpawnTimeMap[data.id] = Time.time;

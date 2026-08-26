@@ -133,9 +133,32 @@ namespace IdleDefenseSurvival.Core
             }
             _databaseEnemy = database;
         }
+
+        private const string DATA_ULTIMATE = "Data/Player/dataUltimate";
+        private static UltimateDatabase _databaseUltimate;
+        public static UltimateDatabase DatabaseUltimate
+        { get { if (_databaseUltimate == null) LoadUltimate(); return _databaseUltimate; }}
+        private static void LoadUltimate()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_ULTIMATE);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_ULTIMATE}.json");
+                return;
+            }
+            var database = JsonConvert.DeserializeObject<UltimateDatabase>(jsonFile.text);
+            if (database == null || database.ultimate == null || database.ultimate.Count == 0)
+            {
+                Debug.LogError($"Ultimate database in {DATA_ULTIMATE} is empty or invalid.");
+                return;
+            }
+            _databaseUltimate = database;
+        }
+        
         public static void ClearAll()
         {
             _databaseEnemy = null;
+            _databaseUltimate = null;
         }
     }
     

@@ -51,6 +51,7 @@ namespace IdleDefenseSurvival.Ultimate
             rb.gravityScale = 0f;
 
             _enemyLayerMask = LayerMask.GetMask("Enemy");
+            transform.localScale = new Vector3(3f, 3f, 1f);
         }
 
         /// <summary>

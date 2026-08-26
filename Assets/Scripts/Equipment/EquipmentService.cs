@@ -240,6 +240,10 @@ namespace IdleDefenseSurvival.Equipment
             _events.Equipped(slot, item, setId, newCount);
             InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
 
+            // Immediate attribute refresh for main-attribute bonuses (STR/CON/INT/DEX)
+            // Ensures newly crafted/equipped gear applies without relog.
+            AttributeModifierManager.Instance?.Apply();
+
             return true;
         }
 

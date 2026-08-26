@@ -94,6 +94,37 @@ namespace IdleDefenseSurvival.Manager
                 ? EquipmentStatCalculator.GetTotalAttributeBonuses(ItemDatabase.Instance,
                     equipment.EquippedItems, equipment.EquippedSetCounts)
                 : null;
+                
+            // ---- NEW: add per-instance attribute data from equipped items ----
+            if (equipment != null)
+            {
+                foreach (var kv in equipment.EquippedItems)
+                {
+                    var attrData = kv.Value?.AttributeData;
+                    if (attrData?.MainAttribute == null) continue;
+                    foreach (var main in attrData.MainAttribute)
+                    {
+                        switch (main.Attribute)
+                        {
+                            case MainAttribute.Constitution: _constitution += main.BaseValue; break;
+                            case MainAttribute.Strength:     _strength     += main.BaseValue; break;
+                            case MainAttribute.Intelligence: _intelligence += main.BaseValue; break;
+                            case MainAttribute.Dexterity:    _dexterity    += main.BaseValue; break;
+                        }
+                    }
+                    // Also handle secondary attributes if present
+                    if (attrData.SecondAttribute != null)
+                    {
+                        foreach (var secAttr in attrData.SecondAttribute)
+                        {
+                            // Map SecondaryStat to MainAttribute pool or handle separately
+                            // depending on your design - SecondaryStat typically maps to SkillType directly
+                            // For now, assuming they contribute to the same attribute pools or are handled elsewhere
+                        }
+                    }
+                }
+            }
+            // -----------------------------------------------------------------
 
             _constitution = Allocated(account?.constitution ?? 0) +
                 (equipBonuses?.GetValueOrDefault(MainAttribute.Constitution, 0) ?? 0);

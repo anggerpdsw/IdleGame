@@ -62,7 +62,7 @@ namespace IdleDefenseSurvival.Data
     }
 
     [Serializable]
-    public class UltimateWrapper
+    public class UltimateDatabase
     {
         public List<UltimateData> ultimate;
     }
