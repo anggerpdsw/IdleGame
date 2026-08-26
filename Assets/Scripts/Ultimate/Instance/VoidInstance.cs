@@ -60,6 +60,7 @@ namespace IdleDefenseSurvival.Ultimate
         private void Awake()
         {
             _enemyLayerMask = LayerMask.GetMask("Enemy");
+            transform.localScale = new Vector3(3f, 3f, 1f);
         }
 
         public void Initialize(Player.Player player, UltimateData voidData)

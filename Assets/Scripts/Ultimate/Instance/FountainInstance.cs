@@ -2,7 +2,6 @@ using UnityEngine;
 using IdleDefenseSurvival.Enemy;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Ultimate
@@ -43,6 +42,7 @@ namespace IdleDefenseSurvival.Ultimate
         {
             _enemyLayerMask = LayerMask.GetMask("Enemy");
             _nextDamageTime = Time.time + _damageTickInterval;
+            transform.localScale = new Vector3(3f, 3f, 1f);
         }
 
         public void Initialize(Player.Player player, UltimateData fountainData)

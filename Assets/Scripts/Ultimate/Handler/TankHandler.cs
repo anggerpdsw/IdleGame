@@ -45,10 +45,6 @@ namespace IdleDefenseSurvival.Ultimate
 
             tankInstance.Initialize(player, destination, ultimateData.GetDuration());
 
-            // Flip sprite if needed
-            if (tankObj.TryGetComponent(out SpriteRenderer sr))
-                sr.flipX = destination.x < player.transform.position.x;
-
             // Track active count
             UltimateFactory.IncrementActiveCount(UltimateId);
             return true;

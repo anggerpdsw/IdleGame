@@ -29,6 +29,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         [Header("Points remaining")]
         [SerializeField] private TextMeshProUGUI _unspentStatPoints;
+        [SerializeField] private GameObject _profileBadge;
 
         [System.Serializable]
         private class AttributeRow
@@ -94,7 +95,9 @@ namespace IdleDefenseSurvival.UI.Upgrade
             var account = AccountManager.Instance;
             if (account == null) return;
 
-            if (_unspentStatPoints != null) _unspentStatPoints.text = $"Points: {account.UnspentStatPoints}";
+            int point = account.UnspentStatPoints;
+            if (_unspentStatPoints != null) _unspentStatPoints.text = $"Points: {point}";
+            if (_profileBadge != null) _profileBadge.SetActive(point > 0);
 
             if (_rows == null) return;
             for (int i = 0; i < _rows.Length && i < _order.Length; i++)

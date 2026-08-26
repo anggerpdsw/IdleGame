@@ -183,14 +183,16 @@ namespace IdleDefenseSurvival.Ultimate
 
         private void DrawAttackRange()
         {
-            if (_attackRangeRenderer == null) return;
             // Attack range visualization is handled by SpriteRenderer's sprite size
-            
+            if (_attackRangeRenderer == null) return;
             if (_tankAttackRange <= 0f) return;
-
             float diameter = _tankAttackRange * 2f;
-
-            _attackRangeRenderer.transform.localScale = new Vector3(diameter, diameter, 1f);
+            Sprite sprite = _attackRangeRenderer.sprite;
+            if (sprite != null)
+            {
+                float range = diameter * 3;
+                _attackRangeRenderer.transform.localScale = new Vector3(range, range, 1f);
+            }
             _attackRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
         }
         
