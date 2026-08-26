@@ -100,6 +100,15 @@ namespace IdleDefenseSurvival.Inventory
         }
                 
         /// <summary>
+        /// Gets the equipment type.
+        /// </summary>
+        public static EquipmentType GetEquipmentType(this InventoryItem item)
+        {
+            var itemData = item.GetEquipmentData();
+            return itemData?.EquipmentType ?? EquipmentType.None;
+        }
+
+        /// <summary>
         /// Checks if the item is an equipment instance.
         ///
         /// Equipment identity is determined from the runtime instance state,
@@ -113,15 +122,6 @@ namespace IdleDefenseSurvival.Inventory
             if (item.EquipmentType != EquipmentType.None) return true;
             if (!string.IsNullOrEmpty(item.EquipmentTemplateId)) return true;
             return item.AttributeData != null;
-        }
-
-        /// <summary>
-        /// Gets the equipment type.
-        /// </summary>
-        public static EquipmentType GetEquipmentType(this InventoryItem item)
-        {
-            var itemData = item.GetEquipmentData();
-            return itemData?.EquipmentType ?? EquipmentType.None;
         }
 
         /// <summary>

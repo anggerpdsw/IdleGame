@@ -94,7 +94,7 @@ namespace IdleDefenseSurvival.Manager
                 ? EquipmentStatCalculator.GetTotalAttributeBonuses(ItemDatabase.Instance,
                     equipment.EquippedItems, equipment.EquippedSetCounts)
                 : null;
-                
+
             _constitution = Allocated(account?.constitution ?? 0) +
                 (equipBonuses?.GetValueOrDefault(MainAttribute.Constitution, 0) ?? 0);
             _strength = Allocated(account?.strength ?? 0) +
@@ -111,6 +111,7 @@ namespace IdleDefenseSurvival.Manager
             Collect(MainAttribute.Dexterity, _dexterity, modifiers);
 
             ModifierManager.Instance.SetSource(ModifierSource.AccountLevel, modifiers);
+            PlayerStatsManager.Instance?.RefreshStats();
             // existing bridge; or add an OnAttributeChanged.Invoke() alias
             AccountManager.Instance?.NotifyDataLoaded();
         }
