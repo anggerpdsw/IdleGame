@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Economy;
 
 namespace IdleDefenseSurvival.Inventory

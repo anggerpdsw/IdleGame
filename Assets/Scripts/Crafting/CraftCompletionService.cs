@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Core.Interfaces;
-using IdleDefenseSurvival.Items.Random;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Crafting

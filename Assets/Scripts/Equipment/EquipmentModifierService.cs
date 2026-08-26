@@ -2,7 +2,6 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Equipment
@@ -42,7 +41,7 @@ namespace IdleDefenseSurvival.Equipment
             }
 
             NotifyManagers();
-            Inventory.InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
+            InventoryService.Instance?.MarkItemDirty(item.InstanceId, DirtyType.Item);
         }
 
         /// <summary>Applies one set-bonus tier's stat bonuses.</summary>
