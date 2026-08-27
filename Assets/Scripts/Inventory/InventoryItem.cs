@@ -328,12 +328,6 @@ namespace IdleDefenseSurvival.Inventory
             !IsLocked &&
             (AllowedCategory == ItemCategory.None || item?.GetItemCategory() == AllowedCategory) &&
             (IsEmpty || (Item.ItemId == item.ItemId && Item.IsStackable && !Item.IsMaxStack));
-
-        public InventoryItem GetItemCategory()
-        {
-            // Will be resolved via ItemDatabase
-            return Item;
-        }
     }
 
     /// <summary>

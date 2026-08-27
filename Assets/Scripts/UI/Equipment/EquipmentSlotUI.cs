@@ -180,6 +180,7 @@ namespace IdleDefenseSurvival.UI.Equipment
         private void ShowEquipmentInfo(Vector3 screenPosition)
         {
             if (_currentItem == null) return;
+            Debug.Log($"[EquipmentSlotUI] _currentItem {_currentItem}");
             var tooltip = TooltipUI.Instance;
             if (tooltip == null) return;
             tooltip.ShowEquipment(_currentItem, screenPosition != Vector3.zero ? screenPosition : _lastPointerPosition);

@@ -242,7 +242,10 @@ namespace IdleDefenseSurvival.Equipment
 
             // Immediate attribute refresh for main-attribute bonuses (STR/CON/INT/DEX)
             // Ensures newly crafted/equipped gear applies without relog.
-            AttributeModifierManager.Instance?.Apply();
+            var attr = AttributeModifierManager.Instance;
+            if(attr == null ) return false;
+            Debug.Log($"[EquipmentService] EquipInternal true");
+            attr.Apply();
 
             return true;
         }

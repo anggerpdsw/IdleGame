@@ -142,7 +142,6 @@ namespace IdleDefenseSurvival.Crafting
                     }
                     else
                     {
-                        Debug.Log($"[CraftCompletionService] ApplyReward item moved to inventory");
                         appliedItems.Add(item);
                     }
                 }

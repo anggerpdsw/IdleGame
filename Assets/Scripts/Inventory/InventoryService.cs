@@ -194,6 +194,7 @@ namespace IdleDefenseSurvival.Inventory
             // Try stacking first (stackables of the same item; equipment never stacks)
             if (item.CanStackWith(item))
             {
+                Debug.Log($"[InventoryService] CanStackWith item");
                 foreach (var slot in _slots)
                 {
                     if (!slot.IsEmpty && slot.Item.CanStackWith(item) && !slot.Item.IsMaxStack)
@@ -213,6 +214,7 @@ namespace IdleDefenseSurvival.Inventory
             // Place remainder in empty slot
             if (item.Quantity > 0)
             {
+                Debug.Log($"[InventoryService] item FindEmptySlot");
                 int emptySlot = FindEmptySlot();
                 if (emptySlot < 0 && !ExpandCapacity(1))
                 {
@@ -1031,6 +1033,10 @@ namespace IdleDefenseSurvival.Inventory
             MarkSaveDirty();
             OnItemAdded?.Invoke(item);
             OnInventoryChanged?.Invoke(InventoryChangedEventArgs.CreateAdded(item.InstanceId, item.ItemId, slotIndex, item.Quantity, item));
+            if (item.IsEquippable())
+            {
+                // tambahkan data equipment baru hasil crafting ke database item runtime?
+            }
         }
 
         private void NotifyRemoved(InventoryItem item, int slotIndex)
@@ -1169,9 +1175,9 @@ namespace IdleDefenseSurvival.Inventory
 
             // Attempt to add the item
             bool added = AddItemInstance(item);
-            if (!added)
-                return ApplyResult.Failure;
+            if (!added) return ApplyResult.Failure;
 
+            Debug.Log($"[InventoryService] ApplyReward item moved to inventory");
             return ApplyResult.Success;
         }
 

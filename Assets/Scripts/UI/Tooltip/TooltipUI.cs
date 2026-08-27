@@ -268,10 +268,10 @@ namespace IdleDefenseSurvival.UI.Tooltip
         private void SetEquipmentInfo(InventoryItem item, EquipmentData itemData)
         {
             if (_equipTypeText != null)
-                _equipTypeText.text = itemData.EquipmentType.GetDisplayName();
+                _equipTypeText.text = item.EquipmentType.GetDisplayName();
 
             if (_levelText != null)
-                _levelText.text = $"Level {item.Level}/{itemData.MaxLevel}";
+                _levelText.text = $"Level {item.Level}/{item.MaxLevel}";
 
             if (_durabilityBar != null)
             {
@@ -328,6 +328,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
             foreach (Transform child in _specialEffectsContainer)
                 Destroy(child.gameObject);
 
+            _specialEffectsContainer.gameObject.SetActive(false);
             if (itemData.SpecialEffects != null)
             {
                 foreach (var effect in itemData.SpecialEffects)
@@ -339,6 +340,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
                         entryUI?.Initialize(effect);
                     }
                 }
+                _specialEffectsContainer.gameObject.SetActive(true);
             }
         }
 
@@ -357,6 +359,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
 
             int pieceCount = EquipmentService.Instance?.GetSetPieceCount(setId) + 1 ?? 1;
 
+            _setBonusContainer.gameObject.SetActive(pieceCount > 1);
             foreach (var tier in setData.Tiers.Where(t => t.IsActive(pieceCount)))
             {
                 var entryObj = Instantiate(_setBonusEntryPrefab, _setBonusContainer);
@@ -372,7 +375,9 @@ namespace IdleDefenseSurvival.UI.Tooltip
             foreach (Transform child in _gemSocketsContainer)
                 Destroy(child.gameObject);
 
-            if (item.Sockets == null) return;
+            bool show = item.Sockets == null;
+            _gemSocketsContainer.gameObject.SetActive(!show);
+            if (show) return;
 
             foreach (var socket in item.Sockets)
             {

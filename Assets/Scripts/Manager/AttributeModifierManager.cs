@@ -48,14 +48,28 @@ namespace IdleDefenseSurvival.Manager
         private void OnEnable()
         {
             SaveManager.OnSaveLoaded += Apply;
-            // AccountManager is created before this manager in BootstrapController; if it is
-            // somehow null we subscribe anyway to attribute changes once it exists.
             if (AccountManager.Instance != null)
                 AccountManager.Instance.OnAttributeChanged += Apply;
-            // EquipmentService is created after this manager in BootstrapController; subscribe
-            // when available so re-apply happens on equip/swap/unequip and set-bonus changes.
+
+            // Subscribe to equipment changes with fallback for init order.
+            // If EquipmentService not ready yet, defer subscription via coroutine.
+            SubscribeToEquipmentService();
+        }
+
+        private async void SubscribeToEquipmentService()
+        {
+            // Wait until EquipmentService is initialized (max 5 frames)
+            for (int i = 0; i < 5 && EquipmentService.Instance == null; i++)
+                await Awaitable.NextFrameAsync();
+
             if (EquipmentService.Instance != null)
+            {
                 EquipmentService.Instance.OnEquipmentChanged += OnEquipmentChanged;
+            }
+            else
+            {
+                Debug.LogWarning("[AttributeModifierManager] EquipmentService not found after 5 frames; equipment changes won't auto-refresh attributes.");
+            }
         }
 
         private void OnDisable()
