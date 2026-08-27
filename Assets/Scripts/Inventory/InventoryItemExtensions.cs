@@ -58,13 +58,23 @@ namespace IdleDefenseSurvival.Inventory
         }
 
         /// <summary>
-        /// Gets the equipment data using EquipmentTemplateId when available, falling back to ItemId.
+        /// Gets the equipment data. Prefers ItemId for crafted/generated equipment (concrete definition),
+        /// falls back to EquipmentTemplateId for legacy template-based items.
         /// </summary>
         public static EquipmentData GetEquipmentData(this InventoryItem item)
         {
             if (item == null) return null;
-            var id = !string.IsNullOrEmpty(item.EquipmentTemplateId) ? item.EquipmentTemplateId : item.ItemId;
-            return ItemDatabase.Instance?.GetItem(id) as EquipmentData;
+
+            // Crafted/generated equipment: ItemId IS the definition ID (e.g., "high_alloy_armor").
+            // Try ItemId first to get the full crafted item data with stats, effects, set bonuses.
+            if (ItemDatabase.Instance?.GetItem(item.ItemId) is EquipmentData data) 
+                return data;
+
+            // Fallback: EquipmentTemplateId (legacy template lookup, e.g., "equip_base").
+            if (!string.IsNullOrEmpty(item.EquipmentTemplateId))
+                return ItemDatabase.Instance?.GetItem(item.EquipmentTemplateId) as EquipmentData;
+
+            return null;
         }
 
         /// <summary>

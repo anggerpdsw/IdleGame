@@ -1033,10 +1033,6 @@ namespace IdleDefenseSurvival.Inventory
             MarkSaveDirty();
             OnItemAdded?.Invoke(item);
             OnInventoryChanged?.Invoke(InventoryChangedEventArgs.CreateAdded(item.InstanceId, item.ItemId, slotIndex, item.Quantity, item));
-            if (item.IsEquippable())
-            {
-                // tambahkan data equipment baru hasil crafting ke database item runtime?
-            }
         }
 
         private void NotifyRemoved(InventoryItem item, int slotIndex)
