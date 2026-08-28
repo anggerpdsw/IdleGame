@@ -62,6 +62,8 @@ namespace IdleDefenseSurvival.Stats
             SkillType.BossDamage => "BDMG",
             SkillType.BounceChance => "BCH",
             SkillType.BounceCount => "BCT",
+            SkillType.CriticalChance => "CCH",
+            SkillType.CriticalDamage => "CDG",
             SkillType.CooldownReduction => "CDR",
             SkillType.DamagePerRange => "DPR",
             SkillType.DeathDefy => "DDF",
