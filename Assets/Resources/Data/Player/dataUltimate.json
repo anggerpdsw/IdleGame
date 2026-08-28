@@ -65,10 +65,10 @@
             "id": "Lightning",
             "active": true,
             "manaCost": 57,
-            "triggerKillCount": 5,
+            "triggerKillCount": 7,
             "count": 3,
-            "chain": 7,
-            "damageMultiplier": 2.3,
+            "chain": 6,
+            "damageMultiplier": 2.01,
             "stuntMultiplier": 2.1,
             "defenseBreak": 0.22,
             "element": "Lightning"

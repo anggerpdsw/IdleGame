@@ -55,9 +55,7 @@ namespace IdleDefenseSurvival.Core
             // Sprite sheet:
             // Potion/hp
             // Potion/Potion/hp
-            // Equipment/Hat/hat_leather
-            // Equipment/Armor/Heavy/armor_iron
-            //
+            // Equipment/Hat/leather_hat
             // Last part = sprite name
             // Everything before it = sheet path
             string spriteName = parts[^1];

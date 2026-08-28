@@ -324,7 +324,7 @@ public class InventorySaveData
 
     public static InventorySaveData CreateEmpty() => new()
     {
-        Capacity = 48, // BaseCapacity from config
+        Capacity = 80, // BaseCapacity from config
         LastModifiedTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
         Items = Array.Empty<InventoryItemData>(),
         SocketedGems = Array.Empty<GemInstanceData>()

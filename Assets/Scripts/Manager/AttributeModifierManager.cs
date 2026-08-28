@@ -50,26 +50,6 @@ namespace IdleDefenseSurvival.Manager
             SaveManager.OnSaveLoaded += Apply;
             if (AccountManager.Instance != null)
                 AccountManager.Instance.OnAttributeChanged += Apply;
-
-            // Subscribe to equipment changes with fallback for init order.
-            // If EquipmentService not ready yet, defer subscription via coroutine.
-            SubscribeToEquipmentService();
-        }
-
-        private async void SubscribeToEquipmentService()
-        {
-            // Wait until EquipmentService is initialized (max 5 frames)
-            for (int i = 0; i < 5 && EquipmentService.Instance == null; i++)
-                await Awaitable.NextFrameAsync();
-
-            if (EquipmentService.Instance != null)
-            {
-                EquipmentService.Instance.OnEquipmentChanged += OnEquipmentChanged;
-            }
-            else
-            {
-                Debug.LogWarning("[AttributeModifierManager] EquipmentService not found after 5 frames; equipment changes won't auto-refresh attributes.");
-            }
         }
 
         private void OnDisable()

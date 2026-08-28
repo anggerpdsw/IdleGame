@@ -337,11 +337,11 @@ namespace IdleDefenseSurvival.Inventory
     public class InventoryConfig
     {
         public int Width = 8;
-        public int Height = 6;
-        public int BaseCapacity = 48; // Width * Height
+        public int Height = 10;
+        public int BaseCapacity = 80; // Width * Height
         public int MaxCapacity = 2000;
         public int ExpansionCostBase = 10; // Gem cost for first expansion
-        public float ExpansionCostMultiplier = 1.5f;
+        public float ExpansionCostMultiplier = 0.5f;
         public int SlotsPerExpansion = 8;
 
         public int GetExpansionCost(int currentExpansions)

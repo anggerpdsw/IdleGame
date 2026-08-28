@@ -810,7 +810,7 @@ namespace IdleDefenseSurvival.Inventory
             }
             if (capacity == 0)
             {
-                capacity = 48; // Default BaseCapacity
+                capacity = 80; // Default BaseCapacity
             }
 
             // Sync Height so Capacity (Width * Height) matches restored slot count

@@ -61,7 +61,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             if (_isInitialized) return;
 
             // Create slot UIs
-            int capacity = InventoryService.Instance?.Config.BaseCapacity ?? 48;
+            int capacity = InventoryService.Instance?.Config.BaseCapacity ?? 80;
             _slotUIs = new InventorySlotUI[capacity];
 
             for (int i = 0; i < capacity; i++)

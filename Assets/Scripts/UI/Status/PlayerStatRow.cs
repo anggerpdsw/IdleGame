@@ -17,6 +17,7 @@ namespace IdleDefenseSurvival.UI
         /// </summary>
         public void SetValue(string statName, float value)
         {
+            if (value < 0.5f) this.gameObject.SetActive(false);
             if (_statNameText != null) _statNameText.text = statName;
             if (_statValueText != null) _statValueText.text = FormatValue(value);
         }

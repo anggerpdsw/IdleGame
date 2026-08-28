@@ -212,4 +212,63 @@ namespace IdleDefenseSurvival.Stats
         Special = 7,
         Other = 8,
     }
+
+    /// <summary>
+    /// Secondary stats - specialization layer from equipment (the ~20% build identity).
+    /// Core power comes from MainAttribute (CON/STR/INT/DEX) via derived SkillTypes,
+    /// and SkillType feeds combat. SecondaryStat is pure specialization (build identity).
+    /// No stat here is derivable from attributes — that avoids double-dipping.
+    /// </summary>
+    public enum SecondaryStat
+    {
+        None = 0,
+
+        // Projectile
+        AttackRange = 1,
+        BounceChance = 2,
+        BounceCount = 3,
+        DefenseBreak = 29,
+
+        // Multi Shot
+        MultiShootChance = 4,
+        MultiShootCount = 5,
+
+        // Crowd Control
+        KnockbackChance = 6,
+        StuntChance = 7,
+        StuntDuration = 8,
+
+        // Sustain
+        Evasion = 9,
+        LifeSteal = 10,
+
+        // Utility
+        DamagePerRange = 11,
+        CooldownReduction = 12,
+        MoveSpeed = 13,
+        UltimateAttack = 14,
+
+        // PvE
+        BossDamage = 15,
+        EliteDamage = 16,
+
+        // Economy
+        GoldGain = 17,
+        DropRate = 18,
+        InterestWave = 19,
+
+        // Accuracy — counters enemy Evasion. Specialization-only (equipment/passive/buff/card).
+        HitRate = 20,
+        Penetration = 28,
+
+        // Element damage bonus (Layer 3) — per-element percent from equipment (Roll → ModifierSource.Equipment → SkillType).
+        MetalDamageBonus = 21,
+        WoodDamageBonus = 22,
+        FireDamageBonus = 23,
+        WaterDamageBonus = 24,
+        EarthDamageBonus = 25,
+        LightningDamageBonus = 26,
+        WindDamageBonus = 27,
+    }
+
 }

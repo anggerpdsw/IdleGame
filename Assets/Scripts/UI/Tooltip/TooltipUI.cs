@@ -9,6 +9,7 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Items;
 using System.Linq;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.UI.Tooltip
 {
@@ -236,7 +237,12 @@ namespace IdleDefenseSurvival.UI.Tooltip
         {
             if (_iconImage != null && itemData.Icon != null)
             {
-                _iconImage.sprite = itemData.Icon;
+                string eq = "";
+                if(item.IsEquippable()) eq = "/" + item.EquipmentType.GetDisplayName();
+
+                _iconImage.sprite = ItemResources.GetItemSource(
+                    $"{item.GetItemCategory()}{eq}/{item.ItemId}");
+
                 _iconImage.enabled = true;
             }
 
@@ -271,7 +277,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
                 _equipTypeText.text = item.EquipmentType.GetDisplayName();
 
             if (_levelText != null)
-                _levelText.text = $"Level {item.Level}/{item.MaxLevel}";
+                _levelText.text = $"Lv. {item.Level}/{item.MaxLevel}";
 
             if (_durabilityBar != null)
             {
@@ -306,7 +312,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
                 if (entryObj.TryGetComponent<TooltipStatEntryUI>(out var entryUI))
                 {
                     float compareValue = comparisonAttr?.GetValueOrDefault(kvp.Key, 0) ?? 0;
-                    entryUI.Initialize(kvp.Key.GetDisplayName(), kvp.Value, compareValue);
+                    entryUI.Initialize(kvp.Key.GetShortName(), kvp.Value, compareValue);
                 }
             }
 
