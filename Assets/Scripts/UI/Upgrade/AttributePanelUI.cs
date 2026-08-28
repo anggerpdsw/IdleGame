@@ -160,7 +160,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
         private string ValueStat(AttributeBonusData type)
         {
             return Mathf.Abs(type.Percent) > 0.000001f
-                    ? $"{type.Percent:P3}"
+                    ? $"{type.Percent:F3}%"
                     : $"+{type.Flat:0.####}";
         }
         public void HideAttributeInfo() => TooltipUI.Instance?.Hide();

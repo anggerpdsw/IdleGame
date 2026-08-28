@@ -51,6 +51,8 @@ namespace IdleDefenseSurvival.Manager
             SaveManager.OnSaveLoaded += Apply;
             if (AccountManager.Instance != null)
                 AccountManager.Instance.OnAttributeChanged += Apply;
+            if (EquipmentService.Instance != null)
+                EquipmentService.Instance.OnEquipmentChanged += OnEquipmentChanged;
         }
 
         private void OnDisable()
@@ -121,7 +123,7 @@ namespace IdleDefenseSurvival.Manager
             foreach (var bonus in bonuses)
             {
                 float flat = bonus.Flat * total;
-                float percent = bonus.Percent * total;
+                float percent = bonus.Percent * total * 100f;
 
                 // Flat and percent are separate modifiers so both can apply at once.
                 if (flat != 0f) modifiers.Add(Create(attr, bonus.Stat, ModifierMode.Flat, flat));

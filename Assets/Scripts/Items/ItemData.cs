@@ -139,7 +139,7 @@ namespace IdleDefenseSurvival.Items
 
         // ============ Secondary Stats (roll pool) ============
         // Candidate SecondaryStats rolled at generation into item.CustomData["SecondaryStats"].
-        public SecondaryStatRow[] SecondaryStats; // Additional stat modifiers
+        public SecondaryStatEntry[] SecondaryStats; // Additional stat modifiers
 
         // ============ Special Effects ============
         public SpecialEffectEntry[] SpecialEffects; // Passive/triggered effects
@@ -170,7 +170,7 @@ namespace IdleDefenseSurvival.Items
             Category = ItemCategory.Equipment;
             if (AttributeStats == null) AttributeStats = Array.Empty<AttributeStatEntry>();
             if (CombatStats == null) CombatStats = Array.Empty<CombatStatEntry>();
-            if (SecondaryStats == null) SecondaryStats = Array.Empty<SecondaryStatRow>();
+            if (SecondaryStats == null) SecondaryStats = Array.Empty<SecondaryStatEntry>();
             if (SpecialEffects == null) SpecialEffects = Array.Empty<SpecialEffectEntry>();
             if (PassiveSkills == null) PassiveSkills = Array.Empty<PassiveSkillEntry>();
             // AllowedGemTypes moved to SocketConfigData.SocketRules
@@ -236,20 +236,20 @@ namespace IdleDefenseSurvival.Items
     }
 
     /// <summary>
-    /// Secondary stat row - defines a stat modifier with complex application mode.
-    /// Renamed from SecondaryStatEntry to avoid collision with the SecondaryStat enum.
+    /// Secondary stat entry - defines a stat modifier with complex application mode.
     /// </summary>
     [Serializable]
-    public class SecondaryStatRow
+    public class SecondaryStatEntry
     {
         public SecondaryStat Stat = SecondaryStat.None;
-        public float Value = 0f;
-        public SecondaryStatMode Mode = SecondaryStatMode.Flat;
-        public string Condition; // For Conditional mode - JSON condition string
-
-        public float Apply(float baseValue)
+        public float BaseValue = 0f;
+        public float ValuePerLevel = 0f; // Scaling per level
+        public SecondaryStatMode Mode = SecondaryStatMode.Flat;        
+        public bool IsPercent = false; // Legacy - use Mode instead
+        public float GetValue(int level)
         {
-            return Mode.Calculate(baseValue, Value);
+            float value = ValuePerLevel * (level - 1);
+            return Mode.Calculate(BaseValue, value);
         }
     }
 

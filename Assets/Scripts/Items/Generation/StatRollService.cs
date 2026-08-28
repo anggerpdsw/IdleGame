@@ -79,7 +79,7 @@ namespace IdleDefenseSurvival.Items.Generation
         private SecondaryStat[] GetAvailableStats(EquipmentData baseEquipment)
         {
             return baseEquipment.SecondaryStats
-                .Where(s => s.Stat != SecondaryStat.None && s.Value > 0)
+                .Where(s => s.Stat != SecondaryStat.None && s.BaseValue > 0)
                 .Select(s => s.Stat)
                 .Distinct()
                 .ToArray();
