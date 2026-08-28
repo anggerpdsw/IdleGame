@@ -242,7 +242,7 @@ namespace IdleDefenseSurvival.UI.Equipment
                 foreach (var kvp in totalBonuses.OrderByDescending(k => Math.Abs(k.Value)))
                 {
                     string sign = kvp.Value >= 0 ? "+" : "";
-                    lines.Add($"{kvp.Key.GetShortName()}: {sign}{kvp.Value:F1}");
+                    lines.Add($"{kvp.Key.GetSkillShortName()}: {sign}{kvp.Value:F1}");
                 }
                 _totalStatsText.text = string.Join("\n", lines);
             }
@@ -389,7 +389,7 @@ namespace IdleDefenseSurvival.UI.Equipment
         public void Initialize(SecondaryStat stat, float value)
         {
             if (_statNameText != null)
-                _statNameText.text = stat.GetDisplayName();
+                _statNameText.text = stat.GetSkillDisplayName();
 
             if (_statValueText != null)
             {

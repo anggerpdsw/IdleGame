@@ -312,7 +312,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
                 if (entryObj.TryGetComponent<TooltipStatEntryUI>(out var entryUI))
                 {
                     float compareValue = comparisonAttr?.GetValueOrDefault(kvp.Key, 0) ?? 0;
-                    entryUI.Initialize(kvp.Key.GetShortName(), kvp.Value, compareValue);
+                    entryUI.Initialize(kvp.Key.GetMainShortName(), kvp.Value, compareValue);
                 }
             }
 

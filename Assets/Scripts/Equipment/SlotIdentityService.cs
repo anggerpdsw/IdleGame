@@ -163,7 +163,7 @@ namespace IdleDefenseSurvival.Equipment
             if (primaries.Length == 0) return "";
 
             var names = new string[primaries.Length];
-            for (int i = 0; i < primaries.Length; i++) names[i] = primaries[i].GetShortName();
+            for (int i = 0; i < primaries.Length; i++) names[i] = primaries[i].GetMainShortName();
             return string.Join("/", names);
         }
     }

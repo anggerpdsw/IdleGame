@@ -5,7 +5,7 @@ namespace IdleDefenseSurvival.Stats
     /// </summary>
     public static class MainAttributeExtensions
     {
-        public static string GetDisplayName(this MainAttribute attr) => attr switch
+        public static string GetMainDisplayName(this MainAttribute attr) => attr switch
         {
             MainAttribute.Constitution => "Constitution",
             MainAttribute.Strength => "Strength",
@@ -14,7 +14,7 @@ namespace IdleDefenseSurvival.Stats
             _ => "Unknown"
         };
 
-        public static string GetShortName(this MainAttribute attr) => attr switch
+        public static string GetMainShortName(this MainAttribute attr) => attr switch
         {
             MainAttribute.Constitution => "CON",
             MainAttribute.Strength => "STR",

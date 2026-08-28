@@ -1,8 +1,6 @@
 using TMPro;
 using UnityEngine;
 using IdleDefenseSurvival.Equipment;
-using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.UI.Equipment
 {
@@ -15,7 +13,7 @@ namespace IdleDefenseSurvival.UI.Equipment
 
         public void Initialize(StatComparison comp)
         {
-            if (_statNameText != null) _statNameText.text = comp.Stat.GetShortName();
+            if (_statNameText != null) _statNameText.text = comp.Stat.GetSkillShortName();
             if (_currentValueText != null) _currentValueText.text = comp.CurrentValue.ToString("F1");
             if (_newValueText != null) _newValueText.text = comp.NewValue.ToString("F1");
             if (_differenceText != null)

@@ -110,7 +110,7 @@ namespace IdleDefenseSurvival.UI.Equipment
                     if (entryObj.TryGetComponent<EquipmentStatEntryUI>(out var entryUI))
                     {
                         string sign = kvp.Value >= 0 ? "+" : "";
-                        entryUI.Initialize(kvp.Key.GetDisplayName(), $"{sign}{kvp.Value:F1}", kvp.Value >= 0 ? Color.green : Color.red);
+                        entryUI.Initialize(kvp.Key.GetSkillDisplayName(), $"{sign}{kvp.Value:F1}", kvp.Value >= 0 ? Color.green : Color.red);
                     }
                 }
             }

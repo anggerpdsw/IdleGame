@@ -204,7 +204,7 @@ namespace IdleDefenseSurvival.Equipment
                 var comp = kvp.Value;
                 string sign = comp.Difference > 0 ? "+" : "";
                 string color = comp.Difference > 0 ? "<color=green>" : "<color=red>";
-                lines.Add($"{color}{comp.Stat.GetShortName()}: {comp.CurrentValue:F1} → {comp.NewValue:F1} ({sign}{comp.Difference:F1})</color>");
+                lines.Add($"{color}{comp.Stat.GetSkillShortName()}: {comp.CurrentValue:F1} → {comp.NewValue:F1} ({sign}{comp.Difference:F1})</color>");
             }
 
             // Effects

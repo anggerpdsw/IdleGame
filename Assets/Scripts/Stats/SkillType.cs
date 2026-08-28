@@ -7,7 +7,7 @@ namespace IdleDefenseSurvival
     /// </summary>
     public static class SkillTypeExtensions
     {
-        public static string GetDisplayName(this SkillType stat) => stat switch
+        public static string GetSkillDisplayName(this SkillType stat) => stat switch
         {
             SkillType.AttackDamage => "Attack Damage",
             SkillType.AttackRange => "Attack Range",
@@ -54,7 +54,7 @@ namespace IdleDefenseSurvival
         /// <summary>
         /// Gets the short display name for compact UI.
         /// </summary>
-        public static string GetShortName(this SkillType stat) => stat switch
+        public static string GetSkillShortName(this SkillType stat) => stat switch
         {
             SkillType.AttackDamage => "ADG",
             SkillType.AttackRange => "ARG",

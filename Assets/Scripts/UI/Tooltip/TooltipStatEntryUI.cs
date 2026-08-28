@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
         [SerializeField] private TextMeshProUGUI _comparisonText;
 
         public void Initialize(SecondaryStat stat, float value, float comparisonValue = 0)
-            => Initialize(stat.GetDisplayName(), value, comparisonValue);
+            => Initialize(stat.GetSkillDisplayName(), value, comparisonValue);
 
         public void Initialize(string statName, float value, float comparisonValue = 0)
         {

@@ -106,7 +106,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 if (row == null) continue;
 
                 var attr = _order[i];
-                if (row.nameText != null) row.nameText.text = attr.GetShortName();
+                if (row.nameText != null) row.nameText.text = attr.GetMainShortName();
                 if (row.valueText != null)
                 {
                     int bonus = account.GetAttributeBonus(attr);
@@ -140,7 +140,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
             var sb = new StringBuilder();
             // Header
-            sb.AppendLine($"<b><color=#FFD700>{attr.GetDisplayName()}</color></b>");
+            sb.AppendLine($"<b><color=#FFD700>{attr.GetMainDisplayName()}</color></b>");
             // Total effect
             sb.AppendLine("<b>Current Status:</b>");
             foreach (var bonus in bonuses) 
@@ -148,13 +148,13 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 float totalFlat = bonus.Flat * attributeValue;
                 float totalPercent = bonus.Percent * attributeValue;
                 AttributeBonusData totalBonus = new(bonus.Stat, totalFlat, totalPercent);
-                sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {ValueStat(totalBonus)}");
+                sb.AppendLine($"• {bonus.Stat.GetSkillDisplayName()} {ValueStat(totalBonus)}");
             }
             // Per point
             sb.AppendLine();
             sb.AppendLine("<b>Per Point:</b>");
             foreach (var bonus in bonuses)
-                sb.AppendLine($"• {bonus.Stat.GetDisplayName()} {ValueStat(bonus)}");
+                sb.AppendLine($"• {bonus.Stat.GetSkillDisplayName()} {ValueStat(bonus)}");
             var mouse = Pointer.current != null
                 ? (Vector3)Pointer.current.position.ReadValue()
                 : screenPosition;

@@ -16,7 +16,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
         public void Initialize(StatComparison comp)
         {
             if (_statNameText != null)
-                _statNameText.text = comp.Stat.GetShortName();
+                _statNameText.text = comp.Stat.GetSkillShortName();
 
             if (_currentValueText != null)
                 _currentValueText.text = comp.CurrentValue.ToString("F1");

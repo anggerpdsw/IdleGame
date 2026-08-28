@@ -184,7 +184,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                 {
                     float value = stat.GetValue(item.Level);
                     string sign = value >= 0 ? "+" : "";
-                    lines.Add($"{stat.Stat.GetDisplayName()}: {sign}{value:F1}");
+                    lines.Add($"{stat.Stat.GetSkillDisplayName()}: {sign}{value:F1}");
                 }
             }
 
@@ -198,7 +198,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                     {
                         if (attr.BaseValue == 0f) continue;
                         string sign = attr.BaseValue >= 0 ? "+" : "";
-                        lines.Add($"{attr.Attribute.GetDisplayName()}: {sign}{attr.BaseValue:F1}");
+                        lines.Add($"{attr.Attribute.GetMainDisplayName()}: {sign}{attr.BaseValue:F1}");
                     }
                 }
 
@@ -211,7 +211,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                         var secStat = (SecondaryStat)(int)attr.Attribute;
                         if (secStat == SecondaryStat.None) continue;
                         string sign = attr.BaseValue >= 0 ? "+" : "";
-                        lines.Add($"{secStat.GetDisplayName()}: {sign}{attr.BaseValue:F1}");
+                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{attr.BaseValue:F1}");
                     }
                 }
             }

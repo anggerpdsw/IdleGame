@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace IdleDefenseSurvival.Stats
+namespace IdleDefenseSurvival
 {
     /// <summary>
     /// Extension methods for SecondaryStat.
@@ -11,70 +11,65 @@ namespace IdleDefenseSurvival.Stats
         /// <summary>
         /// Gets the display name for the stat.
         /// </summary>
-        public static string GetDisplayName(this SecondaryStat stat) => stat switch
+        public static string GetSkillDisplayName(this SecondaryStat stat) => stat switch
         {
-            SecondaryStat.AttackRange => "Attack Range",
+            SecondaryStat.BossDamage => "Boss Damage",
             SecondaryStat.BounceChance => "Bounce Chance",
             SecondaryStat.BounceCount => "Bounce Count",
-            SecondaryStat.BossDamage => "Boss Damage",
+            SecondaryStat.CriticalDamage => "Critical Damage",
             SecondaryStat.CooldownReduction => "Cooldown Reduction",
-            SecondaryStat.DamagePerRange => "Damage per Range",
             SecondaryStat.DefenseBreak => "Defense Break",
             SecondaryStat.DropRate => "Drop Rate",
+            SecondaryStat.EarthDamageBonus => "Earth Damage",
             SecondaryStat.EliteDamage => "Elite Damage",
+            SecondaryStat.FireDamageBonus => "Fire Damage",
             SecondaryStat.GoldGain => "Gold Gain",
             SecondaryStat.HitRate => "Hit Rate",
             SecondaryStat.InterestWave => "Interest Wave",
-            SecondaryStat.KnockbackChance => "Knockback Chance",
+            SecondaryStat.KnockbackForce => "Knockback Force",
             SecondaryStat.LifeSteal => "Life Steal",
+            SecondaryStat.LightningDamageBonus => "Lightning Damage",
+            SecondaryStat.MetalDamageBonus => "Metal Damage",
             SecondaryStat.MoveSpeed => "Move Speed",
             SecondaryStat.MultiShootChance => "Multi-Shot Chance",
             SecondaryStat.MultiShootCount => "Multi-Shot Count",
-            SecondaryStat.Penetration => "Penetration",
             SecondaryStat.StuntChance => "Stun Chance",
             SecondaryStat.StuntDuration => "Stun Duration",
-            SecondaryStat.MetalDamageBonus => "Metal Damage",
-            SecondaryStat.WoodDamageBonus => "Wood Damage",
-            SecondaryStat.FireDamageBonus => "Fire Damage",
             SecondaryStat.WaterDamageBonus => "Water Damage",
-            SecondaryStat.EarthDamageBonus => "Earth Damage",
-            SecondaryStat.LightningDamageBonus => "Lightning Damage",
             SecondaryStat.WindDamageBonus => "Wind Damage",
+            SecondaryStat.WoodDamageBonus => "Wood Damage",
             _ => "Unknown"
         };
 
         /// <summary>
         /// Gets the short display name for compact UI.
         /// </summary>
-        public static string GetShortName(this SecondaryStat stat) => stat switch
+        public static string GetSkillShortName(this SecondaryStat stat) => stat switch
         {
-            SecondaryStat.AttackRange => "ARG",
+            SecondaryStat.BossDamage => "BDMG",
             SecondaryStat.BounceChance => "BCH",
             SecondaryStat.BounceCount => "BCT",
+            SecondaryStat.CooldownReduction => "CDR",
             SecondaryStat.DefenseBreak => "DBK",
+            SecondaryStat.DropRate => "DRT",
+            SecondaryStat.EarthDamageBonus => "EDB",
+            SecondaryStat.EliteDamage => "EDMG",
+            SecondaryStat.FireDamageBonus => "FDB",
+            SecondaryStat.GoldGain => "GOLD",
+            SecondaryStat.HitRate => "HIT",
+            SecondaryStat.InterestWave => "INW",
+            SecondaryStat.KnockbackForce => "KFR",
+            SecondaryStat.LifeSteal => "LFS",
+            SecondaryStat.LightningDamageBonus => "LDB",
+            SecondaryStat.MetalDamageBonus => "MDB",
+            SecondaryStat.MoveSpeed => "MSP",
             SecondaryStat.MultiShootChance => "MCH",
             SecondaryStat.MultiShootCount => "MCT",
-            SecondaryStat.KnockbackChance => "KCH",
             SecondaryStat.StuntChance => "SCH",
             SecondaryStat.StuntDuration => "SDR",
-            SecondaryStat.LifeSteal => "LFS",
-            SecondaryStat.DamagePerRange => "DPR",
-            SecondaryStat.CooldownReduction => "CDR",
-            SecondaryStat.MoveSpeed => "SPD",
-            SecondaryStat.BossDamage => "BDMG",
-            SecondaryStat.EliteDamage => "EDMG",
-            SecondaryStat.GoldGain => "GOLD",
-            SecondaryStat.DropRate => "DRT",
-            SecondaryStat.InterestWave => "INW",
-            SecondaryStat.HitRate => "HIT",
-            SecondaryStat.Penetration => "PEN",
-            SecondaryStat.EarthDamageBonus      => "EDB",
-            SecondaryStat.FireDamageBonus       => "FDB",
-            SecondaryStat.LightningDamageBonus  => "LDB",
-            SecondaryStat.MetalDamageBonus      => "MDB",
-            SecondaryStat.WaterDamageBonus      => "WADB",
-            SecondaryStat.WindDamageBonus       => "WIDB",
-            SecondaryStat.WoodDamageBonus       => "WDDB",
+            SecondaryStat.WaterDamageBonus => "WADB",
+            SecondaryStat.WindDamageBonus => "WIDB",
+            SecondaryStat.WoodDamageBonus => "WDDB",
             _ => "??"
         };
 
@@ -88,7 +83,6 @@ namespace IdleDefenseSurvival.Stats
             // PvE / utility damage - Red/Orange
             SecondaryStat.BossDamage => GameColors.statBossDamage,
             SecondaryStat.EliteDamage => GameColors.statEliteDamage,
-            SecondaryStat.DamagePerRange => GameColors.statDamagePerRange,
             SecondaryStat.DefenseBreak => GameColors.blue,
 
             // Utility stats - Yellow/Gold
@@ -100,7 +94,6 @@ namespace IdleDefenseSurvival.Stats
 
             // Accuracy - Cyan/Blue white
             SecondaryStat.HitRate => GameColors.statHitRate,
-            SecondaryStat.Penetration => GameColors.purple,
 
             // Element damage bonus - Arcane purple/teal family, one hue per element
             SecondaryStat.MetalDamageBonus => GameColors.statMetal,
@@ -112,12 +105,10 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.WindDamageBonus => GameColors.statWind,
 
             // Projectile/Crowd Control - Purple/Teal
-            SecondaryStat.AttackRange => GameColors.statRange,
             SecondaryStat.BounceChance => GameColors.statBounceChance,
             SecondaryStat.BounceCount => GameColors.statBounceCount,
             SecondaryStat.MultiShootChance => GameColors.statMultiShootChance,
             SecondaryStat.MultiShootCount => GameColors.statMultiShootCount,
-            SecondaryStat.KnockbackChance => GameColors.statKnockbackChance,
             SecondaryStat.StuntChance => GameColors.statStunChance,
             SecondaryStat.StuntDuration => GameColors.statStunDuration,
 
@@ -137,7 +128,6 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.GoldGain => true,
             SecondaryStat.BounceChance => true,
             SecondaryStat.MultiShootChance => true,
-            SecondaryStat.KnockbackChance => true,
             SecondaryStat.StuntChance => true,
             SecondaryStat.InterestWave => true,
             SecondaryStat.HitRate => true,
@@ -169,20 +159,16 @@ namespace IdleDefenseSurvival.Stats
         {
             SecondaryStat.LifeSteal => StatCategory.Health,
             SecondaryStat.EliteDamage or 
-            SecondaryStat.BossDamage or 
-            SecondaryStat.DamagePerRange or 
-            SecondaryStat.Penetration => StatCategory.Offense,
+            SecondaryStat.BossDamage => StatCategory.Offense,
             SecondaryStat.MoveSpeed or 
             SecondaryStat.CooldownReduction or 
             SecondaryStat.HitRate => StatCategory.Utility,
             SecondaryStat.GoldGain or 
             SecondaryStat.DropRate or 
             SecondaryStat.InterestWave => StatCategory.Economy,
-            SecondaryStat.AttackRange or 
             SecondaryStat.BounceChance or SecondaryStat.BounceCount or
             SecondaryStat.MultiShootChance or 
             SecondaryStat.MultiShootCount or
-            SecondaryStat.KnockbackChance or 
             SecondaryStat.StuntChance or 
             SecondaryStat.StuntDuration or
             SecondaryStat.DefenseBreak => StatCategory.Special,
@@ -215,60 +201,50 @@ namespace IdleDefenseSurvival.Stats
 
     /// <summary>
     /// Secondary stats - specialization layer from equipment (the ~20% build identity).
-    /// Core power comes from MainAttribute (CON/STR/INT/DEX) via derived SkillTypes,
-    /// and SkillType feeds combat. SecondaryStat is pure specialization (build identity).
+    /// Core power comes from MainAttribute (CON/STR/INT/DEX) via derived SecondaryStats,
+    /// and SecondaryStat feeds combat. SecondaryStat is pure specialization (build identity).
     /// No stat here is derivable from attributes — that avoids double-dipping.
     /// </summary>
     public enum SecondaryStat
     {
         None = 0,
 
-        // Projectile
-        AttackRange = 1,
+        // Physical
+        CriticalDamage = 1,
         BounceChance = 2,
         BounceCount = 3,
-        DefenseBreak = 29,
+        DefenseBreak = 4,
+        MultiShootChance = 5,
+        MultiShootCount = 6,
+        KnockbackForce = 7,
+        StuntChance = 8,
+        StuntDuration = 9,
 
-        // Multi Shot
-        MultiShootChance = 4,
-        MultiShootCount = 5,
-
-        // Crowd Control
-        KnockbackChance = 6,
-        StuntChance = 7,
-        StuntDuration = 8,
-
-        // Sustain
-        Evasion = 9,
+        // Survival
         LifeSteal = 10,
 
-        // Utility
-        DamagePerRange = 11,
-        CooldownReduction = 12,
-        MoveSpeed = 13,
-        UltimateAttack = 14,
-
-        // PvE
-        BossDamage = 15,
-        EliteDamage = 16,
+        // Element damage (Layer 3) — per-element bonus (percent, from equipment/card/buff)
+        MetalDamageBonus = 11,
+        WoodDamageBonus = 12,
+        FireDamageBonus = 13,
+        WaterDamageBonus = 14,
+        EarthDamageBonus = 15,
+        LightningDamageBonus = 16,
+        WindDamageBonus = 17,
 
         // Economy
-        GoldGain = 17,
-        DropRate = 18,
-        InterestWave = 19,
+        InterestWave = 18,
+        GoldGain = 19,
+        DropRate = 20,
 
-        // Accuracy — counters enemy Evasion. Specialization-only (equipment/passive/buff/card).
-        HitRate = 20,
-        Penetration = 28,
+        // Utility
+        MoveSpeed = 21,
+        CooldownReduction = 22,
+        BossDamage = 23,
+        EliteDamage = 24,
 
-        // Element damage bonus (Layer 3) — per-element percent from equipment (Roll → ModifierSource.Equipment → SkillType).
-        MetalDamageBonus = 21,
-        WoodDamageBonus = 22,
-        FireDamageBonus = 23,
-        WaterDamageBonus = 24,
-        EarthDamageBonus = 25,
-        LightningDamageBonus = 26,
-        WindDamageBonus = 27,
+        // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
+        HitRate = 25
     }
 
 }
