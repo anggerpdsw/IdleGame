@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Modifiers;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Player
 {

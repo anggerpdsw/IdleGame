@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using IdleDefenseSurvival.Manager;
-using UnityEngine;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Player
 {

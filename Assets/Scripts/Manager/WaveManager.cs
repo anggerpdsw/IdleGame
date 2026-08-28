@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Mission;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Manager
 {

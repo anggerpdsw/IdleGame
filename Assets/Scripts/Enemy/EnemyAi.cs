@@ -11,6 +11,7 @@ using IdleDefenseSurvival.Items;
 using System.Collections.Generic;
 using UnityEngine.Pool;
 using IdleDefenseSurvival.Mission;
+using IdleDefenseSurvival.Stats;
 
 /// <summary>
 /// Handles basic enemy AI for the auto‑shooter game.

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Card;
-using UnityEngine;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Manager
 {

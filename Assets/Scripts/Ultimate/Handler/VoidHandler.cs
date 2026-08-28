@@ -1,6 +1,7 @@
 using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Ultimate
 {

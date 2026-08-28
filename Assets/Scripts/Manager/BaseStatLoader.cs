@@ -1,5 +1,6 @@
 using System;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Stats;
 using Newtonsoft.Json;
 using UnityEngine;
 

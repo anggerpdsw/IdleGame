@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using System.Collections;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Ultimate
 {

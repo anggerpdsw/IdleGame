@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Items.Random;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -44,23 +43,22 @@ namespace IdleDefenseSurvival.Items.Generation
 
             // Generate stat bonuses
             int statCount = GetEnchantmentStatCount(rarity, context);
-            var allStats = Enum.GetValues(typeof(SecondaryStat)).Cast<SecondaryStat>()
-                .Where(s => s != SecondaryStat.None)
-                .ToArray();
+            var allStats = SecondaryStatRegistry.GetEnchantableStats();
 
             enchantment.StatBonuses = new CombatStatEntry[statCount];
             for (int i = 0; i < statCount; i++)
             {
                 var stat = allStats[_rng.NextInt(allStats.Length)];
-                float baseValue = GetRandomStatValue(stat, rarity, enchantLevel);
+                var meta = SecondaryStatRegistry.Get(stat);
+                float baseValue = meta.BaseValue * rarity.GetDefaultStatMultiplier() * (1f + enchantLevel * 0.1f) * _rng.Range(0.8f, 1.2f);
 
                 enchantment.StatBonuses[i] = new CombatStatEntry
                 {
                     Stat = stat,
                     BaseValue = baseValue,
                     ValuePerLevel = baseValue * 0.1f,
-                    Mode = _config.PercentStats.Contains(stat) ? SecondaryStatMode.Percent : SecondaryStatMode.Flat,
-                    IsPercent = _config.PercentStats.Contains(stat)
+                    Mode = meta.DefaultMode,
+                    IsPercent = meta.IsPercentage
                 };
             }
 
@@ -127,17 +125,6 @@ namespace IdleDefenseSurvival.Items.Generation
             return $"Enchant_{rarity}_{Guid.NewGuid().ToString("N")[..8]}";
         }
 
-        private float GetRandomStatValue(SecondaryStat stat, Rarity rarity, int enchantLevel)
-        {
-            float rarityMult = rarity.GetDefaultStatMultiplier();
-            float levelMult = 1f + enchantLevel * 0.1f;
-            float variance = _rng.Range(0.8f, 1.2f);
-
-            float baseValue = _config.BaseValues.TryGetValue(stat, out var val) ? val : 1f;
-
-            return baseValue * rarityMult * levelMult * variance;
-        }
-
         private SpecialEffectEntry[] GenerateSpecialEffects(Rarity rarity, int level)
         {
             // Could generate special effects based on rarity/level
@@ -180,37 +167,6 @@ namespace IdleDefenseSurvival.Items.Generation
             { Rarity.Legendary, 3 },
             { Rarity.Mythic, 3 },
             { Rarity.Divine, 4 }
-        };
-
-        public Dictionary<SecondaryStat, float> BaseValues = new()
-        {
-            { SecondaryStat.AttackRange, 1f },
-            { SecondaryStat.BounceChance, 5f },
-            { SecondaryStat.BounceCount, 1f },
-            { SecondaryStat.MultiShootChance, 5f },
-            { SecondaryStat.KnockbackChance, 5f },
-            { SecondaryStat.LifeSteal, 1f },
-            { SecondaryStat.MoveSpeed, 0.5f },
-            { SecondaryStat.CooldownReduction, 1f },
-            { SecondaryStat.BossDamage, 1f },
-            { SecondaryStat.EliteDamage, 1f },
-            { SecondaryStat.HitRate, 1f },
-            { SecondaryStat.Penetration, 1f },
-            { SecondaryStat.DefenseBreak, 1f }
-        };
-
-        // Derived combat stats (CriticalChance, AttackSpeed, ...) come from Main Attribute.
-        public HashSet<SecondaryStat> PercentStats = new()
-        {
-            SecondaryStat.BounceChance,
-            SecondaryStat.MultiShootChance,
-            SecondaryStat.KnockbackChance,
-            SecondaryStat.LifeSteal,
-            SecondaryStat.MoveSpeed,
-            SecondaryStat.CooldownReduction,
-            SecondaryStat.BossDamage,
-            SecondaryStat.EliteDamage,
-            SecondaryStat.HitRate
         };
 
         public float SpecialEffectChance = 0.1f;

@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Manager;
 using PlayerClass = IdleDefenseSurvival.Player.Player;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.UI.Game
 {

@@ -1,8 +1,142 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-namespace IdleDefenseSurvival
+namespace IdleDefenseSurvival.Stats
 {
+    /// <summary>
+    /// Centralized metadata for a SecondaryStat — single source of truth for
+    /// display, categorization, and generation configuration.
+    /// </summary>
+    public readonly struct SecondaryStatMeta
+    {
+        public readonly SecondaryStat Stat;
+        public readonly string DisplayName;
+        public readonly string ShortName;
+        public readonly StatCategory Category;
+        public readonly Color Color;
+        public readonly bool IsPercentage;
+        public readonly float BaseValue;
+        public readonly SecondaryStatMode DefaultMode;
+        public readonly bool CanRollOnEquipment;
+        public readonly bool CanEnchant;
+
+        public SecondaryStatMeta(
+            SecondaryStat stat,
+            string displayName,
+            string shortName,
+            StatCategory category,
+            Color color,
+            bool isPercentage,
+            float baseValue,
+            SecondaryStatMode defaultMode = SecondaryStatMode.Flat,
+            bool canRollOnEquipment = true,
+            bool canEnchant = true)
+        {
+            Stat = stat;
+            DisplayName = displayName;
+            ShortName = shortName;
+            Category = category;
+            Color = color;
+            IsPercentage = isPercentage;
+            BaseValue = baseValue;
+            DefaultMode = defaultMode;
+            CanRollOnEquipment = canRollOnEquipment;
+            CanEnchant = canEnchant;
+        }
+
+        /// <summary>Gets the SkillType mapped from this SecondaryStat.</summary>
+        public SkillType SkillType => SecondaryStatExtensions.SecondaryStatToSkillType(Stat);
+    }
+
+    /// <summary>
+    /// Static registry of all SecondaryStat metadata.
+    /// Single source of truth for IsPercentage, BaseValue, Category, DisplayName, etc.
+    /// All systems (enchantment, roll, modifier, UI) must read from here.
+    /// </summary>
+    public static class SecondaryStatRegistry
+    {
+        private static readonly SecondaryStatMeta[] _entries;
+        private static readonly Dictionary<SecondaryStat, SecondaryStatMeta> _byStat;
+
+        static SecondaryStatRegistry()
+        {
+            var list = new List<SecondaryStatMeta>
+            {
+                // Physical
+                new(SecondaryStat.CriticalDamage, "Critical Damage", "Crit Dmg", StatCategory.Offense, GameColors.red, false, 1f, SecondaryStatMode.Flat, canEnchant: false),
+                new(SecondaryStat.BounceChance, "Bounce Chance", "Bounce%", StatCategory.Special, GameColors.statBounceChance, true, 5f, SecondaryStatMode.Percent),
+                new(SecondaryStat.BounceCount, "Bounce Count", "Bounce #", StatCategory.Special, GameColors.statBounceCount, false, 1f),
+                new(SecondaryStat.DefenseBreak, "Defense Break", "Def Break", StatCategory.Special, GameColors.blue, false, 1f, canEnchant: false),
+                new(SecondaryStat.MultiShootChance, "Multi-Shot Chance", "Multi%", StatCategory.Special, GameColors.statMultiShootChance, true, 5f, SecondaryStatMode.Percent),
+                new(SecondaryStat.MultiShootCount, "Multi-Shot Count", "Multi #", StatCategory.Special, GameColors.statMultiShootCount, false, 1f),
+                new(SecondaryStat.KnockbackForce, "Knockback Force", "KB Force", StatCategory.Special, GameColors.red, false, 1f, canEnchant: false),
+                new(SecondaryStat.StuntChance, "Stun Chance", "Stun%", StatCategory.Special, GameColors.statStunChance, true, 3f, SecondaryStatMode.Percent),
+                new(SecondaryStat.StuntDuration, "Stun Duration", "Stun Dur", StatCategory.Special, GameColors.statStunDuration, false, 0.5f),
+
+                // Survival
+                new(SecondaryStat.LifeSteal, "Life Steal", "Lifesteal", StatCategory.Health, GameColors.statLifeSteal, true, 1f, SecondaryStatMode.Percent),
+
+                // Element Damage (Layer 3) — all percent, from equipment/card/buff
+                new(SecondaryStat.MetalDamageBonus, "Metal Damage", "Metal%", StatCategory.Magic, GameColors.statMetal, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.WoodDamageBonus, "Wood Damage", "Wood%", StatCategory.Magic, GameColors.statWood, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.FireDamageBonus, "Fire Damage", "Fire%", StatCategory.Magic, GameColors.statFire, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.WaterDamageBonus, "Water Damage", "Water%", StatCategory.Magic, GameColors.statWater, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.EarthDamageBonus, "Earth Damage", "Earth%", StatCategory.Magic, GameColors.statEarth, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.LightningDamageBonus, "Lightning Damage", "Lightning%", StatCategory.Magic, GameColors.gold, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.WindDamageBonus, "Wind Damage", "Wind%", StatCategory.Magic, GameColors.statWind, true, 1f, SecondaryStatMode.Percent),
+
+                // Economy
+                new(SecondaryStat.InterestWave, "Interest per Wave", "Interest", StatCategory.Economy, GameColors.statInterestWave, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.GoldGain, "Gold Gain", "Gold%", StatCategory.Economy, GameColors.statGoldGain, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.DropRate, "Drop Rate", "Drop%", StatCategory.Economy, GameColors.statDropRate, true, 1f, SecondaryStatMode.Percent),
+
+                // Utility
+                new(SecondaryStat.MoveSpeed, "Move Speed", "Move%", StatCategory.Utility, GameColors.statMoveSpeed, true, 0.5f, SecondaryStatMode.Percent),
+                new(SecondaryStat.CooldownReduction, "Cooldown Reduction", "CDR", StatCategory.Utility, GameColors.statCooldownReduction, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.BossDamage, "Boss Damage", "Boss%", StatCategory.Offense, GameColors.statBossDamage, true, 1f, SecondaryStatMode.Percent),
+                new(SecondaryStat.EliteDamage, "Elite Damage", "Elite%", StatCategory.Offense, GameColors.statEliteDamage, true, 1f, SecondaryStatMode.Percent),
+
+                // Accuracy
+                new(SecondaryStat.HitRate, "Hit Rate", "Hit%", StatCategory.Utility, GameColors.statHitRate, true, 1f, SecondaryStatMode.Percent),
+            };
+
+            _entries = list.ToArray();
+            _byStat = new Dictionary<SecondaryStat, SecondaryStatMeta>(_entries.Length);
+            foreach (var e in _entries) _byStat[e.Stat] = e;
+        }
+
+        /// <summary>Gets metadata for a stat. Returns default if not found.</summary>
+        public static SecondaryStatMeta Get(SecondaryStat stat) =>
+            _byStat.TryGetValue(stat, out var meta) ? meta : default;
+
+        /// <summary>Gets all registered stats (excludes None).</summary>
+        public static IReadOnlyList<SecondaryStatMeta> All => _entries;
+
+        /// <summary>Gets all stats that can roll on equipment.</summary>
+        public static IReadOnlyList<SecondaryStatMeta> Rollable =>
+            _entries.Where(e => e.CanRollOnEquipment).ToArray();
+
+        /// <summary>Gets all stats that can appear as enchantments.</summary>
+        public static IReadOnlyList<SecondaryStatMeta> Enchantable =>
+            _entries.Where(e => e.CanEnchant).ToArray();
+
+        /// <summary>Gets stats filtered by category.</summary>
+        public static IReadOnlyList<SecondaryStatMeta> ByCategory(StatCategory category) =>
+            _entries.Where(e => e.Category == category).ToArray();
+
+        /// <summary>Gets a flat array of just the SecondaryStat enum values for random picks.</summary>
+        public static SecondaryStat[] GetAllStats() => _entries.Select(e => e.Stat).ToArray();
+
+        /// <summary>Gets a flat array of rollable SecondaryStat enum values.</summary>
+        public static SecondaryStat[] GetRollableStats() =>
+            _entries.Where(e => e.CanRollOnEquipment).Select(e => e.Stat).ToArray();
+
+        /// <summary>Gets a flat array of enchantable SecondaryStat enum values.</summary>
+        public static SecondaryStat[] GetEnchantableStats() =>
+            _entries.Where(e => e.CanEnchant).Select(e => e.Stat).ToArray();
+    }
+
     /// <summary>
     /// Extension methods for SecondaryStat.
     /// </summary>
@@ -92,83 +226,40 @@ namespace IdleDefenseSurvival
         }
 
         /// <summary>
-        /// Gets the display name for a SecondaryStat — delegates to SkillTypeExtensions.
+        /// Gets the display name for a SecondaryStat — delegates to metadata registry.
         /// </summary>
         public static string GetSkillDisplayName(this SecondaryStat stat) =>
-            SecondaryStatToSkillType(stat).GetSkillDisplayName();
+            SecondaryStatRegistry.Get(stat).DisplayName;
 
         /// <summary>
-        /// Gets the short display name for a SecondaryStat — delegates to SkillTypeExtensions.
+        /// Gets the short display name for a SecondaryStat.
         /// </summary>
         public static string GetSkillShortName(this SecondaryStat stat) =>
-            SecondaryStatToSkillType(stat).GetSkillShortName();
+            SecondaryStatRegistry.Get(stat).ShortName;
 
         /// <summary>
         /// Gets the default color for the stat in UI.
         /// </summary>
-        public static Color GetStatColor(this SecondaryStat stat) => stat switch
-        {
-            SecondaryStat.LifeSteal => GameColors.statLifeSteal,
-
-            // PvE / utility damage - Red/Orange
-            SecondaryStat.BossDamage => GameColors.statBossDamage,
-            SecondaryStat.EliteDamage => GameColors.statEliteDamage,
-            SecondaryStat.DefenseBreak => GameColors.blue,
-
-            // Utility stats - Yellow/Gold
-            SecondaryStat.MoveSpeed => GameColors.statMoveSpeed,
-            SecondaryStat.CooldownReduction => GameColors.statCooldownReduction,
-            SecondaryStat.GoldGain => GameColors.statGoldGain,
-            SecondaryStat.DropRate => GameColors.statDropRate,
-            SecondaryStat.InterestWave => GameColors.statInterestWave,
-
-            // Accuracy - Cyan/Blue white
-            SecondaryStat.HitRate => GameColors.statHitRate,
-
-            // Element damage bonus - Arcane purple/teal family, one hue per element
-            SecondaryStat.MetalDamageBonus => GameColors.statMetal,
-            SecondaryStat.WoodDamageBonus => GameColors.statWood,
-            SecondaryStat.FireDamageBonus => GameColors.statFire,
-            SecondaryStat.WaterDamageBonus => GameColors.statWater,
-            SecondaryStat.EarthDamageBonus => GameColors.statEarth,
-            SecondaryStat.LightningDamageBonus => GameColors.statMoveSpeed,
-            SecondaryStat.WindDamageBonus => GameColors.statWind,
-
-            // Projectile/Crowd Control - Purple/Teal
-            SecondaryStat.BounceChance => GameColors.statBounceChance,
-            SecondaryStat.BounceCount => GameColors.statBounceCount,
-            SecondaryStat.MultiShootChance => GameColors.statMultiShootChance,
-            SecondaryStat.MultiShootCount => GameColors.statMultiShootCount,
-            SecondaryStat.StuntChance => GameColors.statStunChance,
-            SecondaryStat.StuntDuration => GameColors.statStunDuration,
-
-            _ => Color.white
-        };
+        public static Color GetStatColor(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).Color;
 
         /// <summary>
         /// Checks if the stat is a percentage stat (displayed as %).
         /// </summary>
-        public static bool IsPercentage(this SecondaryStat stat) => stat switch
-        {
-            SecondaryStat.LifeSteal => true,
-            SecondaryStat.CooldownReduction => true,
-            SecondaryStat.BossDamage => true,
-            SecondaryStat.EliteDamage => true,
-            SecondaryStat.DropRate => true,
-            SecondaryStat.GoldGain => true,
-            SecondaryStat.BounceChance => true,
-            SecondaryStat.MultiShootChance => true,
-            SecondaryStat.StuntChance => true,
-            SecondaryStat.InterestWave => true,
-            SecondaryStat.MetalDamageBonus  => true,
-            SecondaryStat.WoodDamageBonus   => true,
-            SecondaryStat.FireDamageBonus   => true,
-            SecondaryStat.WaterDamageBonus  => true,
-            SecondaryStat.EarthDamageBonus  => true,
-            SecondaryStat.WindDamageBonus   => true,
-            SecondaryStat.LightningDamageBonus => true,
-            _ => false
-        };
+        public static bool IsPercentage(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).IsPercentage;
+
+        /// <summary>
+        /// Gets the base value used for stat generation (enchantment/roll).
+        /// </summary>
+        public static float GetBaseValue(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).BaseValue;
+
+        /// <summary>
+        /// Gets the default SecondaryStatMode for this stat.
+        /// </summary>
+        public static SecondaryStatMode GetDefaultMode(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).DefaultMode;
 
         /// <summary>
         /// Checks if the stat is valid (not None).
@@ -176,40 +267,22 @@ namespace IdleDefenseSurvival
         public static bool IsValid(this SecondaryStat stat) => stat != SecondaryStat.None;
 
         /// <summary>
-        /// Gets all valid secondary stats (excludes None).
-        /// </summary>
-        public static SecondaryStat[] GetAllStats() =>
-            (SecondaryStat[])Enum.GetValues(typeof(SecondaryStat));
-
-        /// <summary>
         /// Gets the stat category for UI grouping.
         /// </summary>
-        public static StatCategory GetCategory(this SecondaryStat stat) => stat switch
-        {
-            SecondaryStat.LifeSteal => StatCategory.Health,
-            SecondaryStat.EliteDamage or 
-            SecondaryStat.BossDamage => StatCategory.Offense,
-            SecondaryStat.MoveSpeed or 
-            SecondaryStat.CooldownReduction or 
-            SecondaryStat.HitRate => StatCategory.Utility,
-            SecondaryStat.GoldGain or 
-            SecondaryStat.DropRate or 
-            SecondaryStat.InterestWave => StatCategory.Economy,
-            SecondaryStat.BounceChance or SecondaryStat.BounceCount or
-            SecondaryStat.MultiShootChance or 
-            SecondaryStat.MultiShootCount or
-            SecondaryStat.StuntChance or 
-            SecondaryStat.StuntDuration or
-            SecondaryStat.DefenseBreak => StatCategory.Special,
-            SecondaryStat.MetalDamageBonus or 
-            SecondaryStat.WoodDamageBonus or 
-            SecondaryStat.FireDamageBonus or
-            SecondaryStat.WaterDamageBonus or 
-            SecondaryStat.EarthDamageBonus or
-            SecondaryStat.LightningDamageBonus or 
-            SecondaryStat.WindDamageBonus => StatCategory.Magic,
-            _ => StatCategory.Other
-        };
+        public static StatCategory GetCategory(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).Category;
+
+        /// <summary>
+        /// Checks if this stat can roll on equipment.
+        /// </summary>
+        public static bool CanRollOnEquipment(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).CanRollOnEquipment;
+
+        /// <summary>
+        /// Checks if this stat can appear as an enchantment.
+        /// </summary>
+        public static bool CanEnchant(this SecondaryStat stat) =>
+            SecondaryStatRegistry.Get(stat).CanEnchant;
     }
 
     /// <summary>
@@ -275,5 +348,4 @@ namespace IdleDefenseSurvival
         // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
         HitRate = 40,
     }
-
 }

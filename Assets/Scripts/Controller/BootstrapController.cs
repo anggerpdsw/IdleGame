@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Items;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using IdleDefenseSurvival.Mission;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Core
 {

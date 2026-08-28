@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Equipment
 {

@@ -1,6 +1,7 @@
 using UnityEngine;
 using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Camera
 {

@@ -1,10 +1,8 @@
 using UnityEngine;
-using IdleDefenseSurvival.Enemy;
-using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
-using System;
 using DG.Tweening;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Ultimate
 {

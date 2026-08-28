@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival;
 using IdleDefenseSurvival.Controller;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Stats;
 using UnityEngine;
 
 public static class Utilityku

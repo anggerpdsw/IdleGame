@@ -2,6 +2,7 @@ using UnityEngine;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Manager;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Player
 {

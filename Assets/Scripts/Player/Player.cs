@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
 using System;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Player
 {

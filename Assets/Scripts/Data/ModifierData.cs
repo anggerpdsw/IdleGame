@@ -1,4 +1,5 @@
 using System;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Data
 {

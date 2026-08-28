@@ -4,6 +4,7 @@ using System.Linq;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -95,10 +96,11 @@ namespace IdleDefenseSurvival.Items.Generation
 
         private CombatStatEntry CreateStatEntry(SecondaryStat stat, Rarity rarity, ItemGenerationContext context)
         {
+            var meta = SecondaryStatRegistry.Get(stat);
             float rarityMult = rarity.GetDefaultStatMultiplier();
             float tierMult = 1f + context.Tier * 0.02f;
 
-            float baseValue = _config.BaseValues.TryGetValue(stat, out var val) ? val : 1f;
+            float baseValue = meta.BaseValue;
             float variance = _rng.Range(0.8f, 1.2f);
 
             float finalValue = baseValue * rarityMult * tierMult * variance;
@@ -106,16 +108,13 @@ namespace IdleDefenseSurvival.Items.Generation
             // Per-level scaling
             float perLevel = finalValue * _config.PerLevelMultiplier;
 
-            // Determine mode (flat vs percent)
-            var mode = _config.PercentStats.Contains(stat) ? SecondaryStatMode.Percent : SecondaryStatMode.Flat;
-
             return new CombatStatEntry
             {
                 Stat = stat,
                 BaseValue = finalValue,
                 ValuePerLevel = perLevel,
-                Mode = mode,
-                IsPercent = mode == SecondaryStatMode.Percent
+                Mode = meta.DefaultMode,
+                IsPercent = meta.IsPercentage
             };
         }
     }
@@ -126,55 +125,7 @@ namespace IdleDefenseSurvival.Items.Generation
     [Serializable]
     public class StatRollConfig
     {
-        /// <summary>
-        /// Secondary count per rarity moved to RarityMechanicConfig (single tuning point).
-        /// Only specialization stats (SecondaryStat) are rolled here — derived stats like
-        /// AttackDamage (STR), Health (CON), ManaPoint/ManaRegen (INT), CriticalDamage (DEX) come
-        /// from Main Attributes, not equipment secondaries.
-        /// </summary>
-        public Dictionary<SecondaryStat, float> BaseValues = new()
-        {
-            { SecondaryStat.BounceChance, 5f },
-            { SecondaryStat.BounceCount, 1f },
-            { SecondaryStat.MultiShootChance, 5f },
-            { SecondaryStat.MultiShootCount, 1f },
-            { SecondaryStat.StuntChance, 3f },
-            { SecondaryStat.StuntDuration, 0.5f },
-            { SecondaryStat.LifeSteal, 1f },
-            { SecondaryStat.CooldownReduction, 1f },
-            { SecondaryStat.MoveSpeed, 0.5f },
-            { SecondaryStat.BossDamage, 1f },
-            { SecondaryStat.EliteDamage, 1f },
-            { SecondaryStat.GoldGain, 1f },
-            { SecondaryStat.DropRate, 1f },
-            { SecondaryStat.InterestWave, 1f },
-            { SecondaryStat.HitRate, 1f },
-            { SecondaryStat.DefenseBreak, 1f },
-            { SecondaryStat.MetalDamageBonus, 1f },
-            { SecondaryStat.WoodDamageBonus, 1f },
-            { SecondaryStat.FireDamageBonus, 1f },
-            { SecondaryStat.WaterDamageBonus, 1f },
-            { SecondaryStat.EarthDamageBonus, 1f },
-            { SecondaryStat.LightningDamageBonus, 1f },
-            { SecondaryStat.WindDamageBonus, 1f }
-        };
-
         public float PerLevelMultiplier = 0.1f;
-
-        public HashSet<SecondaryStat> PercentStats = new()
-        {
-            SecondaryStat.BounceChance,
-            SecondaryStat.MultiShootChance,
-            SecondaryStat.StuntChance,
-            SecondaryStat.LifeSteal,
-            SecondaryStat.MoveSpeed,
-            SecondaryStat.CooldownReduction,
-            SecondaryStat.BossDamage,
-            SecondaryStat.EliteDamage,
-            SecondaryStat.GoldGain,
-            SecondaryStat.DropRate,
-            SecondaryStat.InterestWave,
-            SecondaryStat.HitRate        };
 
         public static StatRollConfig Default => new();
     }

@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using IdleDefenseSurvival.Equipment;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.UI.Equipment
 {

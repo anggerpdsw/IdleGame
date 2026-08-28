@@ -1,10 +1,10 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using IdleDefenseSurvival.Player;
 using UnityEngine.UI;
 using IdleDefenseSurvival.Manager;
 using System.Collections;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.UI
 {

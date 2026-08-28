@@ -1,5 +1,6 @@
 using System;
 using IdleDefenseSurvival.Player;
+using IdleDefenseSurvival.Stats;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Manager

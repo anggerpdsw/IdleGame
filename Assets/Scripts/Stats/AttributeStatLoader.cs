@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 
-namespace IdleDefenseSurvival.Manager
+namespace IdleDefenseSurvival.Stats
 {
     /// <summary>
     /// Loads attribute progression values from JSON databases.

@@ -1,4 +1,4 @@
-namespace IdleDefenseSurvival
+namespace IdleDefenseSurvival.Stats
 {
     /// <summary>
     /// Display helpers for SkillType (player runtime stats).

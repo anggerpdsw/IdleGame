@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Enemy
 {
