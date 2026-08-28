@@ -12,6 +12,7 @@ namespace IdleDefenseSurvival.Equipment
 {
     /// <summary>
     /// Equipment comparer - compares equipment items for upgrades, sorting, and evaluation.
+    /// Uses data-driven stat classification via StatClassificationService.
     /// </summary>
     public static class EquipmentComparer
     {
@@ -230,32 +231,37 @@ namespace IdleDefenseSurvival.Equipment
 
         /// <summary>
         /// Calculates a composite score for an equipment item.
+        /// Uses data-driven stat weights from StatClassificationService.
         /// </summary>
         public static float CalculateScore(Dictionary<SecondaryStat, float> statBonuses, IEnumerable<string> effects)
         {
             float score = 0f;
 
-            // Stat weights for specialization (SecondaryStat) — derived combat stats
+            // Stat weights for specialization stats — derived combat stats
             // (AttackDamage, HealthPoint, CriticalDamage, ...) come from Main Attribute.
-            var statWeights = new Dictionary<SecondaryStat, float>
+            // Weights are now defined here but only apply to stats classified as equipment specialization.
+            var statWeights = new Dictionary<SkillType, float>
             {
-                { SecondaryStat.LifeSteal, 1.3f },
-                { SecondaryStat.MoveSpeed, 0.5f },
-                { SecondaryStat.CooldownReduction, 0.8f },
-                { SecondaryStat.BossDamage, 1.5f },
-                { SecondaryStat.EliteDamage, 1.2f },
-                { SecondaryStat.BounceChance, 1.0f },
-                { SecondaryStat.BounceCount, 1.0f },
-                { SecondaryStat.AttackRange, 0.8f },
-                { SecondaryStat.MultiShootChance, 1.2f },
-                { SecondaryStat.KnockbackChance, 0.8f },
-                { SecondaryStat.GoldGain, 1.0f },
-                { SecondaryStat.DropRate, 1.0f },
+                { SkillType.LifeSteal, 1.3f },
+                { SkillType.MoveSpeed, 0.5f },
+                { SkillType.CooldownReduction, 0.8f },
+                { SkillType.BossDamage, 1.5f },
+                { SkillType.EliteDamage, 1.2f },
+                { SkillType.BounceChance, 1.0f },
+                { SkillType.BounceCount, 1.0f },
+                { SkillType.AttackRange, 0.8f },
+                { SkillType.MultiShootChance, 1.2f },
+                { SkillType.KnockbackChance, 0.8f },
+                { SkillType.GoldGain, 1.0f },
+                { SkillType.DropRate, 1.0f },
             };
 
             foreach (var kvp in statBonuses)
             {
-                float weight = statWeights.GetValueOrDefault(kvp.Key, 0.3f);
+                var skillType = SecondaryStatExtensions.SecondaryStatToSkillType(kvp.Key);
+                if (skillType == SkillType.None) continue;
+
+                float weight = statWeights.GetValueOrDefault(skillType, 0.3f);
                 score += kvp.Value * weight;
             }
 

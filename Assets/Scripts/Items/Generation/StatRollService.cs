@@ -134,16 +134,13 @@ namespace IdleDefenseSurvival.Items.Generation
         /// </summary>
         public Dictionary<SecondaryStat, float> BaseValues = new()
         {
-            { SecondaryStat.AttackRange, 5f },
             { SecondaryStat.BounceChance, 5f },
             { SecondaryStat.BounceCount, 1f },
             { SecondaryStat.MultiShootChance, 5f },
             { SecondaryStat.MultiShootCount, 1f },
-            { SecondaryStat.KnockbackChance, 5f },
             { SecondaryStat.StuntChance, 3f },
             { SecondaryStat.StuntDuration, 0.5f },
             { SecondaryStat.LifeSteal, 1f },
-            { SecondaryStat.DamagePerRange, 1f },
             { SecondaryStat.CooldownReduction, 1f },
             { SecondaryStat.MoveSpeed, 0.5f },
             { SecondaryStat.BossDamage, 1f },
@@ -152,7 +149,6 @@ namespace IdleDefenseSurvival.Items.Generation
             { SecondaryStat.DropRate, 1f },
             { SecondaryStat.InterestWave, 1f },
             { SecondaryStat.HitRate, 1f },
-            { SecondaryStat.Penetration, 1f },
             { SecondaryStat.DefenseBreak, 1f },
             { SecondaryStat.MetalDamageBonus, 1f },
             { SecondaryStat.WoodDamageBonus, 1f },
@@ -169,7 +165,6 @@ namespace IdleDefenseSurvival.Items.Generation
         {
             SecondaryStat.BounceChance,
             SecondaryStat.MultiShootChance,
-            SecondaryStat.KnockbackChance,
             SecondaryStat.StuntChance,
             SecondaryStat.LifeSteal,
             SecondaryStat.MoveSpeed,

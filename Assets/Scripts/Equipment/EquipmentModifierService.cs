@@ -52,7 +52,7 @@ namespace IdleDefenseSurvival.Equipment
             foreach (var statEntry in tier.StatBonuses)
             {
                 if (statEntry.Stat == SecondaryStat.None) continue;
-                var skillType = statEntry.Stat.ToSkillType();
+                var skillType = SecondaryStatExtensions.SecondaryStatToSkillType(statEntry.Stat);
                 if (skillType == SkillType.None) continue;
 
                 ModifierManager.Instance?.AddModifier(new StatModifier

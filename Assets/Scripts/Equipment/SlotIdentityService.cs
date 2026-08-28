@@ -47,106 +47,142 @@ namespace IdleDefenseSurvival.Equipment
             _ => Array.Empty<MainAttribute>()
         };
 
-        /// <summary>Recommended secondary stats for a slot (specialization only, from SecondaryStat enum).</summary>
+        /// <summary>
+        /// Recommended secondary stats for an equipment slot.
+        /// Contains only stats defined by SecondaryStat and intended as equipment specialization.
+        /// MainAttribute-derived stats should NOT be listed here.
+        /// </summary>
         public static SecondaryStat[] GetRecommendedSecondaries(EquipmentType slot) => slot switch
         {
-            // Hat: INT/CON main → Specialization: CooldownReduction, GoldGain, DropRate
+            // Hat: INT/CON specialization
+            // Focus: cooldown, economy, boss/elite damage
             EquipmentType.Hat => new[]
             {
                 SecondaryStat.CooldownReduction,
                 SecondaryStat.GoldGain,
-                SecondaryStat.DropRate
+                SecondaryStat.DropRate,
+                SecondaryStat.BossDamage,
+                SecondaryStat.EliteDamage
             },
 
-            // Gloves: STR/DEX main → Specialization: AttackRange, BounceChance, KnockbackChance, MultiShootChance
+            // Gloves: STR/DEX specialization
+            // Focus: physical attack mechanics
             EquipmentType.Gloves => new[]
             {
-                SecondaryStat.AttackRange,
+                SecondaryStat.CriticalDamage,
                 SecondaryStat.BounceChance,
-                SecondaryStat.KnockbackChance,
-                SecondaryStat.MultiShootChance
+                SecondaryStat.BounceCount,
+                SecondaryStat.MultiShootChance,
+                SecondaryStat.MultiShootCount,
+                SecondaryStat.KnockbackForce,
+                SecondaryStat.StuntChance,
+                SecondaryStat.StuntDuration,
+                SecondaryStat.DefenseBreak
             },
 
-            // Cape: DEX/INT main → Specialization: MoveSpeed, CooldownReduction, DropRate
+            // Cape: DEX/INT specialization
+            // Focus: mobility, cooldown, accuracy
             EquipmentType.Cape => new[]
             {
                 SecondaryStat.MoveSpeed,
                 SecondaryStat.CooldownReduction,
-                SecondaryStat.DropRate
+                SecondaryStat.HitRate,
+                SecondaryStat.BossDamage,
+                SecondaryStat.EliteDamage
             },
 
-            // Armor: CON/STR main → Specialization: LifeSteal, BossDamage, EliteDamage, DamagePerRange
-            // (Defense moved to Damage Reduction% / Armor Penetration Resistance — not in SecondaryStat)
+            // Armor: CON/STR specialization
+            // Focus: sustain + offensive physical specialization
             EquipmentType.Armor => new[]
             {
                 SecondaryStat.LifeSteal,
+                SecondaryStat.DefenseBreak,
+                SecondaryStat.KnockbackForce,
+                SecondaryStat.StuntChance,
+                SecondaryStat.StuntDuration,
                 SecondaryStat.BossDamage,
-                SecondaryStat.EliteDamage,
-                SecondaryStat.DamagePerRange
+                SecondaryStat.EliteDamage
             },
 
-            // Belt: CON main → Specialization: LifeSteal, GoldGain, DropRate
-            // (HealthRegen comes from CON, not SecondaryStat)
+            // Belt: CON specialization
+            // Focus: sustain + economy
             EquipmentType.Belt => new[]
             {
                 SecondaryStat.LifeSteal,
                 SecondaryStat.GoldGain,
-                SecondaryStat.DropRate
+                SecondaryStat.DropRate,
+                SecondaryStat.InterestWave
             },
 
-            // Pants: CON/DEX main → Specialization: MoveSpeed, DamagePerRange, CooldownReduction
-            // (Evasion comes from DEX → replace with Slow Resistance not in enum; HealthRegen from CON)
+            // Pants: CON/DEX specialization
+            // Focus: mobility + control/utility
             EquipmentType.Pants => new[]
             {
                 SecondaryStat.MoveSpeed,
-                SecondaryStat.DamagePerRange,
-                SecondaryStat.CooldownReduction
+                SecondaryStat.HitRate,
+                SecondaryStat.KnockbackForce,
+                SecondaryStat.StuntChance,
+                SecondaryStat.StuntDuration
             },
 
-            // Shoes: DEX main → Specialization: MoveSpeed, AttackRange, CooldownReduction
+            // Shoes: DEX specialization
+            // Focus: mobility + accuracy + attack utility
             EquipmentType.Shoes => new[]
             {
                 SecondaryStat.MoveSpeed,
-                SecondaryStat.AttackRange,
-                SecondaryStat.CooldownReduction
+                SecondaryStat.HitRate,
+                SecondaryStat.CooldownReduction,
+                SecondaryStat.KnockbackForce,
+                SecondaryStat.StuntChance
             },
 
-            // Pendant: INT main → Specialization: CooldownReduction, BossDamage, DropRate
-            // (ElementMastery, UltimateAttack, ManaPoint, ManaRegen come from INT — not secondary)
+            // Pendant: INT specialization
+            // Focus: cooldown + elemental damage + boss/elite specialization
             EquipmentType.Pendant => new[]
             {
                 SecondaryStat.CooldownReduction,
                 SecondaryStat.BossDamage,
-                SecondaryStat.DropRate,
-                // Layer 3: element bonus rolls (elemental casters diversify elements)
+                SecondaryStat.EliteDamage,
                 SecondaryStat.FireDamageBonus,
                 SecondaryStat.WaterDamageBonus,
-                SecondaryStat.LightningDamageBonus
+                SecondaryStat.LightningDamageBonus,
+                SecondaryStat.MetalDamageBonus,
+                SecondaryStat.WoodDamageBonus,
+                SecondaryStat.EarthDamageBonus,
+                SecondaryStat.WindDamageBonus
             },
 
-            // Ring: STR main → Specialization: BossDamage, EliteDamage, BounceCount
-            // (CriticalDamage from DEX → Critical Damage replaced with Armor Penetration / Execute Damage not in enum)
+            // Ring: STR specialization
+            // Focus: direct physical damage
             EquipmentType.Ring => new[]
             {
+                SecondaryStat.CriticalDamage,
+                SecondaryStat.DefenseBreak,
                 SecondaryStat.BossDamage,
                 SecondaryStat.EliteDamage,
-                SecondaryStat.BounceCount
+                SecondaryStat.LifeSteal
             },
 
-            // Earring: INT/DEX main → Specialization: CooldownReduction, DropRate, MultiShootCount
-            // (ElementMastery comes from INT)
+            // Earring: INT/DEX specialization
+            // Focus: cooldown + accuracy + multi-shot
             EquipmentType.Earring => new[]
             {
                 SecondaryStat.CooldownReduction,
-                SecondaryStat.DropRate,
-                SecondaryStat.MultiShootCount
+                SecondaryStat.HitRate,
+                SecondaryStat.MultiShootChance,
+                SecondaryStat.MultiShootCount,
+                SecondaryStat.DropRate
             },
 
-            // Bracelet: DEX/INT main → Specialization: BounceCount, MultiShootCount
+            // Bracelet: DEX/INT specialization
+            // Focus: projectile mechanics + cooldown
             EquipmentType.Bracelet => new[]
             {
+                SecondaryStat.BounceChance,
                 SecondaryStat.BounceCount,
-                SecondaryStat.MultiShootCount
+                SecondaryStat.MultiShootChance,
+                SecondaryStat.MultiShootCount,
+                SecondaryStat.CooldownReduction
             },
 
             _ => none

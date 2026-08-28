@@ -299,7 +299,7 @@ namespace IdleDefenseSurvival.Modifiers
                     foreach (var mod in buff.StatModifiers)
                     {
                         float value = mod.Value * buff.StackCount;
-                        SecondaryStat mainStat = mod.UsesSecondaryStat ? mod.SecondaryStat : SkillTypeToSecondaryStat(mod.Stat);
+                        SecondaryStat mainStat = mod.UsesSecondaryStat ? mod.SecondaryStat : SecondaryStatExtensions.SkillTypeToSecondaryStat(mod.Stat);
                         if (mainStat != SecondaryStat.None)
                         {
                             if (modifiers.ContainsKey(mainStat))
@@ -312,41 +312,6 @@ namespace IdleDefenseSurvival.Modifiers
             }
 
             return modifiers;
-        }
-
-        private SecondaryStat SkillTypeToSecondaryStat(SkillType skillType)
-        {
-            // Only specialization stats have a SecondaryStat counterpart. Derived
-            // stats (AttackDamage, HealthPoint, CriticalDamage, ...) come from Main
-            // Attribute and are not buffed via the SecondaryStat path.
-            return skillType switch
-            {
-                // Projectile / Multi / Crowd Control
-                SkillType.AttackRange => SecondaryStat.AttackRange,
-                SkillType.BounceChance => SecondaryStat.BounceChance,
-                SkillType.BounceCount => SecondaryStat.BounceCount,
-                SkillType.MultiShootChance => SecondaryStat.MultiShootChance,
-                SkillType.MultiShootCount => SecondaryStat.MultiShootCount,
-                SkillType.KnockbackChance => SecondaryStat.KnockbackChance,
-                SkillType.StuntChance => SecondaryStat.StuntChance,
-                SkillType.StuntDuration => SecondaryStat.StuntDuration,
-
-                // Sustain / Utility / PvE / Economy
-                SkillType.LifeSteal => SecondaryStat.LifeSteal,
-                SkillType.DamagePerRange => SecondaryStat.DamagePerRange,
-                SkillType.CooldownReduction => SecondaryStat.CooldownReduction,
-                SkillType.MoveSpeed => SecondaryStat.MoveSpeed,
-                SkillType.BossDamage => SecondaryStat.BossDamage,
-                SkillType.EliteDamage => SecondaryStat.EliteDamage,
-                SkillType.GoldGain => SecondaryStat.GoldGain,
-                SkillType.DropRate => SecondaryStat.DropRate,
-                SkillType.InterestWave => SecondaryStat.InterestWave,
-                SkillType.HitRate => SecondaryStat.HitRate,
-                SkillType.Penetration => SecondaryStat.Penetration,
-
-                // Derived from Main Attribute / no secondary equivalent
-                _ => SecondaryStat.None
-            };
         }
         #endregion
 

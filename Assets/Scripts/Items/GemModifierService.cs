@@ -64,7 +64,7 @@ namespace IdleDefenseSurvival.Items
                 {
                     Id = $"{prefix}_{statEntry.Stat}",
                     Source = ModifierSource.Equipment,
-                    Stat = statEntry.Stat.ToSkillType(),
+                    Stat = SecondaryStatExtensions.SecondaryStatToSkillType(statEntry.Stat),
                     SecondaryStat = statEntry.Stat,
                     Mode = (ModifierMode)statEntry.Mode,
                     Value = value,

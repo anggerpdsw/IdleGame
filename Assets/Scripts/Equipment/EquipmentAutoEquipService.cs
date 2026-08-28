@@ -19,21 +19,22 @@ namespace IdleDefenseSurvival.Equipment
 
         // Build weights for specialization stats (tuned to ~20% share).
         // Derived combat stats (AttackDamage, HealthPoint, CriticalDamage, ...) come
-        // from Main Attribute (×80 weight below), so only SecondaryStat routes here.
-        private static readonly Dictionary<SecondaryStat, float> StatWeights = new()
+        // from Main Attribute (×80 weight below), so only equipment specialization stats route here.
+        // Uses SkillType keys for data-driven classification via StatClassificationService.
+        private static readonly Dictionary<SkillType, float> StatWeights = new()
         {
-            { SecondaryStat.LifeSteal, 1.3f },
-            { SecondaryStat.MoveSpeed, 0.5f },
-            { SecondaryStat.CooldownReduction, 0.8f },
-            { SecondaryStat.BossDamage, 1.5f },
-            { SecondaryStat.EliteDamage, 1.2f },
-            { SecondaryStat.BounceChance, 1.0f },
-            { SecondaryStat.BounceCount, 1.0f },
-            { SecondaryStat.AttackRange, 0.8f },
-            { SecondaryStat.MultiShootChance, 1.2f },
-            { SecondaryStat.KnockbackChance, 0.8f },
-            { SecondaryStat.GoldGain, 1.0f },
-            { SecondaryStat.DropRate, 1.0f },
+            { SkillType.LifeSteal, 1.3f },
+            { SkillType.MoveSpeed, 0.5f },
+            { SkillType.CooldownReduction, 0.8f },
+            { SkillType.BossDamage, 1.5f },
+            { SkillType.EliteDamage, 1.2f },
+            { SkillType.BounceChance, 1.0f },
+            { SkillType.BounceCount, 1.0f },
+            { SkillType.AttackRange, 0.8f },
+            { SkillType.MultiShootChance, 1.2f },
+            { SkillType.KnockbackChance, 0.8f },
+            { SkillType.GoldGain, 1.0f },
+            { SkillType.DropRate, 1.0f },
         };
 
         public EquipmentAutoEquipService(IEquipmentRepository repo)
@@ -114,7 +115,13 @@ namespace IdleDefenseSurvival.Equipment
             // ~20% share: combat stats via per-build weights.
             var bonuses = EquipmentStatCalculator.GetItemBonusesWithSet(item, db, setCounts);
             foreach (var (stat, value) in bonuses)
-                score += value * StatWeights.GetValueOrDefault(stat, 0.3f);
+            {
+                var skillType = SecondaryStatExtensions.SecondaryStatToSkillType(stat);
+                if (skillType == SkillType.None) continue;
+
+                float weight = StatWeights.GetValueOrDefault(skillType, 0.3f);
+                score += value * weight;
+            }
 
             // Small terms so rarity won't dominate but mechanics still count.
             if (hasPassive)

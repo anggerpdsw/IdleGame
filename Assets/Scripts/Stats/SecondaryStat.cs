@@ -9,69 +9,99 @@ namespace IdleDefenseSurvival
     public static class SecondaryStatExtensions
     {
         /// <summary>
-        /// Gets the display name for the stat.
+        /// Maps SecondaryStat to its corresponding SkillType for display name lookup.
+        /// Single source of truth for stat display names.
         /// </summary>
-        public static string GetSkillDisplayName(this SecondaryStat stat) => stat switch
+        public static SkillType SecondaryStatToSkillType(SecondaryStat stat) => stat switch
         {
-            SecondaryStat.BossDamage => "Boss Damage",
-            SecondaryStat.BounceChance => "Bounce Chance",
-            SecondaryStat.BounceCount => "Bounce Count",
-            SecondaryStat.CriticalDamage => "Critical Damage",
-            SecondaryStat.CooldownReduction => "Cooldown Reduction",
-            SecondaryStat.DefenseBreak => "Defense Break",
-            SecondaryStat.DropRate => "Drop Rate",
-            SecondaryStat.EarthDamageBonus => "Earth Damage",
-            SecondaryStat.EliteDamage => "Elite Damage",
-            SecondaryStat.FireDamageBonus => "Fire Damage",
-            SecondaryStat.GoldGain => "Gold Gain",
-            SecondaryStat.HitRate => "Hit Rate",
-            SecondaryStat.InterestWave => "Interest Wave",
-            SecondaryStat.KnockbackForce => "Knockback Force",
-            SecondaryStat.LifeSteal => "Life Steal",
-            SecondaryStat.LightningDamageBonus => "Lightning Damage",
-            SecondaryStat.MetalDamageBonus => "Metal Damage",
-            SecondaryStat.MoveSpeed => "Move Speed",
-            SecondaryStat.MultiShootChance => "Multi-Shot Chance",
-            SecondaryStat.MultiShootCount => "Multi-Shot Count",
-            SecondaryStat.StuntChance => "Stun Chance",
-            SecondaryStat.StuntDuration => "Stun Duration",
-            SecondaryStat.WaterDamageBonus => "Water Damage",
-            SecondaryStat.WindDamageBonus => "Wind Damage",
-            SecondaryStat.WoodDamageBonus => "Wood Damage",
-            _ => "Unknown"
+            SecondaryStat.BossDamage => SkillType.BossDamage,
+            SecondaryStat.BounceChance => SkillType.BounceChance,
+            SecondaryStat.BounceCount => SkillType.BounceCount,
+            SecondaryStat.CriticalDamage => SkillType.CriticalDamage,
+            SecondaryStat.CooldownReduction => SkillType.CooldownReduction,
+            SecondaryStat.DefenseBreak => SkillType.DefenseBreak,
+            SecondaryStat.DropRate => SkillType.DropRate,
+            SecondaryStat.EarthDamageBonus => SkillType.EarthDamageBonus,
+            SecondaryStat.EliteDamage => SkillType.EliteDamage,
+            SecondaryStat.FireDamageBonus => SkillType.FireDamageBonus,
+            SecondaryStat.GoldGain => SkillType.GoldGain,
+            SecondaryStat.HitRate => SkillType.HitRate,
+            SecondaryStat.InterestWave => SkillType.InterestWave,
+            SecondaryStat.KnockbackForce => SkillType.KnockbackForce,
+            SecondaryStat.LifeSteal => SkillType.LifeSteal,
+            SecondaryStat.LightningDamageBonus => SkillType.LightningDamageBonus,
+            SecondaryStat.MetalDamageBonus => SkillType.MetalDamageBonus,
+            SecondaryStat.MoveSpeed => SkillType.MoveSpeed,
+            SecondaryStat.MultiShootChance => SkillType.MultiShootChance,
+            SecondaryStat.MultiShootCount => SkillType.MultiShootCount,
+            SecondaryStat.StuntChance => SkillType.StuntChance,
+            SecondaryStat.StuntDuration => SkillType.StuntDuration,
+            SecondaryStat.WaterDamageBonus => SkillType.WaterDamageBonus,
+            SecondaryStat.WindDamageBonus => SkillType.WindDamageBonus,
+            SecondaryStat.WoodDamageBonus => SkillType.WoodDamageBonus,
+            _ => SkillType.None,
         };
 
-        /// <summary>
-        /// Gets the short display name for compact UI.
-        /// </summary>
-        public static string GetSkillShortName(this SecondaryStat stat) => stat switch
+        public static SecondaryStat SkillTypeToSecondaryStat(SkillType skillType)
         {
-            SecondaryStat.BossDamage => "BDMG",
-            SecondaryStat.BounceChance => "BCH",
-            SecondaryStat.BounceCount => "BCT",
-            SecondaryStat.CooldownReduction => "CDR",
-            SecondaryStat.DefenseBreak => "DBK",
-            SecondaryStat.DropRate => "DRT",
-            SecondaryStat.EarthDamageBonus => "EDB",
-            SecondaryStat.EliteDamage => "EDMG",
-            SecondaryStat.FireDamageBonus => "FDB",
-            SecondaryStat.GoldGain => "GOLD",
-            SecondaryStat.HitRate => "HIT",
-            SecondaryStat.InterestWave => "INW",
-            SecondaryStat.KnockbackForce => "KFR",
-            SecondaryStat.LifeSteal => "LFS",
-            SecondaryStat.LightningDamageBonus => "LDB",
-            SecondaryStat.MetalDamageBonus => "MDB",
-            SecondaryStat.MoveSpeed => "MSP",
-            SecondaryStat.MultiShootChance => "MCH",
-            SecondaryStat.MultiShootCount => "MCT",
-            SecondaryStat.StuntChance => "SCH",
-            SecondaryStat.StuntDuration => "SDR",
-            SecondaryStat.WaterDamageBonus => "WADB",
-            SecondaryStat.WindDamageBonus => "WIDB",
-            SecondaryStat.WoodDamageBonus => "WDDB",
-            _ => "??"
-        };
+            // Only specialization stats have a SecondaryStat counterpart. Derived
+            // stats (AttackDamage, HealthPoint, CriticalDamage, ...) come from Main
+            // Attribute and are not buffed via the SecondaryStat path.
+            return skillType switch
+            {
+                // Physical
+                SkillType.CriticalDamage => SecondaryStat.CriticalDamage,
+                SkillType.BounceChance => SecondaryStat.BounceChance,
+                SkillType.BounceCount => SecondaryStat.BounceCount,
+                SkillType.DefenseBreak => SecondaryStat.DefenseBreak,
+                SkillType.MultiShootChance => SecondaryStat.MultiShootChance,
+                SkillType.MultiShootCount => SecondaryStat.MultiShootCount,
+                SkillType.KnockbackForce => SecondaryStat.KnockbackForce,
+                SkillType.StuntChance => SecondaryStat.StuntChance,
+                SkillType.StuntDuration => SecondaryStat.StuntDuration,
+
+                // Survival
+                SkillType.LifeSteal => SecondaryStat.LifeSteal,
+
+                // Element damage (Layer 3) — per-element bonus (percent, from equipment/card/buff)
+                SkillType.MetalDamageBonus => SecondaryStat.MetalDamageBonus,
+                SkillType.WoodDamageBonus => SecondaryStat.WoodDamageBonus,
+                SkillType.FireDamageBonus => SecondaryStat.FireDamageBonus,
+                SkillType.WaterDamageBonus => SecondaryStat.WaterDamageBonus,
+                SkillType.EarthDamageBonus => SecondaryStat.EarthDamageBonus,
+                SkillType.LightningDamageBonus => SecondaryStat.LightningDamageBonus,
+                SkillType.WindDamageBonus => SecondaryStat.WindDamageBonus,
+
+                // Economy
+                SkillType.InterestWave => SecondaryStat.InterestWave,
+                SkillType.GoldGain => SecondaryStat.GoldGain,
+                SkillType.DropRate => SecondaryStat.DropRate,
+
+                // Utility
+                SkillType.MoveSpeed => SecondaryStat.MoveSpeed,
+                SkillType.CooldownReduction => SecondaryStat.CooldownReduction,
+                SkillType.BossDamage => SecondaryStat.BossDamage,
+                SkillType.EliteDamage => SecondaryStat.EliteDamage,
+
+                // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
+                SkillType.HitRate => SecondaryStat.HitRate,
+
+                // Derived from Main Attribute / no secondary equivalent
+                _ => SecondaryStat.None
+            };
+        }
+
+        /// <summary>
+        /// Gets the display name for a SecondaryStat — delegates to SkillTypeExtensions.
+        /// </summary>
+        public static string GetSkillDisplayName(this SecondaryStat stat) =>
+            SecondaryStatToSkillType(stat).GetSkillDisplayName();
+
+        /// <summary>
+        /// Gets the short display name for a SecondaryStat — delegates to SkillTypeExtensions.
+        /// </summary>
+        public static string GetSkillShortName(this SecondaryStat stat) =>
+            SecondaryStatToSkillType(stat).GetSkillShortName();
 
         /// <summary>
         /// Gets the default color for the stat in UI.
@@ -130,7 +160,6 @@ namespace IdleDefenseSurvival
             SecondaryStat.MultiShootChance => true,
             SecondaryStat.StuntChance => true,
             SecondaryStat.InterestWave => true,
-            SecondaryStat.HitRate => true,
             SecondaryStat.MetalDamageBonus  => true,
             SecondaryStat.WoodDamageBonus   => true,
             SecondaryStat.FireDamageBonus   => true,
@@ -210,41 +239,41 @@ namespace IdleDefenseSurvival
         None = 0,
 
         // Physical
-        CriticalDamage = 1,
-        BounceChance = 2,
-        BounceCount = 3,
-        DefenseBreak = 4,
-        MultiShootChance = 5,
-        MultiShootCount = 6,
-        KnockbackForce = 7,
-        StuntChance = 8,
-        StuntDuration = 9,
+        CriticalDamage = 5,
+        BounceChance = 7,
+        BounceCount = 8,
+        DefenseBreak = 9,
+        MultiShootChance = 10,
+        MultiShootCount = 11,
+        KnockbackForce = 13,
+        StuntChance = 14,
+        StuntDuration = 15,
 
         // Survival
-        LifeSteal = 10,
+        LifeSteal = 19,
 
         // Element damage (Layer 3) — per-element bonus (percent, from equipment/card/buff)
-        MetalDamageBonus = 11,
-        WoodDamageBonus = 12,
-        FireDamageBonus = 13,
-        WaterDamageBonus = 14,
-        EarthDamageBonus = 15,
-        LightningDamageBonus = 16,
-        WindDamageBonus = 17,
+        MetalDamageBonus = 26,
+        WoodDamageBonus = 27,
+        FireDamageBonus = 28,
+        WaterDamageBonus = 29,
+        EarthDamageBonus = 30,
+        LightningDamageBonus = 31,
+        WindDamageBonus = 32,
 
         // Economy
-        InterestWave = 18,
-        GoldGain = 19,
-        DropRate = 20,
+        InterestWave = 33,
+        GoldGain = 34,
+        DropRate = 35,
 
         // Utility
-        MoveSpeed = 21,
-        CooldownReduction = 22,
-        BossDamage = 23,
-        EliteDamage = 24,
+        MoveSpeed = 36,
+        CooldownReduction = 37,
+        BossDamage = 38,
+        EliteDamage = 39,
 
         // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
-        HitRate = 25
+        HitRate = 40,
     }
 
 }
