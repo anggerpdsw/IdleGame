@@ -168,6 +168,13 @@ namespace IdleDefenseSurvival.Items.Generation
                     float variance = _rng.Range(0.9f, 1.1f);
 
                     float value = statEntry.BaseValue * rarityMult * tierMult * variance;
+
+                    // Per-level scaling from SOT: dataSkillTypeValuePerLevel.json
+                    var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(statEntry.Stat);
+                    float perLevel = progression?.ValuePerLevel ?? 0f;
+
+                    // Store as CombatStatEntry to preserve ValuePerLevel for later use
+                    // For now we just return the base value; ValuePerLevel is used when applying to item
                     values[statEntry.Stat] = value;
                 }
             }

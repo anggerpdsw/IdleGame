@@ -105,8 +105,9 @@ namespace IdleDefenseSurvival.Items.Generation
 
             float finalValue = baseValue * rarityMult * tierMult * variance;
 
-            // Per-level scaling
-            float perLevel = finalValue * _config.PerLevelMultiplier;
+            // Per-level scaling from SOT: dataSkillTypeValuePerLevel.json
+            var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(stat);
+            float perLevel = progression?.ValuePerLevel ?? (finalValue * _config.PerLevelMultiplier);
 
             return new CombatStatEntry
             {

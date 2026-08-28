@@ -135,36 +135,33 @@ namespace IdleDefenseSurvival.UI.Upgrade
             var account = AccountManager.Instance;
             if (account == null) return;
 
-            int attributeValue = account.GetAttributeValue(attr) - GameConstants.STARTING_STAT_POINTS;
-            var bonuses = AttributeService.GetBonuses(attr);
+            var skillBonus = AttributeService.GetBonuses(attr);
 
             var sb = new StringBuilder();
             // Header
             sb.AppendLine($"<b><color=#FFD700>{attr.GetMainDisplayName()}</color></b>");
             // Total effect
             sb.AppendLine("<b>Current Status:</b>");
-            foreach (var bonus in bonuses) 
+            foreach (var type in skillBonus) 
             {
-                float totalFlat = bonus.Flat * attributeValue;
-                float totalPercent = bonus.Percent * attributeValue;
-                AttributeBonusData totalBonus = new(bonus.Stat, totalFlat, totalPercent);
-                sb.AppendLine($"• {bonus.Stat.GetSkillDisplayName()} {ValueStat(totalBonus)}");
+                SkillType skill = type.Stat;
+                sb.AppendLine($"• {skill.GetSkillDisplayName()} {PlayerStatsManager.Instance.GetStat(skill)}");
             }
             // Per point
             sb.AppendLine();
-            sb.AppendLine("<b>Per Point:</b>");
-            foreach (var bonus in bonuses)
-                sb.AppendLine($"• {bonus.Stat.GetSkillDisplayName()} {ValueStat(bonus)}");
+            sb.AppendLine("<b>Bonus Per Point:</b>");
+            foreach (var type in skillBonus)
+                sb.AppendLine($"• {type.Stat.GetSkillDisplayName()} {ValueStat(type)}");
             var mouse = Pointer.current != null
                 ? (Vector3)Pointer.current.position.ReadValue()
                 : screenPosition;
             tooltip.ShowText(sb.ToString(), mouse);
         }
-        private string ValueStat(AttributeBonusData bonus)
+        private string ValueStat(AttributeBonusData type)
         {
-            return Mathf.Abs(bonus.Percent) > 0.000001f
-                    ? $"+{bonus.Percent:P2}"
-                    : $"+{bonus.Flat:0.####}";
+            return Mathf.Abs(type.Percent) > 0.000001f
+                    ? $"{type.Percent:P3}"
+                    : $"+{type.Flat:0.####}";
         }
         public void HideAttributeInfo() => TooltipUI.Instance?.Hide();
     }

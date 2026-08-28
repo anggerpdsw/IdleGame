@@ -161,6 +161,7 @@ namespace IdleDefenseSurvival.Stats
         public struct AttributeProgression
         {
             public float ValuePerLevel;
+            public float ValuePerEnhance;
         }
     }
 }

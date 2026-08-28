@@ -110,12 +110,12 @@
         "displayName": "Hit Rate"
       },
       "healthPoint": {
-        "baseValue": 140,
+        "baseValue": 143.5,
         "description": "Maximum health of player",
         "displayName": "Health Points"
       },
       "healthRegen": {
-        "baseValue": 0.1,
+        "baseValue": 0.775,
         "description": "Amount of player health regenerated per second",
         "displayName": "Health Regeneration"
       },
@@ -125,14 +125,19 @@
         "displayName": "Life Steal"
       },
       "manaPoint": {
-        "baseValue": 70,
+        "baseValue": 76.5,
         "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
         "displayName": "Mana Points"
       },
       "manaRegen": {
-        "baseValue": 1.1,
+        "baseValue": 1.155,
         "description": "Mana regenerated per second",
         "displayName": "Mana Regeneration"
+      },
+      "elementMastery": {
+        "baseValue": 0,
+        "description": "Damage multiplier for element again element",
+        "displayName": "Element Mastery"
       }
     },
     "currency": {

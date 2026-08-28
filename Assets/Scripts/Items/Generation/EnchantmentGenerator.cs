@@ -50,13 +50,21 @@ namespace IdleDefenseSurvival.Items.Generation
             {
                 var stat = allStats[_rng.NextInt(allStats.Length)];
                 var meta = SecondaryStatRegistry.Get(stat);
-                float baseValue = meta.BaseValue * rarity.GetDefaultStatMultiplier() * (1f + enchantLevel * 0.1f) * _rng.Range(0.8f, 1.2f);
+                float rarityMult = rarity.GetDefaultStatMultiplier();
+                float levelMult = 1f + enchantLevel * 0.1f;
+                float variance = _rng.Range(0.8f, 1.2f);
+
+                float baseValue = meta.BaseValue * rarityMult * levelMult * variance;
+
+                // Per-level scaling from SOT: dataSkillTypeValuePerLevel.json
+                var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(stat);
+                float perLevel = progression?.ValuePerLevel ?? (baseValue * 0.1f);
 
                 enchantment.StatBonuses[i] = new CombatStatEntry
                 {
                     Stat = stat,
                     BaseValue = baseValue,
-                    ValuePerLevel = baseValue * 0.1f,
+                    ValuePerLevel = perLevel,
                     Mode = meta.DefaultMode,
                     IsPercent = meta.IsPercentage
                 };
