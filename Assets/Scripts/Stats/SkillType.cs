@@ -1,7 +1,4 @@
-using System;
-using UnityEngine;
-
-namespace IdleDefenseSurvival.Stats
+namespace IdleDefenseSurvival
 {
     /// <summary>
     /// Display helpers for SkillType (player runtime stats).
