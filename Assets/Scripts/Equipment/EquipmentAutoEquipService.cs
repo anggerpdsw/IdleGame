@@ -46,7 +46,7 @@ namespace IdleDefenseSurvival.Equipment
         /// <param name="equip">Orchestrator Equip(item, slot) — the actual transaction.</param>
         /// <returns>Count of items equipped.</returns>
         public int AutoEquipBest(System.Func<InventoryItem, EquipmentType, bool> canEquip,
-            System.Func<Inventory.InventoryItem, EquipmentType, bool> equip)
+            System.Func<InventoryItem, EquipmentType, bool> equip)
         {
             var inventory = InventoryService.Instance;
             if (inventory == null) return 0;

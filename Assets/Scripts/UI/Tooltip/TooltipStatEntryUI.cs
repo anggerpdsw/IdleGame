@@ -1,7 +1,5 @@
 using TMPro;
 using UnityEngine;
-using IdleDefenseSurvival.Equipment;
-using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.UI.Tooltip

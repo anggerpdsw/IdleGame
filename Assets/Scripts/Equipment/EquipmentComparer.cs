@@ -6,7 +6,6 @@ using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Stats;
-using IdleDefenseSurvival.Items.Generation;
 
 namespace IdleDefenseSurvival.Equipment
 {
