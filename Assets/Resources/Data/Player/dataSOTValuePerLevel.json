@@ -1,165 +1,247 @@
 {
     "attackDamage": {
+        "BaseValue": 10.0,
+        "Mode": 1,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "attackRange": {
+        "BaseValue": 5.0,
+        "Mode": 1,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "attackSpeed": {
+        "BaseValue": 1.0,
+        "Mode": 1,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "bossDamage": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "bounceChance": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.5,
         "ValuePerEnhance": 1.0
     },
     "bounceCount": {
+        "BaseValue": 0.0,
+        "Mode": 1,
         "ValuePerLevel": 0.02,
         "ValuePerEnhance": 0.05
     },
     "cooldownReduction": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.15,
         "ValuePerEnhance": 0.3
     },
     "criticalChance": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.15,
         "ValuePerEnhance": 0.3
     },
     "criticalDamage": {
+        "BaseValue": 1.5,
+        "Mode": 2,
         "ValuePerLevel": 0.15,
         "ValuePerEnhance": 0.3
     },
     "damagePerRange": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "deathDefy": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "defenseAmount": {
+        "BaseValue": 0.0,
+        "Mode": 1,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "defenseBreak": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "dropRate": {
+        "BaseValue": 1.0,
+        "Mode": 2,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "earthDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "elementMastery": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "eliteDamage": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "evasion": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "fireDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "goldGain": {
+        "BaseValue": 1.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "healthPoint": {
+        "BaseValue": 100.0,
+        "Mode": 1,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "healthRegen": {
+        "BaseValue": 0.0,
+        "Mode": 1,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "hitRate": {
+        "BaseValue": 1.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "interestWave": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.05,
         "ValuePerEnhance": 0.1
     },
     "knockbackChance": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.4,
         "ValuePerEnhance": 0.8
     },
     "knockbackForce": {
+        "BaseValue": 1.0,
+        "Mode": 1,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.5
     },
     "lifeSteal": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.15,
         "ValuePerEnhance": 0.3
     },
     "lightningDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "manaPoint": {
+        "BaseValue": 100.0,
+        "Mode": 1,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "manaRegen": {
+        "BaseValue": 0.0,
+        "Mode": 1,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "metalDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "moveSpeed": {
+        "BaseValue": 1.0,
+        "Mode": 1,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "multiShootChance": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.4,
         "ValuePerEnhance": 0.8
     },
     "multiShootCount": {
+        "BaseValue": 1.0,
+        "Mode": 1,
         "ValuePerLevel": 0.02,
         "ValuePerEnhance": 0.05
     },
     "penetration": {
+        "BaseValue": 0.0,
+        "Mode": 1,
         "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.4
     },
     "stuntChance": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.3,
         "ValuePerEnhance": 0.6
     },
     "stuntDuration": {
+        "BaseValue": 1.0,
+        "Mode": 1,
         "ValuePerLevel": 0.02,
         "ValuePerEnhance": 0.05
     },
     "ultimateAttack": {
+        "BaseValue": 1.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "waterDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "windDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     },
     "woodDamageBonus": {
+        "BaseValue": 0.0,
+        "Mode": 2,
         "ValuePerLevel": 0.25,
         "ValuePerEnhance": 0.5
     }

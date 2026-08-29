@@ -246,6 +246,8 @@ namespace IdleDefenseSurvival.Items.Generation
             var mainAttrs = new List<EquipmentAttributeEntry>();
             var secondAttrs = new List<EquipmentAttributeEntry>();
 
+            SecondaryStatResolver.Initialize();
+
             foreach (var affix in affixes)
             {
                 if (affix == null) continue;
@@ -257,7 +259,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
                 if (affix.StatValues != null)
                     foreach (var (stat, value) in affix.StatValues)
-                        if (stat != SecondaryStat.None && value != 0f)
+                        if (stat != SecondaryStat.None && value != 0f && SecondaryStatResolver.IsValidSecondaryStat(stat))
                             secondAttrs.Add(new EquipmentAttributeEntry((MainAttribute)(int)stat, value));
             }
 
