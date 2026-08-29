@@ -64,8 +64,7 @@ namespace IdleDefenseSurvival.Items
         {
             if (item == null || durabilityPoints <= 0) return 0;
 
-            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData;
-            if (itemData == null) return durabilityPoints * _config.BaseRepairCostPerPoint;
+            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return durabilityPoints * _config.BaseRepairCostPerPoint;
 
             long baseCostPerPoint = itemData.RepairCostPerDurability > 0
                 ? itemData.RepairCostPerDurability
@@ -160,8 +159,7 @@ namespace IdleDefenseSurvival.Items
         {
             if (item == null) return null;
 
-            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId) as EquipmentData;
-            if (itemData == null) return null;
+            if (ItemDatabase.Instance?.GetItem(item.ItemId) is not EquipmentData itemData) return null;
 
             int needed = item.MaxDurability - item.CurrentDurability;
             if (needed <= 0) return null;
