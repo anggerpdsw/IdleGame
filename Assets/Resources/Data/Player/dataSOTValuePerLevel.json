@@ -218,8 +218,8 @@
     "stuntDuration": {
         "BaseValue": 1.0,
         "Mode": 1,
-        "ValuePerLevel": 0.02,
-        "ValuePerEnhance": 0.05
+        "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.3
     },
     "ultimateAttack": {
         "BaseValue": 1.0,

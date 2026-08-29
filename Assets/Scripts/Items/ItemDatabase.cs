@@ -45,7 +45,6 @@ namespace IdleDefenseSurvival.Items
         private readonly Dictionary<string, PotionData> _potion = new();
         private readonly Dictionary<string, GemData> _gems = new();
         private readonly Dictionary<string, SetBonusData> _sets = new();
-        private readonly Dictionary<string, AffixData> _affixes = new();
         private bool _isLoaded = false;
         #endregion
 
@@ -57,7 +56,6 @@ namespace IdleDefenseSurvival.Items
         public IReadOnlyDictionary<string, PotionData> AllPotion => _potion;
         public IReadOnlyDictionary<string, GemData> AllGems => _gems;
         public IReadOnlyDictionary<string, SetBonusData> AllSets => _sets;
-        public IReadOnlyDictionary<string, AffixData> AllAffixes => _affixes;
         #endregion
 
         #region Initialization
@@ -81,7 +79,6 @@ namespace IdleDefenseSurvival.Items
                 LoadPotion();
                 LoadGems();
                 LoadSets();
-                LoadAffixes();
 
                 _isLoaded = true;
 
@@ -93,8 +90,7 @@ namespace IdleDefenseSurvival.Items
                     $"{_equipment.Count} equipment, " +
                     $"{_potion.Count} potion, " +
                     $"{_gems.Count} gems, " +
-                    $"{_sets.Count} sets, " +
-                    $"{_affixes.Count} affixes"
+                    $"{_sets.Count} sets"
                 );
             }
             catch (Exception e)
@@ -141,10 +137,6 @@ namespace IdleDefenseSurvival.Items
         {
             LoadJsonList<SetBonusData>("Data/Equipment/dataSets", RegisterSet);
         }
-        private void LoadAffixes()
-        {
-            LoadJsonList<AffixData>("Data/Equipment/dataAffixes", RegisterAffix);
-        }
         #endregion
 
         private void LoadJsonList<T>(string resourcePath, Action<T> registerAction)
@@ -180,15 +172,12 @@ namespace IdleDefenseSurvival.Items
         public PotionData GetPotion(string itemId) => _potion.TryGetValue(itemId, out var potion) ? potion : null;
         public GemData GetGem(string gemId) => _gems.TryGetValue(gemId, out var gem) ? gem : null;
         public SetBonusData GetSet(string setId) => _sets.TryGetValue(setId, out var set) ? set : null;
-        public AffixData GetAffix(string affixId) => _affixes.TryGetValue(affixId, out var affix) ? affix : null;
 
         public bool TryGetItem(string itemId, out ItemData item) => _items.TryGetValue(itemId, out item);
         public bool TryGetEquipment(string itemId, out EquipmentData equipment) => _equipment.TryGetValue(itemId, out equipment);
         public bool TryGetPotion(string itemId, out PotionData potion) => _potion.TryGetValue(itemId, out potion);
         public bool TryGetGem(string gemId, out GemData gem) => _gems.TryGetValue(gemId, out gem);
         public bool TryGetSet(string setId, out SetBonusData set) => _sets.TryGetValue(setId, out set);
-        public bool TryGetAffix(string affixId, out AffixData affix) => _affixes.TryGetValue(affixId, out affix);
-        public IReadOnlyList<AffixData> GetAllAffixes() => _affixes.Values.ToList();
         #endregion
 
         #region Queries
@@ -349,19 +338,6 @@ namespace IdleDefenseSurvival.Items
             }
 
             _sets[set.SetId] = set;
-        }
-
-        public void RegisterAffix(AffixData affix)
-        {
-            if (affix == null || string.IsNullOrEmpty(affix.AffixId)) return;
-
-            if (_affixes.ContainsKey(affix.AffixId))
-            {
-                Debug.LogWarning($"[ItemDatabase] Affix already registered: {affix.AffixId}");
-                return;
-            }
-
-            _affixes[affix.AffixId] = affix;
         }
 
         public void UnregisterItem(string itemId)

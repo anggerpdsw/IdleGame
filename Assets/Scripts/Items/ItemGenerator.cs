@@ -41,10 +41,8 @@ namespace IdleDefenseSurvival.Items
         // Generator components
         private readonly IRandomProvider _rng;
         private readonly RarityRollService _rarityRoll;
-        private readonly StatRollService _statRoll;
         private readonly SocketGenerator _socketGen;
         private readonly EnchantmentGenerator _enchantGen;
-        private readonly AffixGenerator _affixGen;
         private readonly EquipmentGenerator _equipmentGen;
         private readonly GemGenerator _gemGen;
         private readonly ConsumableGenerator _consumableGen;
@@ -58,17 +56,22 @@ namespace IdleDefenseSurvival.Items
 
             // Initialize services
             _rarityRoll = new RarityRollService(_rng);
-            _statRoll = new StatRollService(_rng);
             _socketGen = new SocketGenerator();
             _enchantGen = new EnchantmentGenerator(_rng);
-            _affixGen = new AffixGenerator(_rng);
             _validator = new ItemValidator();
 
             // Initialize generators with shared services (single RNG source for determinism)
-            _equipmentGen = new EquipmentGenerator(_rng, _rarityRoll, _statRoll, _socketGen, _enchantGen, _affixGen, _validator);
+            _equipmentGen = new EquipmentGenerator(
+                rng: _rng,
+                rarityRoll: _rarityRoll,
+                socketGen: _socketGen,
+                enchantGen: _enchantGen,
+                secondaryStatGen: null,
+                validator: _validator
+            );
             _gemGen = new GemGenerator(_rng, _rarityRoll, _validator);
             _consumableGen = new ConsumableGenerator(_rng, _rarityRoll, _validator);
-            _lootGen = new Gen.LootGenerator(_rng, _equipmentGen, _gemGen, _consumableGen, Gen.LootGeneratorConfig.Default);
+            _lootGen = new Gen.LootGenerator(_rng, _equipmentGen, _gemGen, _consumableGen, LootGeneratorConfig.Default);
         }
 
         // ============ Public API (Backward Compatible) ============
@@ -246,13 +249,18 @@ namespace IdleDefenseSurvival.Items
         {
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = new RarityRollService(_rng);
-            _statRoll = new StatRollService(_rng);
             _socketGen = new SocketGenerator();
             _enchantGen = new EnchantmentGenerator(_rng);
-            _affixGen = new AffixGenerator(_rng);
             _validator = new ItemValidator();
 
-            _equipmentGen = new EquipmentGenerator(_rng, _rarityRoll, _statRoll, _socketGen, _enchantGen, _affixGen, _validator);
+            _equipmentGen = new EquipmentGenerator(
+                rng: _rng,
+                rarityRoll: _rarityRoll,
+                socketGen: _socketGen,
+                enchantGen: _enchantGen,
+                secondaryStatGen: null,
+                validator: _validator
+            );
             _gemGen = new GemGenerator(_rng, _rarityRoll, _validator);
             _consumableGen = new ConsumableGenerator(_rng, _rarityRoll, _validator);
             _lootGen = new Gen.LootGenerator(_rng, _equipmentGen, _gemGen, _consumableGen, Gen.LootGeneratorConfig.Default);

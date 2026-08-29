@@ -16,36 +16,33 @@ namespace IdleDefenseSurvival.Items.Generation
     /// Generator for equipment items.
     /// Pipeline: Validate input → Resolve rarity → Load equip_base → Resolve rarity config →
     /// Generate Level → Create InventoryItem → Generate MainAttribute → Generate SecondaryAttribute
-    /// → Generate Sockets → Generate Affixes → Generate Enchantment → Apply Event Modifiers →
+    /// → Generate Sockets → Generate SecondaryStats (via SecondaryStatGenerator) → Generate Enchantment → Apply Event Modifiers →
     /// Calculate final derived values → Validate → Return
     /// </summary>
     public sealed class EquipmentGenerator
     {
         private readonly IRandomProvider _rng;
         private readonly RarityRollService _rarityRoll;
-        private readonly StatRollService _statRoll;
         private readonly SocketGenerator _socketGen;
         private readonly EnchantmentGenerator _enchantGen;
-        private readonly AffixGenerator _affixGen;
+        private readonly SecondaryStatGenerator _secondaryStatGen;
         private readonly ItemValidator _validator;
         private readonly AttributeRollService _attributeRoll;
 
         public EquipmentGenerator(
             IRandomProvider rng,
             RarityRollService rarityRoll = null,
-            StatRollService statRoll = null,
             SocketGenerator socketGen = null,
             EnchantmentGenerator enchantGen = null,
-            AffixGenerator affixGen = null,
+            SecondaryStatGenerator secondaryStatGen = null,
             ItemValidator validator = null,
             AttributeRollService attributeRoll = null)
         {
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = rarityRoll ?? new RarityRollService(_rng);
-            _statRoll = statRoll ?? new StatRollService(_rng);
             _socketGen = socketGen ?? new SocketGenerator();
             _enchantGen = enchantGen ?? new EnchantmentGenerator(_rng);
-            _affixGen = affixGen ?? new AffixGenerator(_rng);
+            _secondaryStatGen = secondaryStatGen ?? new SecondaryStatGenerator(_rng);
             _validator = validator ?? new ItemValidator();
             _attributeRoll = attributeRoll ?? new AttributeRollService(_rng);
         }
@@ -102,19 +99,14 @@ namespace IdleDefenseSurvival.Items.Generation
             GenerateMainAttributes(item, rarity, context);
 
             // 8. Generate Secondary Stats (specialization stats like Crit, LifeSteal, etc.)
-            var secondaryStats = _statRoll.RollSecondaryStats(baseEquipment, rarity, context);
+            var secondaryStats = _secondaryStatGen.Generate(rarity, context);
             if (secondaryStats.Length > 0)
                 ApplySecondaryStats(item, secondaryStats);
 
             // 9. Generate sockets using rolled MaxSockets from item (respects final value from rarityConfig)
             item.Sockets = _socketGen.GenerateSockets(item.MaxSockets, rarity, context);
 
-            // 10. Generate affixes
-            var affixes = _affixGen.GenerateAffixes(baseEquipment, rarity, context);
-            if (affixes.Length > 0)
-                ApplyAffixes(item, affixes);
-
-            // 11. Generate enchantment
+            // 10. Generate enchantment
             item.Enchantment = _enchantGen.GenerateEnchantment(baseEquipment, rarity, level, context);
 
             // 12. Apply event modifiers
@@ -238,40 +230,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 item.AttributeData = new EquipmentAttributeData(Array.Empty<EquipmentAttributeEntry>(), secondAttrs.ToArray());
             else
                 item.AttributeData = new EquipmentAttributeData(item.AttributeData.MainAttribute, secondAttrs.ToArray());
-        }
-
-        private void ApplyAffixes(InventoryItem item, AffixInstanceData[] affixes)
-        {
-            if (affixes == null || affixes.Length == 0) return;
-            var mainAttrs = new List<EquipmentAttributeEntry>();
-            var secondAttrs = new List<EquipmentAttributeEntry>();
-
-            SecondaryStatResolver.Initialize();
-
-            foreach (var affix in affixes)
-            {
-                if (affix == null) continue;
-                affix.ItemInstanceId = item.InstanceId;
-
-                if (affix.AttributeValues != null)
-                    foreach (var (attr, value) in affix.AttributeValues)
-                        if (value != 0f) mainAttrs.Add(new EquipmentAttributeEntry(attr, value));
-
-                if (affix.StatValues != null)
-                    foreach (var (stat, value) in affix.StatValues)
-                        if (stat != SecondaryStat.None && value != 0f && SecondaryStatResolver.IsValidSecondaryStat(stat))
-                            secondAttrs.Add(new EquipmentAttributeEntry((MainAttribute)(int)stat, value));
-            }
-
-            if (mainAttrs.Count > 0 || secondAttrs.Count > 0)
-            {
-                var existingMain = item.AttributeData?.MainAttribute ?? Array.Empty<EquipmentAttributeEntry>();
-                var existingSecond = item.AttributeData?.SecondAttribute ?? Array.Empty<EquipmentAttributeEntry>();
-                item.AttributeData = new EquipmentAttributeData(
-                    existingMain.Concat(mainAttrs).ToArray(),
-                    existingSecond.Concat(secondAttrs).ToArray()
-                );
-            }
         }
 
         private void ApplyEventModifiers(InventoryItem item, EquipmentData baseEquipment, Rarity rarity, int level, ItemGenerationContext context)

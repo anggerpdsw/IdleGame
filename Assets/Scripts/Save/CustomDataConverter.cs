@@ -32,9 +32,6 @@ namespace IdleDefenseSurvival.Save
                     case "SecondaryStats":
                         dict[prop.Name] = prop.Value.ToObject<CombatStatEntry[]>(serializer);
                         break;
-                    case "Affixes":
-                        dict[prop.Name] = prop.Value.ToObject<AffixInstanceData[]>(serializer);
-                        break;
                     case "AttributeStats":
                         dict[prop.Name] = prop.Value.ToObject<AttributeStatEntry[]>(serializer);
                         break;

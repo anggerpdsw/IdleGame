@@ -5,13 +5,11 @@ namespace IdleDefenseSurvival.Equipment
 {
     /// <summary>
     /// Rarity mechanics ladder — how many of each mechanic a rarity unlocks.
-    /// Pure data; single place to re-tune rarity progression (socket/secondary/passive counts).
-    /// Consumed by SocketGenerator, StatRollService, AffixGenerator, EnchantmentGenerator.
+    /// Pure data; single place to re-tune rarity progression (socket/secondary/passive).
+    /// Consumed by SocketGenerator, SecondaryStatGenerator, EnchantmentGenerator.
     /// </summary>
     public static class RarityMechanicConfig
     {
-        // Design ladder: Common 1 attr / Rare +1 socket / Epic +1 secondary / Legendary +1 secondary +passive /
-        // Mythic +1 secondary +socket / Divine +1 secondary +socket.
         private static readonly Dictionary<Rarity, (int min, int max)> SecondaryRollRanges = new()
         {
             { Rarity.Common, (1, 2) },
@@ -31,18 +29,18 @@ namespace IdleDefenseSurvival.Equipment
             { Rarity.Mythic, 4 },    // standard
             { Rarity.Divine, 6 },    // unique
         };
-                
+
         public static (int min, int max) GetSecondaryRollRange(Rarity rarity) =>
             SecondaryRollRanges.TryGetValue(rarity, out var range) ? range : (0, 0);
 
         // Keep GetSecondaryCount for backward compat (returns max)
         public static int GetSecondaryCount(Rarity rarity) =>
             SecondaryRollRanges.TryGetValue(rarity, out var range) ? range.max : 0;
-            
+
         public static int GetPassiveTier(Rarity rarity) =>
             PassiveTiers.TryGetValue(rarity, out var c) ? c : 0;
 
-        /// <summary>Passives unlock from Legendary (tier &gt; 0).</summary>
+        /// <summary>Passives unlock from Legendary (tier > 0).</summary>
         public static bool HasPassive(Rarity rarity) => GetPassiveTier(rarity) > 0;
     }
 }

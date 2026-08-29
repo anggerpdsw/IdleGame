@@ -26,7 +26,7 @@ namespace IdleDefenseSurvival.Equipment
         /// <summary>
         /// Registers the built-in effect implementations once. EffectRegistry starts
         /// empty (zero production call sites previously) so CreateEffect always returned
-        /// null — affix/item passives were dead code. Registration makes them real.
+        /// null — item passives were dead code. Registration makes them real.
         /// </summary>
         private static void EnsureEffectsRegistered()
         {
@@ -85,7 +85,7 @@ namespace IdleDefenseSurvival.Equipment
 
         /// <summary>
         /// Pumps a combat event (e.g. OnHit) into every active equipment effect.
-        /// Called from the projectile hit path; affix passives (FreezeEnemy, BurnEnemy...)
+        /// Called from the projectile hit path; passives (FreezeEnemy, BurnEnemy...)
         /// react here. No-op when no effects are active — zero hot-path cost.
         /// </summary>
         public void TriggerEffects(EffectTriggerType trigger, TriggerData data)
