@@ -308,7 +308,7 @@ namespace IdleDefenseSurvival.Stats
     }
 
     /// <summary>
-    /// Secondary stats - specialization layer from equipment (the ~20% build identity).
+    /// Secondary stats - specialization layer from equipment.
     /// Core power comes from MainAttribute (CON/STR/INT/DEX) via derived SecondaryStats,
     /// and SecondaryStat feeds combat. SecondaryStat is pure specialization (build identity).
     /// No stat here is derivable from attributes — that avoids double-dipping.
