@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Stats;
 using UnityEngine;
@@ -48,16 +49,9 @@ namespace IdleDefenseSurvival.Player
 
         private static void LoadBonuses()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/Player/dataAttribute");
-            if (jsonAsset == null)
-            {
-                Debug.LogWarning("[AttributeService] dataAttribute.json not found.");
-                return;
-            }
-
             try
             {
-                var data = Newtonsoft.Json.JsonConvert.DeserializeObject<AttributeConfig>(jsonAsset.text);
+                AttributeConfig data = DatabaseJSONCache.DatabaseAttributeConfig;
                 if (data == null) return;
 
                 _constitutionBonuses = Parse(data.constitution);

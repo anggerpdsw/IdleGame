@@ -228,6 +228,7 @@ namespace IdleDefenseSurvival.Items.Generation
             var secondAttrs = new List<EquipmentAttributeEntry>();
             foreach (var stat in stats)
             {
+                // SecondaryStat enum values fit in MainAttribute field (int cast)
                 var attrEntry = new EquipmentAttributeEntry((MainAttribute)(int)stat.Stat,
                     stat.GetValue(item.Level));
                 secondAttrs.Add(attrEntry);

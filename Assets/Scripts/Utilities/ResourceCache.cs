@@ -132,6 +132,45 @@ namespace IdleDefenseSurvival.Core
             _databaseEnemy = database;
         }
 
+        private const string DATA_MAIN_ATTRIBUTE = "Data/Player/dataMainAttribute";
+        private static AttributeConfig _databaseAttributeConfig;
+        public static AttributeConfig DatabaseAttributeConfig
+        { get { if (_databaseAttributeConfig == null) LoadMainAttribute(); return _databaseAttributeConfig; }}
+        private static Dictionary<string, List<AttributeBonusEntry>> _databaseAttributeBonusEntry;
+        public static Dictionary<string, List<AttributeBonusEntry>> DatabaseAttributeBonusEntry
+        { get { if (_databaseAttributeBonusEntry == null) LoadMainAttribute(); return _databaseAttributeBonusEntry; }}
+        private static void LoadMainAttribute()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_MAIN_ATTRIBUTE);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_MAIN_ATTRIBUTE}.json");
+                return;
+            }
+            try
+            {
+                var databaseAttributeConfig = JsonConvert.DeserializeObject<AttributeConfig>(jsonFile.text);
+                if (databaseAttributeConfig == null)
+                {
+                    Debug.LogError($"Attribute database in {DATA_MAIN_ATTRIBUTE}.json is empty or invalid.");
+                    return;
+                }
+                var databaseAttributeBonusEntry = JsonConvert.DeserializeObject<Dictionary<string, List<AttributeBonusEntry>>>(jsonFile.text);
+                if (databaseAttributeBonusEntry == null)
+                {
+                    Debug.LogError($"Attribute bonus database in {DATA_MAIN_ATTRIBUTE}.json is empty or invalid.");
+                    return;
+                }
+                _databaseAttributeConfig = databaseAttributeConfig;
+                _databaseAttributeBonusEntry = databaseAttributeBonusEntry;
+            }
+            catch (JsonException ex)
+            {
+                Debug.LogError($"Failed to deserialize attribute data from " +
+                    $"Resources/{DATA_MAIN_ATTRIBUTE}.json: {ex.Message}");
+            }
+        }
+
         private const string DATA_ULTIMATE = "Data/Player/dataUltimate";
         private static UltimateDatabase _databaseUltimate;
         public static UltimateDatabase DatabaseUltimate
@@ -156,6 +195,8 @@ namespace IdleDefenseSurvival.Core
         public static void ClearAll()
         {
             _databaseEnemy = null;
+            _databaseAttributeConfig = null;
+            _databaseAttributeBonusEntry = null;
             _databaseUltimate = null;
         }
     }

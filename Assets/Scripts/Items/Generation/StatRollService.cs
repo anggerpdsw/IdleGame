@@ -4,7 +4,6 @@ using System.Linq;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Equipment;
-using IdleDefenseSurvival;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -27,30 +26,65 @@ namespace IdleDefenseSurvival.Items.Generation
         /// </summary>
         public CombatStatEntry[] RollSecondaryStats(EquipmentData baseEquipment, Rarity rarity, ItemGenerationContext context)
         {
-            if (baseEquipment.SecondaryStats == null || baseEquipment.SecondaryStats.Length == 0)
-                return Array.Empty<CombatStatEntry>();
+            SecondaryStatResolver.Initialize();
+            
+            var validStats = SecondaryStatResolver.GetValidSecondaryStats();
+            if (validStats.Count == 0) return Array.Empty<CombatStatEntry>();
 
-            int statCount = GetStatCount(rarity, context);
-            if (statCount <= 0) return Array.Empty<CombatStatEntry>();
+            var (minRolls, maxRolls) = RarityMechanicConfig.GetSecondaryRollRange(rarity);
+            if (maxRolls <= 0) return Array.Empty<CombatStatEntry>();
 
-            var availableStats = GetAvailableStats(baseEquipment);
-            if (availableStats.Length == 0) return Array.Empty<CombatStatEntry>();
-
-            var results = new List<CombatStatEntry>();
-            var usedStats = new HashSet<SecondaryStat>();
-
-            for (int i = 0; i < statCount && availableStats.Length > 0; i++)
+            int rollCount = _rng.Range(minRolls, maxRolls + 1);
+            
+            // Add tier/event bonuses
+            int tierBonus = context.Tier / 10;
+            int eventBonus = 0;
+            if (context.EventModifiers != null)
             {
-                // Pick a stat (avoid duplicates if configured)
-                var stat = PickStat(availableStats, usedStats, rarity);
-                if (stat == SecondaryStat.None) break;
+                foreach (var mod in context.EventModifiers)
+                {
+                    if (mod is IStatCountModifier statMod)
+                        eventBonus += statMod.GetExtraStatCount(context);
+                }
+            }
+            rollCount = Math.Max(0, rollCount + tierBonus + eventBonus);
 
-                usedStats.Add(stat);
-                var entry = CreateStatEntry(stat, rarity, context);
-                results.Add(entry);
+            var aggregated = new Dictionary<SecondaryStat, float>();
+
+            for (int i = 0; i < rollCount; i++)
+            {
+                var stat = _rng.Choice(validStats.ToArray());
+                var meta = SecondaryStatRegistry.Get(stat);
+                
+                float rarityMult = rarity.GetDefaultStatMultiplier();
+                float tierMult = 1f + context.Tier * 0.02f;
+                float variance = _rng.Range(0.8f, 1.2f);
+                float baseValue = meta.BaseValue * rarityMult * tierMult * variance;
+
+                var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(stat);
+                float perLevel = progression?.ValuePerLevel ?? (baseValue * _config.PerLevelMultiplier);
+
+                if (aggregated.TryGetValue(stat, out float existing))
+                    aggregated[stat] = existing + baseValue;
+                else
+                    aggregated[stat] = baseValue;
             }
 
-            return results.ToArray();
+            var results = new CombatStatEntry[aggregated.Count];
+            int index = 0;
+            foreach (var kvp in aggregated)
+            {
+                var meta = SecondaryStatRegistry.Get(kvp.Key);
+                results[index++] = new CombatStatEntry
+                {
+                    Stat = kvp.Key,
+                    BaseValue = kvp.Value,
+                    ValuePerLevel = AttributeStatLoader.Instance?.GetSecondaryProgression(kvp.Key).ValuePerLevel ?? 0f,
+                    Mode = meta.DefaultMode,
+                    IsPercent = meta.IsPercentage
+                };
+            }
+            return results;
         }
 
         private int GetStatCount(Rarity rarity, ItemGenerationContext context)
