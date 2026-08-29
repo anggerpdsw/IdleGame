@@ -169,7 +169,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
                     float value = statEntry.BaseValue * rarityMult * tierMult * variance;
 
-                    // Per-level scaling from SOT: dataSkillTypeValuePerLevel.json
+                    // Per-level scaling from SOT: dataSOTValuePerLevel.json
                     var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(statEntry.Stat);
                     float perLevel = progression?.ValuePerLevel ?? 0f;
 

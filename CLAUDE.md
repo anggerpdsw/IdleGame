@@ -203,7 +203,7 @@ Important files:
 | `dataConsumables.json` | consumables (potions etc.) |
 | `dataAttribute.json` | CON/STR/INT/DEX attribute bonuses |
 | `dataAttributeMainValuePerLevel.json` | Main-attribute value per level curve |
-| `dataSkillTypeValuePerLevel.json` | Secondary-attribute value per level curve |
+| `dataSOTValuePerLevel.json` | Secondary-attribute value per level curve |
 | `dataConfigSocket.json` | Socket/gem rules |
 | `dataConfigCrafting.json` | Crafting station config |
 | `dataBaseEquipment.json` | Base equipment templates (Crafting/Equipment/) |
@@ -1589,7 +1589,7 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Domain | Main files |
 |---|---|
 | Player | `Scripts/Player/Player.cs`, `Scripts/Player/PlayerStats.cs`, `Scripts/Player/AuraCollider.cs`, `Scripts/Player/AttributeService.cs`; managers: `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Manager/BaseStatLoader.cs`, `Scripts/Manager/AttributeStatLoader.cs` |
-| Attributes | `Assets/Resources/Data/Player/dataAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataSkillTypeValuePerLevel.json`; pipeline = `Scripts/Manager/AttributeModifierManager.cs` → `Scripts/Modifier/ModifierCalculator.cs` |
+| Attributes | `Assets/Resources/Data/Player/dataAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataSOTValuePerLevel.json`; pipeline = `Scripts/Manager/AttributeModifierManager.cs` → `Scripts/Modifier/ModifierCalculator.cs` |
 | Enemy | `Scripts/Enemy/EnemyAi.cs`, `Scripts/Enemy/EnemySpawner.cs`, `Scripts/Enemy/EnemyData.cs`; stats aggregation: `Scripts/Manager/EnemyStatisticsManager.cs` |
 | Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/IStatusEffect.cs`, `BaseStatusEffect.cs`, `ConcreteStatusEffects.cs` |
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
@@ -1893,7 +1893,7 @@ These domains exist in the codebase but were not in the original extension table
 | a new equipment sub-service (durability/auto-equip/comparison/effect) | `Scripts/Equipment/IEquipmentService.cs` | the matching `Equipment*Service.cs` (Durability / AutoEquip / Comparison / Effect / Modifier), `EquipmentStatCalculator.cs`, `EquipmentAttributeData.cs`, `RarityMechanicConfig.cs` | `Assets/Resources/Data/Equipment/dataAffixes.json`, `dataSets.json`, per-slot `dataHat.json`…`dataShoes.json`, `dataBaseEquipment.json` |
 | a new rarity tier (e.g. above Mythic, like Divine) | `Scripts/Equipment/RarityMechanicConfig.cs` | `EquipmentEffect.cs`, `EffectRegistry.cs` (in `Scripts/Modifiers/`) | `Assets/Resources/Data/Equipment/dataAffixes.json`, `dataSets.json` |
 | a new buff / equipment effect type | `Scripts/Modifiers/EffectRegistry.cs` | `Scripts/Modifiers/Buff.cs`, `Scripts/Modifiers/EquipmentEffect.cs`, `Scripts/Modifier/ModifierCalculator.cs` | none — register through `EffectRegistry`; route final value through `ModifierCalculator` |
-| an attribute roll variant | `Scripts/Crafting/AttributeRollService.cs` | `Scripts/Equipment/AttributeWeightsConfig.cs`, `Scripts/Stats/MainAttributeExtensions.cs`, `Scripts/Stats/SecondaryStat.cs`, `Scripts/Stats/SecondaryStatMode.cs`, `Scripts/Stats/SecondaryStatMappingExtensions.cs` | `Assets/Resources/Data/Player/dataAttribute.json`, `dataAttributeMainValuePerLevel.json`, `dataSkillTypeValuePerLevel.json` |
+| an attribute roll variant | `Scripts/Crafting/AttributeRollService.cs` | `Scripts/Equipment/AttributeWeightsConfig.cs`, `Scripts/Stats/MainAttributeExtensions.cs`, `Scripts/Stats/SecondaryStat.cs`, `Scripts/Stats/SecondaryStatMode.cs`, `Scripts/Stats/SecondaryStatMappingExtensions.cs` | `Assets/Resources/Data/Player/dataAttribute.json`, `dataAttributeMainValuePerLevel.json`, `dataSOTValuePerLevel.json` |
 | account progression / profile field | `Scripts/Manager/AccountManager.cs` | `Scripts/Data/SaveData.cs` (account sub-section), `Scripts/Manager/SaveManager.cs` (`GetAccountData`) | none — code-only, requires §48 version bump if shape changes |
 | a new analytics event | `Scripts/Manager/AnalyticsManager.cs` | `Scripts/Core/Interfaces/IAnalyticsService.cs`, `Scripts/Core/ServiceLocator.cs` | none — define event name + payload schema in `AnalyticsManager` |
 | a new audio cue / BGM layer | `Scripts/Manager/AudioManager.cs` | `Scripts/Core/Interfaces/IAudioService.cs` | none — AudioClip assets, mixer groups, channel priority in `AudioManager` |
@@ -1973,7 +1973,7 @@ If the new feature survives restart: append to `SaveData`, write serializer if n
 |---|---|---|---|
 | Final player stats | `Scripts/Player/PlayerStats.cs` | `Scripts/Player/AttributeService.cs`, `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Manager/AttributeModifierManager.cs`, `Scripts/Manager/BaseStatLoader.cs`, `Scripts/Manager/AttributeStatLoader.cs` | none |
 | Modifier math | `Scripts/Modifier/ModifierCalculator.cs` | `Scripts/Modifiers/EffectRegistry.cs`, `Scripts/Modifiers/Buff.cs`, `Scripts/Modifiers/EquipmentEffect.cs` | none |
-| Attribute → secondary stat | `Scripts/Stats/SecondaryStat.cs` | `Scripts/Stats/SecondaryStatMode.cs`, `Scripts/Stats/MainAttributeExtensions.cs`, `Scripts/Stats/SecondaryStatMappingExtensions.cs` | `Player/dataAttribute.json`, `dataAttributeMainValuePerLevel.json`, `dataSkillTypeValuePerLevel.json` |
+| Attribute → secondary stat | `Scripts/Stats/SecondaryStat.cs` | `Scripts/Stats/SecondaryStatMode.cs`, `Scripts/Stats/MainAttributeExtensions.cs`, `Scripts/Stats/SecondaryStatMappingExtensions.cs` | `Player/dataAttribute.json`, `dataAttributeMainValuePerLevel.json`, `dataSOTValuePerLevel.json` |
 
 New modifiers must register in `EffectRegistry` and feed through `ModifierCalculator`. Never rebuild final stats in UI.
 

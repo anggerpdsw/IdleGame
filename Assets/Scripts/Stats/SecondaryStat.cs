@@ -48,10 +48,10 @@ namespace IdleDefenseSurvival.Stats
         /// <summary>Gets the SkillType mapped from this SecondaryStat.</summary>
         public SkillType SkillType => SecondaryStatExtensions.SecondaryStatToSkillType(Stat);
 
-        /// <summary>Gets ValuePerLevel from dataSkillTypeValuePerLevel.json (SOT for equipment level scaling).</summary>
+        /// <summary>Gets ValuePerLevel from dataSOTValuePerLevel.json (SOT for equipment level scaling).</summary>
         public float ValuePerLevel => AttributeStatLoader.Instance?.GetSecondaryProgression(Stat).ValuePerLevel ?? 0f;
 
-        /// <summary>Gets ValuePerEnhance from dataSkillTypeValuePerLevel.json (SOT for equipment enhance scaling).</summary>
+        /// <summary>Gets ValuePerEnhance from dataSOTValuePerLevel.json (SOT for equipment enhance scaling).</summary>
         public float ValuePerEnhance => 0f; // JSON has it but AttributeStatLoader doesn't expose it yet
     }
 

@@ -56,7 +56,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
                 float baseValue = meta.BaseValue * rarityMult * levelMult * variance;
 
-                // Per-level scaling from SOT: dataSkillTypeValuePerLevel.json
+                // Per-level scaling from SOT: dataSOTValuePerLevel.json
                 var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(stat);
                 float perLevel = progression?.ValuePerLevel ?? (baseValue * 0.1f);
 

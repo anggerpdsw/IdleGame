@@ -80,10 +80,10 @@ namespace IdleDefenseSurvival.Stats
 
         private void LoadSecondaryAttributeProgression()
         {
-            var jsonAsset = Resources.Load<TextAsset>("Data/Player/dataSkillTypeValuePerLevel");
+            var jsonAsset = Resources.Load<TextAsset>("Data/Player/dataSOTValuePerLevel");
             if (jsonAsset == null)
             {
-                Debug.LogError("[AttributeStatLoader] dataSkillTypeValuePerLevel.json not found in Resources/Data/Player/");
+                Debug.LogError("[AttributeStatLoader] dataSOTValuePerLevel.json not found in Resources/Data/Player/");
                 return;
             }
 
@@ -108,7 +108,7 @@ namespace IdleDefenseSurvival.Stats
             }
             catch (Exception e)
             {
-                Debug.LogError($"[AttributeStatLoader] Failed to parse dataSkillTypeValuePerLevel.json: {e.Message}");
+                Debug.LogError($"[AttributeStatLoader] Failed to parse dataSOTValuePerLevel.json: {e.Message}");
             }
         }
 
