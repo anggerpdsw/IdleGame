@@ -4,7 +4,6 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Items.Generation;
 using IdleDefenseSurvival.Stats;
 using TMPro;
 using UnityEngine;
@@ -210,8 +209,12 @@ namespace IdleDefenseSurvival.UI.Inventory
                         if (attr.BaseValue == 0f) continue;
                         var secStat = (SecondaryStat)(int)attr.Attribute;
                         if (secStat == SecondaryStat.None) continue;
-                        string sign = attr.BaseValue >= 0 ? "+" : "";
-                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{attr.BaseValue:F1}");
+                        bool isPercent = secStat.IsPercentage();
+                        float displayValue = isPercent 
+                            ? attr.BaseValue * 100f : attr.BaseValue;
+                        string sign = displayValue >= 0 ? "+" : "";
+                        string suffix = isPercent ? "%" : "";
+                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{displayValue:F1}{suffix}");
                     }
                 }
             }

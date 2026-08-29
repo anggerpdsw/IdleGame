@@ -15,6 +15,7 @@ using IdleDefenseSurvival.Save;
 using IdleDefenseSurvival.Core.Interfaces;
 using IdleDefenseSurvival.Mission;
 using System.Linq;
+using IdleDefenseSurvival.Stats;
 // ponytail: CraftTransactionJournal removed; re-add when journal feature returns.
 
 namespace IdleDefenseSurvival.Manager
@@ -264,7 +265,7 @@ namespace IdleDefenseSurvival.Manager
                     return;
                 }
 
-                var saveData = LoadFromFile();
+                var saveData = LoadFromDisk();
                 if (saveData == null)
                 {
                     // Broken or empty file: keep it for manual recovery, then start fresh.
@@ -615,24 +616,54 @@ namespace IdleDefenseSurvival.Manager
                 File.Move(tempPath, SaveFile);
         }
 
-        private SaveData LoadFromFile()
+        private SaveData LoadFromDisk()
         {
             if (!File.Exists(SaveFile)) return null;
             string json = File.ReadAllText(SaveFile);
             if (string.IsNullOrEmpty(json)) return null;
             try
             {
-                return JsonConvert.DeserializeObject<SaveData>(json,
+                var save = JsonConvert.DeserializeObject<SaveData>(json,
                     new JsonSerializerSettings
                     {
                         NullValueHandling = NullValueHandling.Ignore,
                         Converters = { new CustomDataConverter() }
                     });
+
+                // MigrateEquipmentSecondAttributes(save);
+
+                return save;
             }
             catch (Exception e)
             {
                 Debug.LogError($"[SaveManager] JSON parse error: {e.Message}");
                 return null;
+            }
+        }
+
+        private void MigrateEquipmentSecondAttributes(SaveData data)
+        {
+            if (data?.inventoryData?.Items == null) return;
+
+            var loader = AttributeStatLoader.Instance;
+            if (loader == null) return;
+
+            foreach (var item in data.inventoryData.Items)
+            {
+                if (item.EquipmentType == null) continue;
+                if (item.AttributeData?.SecondAttribute == null) continue;
+
+                foreach (var attr in item.AttributeData.SecondAttribute)
+                {
+                    var stat = (SecondaryStat)(int)attr.Attribute;
+                    if (stat == SecondaryStat.None) continue;
+
+                    var meta = SecondaryStatRegistry.Get(stat);
+                    var prog = loader.GetSecondaryProgression(stat);
+
+                    // Correct formula: templateBase + Level * ValuePerLevel
+                    attr.BaseValue = meta.BaseValue + prog.ValuePerLevel * (item.Level ?? 1);
+                }
             }
         }
 

@@ -54,17 +54,19 @@ namespace IdleDefenseSurvival.Items.Generation
                 float levelMult = 1f + enchantLevel * 0.1f;
                 float variance = _rng.Range(0.8f, 1.2f);
 
-                float baseValue = meta.BaseValue * rarityMult * levelMult * variance;
-
-                // Per-level scaling from SOT: dataSOTValuePerLevel.json
+                float templateBaseValue = meta.BaseValue;
                 var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(stat);
-                float perLevel = progression?.ValuePerLevel ?? (baseValue * 0.1f);
+                float valuePerLevel = progression?.ValuePerLevel ?? 0f;
+
+                // BaseValue at level 1 = templateBaseValue + ValuePerLevel
+                // GetValue(enchantLevel) = BaseValue + ValuePerLevel * (enchantLevel - 1) = templateBaseValue + enchantLevel * ValuePerLevel
+                float baseValue = templateBaseValue + valuePerLevel;
 
                 enchantment.StatBonuses[i] = new CombatStatEntry
                 {
                     Stat = stat,
                     BaseValue = baseValue,
-                    ValuePerLevel = perLevel,
+                    ValuePerLevel = valuePerLevel,
                     Mode = meta.DefaultMode,
                     IsPercent = meta.IsPercentage
                 };

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using IdleDefenseSurvival.Equipment;
-using IdleDefenseSurvival.Items.Generation;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Stats;
 
@@ -76,7 +74,11 @@ namespace IdleDefenseSurvival.Items.Generation
                     aggregated[stat] = baseValue;
             }
 
-            // Convert to CombatStatEntry with ValuePerLevel from SOT
+            // Convert to CombatStatEntry with proper template BaseValue + level progression
+            // Use registry BaseValue (template) + Level * ValuePerLevel (from SOT)
+            // GetValue(level) = BaseValue + ValuePerLevel * (level - 1)
+            // We want final = templateBaseValue + Level * ValuePerLevel
+            // So BaseValue = templateBaseValue + ValuePerLevel
             var results = new CombatStatEntry[aggregated.Count];
             int index = 0;
             foreach (var kvp in aggregated)
@@ -84,11 +86,18 @@ namespace IdleDefenseSurvival.Items.Generation
                 var meta = SecondaryStatRegistry.Get(kvp.Key);
                 var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(kvp.Key);
 
+                float templateBaseValue = meta.BaseValue;
+                float valuePerLevel = progression?.ValuePerLevel ?? 0f;
+
+                // BaseValue stores the value at level 1: templateBaseValue + ValuePerLevel
+                // GetValue(level) = BaseValue + ValuePerLevel * (level - 1) = templateBaseValue + Level * ValuePerLevel
+                float baseValue = templateBaseValue + valuePerLevel;
+
                 results[index++] = new CombatStatEntry
                 {
                     Stat = kvp.Key,
-                    BaseValue = kvp.Value,
-                    ValuePerLevel = progression?.ValuePerLevel ?? 0f,
+                    BaseValue = baseValue,
+                    ValuePerLevel = valuePerLevel,
                     Mode = meta.DefaultMode,
                     IsPercent = meta.IsPercentage
                 };
