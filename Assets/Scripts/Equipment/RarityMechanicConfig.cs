@@ -20,6 +20,16 @@ namespace IdleDefenseSurvival.Equipment
             { Rarity.Divine, (6, 8) },
         };
 
+        private static readonly Dictionary<Rarity, (int min, int max)> StatBonusesRollRanges = new()
+        {
+            { Rarity.Common, (0, 2) },
+            { Rarity.Rare, (0, 3) },
+            { Rarity.Epic, (0, 4) },
+            { Rarity.Legendary, (0, 5) },
+            { Rarity.Mythic, (0, 6) },
+            { Rarity.Divine, (0, 8) },
+        };
+
         private static readonly Dictionary<Rarity, int> PassiveTiers = new()
         {
             { Rarity.Common, 0 },
@@ -32,6 +42,9 @@ namespace IdleDefenseSurvival.Equipment
 
         public static (int min, int max) GetSecondaryRollRange(Rarity rarity) =>
             SecondaryRollRanges.TryGetValue(rarity, out var range) ? range : (0, 0);
+
+        public static (int min, int max) GetStatBonusesRollRange(Rarity rarity) =>
+            StatBonusesRollRanges.TryGetValue(rarity, out var range) ? range : (0, 0);
 
         // Keep GetSecondaryCount for backward compat (returns max)
         public static int GetSecondaryCount(Rarity rarity) =>

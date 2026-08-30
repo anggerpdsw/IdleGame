@@ -358,6 +358,19 @@ namespace IdleDefenseSurvival.Equipment
                 }
             }
 
+            // AttributeData StatBonuses (enchantment-derived bonuses stored in AttributeData)
+            if (item.AttributeData?.StatBonuses != null)
+            {
+                foreach (var statEntry in item.AttributeData.StatBonuses)
+                {
+                    float value = statEntry.BaseValue;
+                    if (bonuses.ContainsKey(statEntry.Stat))
+                        bonuses[statEntry.Stat] += value;
+                    else
+                        bonuses[statEntry.Stat] = value;
+                }
+            }
+
             return bonuses;
         }
 

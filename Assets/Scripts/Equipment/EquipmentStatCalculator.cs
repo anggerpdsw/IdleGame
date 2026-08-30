@@ -27,9 +27,13 @@ namespace IdleDefenseSurvival.Equipment
                 foreach (var statEntry in itemData.CombatStats)
                     Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Level));
 
-            if (item.Enchantment?.StatBonuses != null)
-                foreach (var statEntry in item.Enchantment.StatBonuses)
-                    Add(bonuses, statEntry.Stat, statEntry.GetValue(item.Enchantment.Level));
+            // Enchantment stat bonuses from EquipmentAttributeData.StatBonuses
+            if (item.AttributeData?.StatBonuses != null)
+                foreach (var bonusEntry in item.AttributeData.StatBonuses)
+                {
+                    float value = bonusEntry.BaseValue + bonusEntry.ValuePerLevel * (item.Enchantment?.Level - 1 ?? 0);
+                    Add(bonuses, bonusEntry.Stat, value);
+                }
 
             // Gem stats
             if (item.Sockets != null)
@@ -37,7 +41,7 @@ namespace IdleDefenseSurvival.Equipment
                 foreach (var socket in item.Sockets)
                 {
                     if (socket.IsEmpty) continue;
-                    var gemStats = Items.GemService.Instance?.GetGemStats(socket.GemId, socket.GemLevel);
+                    var gemStats = GemService.Instance?.GetGemStats(socket.GemId, socket.GemLevel);
                     if (gemStats == null) continue;
                     foreach (var statEntry in gemStats)
                         Add(bonuses, statEntry.Stat, statEntry.GetValue(socket.GemLevel));

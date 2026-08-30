@@ -4,7 +4,6 @@ using System.Linq;
 using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Data;
 using IdleDefenseSurvival.Items.Random;
 using IdleDefenseSurvival.Stats;
@@ -106,7 +105,18 @@ namespace IdleDefenseSurvival.Items.Generation
             // 9. Generate sockets using rolled MaxSockets from item (respects final value from rarityConfig)
             item.Sockets = _socketGen.GenerateSockets(item.MaxSockets, rarity, context);
 
-            // 10. Generate enchantment
+            // 10. Generate stat bonuses (always rolls, independent of enchant chance)
+            var statBonuses = _enchantGen.GenerateStatBonuses(rarity, level, context);
+            if (statBonuses.Length > 0)
+            {
+                if (item.AttributeData == null) item.AttributeData = new EquipmentAttributeData();
+                var existingBonuses = item.AttributeData.StatBonuses ?? Array.Empty<EnchantmentStatBonusEntry>();
+                var merged = new List<EnchantmentStatBonusEntry>(existingBonuses);
+                merged.AddRange(statBonuses);
+                item.AttributeData.StatBonuses = merged.ToArray();
+            }
+
+            // 11. Generate enchantment (effects only, chance-based)
             item.Enchantment = _enchantGen.GenerateEnchantment(baseEquipment, rarity, level, context);
 
             // 12. Apply event modifiers
@@ -244,7 +254,7 @@ namespace IdleDefenseSurvival.Items.Generation
                 }
             }
         }
-
+        
         private void CalculateDerivedValues(InventoryItem item, EquipmentBaseData baseConfig, EquipmentRarityConfig rarityConfig, Rarity rarity, int level)
         {
             // Sell price: base + rarity modifier + level modifier
