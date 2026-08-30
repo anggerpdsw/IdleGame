@@ -153,9 +153,7 @@ namespace IdleDefenseSurvival.Items
         public int DurabilityLossPerUse = 1;
         public long RepairCostPerDurability = 10;
 
-        // ============ Enchantment ============
-        public EnchantmentData BaseEnchantment; // Fixed enchantment on this equipment
-
+        
         // ============ Visual (Equipment-specific) ============
         public GameObject EquippedModelPrefab; // 3D/2D model when equipped
         public Vector3 EquippedPositionOffset;
@@ -303,19 +301,7 @@ namespace IdleDefenseSurvival.Items
         public SecondaryStat[] AffectedStats; // Which stats this passive affects
     }
 
-    /// <summary>
-    /// Enchantment data - fixed enchantment on equipment.
-    /// </summary>
-    [Serializable]
-    public class EnchantmentData
-    {
-        public string EnchantmentId;
-        public CombatStatEntry[] StatBonuses;
-        public SpecialEffectEntry[] Effects;
-        public int Level = 1;
-        public int MaxLevel = 5;
-    }
-
+    
     /// <summary>
     /// Upgrade curve data - defines how stats scale with upgrades.
     /// </summary>

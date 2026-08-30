@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Items.Generation;
 
 namespace IdleDefenseSurvival.Equipment
 {
@@ -17,7 +17,7 @@ namespace IdleDefenseSurvival.Equipment
             { Rarity.Epic, (3, 4) },
             { Rarity.Legendary, (4, 5) },
             { Rarity.Mythic, (5, 6) },
-            { Rarity.Divine, (25, 50) },
+            { Rarity.Divine, (6, 8) },
         };
 
         private static readonly Dictionary<Rarity, int> PassiveTiers = new()
@@ -42,5 +42,13 @@ namespace IdleDefenseSurvival.Equipment
 
         /// <summary>Passives unlock from Legendary (tier > 0).</summary>
         public static bool HasPassive(Rarity rarity) => GetPassiveTier(rarity) > 0;
+    }
+    
+    /// <summary>
+    /// Interface for modifiers that affect stat count.
+    /// </summary>
+    public interface IStatCountModifier
+    {
+        int GetExtraStatCount(ItemGenerationContext context);
     }
 }

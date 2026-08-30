@@ -19,7 +19,6 @@ namespace IdleDefenseSurvival.Stats
         public readonly float BaseValue;
         public readonly SecondaryStatMode DefaultMode;
         public readonly bool CanRollOnEquipment;
-        public readonly bool CanEnchant;
 
         public SecondaryStatMeta(
             SecondaryStat stat,
@@ -30,8 +29,7 @@ namespace IdleDefenseSurvival.Stats
             bool isPercentage,
             float baseValue,
             SecondaryStatMode defaultMode = SecondaryStatMode.Flat,
-            bool canRollOnEquipment = true,
-            bool canEnchant = true)
+            bool canRollOnEquipment = true)
         {
             Stat = stat;
             DisplayName = displayName;
@@ -42,7 +40,6 @@ namespace IdleDefenseSurvival.Stats
             BaseValue = baseValue;
             DefaultMode = defaultMode;
             CanRollOnEquipment = canRollOnEquipment;
-            CanEnchant = canEnchant;
         }
 
         /// <summary>Gets the SkillType mapped from this SecondaryStat.</summary>
@@ -58,7 +55,7 @@ namespace IdleDefenseSurvival.Stats
     /// <summary>
     /// Static registry of all SecondaryStat metadata.
     /// Single source of truth for IsPercentage, BaseValue, Category, DisplayName, etc.
-    /// All systems (enchantment, roll, modifier, UI) must read from here.
+    /// All systems (roll, modifier, UI) must read from here.
     /// </summary>
     public static class SecondaryStatRegistry
     {
@@ -70,13 +67,13 @@ namespace IdleDefenseSurvival.Stats
             var list = new List<SecondaryStatMeta>
             {
                 // Physical
-                new(SecondaryStat.CriticalDamage, "Critical Damage", "Crit Dmg", StatCategory.Offense, GameColors.red, false, 1f, SecondaryStatMode.Flat, canEnchant: false),
+                new(SecondaryStat.CriticalDamage, "Critical Damage", "Crit Dmg", StatCategory.Offense, GameColors.red, false, 1f, SecondaryStatMode.Flat, canRollOnEquipment: false),
                 new(SecondaryStat.BounceChance, "Bounce Chance", "Bounce%", StatCategory.Special, GameColors.statBounceChance, true, 5f, SecondaryStatMode.Percent),
                 new(SecondaryStat.BounceCount, "Bounce Count", "Bounce #", StatCategory.Special, GameColors.statBounceCount, false, 1f),
-                new(SecondaryStat.DefenseBreak, "Defense Break", "Def Break", StatCategory.Special, GameColors.blue, false, 1f, canEnchant: false),
+                new(SecondaryStat.DefenseBreak, "Defense Break", "Def Break", StatCategory.Special, GameColors.blue, false, 1f, canRollOnEquipment: false),
                 new(SecondaryStat.MultiShootChance, "Multi-Shot Chance", "Multi%", StatCategory.Special, GameColors.statMultiShootChance, true, 5f, SecondaryStatMode.Percent),
                 new(SecondaryStat.MultiShootCount, "Multi-Shot Count", "Multi #", StatCategory.Special, GameColors.statMultiShootCount, false, 1f),
-                new(SecondaryStat.KnockbackForce, "Knockback Force", "KB Force", StatCategory.Special, GameColors.red, false, 1f, canEnchant: false),
+                new(SecondaryStat.KnockbackForce, "Knockback Force", "KB Force", StatCategory.Special, GameColors.red, false, 1f, canRollOnEquipment: false),
                 new(SecondaryStat.StuntChance, "Stun Chance", "Stun%", StatCategory.Special, GameColors.statStunChance, true, 3f, SecondaryStatMode.Percent),
                 new(SecondaryStat.StuntDuration, "Stun Duration", "Stun Dur", StatCategory.Special, GameColors.statStunDuration, false, 0.5f),
 
@@ -123,10 +120,6 @@ namespace IdleDefenseSurvival.Stats
         public static IReadOnlyList<SecondaryStatMeta> Rollable =>
             _entries.Where(e => e.CanRollOnEquipment).ToArray();
 
-        /// <summary>Gets all stats that can appear as enchantments.</summary>
-        public static IReadOnlyList<SecondaryStatMeta> Enchantable =>
-            _entries.Where(e => e.CanEnchant).ToArray();
-
         /// <summary>Gets stats filtered by category.</summary>
         public static IReadOnlyList<SecondaryStatMeta> ByCategory(StatCategory category) =>
             _entries.Where(e => e.Category == category).ToArray();
@@ -137,10 +130,6 @@ namespace IdleDefenseSurvival.Stats
         /// <summary>Gets a flat array of rollable SecondaryStat enum values.</summary>
         public static SecondaryStat[] GetRollableStats() =>
             _entries.Where(e => e.CanRollOnEquipment).Select(e => e.Stat).ToArray();
-
-        /// <summary>Gets a flat array of enchantable SecondaryStat enum values.</summary>
-        public static SecondaryStat[] GetEnchantableStats() =>
-            _entries.Where(e => e.CanEnchant).Select(e => e.Stat).ToArray();
     }
 
     /// <summary>
@@ -256,7 +245,7 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStatRegistry.Get(stat).IsPercentage;
 
         /// <summary>
-        /// Gets the base value used for stat generation (enchantment/roll).
+        /// Gets the base value used for stat generation (roll).
         /// </summary>
         public static float GetBaseValue(this SecondaryStat stat) =>
             SecondaryStatRegistry.Get(stat).BaseValue;
@@ -283,12 +272,6 @@ namespace IdleDefenseSurvival.Stats
         /// </summary>
         public static bool CanRollOnEquipment(this SecondaryStat stat) =>
             SecondaryStatRegistry.Get(stat).CanRollOnEquipment;
-
-        /// <summary>
-        /// Checks if this stat can appear as an enchantment.
-        /// </summary>
-        public static bool CanEnchant(this SecondaryStat stat) =>
-            SecondaryStatRegistry.Get(stat).CanEnchant;
     }
 
     /// <summary>

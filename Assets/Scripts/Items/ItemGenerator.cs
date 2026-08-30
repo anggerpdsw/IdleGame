@@ -230,7 +230,7 @@ namespace IdleDefenseSurvival.Items
         /// <summary>
         /// Creates a deterministic generator with a specific seed.
         /// All sub-generators share the SAME SeedRandomProvider instance so that
-        /// AttributeRollService, RarityRollService, StatRollService, SocketGenerator,
+        /// AttributeRollService, RarityRollService, SecondaryStatGenerator, SocketGenerator,
         /// EnchantmentGenerator, AffixGenerator all consume from one RNG stream.
         /// This guarantees I-11 determinism: same seed -> same AttributeStats.
         /// </summary>

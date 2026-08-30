@@ -38,11 +38,35 @@
   "WaterTolerancePercent": 0.20,
   "ArmorMarginPercent": 0.20,
   "AttributeRolls": {
-    "1": { "MaxRolls": 1, "MinValue": 3, "MaxValue": 6 },
-    "2": { "MaxRolls": 2, "MinValue": 5, "MaxValue": 10 },
-    "3": { "MaxRolls": 3, "MinValue": 8, "MaxValue": 16 },
-    "4": { "MaxRolls": 4, "MinValue": 12, "MaxValue": 24 },
-    "5": { "MaxRolls": 5, "MinValue": 17, "MaxValue": 34 },
-    "6": { "MaxRolls": 6, "MinValue": 25, "MaxValue": 50 }
+    "1": {
+      "MaxRolls": 1,
+      "MinValue": 3,
+      "MaxValue": 6
+    },
+    "2": {
+      "MaxRolls": 2,
+      "MinValue": 5,
+      "MaxValue": 10
+    },
+    "3": {
+      "MaxRolls": 3,
+      "MinValue": 8,
+      "MaxValue": 16
+    },
+    "4": {
+      "MaxRolls": 4,
+      "MinValue": 12,
+      "MaxValue": 24
+    },
+    "5": {
+      "MaxRolls": 5,
+      "MinValue": 17,
+      "MaxValue": 34
+    },
+    "6": {
+      "MaxRolls": 6,
+      "MinValue": 25,
+      "MaxValue": 50
+    }
   }
 }
