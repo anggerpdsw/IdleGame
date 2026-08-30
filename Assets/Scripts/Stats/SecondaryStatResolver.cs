@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Core;
-using IdleDefenseSurvival.Data;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Stats
@@ -19,7 +17,7 @@ namespace IdleDefenseSurvival.Stats
             if (_initialized) return;
             try
             {
-                var data = DatabaseJSONCache.DatabaseAttributeBonusEntry;
+                var data = DatabaseJSONCache.DatabaseSecondaryStatAttribute;
                 _mainAttributeAffectedStats = new HashSet<SkillType>();
                 foreach (var kvp in data)
                 {
@@ -53,7 +51,7 @@ namespace IdleDefenseSurvival.Stats
         public static IReadOnlyList<SecondaryStat> GetValidSecondaryStats()
         {
             Initialize();
-            return _validSecondaryStats ?? System.Array.Empty<SecondaryStat>();
+            return _validSecondaryStats ?? Array.Empty<SecondaryStat>();
         }
 
         public static bool IsMainAttributeAffected(SkillType skillType)

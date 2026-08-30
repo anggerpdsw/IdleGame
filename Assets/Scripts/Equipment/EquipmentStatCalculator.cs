@@ -185,8 +185,11 @@ namespace IdleDefenseSurvival.Equipment
                 {
                     // SecondAttribute uses SecondaryStat enum values in Attribute field (cast from int)
                     var secStat = (SecondaryStat)(int)attrEntry.Attribute;
-                    if (secStat != SecondaryStat.None && attrEntry.BaseValue != 0f)
-                        builder.Add(prefix + "_SecondAttr", secStat, SecondaryStatMode.Flat, attrEntry.BaseValue);
+                    if (secStat == SecondaryStat.None || attrEntry.BaseValue == 0f) continue;
+
+                    // Use stat's default mode (Percent, Flat, etc.) from registry instead of hard-coded Flat
+                    var mode = SecondaryStatRegistry.Get(secStat).DefaultMode;
+                    builder.Add(prefix + "_SecondAttr", secStat, mode, attrEntry.BaseValue);
                 }
 
             foreach (var modifier in builder.Modifiers)

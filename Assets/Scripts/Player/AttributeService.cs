@@ -51,7 +51,7 @@ namespace IdleDefenseSurvival.Player
         {
             try
             {
-                AttributeConfig data = DatabaseJSONCache.DatabaseAttributeConfig;
+                AttributeConfig data = DatabaseJSONCache.DatabaseMainAttributeConfig;
                 if (data == null) return;
 
                 _constitutionBonuses = Parse(data.constitution);

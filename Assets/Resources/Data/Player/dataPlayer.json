@@ -9,142 +9,302 @@
     "attack": {
       "attackDamage": {
         "baseValue": 5.7,
+        "Mode": 1,
+        "ValuePerLevel": 0.2,
         "description": "The damage that character's attack power and ultimate weapons can cause to enemies.",
         "displayName": "Attack Damage"
       },
       "attackSpeed": {
         "baseValue": 1.15,
+        "Mode": 1,
+        "ValuePerLevel": 0.02,
         "description": "Speed projectiles are fired from player",
         "displayName": "Attack Speed"
       },
       "attackRange": {
         "baseValue": 3.37,
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
         "description": "Maximum range of player",
         "displayName": "Attack Range"
       },
-      "bounceChance": {
-        "baseValue": 5,
-        "description": "Probability of projectile bouncing to another enemy after hitting one",
-        "displayName": "Bounce Chance"
-      },
-      "bounceCount": {
-        "baseValue": 3,
-        "description": "Number of times a projectile can bounce from enemy to enemy",
-        "displayName": "Bounce Count"
-      },
       "criticalChance": {
         "baseValue": 3,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
         "description": "Chance of each projectile to deal critical damage",
         "displayName": "Critical Chance"
       },
       "criticalDamage": {
         "baseValue": 1.5,
+        "Mode": 2,
+        "ValuePerLevel": 1,
         "description": "Damage multiplier for critical hits",
         "displayName": "Critical Damage"
       },
       "damagePerRange": {
         "baseValue": 5,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
         "description": "Damage increased the further the enemy is from the player",
         "displayName": "Damage Per Range"
       },
-      "knockbackChance": {
-        "baseValue": 2.5,
-        "description": "Chance to knockback enemies",
-        "displayName": "Knockback Chance"
+      "bounceChance": {
+        "baseValue": 5,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Probability of projectile bouncing to another enemy after hitting one",
+        "displayName": "Bounce Chance"
       },
-      "knockbackForce": {
-        "baseValue": 1.5,
-        "description": "Force applied to knockbacked enemies",
-        "displayName": "Knockback Force"
+      "bounceCount": {
+        "baseValue": 3,
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
+        "description": "Number of times a projectile can bounce from enemy to enemy",
+        "displayName": "Bounce Count"
+      },
+      "defenseBreak": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Reduces the enemy's effective defense when dealing damage",
+        "displayName": "Defense Break"
       },
       "multiShootChance": {
         "baseValue": 5,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
         "description": "Chance to shoot more than one projectile when firing",
         "displayName": "Multi-Shot Chance"
       },
       "multiShootCount": {
         "baseValue": 2,
-        "description": "Number of projetiles shot when multishot activates",
+        "Mode": 1,
+        "ValuePerLevel": 0.02,
+        "description": "Number of projectiles shot when multishot activates",
         "displayName": "Multi-Shot Count"
       },
-      "penetration": {
-        "baseValue": 0,
-        "description": "Base penetration on enemy defense",
-        "displayName": "Penetration"
+      "knockbackChance": {
+        "baseValue": 2.5,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Chance to knockback enemies",
+        "displayName": "Knockback Chance"
+      },
+      "knockbackForce": {
+        "baseValue": 1.5,
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
+        "description": "Force applied to knockbacked enemies",
+        "displayName": "Knockback Force"
       },
       "stuntChance": {
         "baseValue": 0.5,
-        "description": "Probability of triggering stunt effect when attacking",
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Probability of triggering stun effect when attacking",
         "displayName": "Stun Chance"
       },
       "stuntDuration": {
         "baseValue": 1.5,
-        "description": "Can stunt enemies for a period of time",
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
+        "description": "Can stun enemies for a period of time",
         "displayName": "Stun Duration"
       },
       "ultimateAttack": {
         "baseValue": 1,
+        "Mode": 2,
+        "ValuePerLevel": 0.5,
         "description": "Extra Attack Power from Ultimate Weapon",
         "displayName": "Ultimate Weapon Attack"
       }
     },
+
     "defense": {
-      "deathDefy": {
-        "baseValue": 0,
-        "description": "When suffering fatal damage, there's a chance to retain 5% max health",
-        "displayName": "Death Defy"
-      },
-      "defenseAmount": {
-        "baseValue": 0,
-        "description": "Reduced absolute damage when player attacked",
-        "displayName": "Defense"
-      },
-      "evasion": {
-        "baseValue": 0,
-        "description": "An opportunity to avoid direct enemy attacks",
-        "displayName": "Evasion"
-      },
-      "hitRate": {
-        "baseValue": 93,
-        "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
-        "displayName": "Hit Rate"
-      },
       "healthPoint": {
         "baseValue": 143.5,
+        "Mode": 1,
+        "ValuePerLevel": 5,
         "description": "Maximum health of player",
         "displayName": "Health Points"
       },
       "healthRegen": {
         "baseValue": 0.775,
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
         "description": "Amount of player health regenerated per second",
         "displayName": "Health Regeneration"
       },
+      "defenseAmount": {
+        "baseValue": 0,
+        "Mode": 1,
+        "ValuePerLevel": 1,
+        "description": "Reduced absolute damage when player attacked",
+        "displayName": "Defense"
+      },
       "lifeSteal": {
         "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
         "description": "Can heal health player, percentage amount from attack damage player to enemies",
         "displayName": "Life Steal"
       },
+      "deathDefy": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "When suffering fatal damage, there's a chance to retain 5% max health",
+        "displayName": "Death Defy"
+      },
+      "evasion": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "An opportunity to avoid direct enemy attacks",
+        "displayName": "Evasion"
+      },
+      "hitRate": {
+        "baseValue": 93,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
+        "displayName": "Hit Rate"
+      },
+      "penetration": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Base penetration on enemy defense",
+        "displayName": "Penetration"
+      },
       "manaPoint": {
         "baseValue": 76.5,
+        "Mode": 1,
+        "ValuePerLevel": 3,
         "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
         "displayName": "Mana Points"
       },
       "manaRegen": {
         "baseValue": 1.155,
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
         "description": "Mana regenerated per second",
         "displayName": "Mana Regeneration"
       },
-      "elementMastery": {
+      "moveSpeed": {
         "baseValue": 0,
-        "description": "Damage multiplier for element again element",
-        "displayName": "Element Mastery"
+        "Mode": 1,
+        "ValuePerLevel": 0.05,
+        "description": "Movement speed of the player",
+        "displayName": "Move Speed"
       }
     },
-    "currency": {
+
+    "element": {
+      "elementMastery": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Damage multiplier for element against element",
+        "displayName": "Element Mastery"
+      },
+      "metalDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Metal element",
+        "displayName": "Metal Damage Bonus"
+      },
+      "woodDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Wood element",
+        "displayName": "Wood Damage Bonus"
+      },
+      "fireDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Fire element",
+        "displayName": "Fire Damage Bonus"
+      },
+      "waterDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Water element",
+        "displayName": "Water Damage Bonus"
+      },
+      "earthDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Earth element",
+        "displayName": "Earth Damage Bonus"
+      },
+      "lightningDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Lightning element",
+        "displayName": "Lightning Damage Bonus"
+      },
+      "windDamageBonus": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Bonus damage dealt through the Wind element",
+        "displayName": "Wind Damage Bonus"
+      }
+    },
+
+    "economy": {
       "interestWave": {
         "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
         "description": "Earn a percent of gold and meat kept on hand at the end of wave",
         "displayName": "Interest Wave"
+      },
+      "goldGain": {
+        "baseValue": 1,
+        "Mode": 2,
+        "ValuePerLevel": 0.25,
+        "description": "Bonus gold gained from gameplay rewards",
+        "displayName": "Gold Gain"
+      },
+      "dropRate": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Increases the chance of obtaining item and reward drops",
+        "displayName": "Drop Rate"
+      }
+    },
+
+    "utility": {
+      "cooldownReduction": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.1,
+        "description": "Reduces the cooldown duration of skills and abilities",
+        "displayName": "Cooldown Reduction"
+      },
+      "bossDamage": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.25,
+        "description": "Bonus damage dealt to Boss enemies",
+        "displayName": "Boss Damage"
+      },
+      "eliteDamage": {
+        "baseValue": 0,
+        "Mode": 2,
+        "ValuePerLevel": 0.25,
+        "description": "Bonus damage dealt to Elite enemies",
+        "displayName": "Elite Damage"
       }
     }
   }

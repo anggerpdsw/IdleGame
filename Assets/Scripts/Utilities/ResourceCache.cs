@@ -133,12 +133,12 @@ namespace IdleDefenseSurvival.Core
         }
 
         private const string DATA_MAIN_ATTRIBUTE = "Data/Player/dataMainAttribute";
-        private static AttributeConfig _databaseAttributeConfig;
-        public static AttributeConfig DatabaseAttributeConfig
-        { get { if (_databaseAttributeConfig == null) LoadMainAttribute(); return _databaseAttributeConfig; }}
-        private static Dictionary<string, List<AttributeBonusEntry>> _databaseAttributeBonusEntry;
-        public static Dictionary<string, List<AttributeBonusEntry>> DatabaseAttributeBonusEntry
-        { get { if (_databaseAttributeBonusEntry == null) LoadMainAttribute(); return _databaseAttributeBonusEntry; }}
+        private static AttributeConfig _databaseMainAttributeConfig;
+        public static AttributeConfig DatabaseMainAttributeConfig
+        { get { if (_databaseMainAttributeConfig == null) LoadMainAttribute(); return _databaseMainAttributeConfig; }}
+        private static Dictionary<string, List<AttributeBonusEntry>> _databaseSecondaryStatAttribute;
+        public static Dictionary<string, List<AttributeBonusEntry>> DatabaseSecondaryStatAttribute
+        { get { if (_databaseSecondaryStatAttribute == null) LoadMainAttribute(); return _databaseSecondaryStatAttribute; }}
         private static void LoadMainAttribute()
         {
             TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_MAIN_ATTRIBUTE);
@@ -149,20 +149,20 @@ namespace IdleDefenseSurvival.Core
             }
             try
             {
-                var databaseAttributeConfig = JsonConvert.DeserializeObject<AttributeConfig>(jsonFile.text);
-                if (databaseAttributeConfig == null)
+                var dataMain = JsonConvert.DeserializeObject<AttributeConfig>(jsonFile.text);
+                if (dataMain == null)
                 {
                     Debug.LogError($"Attribute database in {DATA_MAIN_ATTRIBUTE}.json is empty or invalid.");
                     return;
                 }
-                var databaseAttributeBonusEntry = JsonConvert.DeserializeObject<Dictionary<string, List<AttributeBonusEntry>>>(jsonFile.text);
-                if (databaseAttributeBonusEntry == null)
+                var dataSecondary = JsonConvert.DeserializeObject<Dictionary<string, List<AttributeBonusEntry>>>(jsonFile.text);
+                if (dataSecondary == null)
                 {
                     Debug.LogError($"Attribute bonus database in {DATA_MAIN_ATTRIBUTE}.json is empty or invalid.");
                     return;
                 }
-                _databaseAttributeConfig = databaseAttributeConfig;
-                _databaseAttributeBonusEntry = databaseAttributeBonusEntry;
+                _databaseMainAttributeConfig = dataMain;
+                _databaseSecondaryStatAttribute = dataSecondary;
             }
             catch (JsonException ex)
             {
@@ -195,8 +195,8 @@ namespace IdleDefenseSurvival.Core
         public static void ClearAll()
         {
             _databaseEnemy = null;
-            _databaseAttributeConfig = null;
-            _databaseAttributeBonusEntry = null;
+            _databaseMainAttributeConfig = null;
+            _databaseSecondaryStatAttribute = null;
             _databaseUltimate = null;
         }
     }

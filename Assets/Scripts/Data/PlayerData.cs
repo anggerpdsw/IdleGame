@@ -50,7 +50,9 @@ namespace IdleDefenseSurvival.Data
     {
         public AttackGroup attack;
         public DefenseGroup defense;
-        public CurrencyGroup currency;
+        public ElementGroup element;
+        public EconomyGroup economy;
+        public UtilityGroup utility;
     }
 
     [Serializable]
@@ -59,16 +61,16 @@ namespace IdleDefenseSurvival.Data
         public SkillData attackDamage;
         public SkillData attackSpeed;
         public SkillData attackRange;
-        public SkillData bounceChance;
-        public SkillData bounceCount;
         public SkillData criticalChance;
         public SkillData criticalDamage;
         public SkillData damagePerRange;
-        public SkillData knockbackChance;
-        public SkillData knockbackForce;
+        public SkillData bounceChance;
+        public SkillData bounceCount;
+        public SkillData defenseBreak;
         public SkillData multiShootChance;
         public SkillData multiShootCount;
-        public SkillData penetration;
+        public SkillData knockbackChance;
+        public SkillData knockbackForce;
         public SkillData stuntChance;
         public SkillData stuntDuration;
         public SkillData ultimateAttack;
@@ -77,21 +79,46 @@ namespace IdleDefenseSurvival.Data
     [Serializable]
     public class DefenseGroup
     {
-        public SkillData deathDefy;
-        public SkillData defenseAmount;
-        public SkillData evasion;
-        public SkillData hitRate;
         public SkillData healthPoint;
         public SkillData healthRegen;
+        public SkillData defenseAmount;
         public SkillData lifeSteal;
+        public SkillData deathDefy;
+        public SkillData evasion;
+        public SkillData hitRate;
+        public SkillData penetration;
         public SkillData manaPoint;
         public SkillData manaRegen;
+        public SkillData moveSpeed;
     }
 
     [Serializable]
-    public class CurrencyGroup
+    public class ElementGroup
+    {
+        public SkillData elementMastery;
+        public SkillData metalDamageBonus;
+        public SkillData woodDamageBonus;
+        public SkillData fireDamageBonus;
+        public SkillData waterDamageBonus;
+        public SkillData earthDamageBonus;
+        public SkillData lightningDamageBonus;
+        public SkillData windDamageBonus;
+    }
+
+    [Serializable]
+    public class EconomyGroup
     {
         public SkillData interestWave;
+        public SkillData goldGain;
+        public SkillData dropRate;
+    }
+
+    [Serializable]
+    public class UtilityGroup
+    {
+        public SkillData cooldownReduction;
+        public SkillData bossDamage;
+        public SkillData eliteDamage;
     }
 
     /// <summary>

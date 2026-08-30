@@ -215,7 +215,9 @@ namespace IdleDefenseSurvival.Items
     }
 
     /// <summary>
-    /// Main stat entry - defines a single main stat with value and scaling.
+    /// Combat stat entry - item's fixed combat/specialization stats (Crit, LifeSteal, AttackSpeed, CooldownReduction, element damage, ...).
+    /// Unlike SecondaryStatEntry, this is a base stat present on the item definition (not drawn from a random roll pool),
+    /// and it only supports Flat / Percent modes.
     /// </summary>
     [Serializable]
     public class CombatStatEntry

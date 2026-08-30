@@ -75,7 +75,7 @@ namespace IdleDefenseSurvival.Controller
 
         private void RefreshPlayer()
         {
-            _coinMultiplier.text = "x1";
+            _coinMultiplier.text = FormatValue(_playerStats.GetStat(SkillType.GoldGain));
             RefreshPlayerHealth();
             RefreshPlayerMana();
             _attackPlayer.text = FormatValue(_playerStats.GetStat(SkillType.AttackDamage));
