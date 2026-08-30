@@ -123,29 +123,6 @@ namespace IdleDefenseSurvival.Items.Generation
                 }
             }
 
-            // Validate Enchantment
-            if (item.Enchantment != null)
-            {
-                if (string.IsNullOrEmpty(item.Enchantment.EnchantmentId))
-                {
-                    errors.Add("Enchantment has empty ID");
-                }
-                if (item.Enchantment.Level < 1)
-                {
-                    errors.Add("Enchantment level must be >= 1");
-                }
-                if (item.Enchantment.StatBonuses != null)
-                {
-                    foreach (var stat in item.Enchantment.StatBonuses)
-                    {
-                        if (stat.Stat == SecondaryStat.None)
-                        {
-                            errors.Add("Enchantment has None stat");
-                        }
-                    }
-                }
-            }
-
             // Validate MaxLevel
             if (item.MaxLevel < 1)
             {

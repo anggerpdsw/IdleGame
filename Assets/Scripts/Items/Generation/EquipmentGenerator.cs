@@ -15,7 +15,7 @@ namespace IdleDefenseSurvival.Items.Generation
     /// Generator for equipment items.
     /// Pipeline: Validate input → Resolve rarity → Load equip_base → Resolve rarity config →
     /// Generate Level → Create InventoryItem → Generate MainAttribute → Generate SecondaryAttribute
-    /// → Generate Sockets → Generate SecondaryStats (via SecondaryStatGenerator) → Generate Enchantment → Apply Event Modifiers →
+    /// → Generate Sockets → Generate SecondaryStats (via SecondaryStatGenerator) → Apply Event Modifiers →
     /// Calculate final derived values → Validate → Return
     /// </summary>
     public sealed class EquipmentGenerator
@@ -23,7 +23,6 @@ namespace IdleDefenseSurvival.Items.Generation
         private readonly IRandomProvider _rng;
         private readonly RarityRollService _rarityRoll;
         private readonly SocketGenerator _socketGen;
-        private readonly EnchantmentGenerator _enchantGen;
         private readonly SecondaryStatGenerator _secondaryStatGen;
         private readonly ItemValidator _validator;
         private readonly AttributeRollService _attributeRoll;
@@ -32,7 +31,6 @@ namespace IdleDefenseSurvival.Items.Generation
             IRandomProvider rng,
             RarityRollService rarityRoll = null,
             SocketGenerator socketGen = null,
-            EnchantmentGenerator enchantGen = null,
             SecondaryStatGenerator secondaryStatGen = null,
             ItemValidator validator = null,
             AttributeRollService attributeRoll = null)
@@ -40,7 +38,6 @@ namespace IdleDefenseSurvival.Items.Generation
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = rarityRoll ?? new RarityRollService(_rng);
             _socketGen = socketGen ?? new SocketGenerator();
-            _enchantGen = enchantGen ?? new EnchantmentGenerator(_rng);
             _secondaryStatGen = secondaryStatGen ?? new SecondaryStatGenerator(_rng);
             _validator = validator ?? new ItemValidator();
             _attributeRoll = attributeRoll ?? new AttributeRollService(_rng);
@@ -105,27 +102,13 @@ namespace IdleDefenseSurvival.Items.Generation
             // 9. Generate sockets using rolled MaxSockets from item (respects final value from rarityConfig)
             item.Sockets = _socketGen.GenerateSockets(item.MaxSockets, rarity, context);
 
-            // 10. Generate stat bonuses (always rolls, independent of enchant chance)
-            var statBonuses = _enchantGen.GenerateStatBonuses(rarity, level, context);
-            if (statBonuses.Length > 0)
-            {
-                if (item.AttributeData == null) item.AttributeData = new EquipmentAttributeData();
-                var existingBonuses = item.AttributeData.StatBonuses ?? Array.Empty<EnchantmentStatBonusEntry>();
-                var merged = new List<EnchantmentStatBonusEntry>(existingBonuses);
-                merged.AddRange(statBonuses);
-                item.AttributeData.StatBonuses = merged.ToArray();
-            }
-
-            // 11. Generate enchantment (effects only, chance-based)
-            item.Enchantment = _enchantGen.GenerateEnchantment(baseEquipment, rarity, level, context);
-
-            // 12. Apply event modifiers
+            // 10. Apply event modifiers
             ApplyEventModifiers(item, baseEquipment, rarity, level, context);
 
-            // 13. Calculate final derived values (sell price, etc.)
+            // 11. Calculate final derived values (sell price, etc.)
             CalculateDerivedValues(item, baseConfig, rarityConfig, rarity, level);
 
-            // 14. Validate
+            // 12. Validate
             var validation = _validator.Validate(item, baseEquipment);
             if (!validation.IsValid)
             {

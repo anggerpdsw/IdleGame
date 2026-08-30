@@ -42,7 +42,6 @@ namespace IdleDefenseSurvival.Items
         private readonly IRandomProvider _rng;
         private readonly RarityRollService _rarityRoll;
         private readonly SocketGenerator _socketGen;
-        private readonly EnchantmentGenerator _enchantGen;
         private readonly EquipmentGenerator _equipmentGen;
         private readonly GemGenerator _gemGen;
         private readonly ConsumableGenerator _consumableGen;
@@ -57,7 +56,6 @@ namespace IdleDefenseSurvival.Items
             // Initialize services
             _rarityRoll = new RarityRollService(_rng);
             _socketGen = new SocketGenerator();
-            _enchantGen = new EnchantmentGenerator(_rng);
             _validator = new ItemValidator();
 
             // Initialize generators with shared services (single RNG source for determinism)
@@ -65,7 +63,6 @@ namespace IdleDefenseSurvival.Items
                 rng: _rng,
                 rarityRoll: _rarityRoll,
                 socketGen: _socketGen,
-                enchantGen: _enchantGen,
                 secondaryStatGen: null,
                 validator: _validator
             );
@@ -250,14 +247,12 @@ namespace IdleDefenseSurvival.Items
             _rng = rng ?? new UnityRandomProvider();
             _rarityRoll = new RarityRollService(_rng);
             _socketGen = new SocketGenerator();
-            _enchantGen = new EnchantmentGenerator(_rng);
             _validator = new ItemValidator();
 
             _equipmentGen = new EquipmentGenerator(
                 rng: _rng,
                 rarityRoll: _rarityRoll,
                 socketGen: _socketGen,
-                enchantGen: _enchantGen,
                 secondaryStatGen: null,
                 validator: _validator
             );

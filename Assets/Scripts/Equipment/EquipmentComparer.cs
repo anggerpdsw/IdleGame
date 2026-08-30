@@ -278,7 +278,7 @@ namespace IdleDefenseSurvival.Equipment
         }
 
         /// <summary>
-        /// Gets total stat bonuses for an item (including gems, enchantments, etc.)
+        /// Gets total stat bonuses for an item (including gems, sockets, etc.)
         /// </summary>
         public static Dictionary<SecondaryStat, float> GetTotalStatBonuses(InventoryItem item)
         {
@@ -342,32 +342,6 @@ namespace IdleDefenseSurvival.Equipment
                             }
                         }
                     }
-                }
-            }
-
-            // Enchantment stats
-            if (item.Enchantment?.StatBonuses != null)
-            {
-                foreach (var statEntry in item.Enchantment.StatBonuses)
-                {
-                    float value = statEntry.GetValue(item.Enchantment.Level);
-                    if (bonuses.ContainsKey(statEntry.Stat))
-                        bonuses[statEntry.Stat] += value;
-                    else
-                        bonuses[statEntry.Stat] = value;
-                }
-            }
-
-            // AttributeData StatBonuses (enchantment-derived bonuses stored in AttributeData)
-            if (item.AttributeData?.StatBonuses != null)
-            {
-                foreach (var statEntry in item.AttributeData.StatBonuses)
-                {
-                    float value = statEntry.BaseValue;
-                    if (bonuses.ContainsKey(statEntry.Stat))
-                        bonuses[statEntry.Stat] += value;
-                    else
-                        bonuses[statEntry.Stat] = value;
                 }
             }
 

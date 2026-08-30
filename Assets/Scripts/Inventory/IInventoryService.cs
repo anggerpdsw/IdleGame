@@ -367,7 +367,6 @@ public class InventoryItemData
     public int? MaxSockets; // From rarity config
     public EquipmentType? EquipmentType; // Persisted equipment slot type (null for non-equipment)
     public SocketData[] Sockets; // { IsUnlocked, GemInstanceId }
-    public EnchantmentInstanceData Enchantment;
     public EquipmentAttributeData AttributeData; // Main + Secondary attributes (BaseValue only)
 
     // ---- Non-equipment (stackables/consumables) ----

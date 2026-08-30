@@ -46,9 +46,6 @@ namespace IdleDefenseSurvival.Inventory
         [JsonIgnore]
         public Dictionary<string, object> CustomData;
 
-        // ============ Enchantment ============
-        public EnchantmentInstanceData Enchantment; // Current enchantment data
-
         // ============ Attribute Data (New Equipment Attribute System) ============
         public EquipmentAttributeData AttributeData; // Main + Secondary attributes with BaseValue only
 
@@ -143,8 +140,6 @@ namespace IdleDefenseSurvival.Inventory
                 for (int i = 0; i < Sockets.Length; i++)
                     clone.Sockets[i] = Sockets[i]?.Clone();
             }
-            if (Enchantment != null)
-                clone.Enchantment = Enchantment.Clone();
             return clone;
         }
 
@@ -281,36 +276,7 @@ namespace IdleDefenseSurvival.Inventory
         }
     }
 
-    /// <summary>
-    /// Enchantment instance data for equipment enchantments.
-    /// </summary>
-    [Serializable]
-    public class EnchantmentInstanceData
-    {
-        public string EnchantmentId;
-        public int Level = 1;
-        public int Experience = 0;
-        public CombatStatEntry[] StatBonuses;
-        public SpecialEffectEntry[] Effects;
-        public long AcquiredTimestamp;
-
-        public EnchantmentInstanceData Clone()
-        {
-            var clone = (EnchantmentInstanceData)MemberwiseClone();
-            if (StatBonuses != null)
-            {
-                clone.StatBonuses = new CombatStatEntry[StatBonuses.Length];
-                Array.Copy(StatBonuses, clone.StatBonuses, StatBonuses.Length);
-            }
-            if (Effects != null)
-            {
-                clone.Effects = new SpecialEffectEntry[Effects.Length];
-                Array.Copy(Effects, clone.Effects, Effects.Length);
-            }
-            return clone;
-        }
-    }
-
+    
     /// <summary>
     /// Inventory slot - a position in the inventory grid that can hold an item.
     /// </summary>

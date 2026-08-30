@@ -210,28 +210,14 @@ namespace IdleDefenseSurvival.UI.Inventory
                         var secStat = (SecondaryStat)(int)attr.Attribute;
                         if (secStat == SecondaryStat.None) continue;
                         bool isPercent = secStat.IsPercentage();
-                        float displayValue = isPercent
+                        float value = isPercent
                             ? attr.BaseValue * 100f : attr.BaseValue;
-                        string sign = displayValue >= 0 ? "+" : "";
+                        string sign = value >= 0  && !isPercent ? "+" : "";
                         string suffix = isPercent ? "%" : "";
-                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{displayValue:F1}{suffix}");
+                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{value:F1}{suffix}");
                     }
                 }
 
-                // Stat Bonuses (enchantment-derived bonuses)
-                if (item.AttributeData.StatBonuses != null)
-                {
-                    foreach (var bonus in item.AttributeData.StatBonuses)
-                    {
-                        if (bonus.Stat == SecondaryStat.None) continue;
-                        float value = bonus.BaseValue;
-                        bool isPercent = bonus.IsPercent;
-                        float displayValue = isPercent ? value * 100f : value;
-                        string sign = displayValue >= 0 ? "+" : "";
-                        string suffix = isPercent ? "%" : "";
-                        lines.Add($"{bonus.Stat.GetSkillDisplayName()}: {sign}{displayValue:F1}{suffix}");
-                    }
-                }
             }
 
             return string.Join("\n", lines);

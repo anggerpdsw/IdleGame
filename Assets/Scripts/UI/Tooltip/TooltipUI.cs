@@ -61,7 +61,9 @@ namespace IdleDefenseSurvival.UI.Tooltip
         [SerializeField] private Slider _durabilityBar;
         [SerializeField] private TextMeshProUGUI _durabilityText;
         [SerializeField] private Transform _mainStatsContainer;
-        [SerializeField] private GameObject _statEntryPrefab;
+        [SerializeField] private GameObject _mainStatEntryPrefab;
+        [SerializeField] private Transform _secondaryStatsContainer;
+        [SerializeField] private GameObject _secondaryStatEntryPrefab;
         [SerializeField] private Transform _specialEffectsContainer;
         [SerializeField] private GameObject _effectEntryPrefab;
         [SerializeField] private Transform _setBonusContainer;
@@ -293,9 +295,9 @@ namespace IdleDefenseSurvival.UI.Tooltip
 
         private void SetCombatStats(InventoryItem item, EquipmentData itemData, InventoryItem comparisonItem)
         {
-            if (_mainStatsContainer == null || _statEntryPrefab == null) return;
+            if (_mainStatsContainer == null || _mainStatEntryPrefab == null) return;
 
-            // Clear existing
+            // Clear existing Main Attribute
             foreach (Transform child in _mainStatsContainer)
                 Destroy(child.gameObject);
 
@@ -308,7 +310,7 @@ namespace IdleDefenseSurvival.UI.Tooltip
 
             foreach (var kvp in attrBonuses.OrderByDescending(k => Math.Abs(k.Value)))
             {
-                var entryObj = Instantiate(_statEntryPrefab, _mainStatsContainer);
+                var entryObj = Instantiate(_mainStatEntryPrefab, _mainStatsContainer);
                 if (entryObj.TryGetComponent<TooltipStatEntryUI>(out var entryUI))
                 {
                     float compareValue = comparisonAttr?.GetValueOrDefault(kvp.Key, 0) ?? 0;
@@ -316,9 +318,15 @@ namespace IdleDefenseSurvival.UI.Tooltip
                 }
             }
 
+            if (_secondaryStatsContainer == null || _secondaryStatEntryPrefab == null) return;
+
+            // Clear existing Secondary Attribute
+            foreach (Transform child in _secondaryStatsContainer)
+                Destroy(child.gameObject);
+
             foreach (var kvp in bonuses.OrderByDescending(k => Math.Abs(k.Value)))
             {
-                var entryObj = Instantiate(_statEntryPrefab, _mainStatsContainer);
+                var entryObj = Instantiate(_secondaryStatEntryPrefab, _secondaryStatsContainer);
                 if (entryObj.TryGetComponent<TooltipStatEntryUI>(out var entryUI))
                 {
                     float compareValue = comparisonBonuses?.GetValueOrDefault(kvp.Key, 0) ?? 0;

@@ -782,7 +782,6 @@ namespace IdleDefenseSurvival.Inventory
                 data.RepairCostPerDurability = item.RepairCostPerDurability;
                 data.MaxSockets = item.MaxSockets;
                 data.EquipmentType = item.EquipmentType;
-                data.Enchantment = item.Enchantment?.Clone();
                 data.Sockets = item.Sockets?.Select(s => s?.Clone()).ToArray();
                 data.AttributeData = item.AttributeData;
             }
@@ -877,7 +876,6 @@ namespace IdleDefenseSurvival.Inventory
                 item.InstanceId = data.InstanceId;
                 item.Level = data.Level ?? 1;
                 item.MaxLevel = data.MaxLevel ?? 20;
-                item.Enchantment = data.Enchantment;
 
                 // ponytail: use persisted durability instead of DB template (crafted items lack DB entry)
                 item.MaxDurability = data.MaxDurability ?? 100;
