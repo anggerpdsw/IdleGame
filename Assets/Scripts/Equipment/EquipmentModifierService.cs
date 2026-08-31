@@ -27,16 +27,16 @@ namespace IdleDefenseSurvival.Equipment
             {
                 foreach (var modifier in EquipmentStatCalculator.CreateStatModifiers(item))
                 {
-                    if (modifier.Stat != SkillType.None)
-                        ModifierManager.Instance?.AddModifier(modifier);
+                    if (modifier.Stat == SkillType.None) continue;
+                    ModifierManager.Instance?.AddModifier(modifier);
                 }
             }
             else
             {
                 foreach (var modifier in EquipmentStatCalculator.CreateStatModifiers(item))
                 {
-                    if (modifier.Stat != SkillType.None)
-                        ModifierManager.Instance?.RemoveModifier(modifier.Id);
+                    if (modifier.Stat == SkillType.None) continue;
+                    ModifierManager.Instance?.RemoveModifier(modifier.Id);
                 }
             }
 

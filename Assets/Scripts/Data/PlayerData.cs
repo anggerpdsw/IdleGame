@@ -129,7 +129,11 @@ namespace IdleDefenseSurvival.Data
     public class SkillData
     {
         public float baseValue;
+        public int Mode;
+        public float ValuePerLevel;
+        public float ValuePerEnhance;
         public string description;
         public string displayName;
+        public string shortName;
     }
 }

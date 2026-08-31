@@ -1,3 +1,5 @@
+using IdleDefenseSurvival.Manager;
+
 namespace IdleDefenseSurvival.Stats
 {
     /// <summary>
@@ -7,100 +9,36 @@ namespace IdleDefenseSurvival.Stats
     /// </summary>
     public static class SkillTypeExtensions
     {
-        public static string GetSkillDisplayName(this SkillType stat) => stat switch
+        public static string GetSkillDisplayName(this SkillType stat)
         {
-            SkillType.AttackDamage => "Attack Damage",
-            SkillType.AttackRange => "Attack Range",
-            SkillType.AttackSpeed => "Attack Speed",
-            SkillType.BossDamage => "Boss Damage",
-            SkillType.BounceChance => "Bounce Chance",
-            SkillType.BounceCount => "Bounce Count",
-            SkillType.CriticalChance => "Critical Chance",
-            SkillType.CriticalDamage => "Critical Damage",
-            SkillType.CooldownReduction => "Cooldown Reduction",
-            SkillType.DamagePerRange => "Damage per Range",
-            SkillType.DeathDefy => "Death Defy",
-            SkillType.DefenseAmount => "Defense",
-            SkillType.DefenseBreak => "Defense Break",
-            SkillType.DropRate => "Drop Rate",
-            SkillType.EarthDamageBonus => "Earth Damage",
-            SkillType.ElementMastery => "Element Mastery",
-            SkillType.EliteDamage => "Elite Damage",
-            SkillType.FireDamageBonus => "Fire Damage",
-            SkillType.GoldGain => "Gold Gain",
-            SkillType.HealthPoint => "Health Points",
-            SkillType.HealthRegen => "Health Regen",
-            SkillType.HitRate => "Hit Rate",
-            SkillType.InterestWave => "Interest Wave",
-            SkillType.KnockbackChance => "Knockback Chance",
-            SkillType.KnockbackForce => "Knockback Force",
-            SkillType.LifeSteal => "Life Steal",
-            SkillType.LightningDamageBonus => "Lightning Damage",
-            SkillType.ManaPoint => "Mana Points",
-            SkillType.ManaRegen => "Mana Regen",
-            SkillType.MetalDamageBonus => "Metal Damage",
-            SkillType.MoveSpeed => "Move Speed",
-            SkillType.MultiShootChance => "Multi-Shot Chance",
-            SkillType.MultiShootCount => "Multi-Shot Count",
-            SkillType.StuntChance => "Stun Chance",
-            SkillType.StuntDuration => "Stun Duration",
-            SkillType.UltimateAttack => "Ultimate Attack",
-            SkillType.WaterDamageBonus => "Water Damage",
-            SkillType.WindDamageBonus => "Wind Damage",
-            SkillType.WoodDamageBonus => "Wood Damage",
-            _ => stat.ToString(),
-        };
+            // Try to get displayName from dataPlayer.json via BaseStatLoader (single source of truth)
+            var loader = BaseStatLoader.Instance;
+            if (loader != null)
+            {
+                var skillData = loader.GetSkillData(stat);
+                if (skillData != null && !string.IsNullOrEmpty(skillData.displayName))
+                    return skillData.displayName;
+            }
+            // Fallback to hardcoded names for any missing entries
+            return "???!";
+        }
     
         /// <summary>
         /// Gets the short display name for compact UI.
         /// </summary>
-        public static string GetSkillShortName(this SkillType stat) => stat switch
+        public static string GetSkillShortName(this SkillType stat)
         {
-            SkillType.AttackDamage => "ADG",
-            SkillType.AttackRange => "ARG",
-            SkillType.AttackSpeed => "ASP",
-            SkillType.BossDamage => "BDMG",
-            SkillType.BounceChance => "BCH",
-            SkillType.BounceCount => "BCT",
-            SkillType.CriticalChance => "CCH",
-            SkillType.CriticalDamage => "CDG",
-            SkillType.CooldownReduction => "CDR",
-            SkillType.DamagePerRange => "DPR",
-            SkillType.DeathDefy => "DDF",
-            SkillType.DefenseAmount => "DEF",
-            SkillType.DefenseBreak => "DBK",
-            SkillType.DropRate => "DRT",
-            SkillType.EarthDamageBonus => "EDB",
-            SkillType.ElementMastery => "ELM",
-            SkillType.Evasion => "EVA",
-            SkillType.EliteDamage => "EDMG",
-            SkillType.FireDamageBonus => "FDB",
-            SkillType.GoldGain => "GOLD",
-            SkillType.HealthPoint => "HP",
-            SkillType.HealthRegen => "HRG",
-            SkillType.HitRate => "HIT",
-            SkillType.InterestWave => "INW",
-            SkillType.KnockbackChance => "KCH",
-            SkillType.KnockbackForce => "KFR",
-            SkillType.LifeSteal => "LFS",
-            SkillType.LightningDamageBonus => "LDB",
-            SkillType.ManaPoint => "MP",
-            SkillType.ManaRegen => "MRG",
-            SkillType.MetalDamageBonus => "MDB",
-            SkillType.MoveSpeed => "MSP",
-            SkillType.MultiShootChance => "MCH",
-            SkillType.MultiShootCount => "MCT",
-            SkillType.Penetration => "PEN",
-            SkillType.StuntChance => "SCH",
-            SkillType.StuntDuration => "SDR",
-            SkillType.UltimateAttack => "UAK",
-            SkillType.WaterDamageBonus => "WADB",
-            SkillType.WindDamageBonus => "WIDB",
-            SkillType.WoodDamageBonus => "WDDB",
-            _ => "??"
-        };
-
-
+            // Try to get shortName from dataPlayer.json via BaseStatLoader (single source of truth)
+            var loader = BaseStatLoader.Instance;
+            if (loader != null)
+            {
+                var skillData = loader.GetSkillData(stat);
+                if (skillData != null && !string.IsNullOrEmpty(skillData.shortName))
+                    return skillData.shortName;
+            }
+            // Fallback to hardcoded names for any missing entries
+            return "???!";
+        }
     }
 
     /// <summary>

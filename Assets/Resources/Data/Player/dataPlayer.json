@@ -11,113 +11,145 @@
         "baseValue": 5.7,
         "Mode": 1,
         "ValuePerLevel": 0.2,
+        "ValuePerEnhance": 0.1,
         "description": "The damage that character's attack power and ultimate weapons can cause to enemies.",
-        "displayName": "Attack Damage"
+        "displayName": "Attack Damage",
+        "shortName": "ADG"
       },
       "attackSpeed": {
         "baseValue": 1.15,
         "Mode": 1,
         "ValuePerLevel": 0.02,
+        "ValuePerEnhance": 0.02,
         "description": "Speed projectiles are fired from player",
-        "displayName": "Attack Speed"
+        "displayName": "Attack Speed",
+        "shortName": "ASP"
       },
       "attackRange": {
         "baseValue": 3.37,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.05,
         "description": "Maximum range of player",
-        "displayName": "Attack Range"
+        "displayName": "Attack Range",
+        "shortName": "ARG"
       },
       "criticalChance": {
         "baseValue": 3,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Chance of each projectile to deal critical damage",
-        "displayName": "Critical Chance"
+        "displayName": "Critical Chance",
+        "shortName": "CCH"
       },
       "criticalDamage": {
         "baseValue": 1.5,
         "Mode": 2,
         "ValuePerLevel": 1,
+        "ValuePerEnhance": 0.1,
         "description": "Damage multiplier for critical hits",
-        "displayName": "Critical Damage"
+        "displayName": "Critical Damage",
+        "shortName": "CDG"
       },
       "damagePerRange": {
         "baseValue": 5,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Damage increased the further the enemy is from the player",
-        "displayName": "Damage Per Range"
+        "displayName": "Damage Per Range",
+        "shortName": "DPR"
       },
       "bounceChance": {
         "baseValue": 5,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Probability of projectile bouncing to another enemy after hitting one",
-        "displayName": "Bounce Chance"
+        "displayName": "Bounce Chance",
+        "shortName": "BCH"
       },
       "bounceCount": {
         "baseValue": 3,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.1,
         "description": "Number of times a projectile can bounce from enemy to enemy",
-        "displayName": "Bounce Count"
+        "displayName": "Bounce Count",
+        "shortName": "BCT"
       },
       "defenseBreak": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Reduces the enemy's effective defense when dealing damage",
-        "displayName": "Defense Break"
+        "displayName": "Defense Break",
+        "shortName": "DBK"
       },
       "multiShootChance": {
         "baseValue": 5,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Chance to shoot more than one projectile when firing",
-        "displayName": "Multi-Shot Chance"
+        "displayName": "Multi-Shot Chance",
+        "shortName": "MCH"
       },
       "multiShootCount": {
         "baseValue": 2,
         "Mode": 1,
         "ValuePerLevel": 0.02,
+        "ValuePerEnhance": 0.1,
         "description": "Number of projectiles shot when multishot activates",
-        "displayName": "Multi-Shot Count"
+        "displayName": "Multi-Shot Count",
+        "shortName": "MCT"
       },
       "knockbackChance": {
         "baseValue": 2.5,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Chance to knockback enemies",
-        "displayName": "Knockback Chance"
+        "displayName": "Knockback Chance",
+        "shortName": "KCH"
       },
       "knockbackForce": {
         "baseValue": 1.5,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.05,
         "description": "Force applied to knockbacked enemies",
-        "displayName": "Knockback Force"
+        "displayName": "Knockback Force",
+        "shortName": "KFR"
       },
       "stuntChance": {
         "baseValue": 0.5,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Probability of triggering stun effect when attacking",
-        "displayName": "Stun Chance"
+        "displayName": "Stun Chance",
+        "shortName": "SCH"
       },
       "stuntDuration": {
         "baseValue": 1.5,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.05,
         "description": "Can stun enemies for a period of time",
-        "displayName": "Stun Duration"
+        "displayName": "Stun Duration",
+        "shortName": "SDR"
       },
       "ultimateAttack": {
         "baseValue": 1,
         "Mode": 2,
         "ValuePerLevel": 0.5,
+        "ValuePerEnhance": 0.25,
         "description": "Extra Attack Power from Ultimate Weapon",
-        "displayName": "Ultimate Weapon Attack"
+        "displayName": "Ultimate Weapon Attack",
+        "shortName": "UAK"
       }
     },
 
@@ -126,78 +158,100 @@
         "baseValue": 143.5,
         "Mode": 1,
         "ValuePerLevel": 5,
+        "ValuePerEnhance": 2.5,
         "description": "Maximum health of player",
-        "displayName": "Health Points"
+        "displayName": "Health Points",
+        "shortName": "HP"
       },
       "healthRegen": {
         "baseValue": 0.775,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.02,
         "description": "Amount of player health regenerated per second",
-        "displayName": "Health Regeneration"
+        "displayName": "Health Regeneration",
+        "shortName": "HRG"
       },
       "defenseAmount": {
         "baseValue": 0,
         "Mode": 1,
         "ValuePerLevel": 1,
+        "ValuePerEnhance": 0.1,
         "description": "Reduced absolute damage when player attacked",
-        "displayName": "Defense"
+        "displayName": "Defense",
+        "shortName": "DEF"
       },
       "lifeSteal": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Can heal health player, percentage amount from attack damage player to enemies",
-        "displayName": "Life Steal"
+        "displayName": "Life Steal",
+        "shortName": "LFS"
       },
       "deathDefy": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "When suffering fatal damage, there's a chance to retain 5% max health",
-        "displayName": "Death Defy"
+        "displayName": "Death Defy",
+        "shortName": "DDF"
       },
       "evasion": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "An opportunity to avoid direct enemy attacks",
-        "displayName": "Evasion"
+        "displayName": "Evasion",
+        "shortName": "EVA"
       },
       "hitRate": {
         "baseValue": 93,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
-        "displayName": "Hit Rate"
+        "displayName": "Hit Rate",
+        "shortName": "HIT"
       },
       "penetration": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Base penetration on enemy defense",
-        "displayName": "Penetration"
+        "displayName": "Penetration",
+        "shortName": "PEN"
       },
       "manaPoint": {
         "baseValue": 76.5,
         "Mode": 1,
         "ValuePerLevel": 3,
+        "ValuePerEnhance": 1.5,
         "description": "Maximum mana pool. Ultimates and mana-cost skills draw from this",
-        "displayName": "Mana Points"
+        "displayName": "Mana Points",
+        "shortName": "MP"
       },
       "manaRegen": {
         "baseValue": 1.155,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.02,
         "description": "Mana regenerated per second",
-        "displayName": "Mana Regeneration"
+        "displayName": "Mana Regeneration",
+        "shortName": "MRG"
       },
       "moveSpeed": {
         "baseValue": 0,
         "Mode": 1,
         "ValuePerLevel": 0.05,
+        "ValuePerEnhance": 0.05,
         "description": "Movement speed of the player",
-        "displayName": "Move Speed"
+        "displayName": "Move Speed",
+        "shortName": "MSP"
       }
     },
 
@@ -206,57 +260,73 @@
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Damage multiplier for element against element",
-        "displayName": "Element Mastery"
+        "displayName": "Element Mastery",
+        "shortName": "ELM"
       },
       "metalDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Metal element",
-        "displayName": "Metal Damage Bonus"
+        "displayName": "Metal Damage Bonus",
+        "shortName": "MDB"
       },
       "woodDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Wood element",
-        "displayName": "Wood Damage Bonus"
+        "displayName": "Wood Damage Bonus",
+        "shortName": "WDDB"
       },
       "fireDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Fire element",
-        "displayName": "Fire Damage Bonus"
+        "displayName": "Fire Damage Bonus",
+        "shortName": "FDB"
       },
       "waterDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Water element",
-        "displayName": "Water Damage Bonus"
+        "displayName": "Water Damage Bonus",
+        "shortName": "WADB"
       },
       "earthDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Earth element",
-        "displayName": "Earth Damage Bonus"
+        "displayName": "Earth Damage Bonus",
+        "shortName": "EDB"
       },
       "lightningDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Lightning element",
-        "displayName": "Lightning Damage Bonus"
+        "displayName": "Lightning Damage Bonus",
+        "shortName": "LDB"
       },
       "windDamageBonus": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Wind element",
-        "displayName": "Wind Damage Bonus"
+        "displayName": "Wind Damage Bonus",
+        "shortName": "WIDB"
       }
     },
 
@@ -265,22 +335,28 @@
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Earn a percent of gold and meat kept on hand at the end of wave",
-        "displayName": "Interest Wave"
+        "displayName": "Interest Wave",
+        "shortName": "INW"
       },
       "goldGain": {
         "baseValue": 1,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus gold gained from gameplay rewards",
-        "displayName": "Gold Gain"
+        "displayName": "Gold Gain",
+        "shortName": "GOLD"
       },
       "dropRate": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.5,
         "description": "Increases the chance of obtaining item and reward drops",
-        "displayName": "Drop Rate"
+        "displayName": "Drop Rate",
+        "shortName": "DRT"
       }
     },
 
@@ -289,22 +365,28 @@
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.1,
+        "ValuePerEnhance": 0.25,
         "description": "Reduces the cooldown duration of skills and abilities",
-        "displayName": "Cooldown Reduction"
+        "displayName": "Cooldown Reduction",
+        "shortName": "CDR"
       },
       "bossDamage": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt to Boss enemies",
-        "displayName": "Boss Damage"
+        "displayName": "Boss Damage",
+        "shortName": "BDMG"
       },
       "eliteDamage": {
         "baseValue": 0,
         "Mode": 2,
         "ValuePerLevel": 0.25,
+        "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt to Elite enemies",
-        "displayName": "Elite Damage"
+        "displayName": "Elite Damage",
+        "shortName": "EDMG"
       }
     }
   }

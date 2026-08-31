@@ -198,24 +198,30 @@ Important files:
 | `dataPlayer.json` | Player base stats, main attributes, skill base values |
 | `dataEnemy.json` | Enemy types, stats, spawn weights, rewards, roles, elements |
 | `dataWave.json` | Wave duration, difficulty, spawn configuration, progression |
-| `dataUltimate.json` | Ultimate definitions |
-| `dataCard.json` | Card definitions, rarity, scaling, effects |
-| `dataConsumables.json` | consumables (potions etc.) |
-| `dataAttribute.json` | CON/STR/INT/DEX attribute bonuses |
-| `dataAttributeMainValuePerLevel.json` | Main-attribute value per level curve |
-| `dataSOTValuePerLevel.json` | Secondary-attribute value per level curve |
-| `dataConfigSocket.json` | Socket/gem rules |
-| `dataConfigCrafting.json` | Crafting station config |
-| `dataBaseEquipment.json` | Base equipment templates (Crafting/Equipment/) |
-| `dataRecipeHat.json` ... `dataRecipeShoes.json` | Per-slot crafting recipes |
-| `dataAffixes.json` | Affix (prefix/suffix) definitions for equipment rolls |
-| `dataSets.json` | Equipment set bonus definitions |
-| `dataBelt.json` ... `dataShoes.json` | Per-slot equipment definitions |
-| `dataGems.json` | Gem definitions, base stats, upgrade curve |
-| `dataHerbs.json` | Herb definitions (alchemical ingredient) |
-| `dataMinerals.json` | Mineral material definitions |
-| `dataOtherMaterials.json` | Other crafting materials (logs, glue, etc.) |
-| `dataOtherItems.json` | Miscellaneous items (tickets, special items) |
+| `dataDropTables.json` | Drop table definitions for enemy loot |
+| `Card/dataCard.json` | Card definitions, rarity, scaling, effects |
+| `Items/dataConsumables.json` | Consumables (potions, tickets) |
+| `Items/dataOtherItems.json` | Miscellaneous items (tickets, special items) |
+| `Items/Material/dataHerbs.json` | Herb definitions (alchemical ingredient) |
+| `Items/Material/dataMinerals.json` | Mineral material definitions |
+| `Items/Material/dataOtherMaterials.json` | Other crafting materials (logs, glue, etc.) |
+| `Items/Potion/dataHealthPotion.json` | Health potion definitions |
+| `Items/Potion/dataManaPotion.json` | Mana potion definitions |
+| `Player/dataMainAttribute.json` | CON/STR/INT/DEX attribute per-point bonuses |
+| `Player/dataAttributeMainValuePerLevel.json` | Main-attribute value per level curve |
+| `Player/dataSOTValuePerLevel.json` | Secondary-attribute value per level curve |
+| `Player/dataMission.json` | Mission templates |
+| `Player/dataUltimate.json` | Ultimate definitions |
+| `Gems/dataConfigSocket.json` | Socket/gem rules |
+| `Gems/dataGems.json` | Gem definitions, base stats, upgrade curve |
+| `Crafting/dataConfigCrafting.json` | Crafting station config |
+| `Crafting/Equipment/dataBaseEquipment.json` | Base equipment templates |
+| `Crafting/Equipment/dataRecipeHat.json` ... `dataRecipeShoes.json` | Per-slot crafting recipes |
+| `Crafting/Potion/dataRecipeHealthPotion.json` | Health potion crafting recipe |
+| `Crafting/Potion/dataRecipeManaPotion.json` | Mana potion crafting recipe |
+| `Equipment/dataAffixes.json` | Affix (prefix/suffix) definitions for event equipment rolls |
+| `Equipment/dataSets.json` | Equipment set bonus definitions |
+| `Equipment/dataHat.json` ... `dataShoes.json` | Per-slot equipment definitions (11 files) |
 
 Sibling design-doc folder (`Assets/Resources/Data/Design/`) is the authoritative
 catalog of these JSONs — see §53 Design Documentation Index.
@@ -266,10 +272,7 @@ It is especially important for:
 - equipment;
 - individually tracked items;
 - durability;
-- enhancement;
 - sockets;
-- affixes;
-- enchantment;
 - unique state.
 
 **Never use item display names as save keys or logic keys.**
@@ -451,24 +454,21 @@ Primary location:
 
 Equipment supports:
 
-- equipment slots;
+- equipment slots (11 fixed slots);
 - level;
-- enhancement;
 - durability;
 - sockets;
 - gems;
-- affixes;
-- enchantments;
 - set bonuses;
-- special effects;
+- special effects (active/passive);
 - comparison;
 - auto-equip;
 - persistence;
 - visual representation.
 
-## 10.1 Current conceptual equipment slots
+## 10.1 Current equipment slots (11 fixed)
 
-The intended equipment model uses these slot identities (verified from `EquipmentTypeExtensions.GetDisplayName`):
+The equipment model uses these slot identities (verified from `EquipmentTypeExtensions.GetDisplayName`):
 
 | Index | Slot | Type enum value |
 |---|---|---|
@@ -496,6 +496,8 @@ unless the actual project data has intentionally changed.
 
 Slot identity must be stable for save data.
 
+Slot specialization (focus attributes + recommended secondary stats) is defined in `SlotIdentityService.cs` — see §55.3.
+
 ## 10.2 Equipment service responsibilities
 
 The equipment service owns operations such as:
@@ -507,6 +509,7 @@ The equipment service owns operations such as:
 - auto-equip;
 - persistence;
 - slot validation.
+- slot unlocking (cost-based progression)
 
 UI must request equipment operations from the equipment domain instead of directly mutating equipment state.
 
@@ -516,39 +519,44 @@ Final equipment stats should be calculated from the authoritative equipment aggr
 
 Relevant sources may include:
 
-- main stats;
-- enhancement;
-- enchantment;
-- gems;
-- affixes;
+- main stats (from equipment level/rarity);
 - set bonuses;
-- special effects.
+- special effects (equipment effects);
+- gems (socketed).
 
 Do not manually reconstruct equipment bonuses inside Player UI, tooltips, or individual gameplay classes.
+
+The pipeline: `EquipmentStatCalculator` → `EquipmentEffectService` → `EquipmentModifierService` → `EquipmentSetBonusService` → `ModifierCalculator` → `PlayerStatsManager`.
 
 ---
 
 # 11. SOCKET AND GEM SYSTEM
 
-Primary systems:
+Primary systems (in `Scripts/Items/`):
 
-- `GemService`
-- `SocketConfigData`
+- `GemService` — gem definition lookup, upgrade curves
+- `GemSocketService` — socketing/unsocketing gems
+- `GemUpgradeService` — gem leveling
+- `GemExperienceService` — gem XP handling
+- `GemModifierService` — gem stat contributions
+- `SocketValidationService` — validation rules
+- `SocketConfig` — socket configuration data class
 
 Current design concepts include:
 
-- maximum sockets per item;
-- socket unlock requirements;
-- allowed gem types;
-- adding sockets;
-- removing gems;
+- maximum sockets per item (by rarity);
+- socket unlock requirements (item level/rarity);
+- allowed gem types per socket;
+- adding sockets (costs materials);
+- removing gems (destroys gem);
 - destroying gems;
-- gem experience;
-- gem upgrading.
+- gem experience (from combat/crafting);
+- gem upgrading (costs materials + gold).
 
 The current configuration must be read from:
 
-`dataConfigSocket.json`
+`Gems/dataConfigSocket.json` (socket rules)
+`Gems/dataGems.json` (gem definitions)
 
 Do not hardcode socket rules into UI.
 
@@ -571,7 +579,7 @@ Main attributes:
 - **INTELLIGENCE**
 - **DEXTERITY**
 
-Default starting attributes are defined by the attribute system/data.
+Default starting attributes: 5 each (from `AccountData`), +5 unspent points per level-up (from `GameConstants`).
 
 Conceptually:
 
@@ -611,9 +619,15 @@ Contributes to:
 - Evasion
 - DamagePerRange
 
-The exact values must come from:
+The exact per-point bonuses must come from:
 
-`dataAttribute.json`
+`Player/dataMainAttribute.json` (replaces old `dataAttribute.json`)
+
+Per-level value curves:
+- `Player/dataAttributeMainValuePerLevel.json` — main attribute value per level
+- `Player/dataSOTValuePerLevel.json` — secondary stat value per level
+
+Pipeline: `AttributeStatLoader` → `AttributeModifierManager` → `ModifierCalculator` → `PlayerStatsManager`.
 
 Do not duplicate attribute-to-stat conversion tables in multiple scripts.
 
@@ -621,37 +635,45 @@ Do not duplicate attribute-to-stat conversion tables in multiple scripts.
 
 # 13. MODIFIER ARCHITECTURE
 
+CORE FORMULA: Formula global yang didokumentasikan adalah:
+(Base + Flat) * (1 + Percent / 100)
+Jadi simpan semua data langsung dalam bentuk finalnya
+Contoh: data tersimpan adalah 7.25 → jika dalam persen maka artinya 7.25%
+
 The modifier pipeline is central to player progression.
 
 Sources can include:
 
-- base player stats;
-- attributes;
-- cards;
-- equipment;
-- gems;
-- set bonuses;
-- upgrades;
-- temporary effects;
-- other explicitly supported systems.
+- base player stats (from `dataPlayer.json`);
+- main attributes (CON/STR/INT/DEX from `AccountData`);
+- cards (equipped card effects);
+- equipment (main stats, affixes, set bonuses, special effects, gems);
+- temporary effects (buffs, status effects);
+- wave/tier progression multipliers.
 
 Primary systems:
 
-- `ModifierManager`
-- `CardModifierService`
-- equipment modifier services
-- `PlayerStatsManager`
+- `ModifierCalculator` — core math (flat then percent, additive stacking);
+- `EffectRegistry` — registers all effect types (buffs, equipment effects);
+- `AttributeModifierManager` — attribute → secondary stat conversion;
+- `CardModifierService` — card effect → modifier conversion;
+- `EquipmentModifierService` — equipment → modifier conversion;
+- `PlayerStatsManager` — final stat aggregation + cache invalidation.
 
 ## 13.1 Flat vs Percent
 
 Modifiers must clearly distinguish:
 
-- Flat
-- Percent
+- Flat (additive)
+- Percent (multiplicative on base)
 
 Do not mix them accidentally.
 
-A stat calculation should follow one defined order.
+Calculation order (enforced in `ModifierCalculator`):
+
+1. Sum all flat modifiers
+2. Apply percent modifiers on (base + flat sum)
+3. Special: some effects (e.g., `DamagePerRange`) have custom formulas
 
 When changing modifier order:
 
@@ -665,14 +687,15 @@ If a source of modifiers changes, the authoritative stat pipeline must be refres
 
 Examples:
 
-- equip item;
-- unequip item;
-- card equipped;
-- card removed;
-- attribute changed;
-- gem changed;
-- set bonus changed;
-- enhancement changed.
+- equip/unequip item;
+- card equipped/removed;
+- attribute point allocated;
+- gem socketed/removed/upgraded;
+- set bonus activated/deactivated;
+- enhancement level changed;
+- wave/tier changed (affects enemy stats, not player).
+
+`PlayerStatsManager.InvalidateCache()` must be called after any modifier source changes.
 
 ---
 
@@ -684,17 +707,18 @@ Primary location:
 
 Core components include:
 
-- `CardManager`
-- `CardDatabase`
-- `CardInventory`
-- `CardUpgradeService`
-- `CardRollService`
-- `CardEquipmentService`
-- `CardModifierService`
+- `CardDatabase` — loads `Card/dataCard.json`
+- `CardInventory` — owns owned cards, duplicates, pity counters
+- `CardUpgradeService` — duplicate → level conversion
+- `CardRollService` — gem-based rolling, pity, bundle pricing
+- `CardEquipmentService` — equip/unequip cards to slots (max 19)
+- `CardModifierService` — card effects → modifier pipeline
+- `VirtualCardInventorySnapshot` — UI snapshot for collection view
+- `CardManager` (in `Scripts/Manager/`) — UI façade, delegates to services
 
 ## 14.1 Rarities
 
-Current rarity model (`dataCard.json`, verified) — **six** tiers:
+Current rarity model (`Card/dataCard.json`, verified) — **six** tiers:
 
 - Common
 - Rare
@@ -714,7 +738,7 @@ Weight/multiplier values per rarity (verified):
 | Mythic | `1.0` |
 | Divine | `0.006` |
 
-Pity thresholds (verified in `dataCard.json`):
+Pity thresholds (verified in `Constantku.cs`):
 
 | Rarity | Pity count |
 |---|---|
@@ -752,12 +776,12 @@ Do not change this progression without updating the relevant design/balance docu
 
 Card equipment has a defined maximum slot count.
 
-Verified values (`Constantku.cs`):
+Verified values (`GameConstants.cs`):
 
 - `CARD_START_SLOT = 1`
 - `CARD_MAX_SLOT = 19`
 
-`CARD_SLOT_EXPANSION_COSTS[]` is a cost curve array, length-gated in code. Do not invent new slot costs — add a row to the array.
+`CARD_SLOT_EXPANSION_COSTS[]` is a cost curve array (18 entries for slots 2-19), length-gated in code. Do not invent new slot costs — add a row to the array.
 
 ## 14.4 Card effects
 
@@ -765,17 +789,9 @@ Card effects may be:
 
 - flat stat modifiers;
 - percentage modifiers;
-- special effects.
+- special effects (FrostAura, Shield, TimeFast, Gold, Meat).
 
-Examples include:
-
-- FrostAura;
-- Shield;
-- TimeFast;
-- Gold;
-- Meat.
-
-Special effects must have an explicit owner.
+Special effects must have an explicit owner in the modifier pipeline.
 
 Do not implement special card behavior inside generic UI classes.
 
@@ -783,7 +799,7 @@ Do not implement special card behavior inside generic UI classes.
 
 The roll cost is a balance value and must come from the current implementation/data.
 
-Verified (`Constantku.cs`, `CardRollService.cs`):
+Verified (`GameConstants.cs`, `CardRollService.cs`):
 
 - 1x = 20 gems (`ROLL1X_GEM_COST`)
 - 10x = 190 gems (`ROLL10X_GEM_COST`)
@@ -802,7 +818,7 @@ This is **not** `amount * 20`. Preserves the bundled-discount tier behavior.
 
 ## 14.6 CardRoll item
 
-The project supports a free card-roll item.
+The project supports a free card-roll item (`CardRoll` in inventory).
 
 If the player uses a `CardRoll` inventory item:
 
@@ -1589,7 +1605,7 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Domain | Main files |
 |---|---|
 | Player | `Scripts/Player/Player.cs`, `Scripts/Player/PlayerStats.cs`, `Scripts/Player/AuraCollider.cs`, `Scripts/Player/AttributeService.cs`; managers: `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Manager/BaseStatLoader.cs`, `Scripts/Manager/AttributeStatLoader.cs` |
-| Attributes | `Assets/Resources/Data/Player/dataAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataSOTValuePerLevel.json`; pipeline = `Scripts/Manager/AttributeModifierManager.cs` → `Scripts/Modifier/ModifierCalculator.cs` |
+| Attributes | `Assets/Resources/Data/Player/dataMainAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataSOTValuePerLevel.json`; pipeline = `Scripts/Manager/AttributeModifierManager.cs` → `Scripts/Modifier/ModifierCalculator.cs` |
 | Enemy | `Scripts/Enemy/EnemyAi.cs`, `Scripts/Enemy/EnemySpawner.cs`, `Scripts/Enemy/EnemyData.cs`; stats aggregation: `Scripts/Manager/EnemyStatisticsManager.cs` |
 | Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/IStatusEffect.cs`, `BaseStatusEffect.cs`, `ConcreteStatusEffects.cs` |
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
@@ -1602,10 +1618,10 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Crafting (own domain) | `Scripts/Crafting/CraftingManager.cs` is the entry point. Pipeline files in `Scripts/Crafting/`: `CraftRollService.cs`, `CraftValidator.cs`, `CraftRecipeValidationRunner.cs`, `CraftCostResolver.cs`, `CraftTransactionService.cs`, `CraftContextBuilder.cs`, `CraftPipeline.cs`, `CraftResultValidator.cs`, `CraftRewardBuilder.cs`, `CraftRewardService.cs`, `CraftCompletionService.cs`, `CraftPersistenceService.cs`, `CraftQueueService.cs`, `CraftModifiers.cs`, `CraftRecipeData.cs`, `CraftRecipeRepository.cs`, `CraftingConfig.cs`, `CraftData.cs`, `CraftJob.cs`, `AttributeRollService.cs`. UI: `Scripts/Crafting/JobEntryUI.cs`, `Scripts/Controller/CraftingController.cs`, `CraftingUIController.cs`, `CraftingRecipeEntry.cs`. Data: `Assets/Resources/Data/Crafting/dataConfigCrafting.json`, `Crafting/Equipment/dataBaseEquipment.json`, per-slot `Crafting/Equipment/dataRecipeHat.json` … `dataRecipeShoes.json`, `Crafting/Potion/dataRecipeHealthPotion.json`, `dataRecipeManaPotion.json`. **There is no `Scripts/Items/CraftService.cs`** — the file map in old CLAUDE.md is wrong. |
 | Potion (consumable subtypes) | `Assets/Resources/Data/Items/Potion/dataHealthPotion.json`, `dataManaPotion.json`; consumed via `Scripts/UI/Game/ItemConsumableUI.cs` |
 | Economy | `Scripts/Economy/EconomyManager.cs`, `Scripts/Economy/CurrencyData.cs`, `Scripts/Core/Interfaces/IEconomyService.cs` |
-| Save | `Scripts/Manager/SaveManager.cs` (root), `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`; constants: `Scripts/Utilities/Constantku.cs` (`CURRENT_SAVE_VERSION = 3`) |
+| Save | `Scripts/Manager/SaveManager.cs` (root), `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`; constants: `Scripts/Utilities/GameConstants.cs` (`CURRENT_SAVE_VERSION = 3`) |
 | Daily | `Scripts/Daily/DailyRewardService.cs` (logic), `DailyRewardManager.cs`, `DailyRewardSaveData.cs`, `DailyRewardSlot.cs`, `DailyRewardUI.cs` |
 | Idle | `Scripts/IdleReward/IdleRewardManager.cs`, `IdleRewardUI.cs`, `IdleRewardData.cs` |
-| Ultimates | `Scripts/Ultimate/UltimateManager.cs` (registration host), `UltimateFactory.cs` (static registry), `IUltimateHandler.cs` (interface). 8 handler ids registered from `UltimateManager.Awake`: Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave. Definitions: `Assets/Resources/Data/Player/dataUltimate.json`. **There is no `Scripts/Ultimate/<Name>Handler.cs` per-ultimate file** — handlers are wired through `UltimateFactory` and `dataUltimate.json`; treat the 8 names as handler keys, not filenames. |
+| Ultimates | `Scripts/Ultimate/UltimateManager.cs` (registration host), `UltimateFactory.cs` (static registry), `IUltimateHandler.cs` (interface). 8 handler ids registered from `UltimateManager.Awake`: Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave. Definitions: `Assets/Resources/Data/Player/dataUltimate.json`. Handler implementations exist as separate files under `Scripts/Ultimate/` (e.g., `VoidHandler.cs`, `TankHandler.cs`, etc.). |
 | Modifier / effect registry | `Scripts/Modifier/ModifierCalculator.cs`, `Scripts/Modifiers/EffectRegistry.cs`, `Scripts/Manager/AttributeModifierManager.cs`, `Scripts/Player/AttributeService.cs` |
 | Stats | `Scripts/Stats/SecondaryStatMode.cs` (secondary-stat computation mode) |
 | Reward | `Scripts/Reward/RewardData.cs`, `RewardManager.cs`, `RewardPopup.cs`, `RewardSlot.cs`; UI: `Scripts/UI/.../RewardUI/*` |
@@ -1619,7 +1635,7 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Game speed | `Scripts/Controller/GameSpeedController.cs` |
 | UI | `Scripts/UI/` (per-domain panels), `Scripts/Controller/` (scene controllers: `MainMenuController`, `GameController`, `BootstrapController`, `SettingsController`, `VictoryController`, `InventoryController`, `CardCollectionController`, `CraftingController` + `CraftingUIController` + `CraftingRecipeEntry`, `GameSpeedController`) |
 | Core / boot | `Scripts/Core/BootstrapInitializer.cs`, `CanvasRoot.cs`, `SceneCleanupHandler.cs`, `ServiceLocator.cs`, `Interfaces/*` |
-| Utilities | `Scripts/Utilities/Constantku.cs`, `Utilityku.cs`, `Colorku.cs`, `ResourceCache.cs`, `Enumku.cs` |
+| Utilities | `Scripts/Utilities/GameConstants.cs`, `Utilityku.cs`, `Colorku.cs`, `ResourceCache.cs`, `Enumku.cs` |
 
 ---
 
@@ -1723,7 +1739,7 @@ Workflow:
 2. Assign a stable `ItemId`.
 3. Define equipment type/slot.
 4. Define base stats.
-5. Define rarity/affixes if applicable.
+5. Define rarity if applicable.
 6. Define sockets according to socket configuration.
 7. Ensure persistence uses `InstanceId`.
 8. Test equip/unequip/swap.
@@ -1866,14 +1882,14 @@ Start by reading the listed owner file, then the matching §39–§44 workflow, 
 
 | If you want to add… | Open first | Then read | Data file |
 |---|---|---|---|
-| a new ultimate | `Scripts/Ultimate/UltimateFactory.cs` | existing handler in `Scripts/Ultimate/` (e.g. `BombHandler`) | `Resources/Data/dataUltimate.json` |
+| a new ultimate | `Scripts/Ultimate/UltimateFactory.cs` | existing handler in `Scripts/Ultimate/Handler/` (e.g. `BombHandler.cs`) | `Resources/Data/Player/dataUltimate.json` |
 | a new card | `Scripts/Card/CardRollService.cs` | `CardModifierService` + `CardUpgradeService` | `Resources/Data/dataCard.json` |
 | a new enemy | `Scripts/Enemy/EnemyAi.cs` | `EnemySpawner.cs` (spawn weights), `EnemyStatusEffectController.cs` | `Resources/Data/dataEnemy.json` |
 | a new equipment slot or piece | `Scripts/Equipment/IEquipmentService.cs` | `SlotIdentityService`, `AttributeWeightsConfig` | `Resources/Data/dataBaseEquipment.json` + per-slot JSON |
 | a new affix or set | `Scripts/Items/EquipmentSetBonusService` (or wherever affix roll lives) | equipment persistence path | `Resources/Data/dataAffixes.json` / `dataSets.json` |
 | a new status effect | `Scripts/Enemy/EnemyStatusEffectController.cs` | `Scripts/Enemy/StatusEffects/ConcreteStatusEffects/` | none — code-only |
 | a new socket/gem rule | `Scripts/Items/GemSocketService.cs` + `SocketValidationService.cs` | `GemExperienceService`, `GemUpgradeService` | `Resources/Data/dataConfigSocket.json`, `dataGems.json` |
-| a new crafting recipe | `Scripts/Items/CraftService.cs` | `CraftContextBuilder`, `CraftCompletionService` | `Resources/Data/Player/dataRecipe*.json` + `dataConfigCrafting.json` |
+| a new crafting recipe | `Scripts/Crafting/CraftingManager.cs` | `CraftContextBuilder`, `CraftCompletionService` | `Assets/Resources/Data/Crafting/Equipment/dataRecipe*.json` + `Assets/Resources/Data/Crafting/dataConfigCrafting.json` |
 | a new consumable | `dataConsumables.json` consumer | `Scripts/Item/Items.cs` (`ItemClickManager`) | `Resources/Data/dataConsumables.json` |
 | a new daily reward slot | `Scripts/Daily/DailyRewardService.cs` | `DailyRewardSaveData`, `DailyRewardUI` | `Resources/Data/Player/dataDailyReward.json` (verify path) |
 | a new mission event | `Scripts/Mission/MissionService.cs` | `MissionUI.GetMissionIcon` switch | `Resources/Data/Player/dataMission.json` |

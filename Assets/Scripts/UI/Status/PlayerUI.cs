@@ -117,7 +117,7 @@ namespace IdleDefenseSurvival.UI
             foreach (var kvp in _rows)
             {
                 float value = PlayerStatsManager.Instance.GetStat(kvp.Key);
-                kvp.Value.SetValue(kvp.Key.ToString(), value);
+                kvp.Value.SetValue(kvp.Key.GetSkillDisplayName(), value);
             }
         }
 

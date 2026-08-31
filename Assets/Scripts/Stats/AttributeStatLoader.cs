@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Data;
 
 namespace IdleDefenseSurvival.Stats
 {
     /// <summary>
     /// Loads attribute progression values from JSON databases.
-    /// Single source of truth for ValuePerLevel for both Main and Secondary attributes.
+    /// Main attributes from dataAttributeMainValuePerLevel.json.
+    /// Secondary attributes now from dataPlayer.json via BaseStatLoader (single source of truth).
     /// </summary>
     public sealed class AttributeStatLoader : MonoBehaviour
     {
@@ -33,17 +36,13 @@ namespace IdleDefenseSurvival.Stats
         // Main Attribute progression (CON/STR/INT/DEX)
         private readonly Dictionary<MainAttribute, AttributeProgression> _mainProgression = new();
 
-        // Secondary Attribute progression (SecondaryStat enum)
-        private readonly Dictionary<SecondaryStat, AttributeProgression> _secondaryProgression = new();
-
         public bool IsLoaded { get; private set; } = false;
 
         public void LoadAll()
         {
             LoadMainAttributeProgression();
-            LoadSecondaryAttributeProgression();
             IsLoaded = true;
-            if (_debug) Debug.Log("[AttributeStatLoader] Loaded main and secondary attribute progression databases.");
+            if (_debug) Debug.Log("[AttributeStatLoader] Loaded main attribute progression database. Secondary stats now from BaseStatLoader.");
         }
 
         private void LoadMainAttributeProgression()
@@ -78,46 +77,6 @@ namespace IdleDefenseSurvival.Stats
             }
         }
 
-        private void LoadSecondaryAttributeProgression()
-        {
-            var jsonAsset = Resources.Load<TextAsset>("Data/Player/dataSOTValuePerLevel");
-            if (jsonAsset == null)
-            {
-                Debug.LogError("[AttributeStatLoader] dataSOTValuePerLevel.json not found in Resources/Data/Player/");
-                return;
-            }
-
-            try
-            {
-                var data = JsonConvert.DeserializeObject<Dictionary<string, AttributeProgression>>(jsonAsset.text);
-                if (data == null) return;
-
-                foreach (var kvp in data)
-                {
-                    // JSON uses camelCase (e.g., "attackRange"), enum uses PascalCase (e.g., AttackRange)
-                    string enumName = ToPascalCase(kvp.Key);
-                    if (Enum.TryParse<SecondaryStat>(enumName, true, out var stat))
-                    {
-                        _secondaryProgression[stat] = kvp.Value;
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[AttributeStatLoader] Unknown SecondaryStat key in JSON: {kvp.Key} (tried {enumName})");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[AttributeStatLoader] Failed to parse dataSOTValuePerLevel.json: {e.Message}");
-            }
-        }
-
-        private static string ToPascalCase(string camelCase)
-        {
-            if (string.IsNullOrEmpty(camelCase)) return camelCase;
-            return char.ToUpperInvariant(camelCase[0]) + camelCase.Substring(1);
-        }
-
         /// <summary>
         /// Gets progression for a MainAttribute. Returns default (0,0) if not found.
         /// </summary>
@@ -127,11 +86,21 @@ namespace IdleDefenseSurvival.Stats
         }
 
         /// <summary>
-        /// Gets progression for a SecondaryStat. Returns default (0,0) if not found.
+        /// Gets progression for a SecondaryStat from BaseStatLoader (single source of truth).
+        /// Returns default (0,0) if not found.
         /// </summary>
         public AttributeProgression GetSecondaryProgression(SecondaryStat stat)
         {
-            return _secondaryProgression.TryGetValue(stat, out var prog) ? prog : default;
+            if (BaseStatLoader.Instance == null) return default;
+
+            var skillData = BaseStatLoader.Instance.GetSecondarySkillData(stat);
+            if (skillData == null) return default;
+
+            return new AttributeProgression
+            {
+                ValuePerLevel = skillData.ValuePerLevel,
+                ValuePerEnhance = skillData.ValuePerEnhance
+            };
         }
 
         /// <summary>

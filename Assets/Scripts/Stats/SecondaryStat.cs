@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Stats
 {
@@ -11,14 +12,15 @@ namespace IdleDefenseSurvival.Stats
     public readonly struct SecondaryStatMeta
     {
         public readonly SecondaryStat Stat;
-        public readonly string DisplayName;
-        public readonly string ShortName;
         public readonly StatCategory Category;
         public readonly Color Color;
         public readonly bool IsPercentage;
         public readonly float BaseValue;
         public readonly SecondaryStatMode DefaultMode;
         public readonly bool CanRollOnEquipment;
+        // Fallback display names (used if BaseStatLoader not available or JSON missing)
+        private readonly string _fallbackDisplayName;
+        private readonly string _fallbackShortName;
 
         public SecondaryStatMeta(
             SecondaryStat stat,
@@ -32,24 +34,70 @@ namespace IdleDefenseSurvival.Stats
             bool canRollOnEquipment = true)
         {
             Stat = stat;
-            DisplayName = displayName;
-            ShortName = shortName;
             Category = category;
             Color = color;
             IsPercentage = isPercentage;
             BaseValue = baseValue;
             DefaultMode = defaultMode;
             CanRollOnEquipment = canRollOnEquipment;
+            _fallbackDisplayName = displayName;
+            _fallbackShortName = shortName;
         }
 
         /// <summary>Gets the SkillType mapped from this SecondaryStat.</summary>
         public SkillType SkillType => SecondaryStatExtensions.SecondaryStatToSkillType(Stat);
 
-        /// <summary>Gets ValuePerLevel from dataSOTValuePerLevel.json (SOT for equipment level scaling).</summary>
-        public float ValuePerLevel => AttributeStatLoader.Instance?.GetSecondaryProgression(Stat).ValuePerLevel ?? 0f;
+        /// <summary>Gets display name from dataPlayer.json via BaseStatLoader (single source of truth).</summary>
+        public string DisplayName
+        {
+            get
+            {
+                var loader = BaseStatLoader.Instance;
+                if (loader != null)
+                {
+                    var skillData = loader.GetSecondarySkillData(Stat);
+                    if (skillData != null && !string.IsNullOrEmpty(skillData.displayName))
+                        return skillData.displayName;
+                }
+                return _fallbackDisplayName;
+            }
+        }
 
-        /// <summary>Gets ValuePerEnhance from dataSOTValuePerLevel.json (SOT for equipment enhance scaling).</summary>
-        public float ValuePerEnhance => 0f; // JSON has it but AttributeStatLoader doesn't expose it yet
+        /// <summary>Gets short name from dataPlayer.json via BaseStatLoader (single source of truth).</summary>
+        public string ShortName
+        {
+            get
+            {
+                var loader = BaseStatLoader.Instance;
+                if (loader != null)
+                {
+                    var skillData = loader.GetSecondarySkillData(Stat);
+                    if (skillData != null && !string.IsNullOrEmpty(skillData.shortName))
+                        return skillData.shortName;
+                }
+                return _fallbackShortName;
+            }
+        }
+
+        /// <summary>Gets ValuePerLevel from dataPlayer.json via BaseStatLoader (single source of truth).</summary>
+        public float ValuePerLevel
+        {
+            get
+            {
+                var loader = BaseStatLoader.Instance;
+                return loader != null ? loader.GetSecondaryValuePerLevel(Stat) : 0f;
+            }
+        }
+
+        /// <summary>Gets ValuePerEnhance from dataPlayer.json via BaseStatLoader (single source of truth).</summary>
+        public float ValuePerEnhance
+        {
+            get
+            {
+                var loader = BaseStatLoader.Instance;
+                return loader != null ? loader.GetSecondaryValuePerEnhance(Stat) : 0f;
+            }
+        }
     }
 
     /// <summary>
