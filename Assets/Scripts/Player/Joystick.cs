@@ -17,14 +17,19 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Vector2 _joyStickOriginalPos;
         [SerializeField] private float _joyStickRadius;
         
-        private void Start()
+        private void Awake()
         {
             _joyStickOriginalPos = _background.transform.position;
             _joyStickRadius = _background.GetComponent<RectTransform>().sizeDelta.y / 4;
+            _background.SetActive(false);
+            _handle.SetActive(false);
         }
 
         public void PointerDown(BaseEventData baseEventData)
         {
+            _background.SetActive(true);
+            _handle.SetActive(true);
+
             PointerEventData pointerEventData = baseEventData as PointerEventData;
             Vector2 pos = pointerEventData.position;
             _handle.transform.position = pos;
@@ -58,6 +63,8 @@ namespace IdleDefenseSurvival.Player
             joyStickVec = Vector2.zero;
             _handle.transform.position = _joyStickOriginalPos;
             _background.transform.position = _joyStickOriginalPos;
+            _handle.SetActive(false);
+            _background.SetActive(false);
         }
     }
 

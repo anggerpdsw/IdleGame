@@ -367,7 +367,7 @@ namespace IdleDefenseSurvival.Manager
         private float GetWaveHealthMultiplier()
             => Mathf.Lerp(1f, 2.37f, Mathf.Pow(GetWaveProgressMultiplier(), 1.2f)) * GetTierMultiplier();
         private float GetWaveDamageMultiplier() => 
-            Mathf.Lerp(1f, 1.15f, Mathf.Pow(GetWaveProgressMultiplier(), 0.7f)) * GetTierMultiplier();
+            Mathf.Lerp(1f, 1.15f, Mathf.Pow(GetWaveProgressMultiplier(), 0.18f)) * GetTierMultiplier();
 
         public float CurrentWaveDuration => _waveDuration * ProgressionSpeed;
         public float CurrentInterWaveDuration => _interWaveDuration * ProgressionSpeed;

@@ -1,5 +1,11 @@
 {
     "ultimate": [{
+            "id": "Movement",
+            "active": true,
+            "manaCost": 1,
+            "element": "None"
+        },
+        {
             "id": "Void",
             "active": true,
             "manaCost": 15,

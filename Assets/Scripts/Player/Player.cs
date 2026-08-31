@@ -169,13 +169,18 @@ namespace IdleDefenseSurvival.Player
         private void FixedUpdate()
         {
             if (_joyStick.joyStickVec.y != 0)
-            {
-                float playerspeed = PlayerStatsManager.Instance.GetStat(SkillType.MoveSpeed) * 0.5f;
-                rb.linearVelocity = new Vector2(_joyStick.joyStickVec.x * playerspeed, _joyStick.joyStickVec.y * playerspeed);
-            } else
-            {
+                MoveTo();
+            else
                 rb.linearVelocity = Vector2.zero;
-            }
+        }
+
+        private void MoveTo()
+        {
+            if (!UltimateManager.Instance.TryGetUltimate("Movement", out var ultimateData)) return;
+            if(!CanAfford(ultimateData.manaCost)) return;
+            float playerspeed = PlayerStatsManager.Instance.GetStat(SkillType.MoveSpeed) * 0.03f;
+            rb.linearVelocity = new Vector2(_joyStick.joyStickVec.x * playerspeed, _joyStick.joyStickVec.y * playerspeed);
+            SpendMana(ultimateData.manaCost);
         }
 
         private void FaceTarget(Transform target)
