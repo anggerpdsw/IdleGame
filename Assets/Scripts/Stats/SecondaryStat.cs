@@ -128,14 +128,14 @@ namespace IdleDefenseSurvival.Stats
                 // Survival
                 new(SecondaryStat.LifeSteal, "Life Steal", "Lifesteal", StatCategory.Health, GameColors.statLifeSteal, true, 1f, SecondaryStatMode.Percent),
 
-                // Element Damage (Layer 3) — all percent, from equipment/card/buff
-                new(SecondaryStat.MetalDamageBonus, "Metal Damage", "Metal%", StatCategory.Magic, GameColors.statMetal, true, 1f, SecondaryStatMode.Percent),
-                new(SecondaryStat.WoodDamageBonus, "Wood Damage", "Wood%", StatCategory.Magic, GameColors.statWood, true, 1f, SecondaryStatMode.Percent),
-                new(SecondaryStat.FireDamageBonus, "Fire Damage", "Fire%", StatCategory.Magic, GameColors.statFire, true, 1f, SecondaryStatMode.Percent),
-                new(SecondaryStat.WaterDamageBonus, "Water Damage", "Water%", StatCategory.Magic, GameColors.statWater, true, 1f, SecondaryStatMode.Percent),
-                new(SecondaryStat.EarthDamageBonus, "Earth Damage", "Earth%", StatCategory.Magic, GameColors.statEarth, true, 1f, SecondaryStatMode.Percent),
-                new(SecondaryStat.LightningDamageBonus, "Lightning Damage", "Lightning%", StatCategory.Magic, GameColors.gold, true, 1f, SecondaryStatMode.Percent),
-                new(SecondaryStat.WindDamageBonus, "Wind Damage", "Wind%", StatCategory.Magic, GameColors.statWind, true, 1f, SecondaryStatMode.Percent),
+                // Element Damage (Layer 3) — all flat, from equipment/card/buff
+                new(SecondaryStat.MetalDamageBonus, "Metal Damage", "Metal", StatCategory.Magic, GameColors.statMetal, false, 1f, SecondaryStatMode.Flat),
+                new(SecondaryStat.WoodDamageBonus, "Wood Damage", "Wood", StatCategory.Magic, GameColors.statWood, false, 1f, SecondaryStatMode.Flat),
+                new(SecondaryStat.FireDamageBonus, "Fire Damage", "Fire", StatCategory.Magic, GameColors.statFire, false, 1f, SecondaryStatMode.Flat),
+                new(SecondaryStat.WaterDamageBonus, "Water Damage", "Water", StatCategory.Magic, GameColors.statWater, false, 1f, SecondaryStatMode.Flat),
+                new(SecondaryStat.EarthDamageBonus, "Earth Damage", "Earth", StatCategory.Magic, GameColors.statEarth, false, 1f, SecondaryStatMode.Flat),
+                new(SecondaryStat.LightningDamageBonus, "Lightning Damage", "Lightning", StatCategory.Magic, GameColors.gold, false, 1f, SecondaryStatMode.Flat),
+                new(SecondaryStat.WindDamageBonus, "Wind Damage", "Wind", StatCategory.Magic, GameColors.statWind, false, 1f, SecondaryStatMode.Flat),
 
                 // Economy
                 new(SecondaryStat.InterestWave, "Interest per Wave", "Interest", StatCategory.Economy, GameColors.statInterestWave, true, 1f, SecondaryStatMode.Percent),

@@ -258,7 +258,7 @@
     "element": {
       "elementMastery": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.25,
         "description": "Damage multiplier for element against element",
@@ -267,7 +267,7 @@
       },
       "metalDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Metal element",
@@ -276,7 +276,7 @@
       },
       "woodDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Wood element",
@@ -285,7 +285,7 @@
       },
       "fireDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Fire element",
@@ -294,7 +294,7 @@
       },
       "waterDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Water element",
@@ -303,7 +303,7 @@
       },
       "earthDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Earth element",
@@ -312,7 +312,7 @@
       },
       "lightningDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Lightning element",
@@ -321,7 +321,7 @@
       },
       "windDamageBonus": {
         "baseValue": 0,
-        "Mode": 2,
+        "Mode": 1,
         "ValuePerLevel": 0.1,
         "ValuePerEnhance": 0.5,
         "description": "Bonus damage dealt through the Wind element",

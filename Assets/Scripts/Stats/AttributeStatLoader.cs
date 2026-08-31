@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Data;
 
 namespace IdleDefenseSurvival.Stats
 {

@@ -30,7 +30,7 @@ namespace IdleDefenseSurvival.Manager
         private readonly PlayerStats _stats = new();
 
         public float GetStat(SkillType stat) =>
-            ModifierManager.Instance.ApplyModifiers(stat, GetBaseStat(stat));
+            ModifierManager.Instance.Calculate(stat, GetBaseStat(stat));
 
         public int GetStatInt(SkillType stat) => Mathf.RoundToInt(GetStat(stat));
 

@@ -1,5 +1,3 @@
-using IdleDefenseSurvival.Manager;
-
 namespace IdleDefenseSurvival.Modifier
 {
     /// <summary>
@@ -15,9 +13,7 @@ namespace IdleDefenseSurvival.Modifier
         /// (Base + Flat) * (1 + Percent / 100)
         /// </summary>
         public static float Calculate(float baseValue, float flat, float percent)
-        {
-            return (baseValue + flat) * (1f + percent * 0.01f);
-        }
+            => (baseValue + flat) * (1f + percent * 0.01f);
 
         /// <summary>
         /// Clamp helper.
