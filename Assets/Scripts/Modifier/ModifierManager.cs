@@ -337,29 +337,20 @@ namespace IdleDefenseSurvival.Manager
         #region Cache
 
         /// <summary>
+        /// Backward compatibility.
+        /// </summary>
+        public float Calculate(SkillType stat, float baseValue) => ApplyModifiers(stat, baseValue);
+
+        /// <summary>
         /// Returns final stat.
         /// O(1) after cache.
         /// </summary>
         private float ApplyModifiers(SkillType stat, float baseValue)
         {
             if (_dirtyStats.Remove(stat)) RebuildCache(stat);
-            
-            if (!_cache.TryGetValue(stat, out var cache))
-            {
-                Debug.Log($"[ModifierManager] Stat {stat}: no modifiers, baseValue={baseValue}");
-                return baseValue;
-            }
-            
-            float final = ModifierCalculator.Calculate(baseValue, cache.Flat, cache.Percent);
-            Debug.Log($"[ModifierManager] Stat {stat}: base={baseValue}, flat={cache.Flat}, pct={cache.Percent}, final={final}");
-            return final;
+            if (!_cache.TryGetValue(stat, out var cache)) return baseValue;
+            return ModifierCalculator.Calculate(baseValue, cache.Flat, cache.Percent);
         }
-
-
-        /// <summary>
-        /// Backward compatibility.
-        /// </summary>
-        public float Calculate(SkillType stat, float baseValue) => ApplyModifiers(stat, baseValue);
 
         /// <summary>
         /// Rebuild one stat cache only.

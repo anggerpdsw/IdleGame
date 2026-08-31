@@ -16,19 +16,19 @@
     },
     {
       "stat": "DeathDefy",
-      "flat": 0.0005,
+      "flat": 0.05,
       "percent": 0
     }
   ],
   "strength": [{
       "stat": "AttackDamage",
-      "flat": 0.333,
+      "flat": 0.083,
       "percent": 0
     },
     {
       "stat": "KnockbackChance",
       "flat": 0,
-      "percent": 0.125
+      "percent": 0.152
     },
     {
       "stat": "Penetration",
@@ -37,7 +37,7 @@
     },
     {
       "stat": "UltimateAttack",
-      "flat": 0.201,
+      "flat": 0.105,
       "percent": 0
     }
   ],
@@ -48,33 +48,33 @@
     },
     {
       "stat": "ManaRegen",
-      "flat": 0.231,
+      "flat": 0.131,
       "percent": 0
     },
     {
       "stat": "ElementMastery",
-      "flat": 0.212,
+      "flat": 0.077,
       "percent": 0
     },
     {
       "stat": "AttackRange",
-      "flat": 0.011,
+      "flat": 0.007,
       "percent": 0
     }
   ],
   "dexterity": [{
       "stat": "AttackSpeed",
-      "flat": 0.03,
+      "flat": 0.017,
       "percent": 0
     },
     {
       "stat": "CriticalChance",
       "flat": 0,
-      "percent": 0.211
+      "percent": 0.111
     },
     {
       "stat": "Evasion",
-      "flat": 0.273,
+      "flat": 0.137,
       "percent": 0
     },
     {

@@ -176,7 +176,7 @@ namespace IdleDefenseSurvival.Equipment
                 {
                     float value = statEntry.GetValue(item.Level);
                     if (value != 0)
-                        builder.Add(prefix, statEntry.Stat, statEntry.Mode, value);
+                        builder.Add(prefix, statEntry.Stat, value);
                 }
 
             // Second Attributes from item.AttributeData (specialization stats) — stored as SecondaryStat in Attribute field
@@ -188,8 +188,7 @@ namespace IdleDefenseSurvival.Equipment
                     if (secStat == SecondaryStat.None || attrEntry.BaseValue == 0f) continue;
 
                     // Use stat's default mode (Percent, Flat, etc.) from registry instead of hard-coded Flat
-                    var mode = SecondaryStatRegistry.Get(secStat).DefaultMode;
-                    builder.Add(prefix + "_SecondAttr", secStat, mode, attrEntry.BaseValue);
+                    builder.Add(prefix + "_SecondAttr", secStat, attrEntry.BaseValue);
                 }
 
             foreach (var modifier in builder.Modifiers)
@@ -207,14 +206,14 @@ namespace IdleDefenseSurvival.Equipment
         {
             public readonly List<StatModifier> Modifiers = new();
 
-            public void Add(string idPrefix, SecondaryStat stat, SecondaryStatMode mode, float value) =>
+            public void Add(string idPrefix, SecondaryStat stat, float value) =>
                 Modifiers.Add(new StatModifier
                 {
                     Id = $"{idPrefix}_{stat}",
                     Source = ModifierSource.Equipment,
                     Stat = SecondaryStatExtensions.SecondaryStatToSkillType(stat),
                     SecondaryStat = stat,
-                    Mode = (ModifierMode)mode,
+                    Mode = ModifierMode.Flat,
                     Value = value,
                     Permanent = true
                 });

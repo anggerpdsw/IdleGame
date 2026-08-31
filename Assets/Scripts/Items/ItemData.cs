@@ -198,14 +198,9 @@ namespace IdleDefenseSurvival.Items
         /// Cooldown after using the potion.
         /// </summary>
         public float Cooldown = 0f;
-        public override string ToString()
-        {
-            return $"{Name} ({PotionType})";
-        }
+        public override string ToString() => $"{Name} ({PotionType})";
         public float CalculateAmount(float maxValue)
-        {
-            return maxValue * (PercentValue * 0.01f) + FlatValue;
-        }
+            => maxValue * (PercentValue * 0.01f) + FlatValue;
         public void InitializeDefaults()
         {
             Category = ItemCategory.Consumable;
@@ -225,8 +220,6 @@ namespace IdleDefenseSurvival.Items
         public SecondaryStat Stat = SecondaryStat.None;
         public float BaseValue = 0f;
         public float ValuePerLevel = 0f; // Scaling per level
-        public SecondaryStatMode Mode = SecondaryStatMode.Flat;
-        public bool IsPercent = false; // Legacy - use Mode instead
         // percentage points flow through unchanged
         public float GetValue(int level)
             => BaseValue + ValuePerLevel * (level - 1);
@@ -241,8 +234,6 @@ namespace IdleDefenseSurvival.Items
         public SecondaryStat Stat = SecondaryStat.None;
         public float BaseValue = 0f;
         public float ValuePerLevel = 0f; // Scaling per level
-        public SecondaryStatMode Mode = SecondaryStatMode.Flat;        
-        public bool IsPercent = false; // Legacy - use Mode instead
         // additive for all modes; Mode only affects ModifierManager
         public float GetValue(int level)
             => BaseValue + ValuePerLevel * (level - 1);
@@ -258,11 +249,8 @@ namespace IdleDefenseSurvival.Items
         public MainAttribute Attribute = MainAttribute.Constitution;
         public float BaseValue = 0f;
         public float ValuePerLevel = 0f; // Scaling per level
-
         public float GetValue(int level)
-        {
-            return BaseValue + ValuePerLevel * (level - 1);
-        }
+            => BaseValue + ValuePerLevel * (level - 1);
     }
 
     /// <summary>
@@ -278,7 +266,6 @@ namespace IdleDefenseSurvival.Items
         public string[] Conditions; // Additional conditions (JSON)
         public int RequiredLevel = 1; // Minimum item level to activate
         public bool IsActive = true; // Can be toggled
-
         public bool CanActivate(int itemLevel) =>
             IsActive && itemLevel >= RequiredLevel;
     }
@@ -294,7 +281,6 @@ namespace IdleDefenseSurvival.Items
         [TextArea] public string Description;
         public int MaxLevel = 10;
         public float ValuePerLevel = 1f;
-        public SecondaryStatMode Mode = SecondaryStatMode.Flat;
         public SecondaryStat[] AffectedStats; // Which stats this passive affects
     }
 

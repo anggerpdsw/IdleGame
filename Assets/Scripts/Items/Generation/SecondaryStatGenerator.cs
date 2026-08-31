@@ -98,8 +98,6 @@ namespace IdleDefenseSurvival.Items.Generation
                     Stat = kvp.Key,
                     BaseValue = baseValue,
                     ValuePerLevel = valuePerLevel,
-                    Mode = meta.DefaultMode,
-                    IsPercent = meta.IsPercentage
                 };
             }
 

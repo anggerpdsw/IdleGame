@@ -77,14 +77,6 @@ namespace IdleDefenseSurvival.Stats
         }
 
         /// <summary>
-        /// Gets progression for a MainAttribute. Returns default (0,0) if not found.
-        /// </summary>
-        public AttributeProgression GetMainProgression(MainAttribute attribute)
-        {
-            return _mainProgression.TryGetValue(attribute, out var prog) ? prog : default;
-        }
-
-        /// <summary>
         /// Gets progression for a SecondaryStat from BaseStatLoader (single source of truth).
         /// Returns default (0,0) if not found.
         /// </summary>
@@ -100,16 +92,6 @@ namespace IdleDefenseSurvival.Stats
                 ValuePerLevel = skillData.ValuePerLevel,
                 ValuePerEnhance = skillData.ValuePerEnhance
             };
-        }
-
-        /// <summary>
-        /// Calculates final attribute value from base + level contributions.
-        /// Uses (Level - 1) * ValuePerLevel + EnhanceLevel * ValuePerEnhance progression.
-        /// </summary>
-        public float CalculateFinalValue(MainAttribute attribute, float baseValue, int level)
-        {
-            var prog = GetMainProgression(attribute);
-            return baseValue + prog.ValuePerLevel * (level - 1);
         }
 
         /// <summary>

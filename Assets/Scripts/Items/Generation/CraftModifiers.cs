@@ -300,7 +300,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
         public void Apply(ItemGenerationContext context, ref CraftRollResult result)
         {
-            context = context.With(customData: new System.Collections.Generic.Dictionary<string, object>
+            context = context.With(customData: new Dictionary<string, object>
             {
                 ["CriticalChanceBonus"] = CriticalChanceBonus
             });

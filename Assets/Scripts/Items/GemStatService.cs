@@ -83,7 +83,6 @@ namespace IdleDefenseSurvival.Items
                         Stat = stat.Stat,
                         BaseValue = stat.BaseValue,
                         ValuePerLevel = stat.ValuePerLevel,
-                        Mode = stat.Mode
                     });
                 }
             }

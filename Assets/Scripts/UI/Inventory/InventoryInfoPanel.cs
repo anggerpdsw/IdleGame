@@ -33,6 +33,7 @@ namespace IdleDefenseSurvival.UI.Inventory
 
         private InventoryItem _currentItem;
         private InventoryUI _parentUI;
+        private const string ValueFormat = "0.##";
 
         public void Initialize(InventoryUI parentUI)
         {
@@ -197,7 +198,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                     {
                         if (attr.BaseValue == 0f) continue;
                         string sign = attr.BaseValue >= 0 ? "+" : "";
-                        lines.Add($"{attr.Attribute.GetMainDisplayName()}: {sign}{attr.BaseValue:F2}");
+                        lines.Add($"{attr.Attribute.GetMainDisplayName()}: {sign}{attr.BaseValue.ToString(ValueFormat)}");
                     }
                 }
 
@@ -209,10 +210,8 @@ namespace IdleDefenseSurvival.UI.Inventory
                         if (attr.BaseValue == 0f) continue;
                         var secStat = (SecondaryStat)(int)attr.Attribute;
                         if (secStat == SecondaryStat.None) continue;
-                        bool isPercent = secStat.IsPercentage();
-                        string sign = attr.BaseValue >= 0  && !isPercent ? "+" : "";
-                        string suffix = isPercent ? "%" : "";
-                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{attr.BaseValue:F2}{suffix}");
+                        string sign = attr.BaseValue >= 0 ? "+" : "";
+                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{attr.BaseValue.ToString(ValueFormat)}");
                     }
                 }
 

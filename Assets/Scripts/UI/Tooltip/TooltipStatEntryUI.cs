@@ -10,27 +10,27 @@ namespace IdleDefenseSurvival.UI.Tooltip
         [SerializeField] private TextMeshProUGUI _statValueText;
         [SerializeField] private TextMeshProUGUI _comparisonText;
 
-        public void Initialize(SecondaryStat stat, float value, float comparisonValue = 0)
-            => Initialize(stat.GetSkillDisplayName(), value, comparisonValue, stat.IsPercentage());
+        private const string ValueFormat = "0.##";
 
-        public void Initialize(string statName, float value, float comparisonValue = 0, bool isPercent = false)
+        public void Initialize(SecondaryStat stat, float value, float comparisonValue = 0)
+            => Initialize(stat.GetSkillDisplayName(), value, comparisonValue);
+
+        public void Initialize(string statName, float value, float comparisonValue = 0)
         {
             if (_statNameText != null) _statNameText.text = statName;
 
             if (_statValueText != null)
             {
-                string sign = value >= 0  && !isPercent ? "+" : "";
-                string suffix = isPercent ? "%" : "";
-                _statValueText.text = $"{sign}{value:F2}{suffix}";
+                string sign = value >= 0 ? "+" : "";
+                _statValueText.text = $"{sign}{value.ToString(ValueFormat)}";
                 _statValueText.color = value >= 0 ? Color.green : Color.red;
             }
 
             if (_comparisonText != null && comparisonValue != 0)
             {
                 float diff = comparisonValue - value;
-                string sign = diff >= 0 && !isPercent ? "+" : "";
-                string suffix = isPercent ? "%" : "";
-                _comparisonText.text = $"({sign}{diff:F2}{suffix})";
+                string sign = diff >= 0 ? "+" : "";
+                _comparisonText.text = $"({sign}{diff.ToString(ValueFormat)})";
                 _comparisonText.color = diff >= 0 ? Color.green : Color.red;
             }
             else if (_comparisonText != null)

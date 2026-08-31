@@ -416,9 +416,8 @@ namespace IdleDefenseSurvival.Items
             return baseStats.Select(s => new CombatStatEntry
             {
                 Stat = s.Stat,
-                BaseValue = s.BaseValue * multiplier,
+                BaseValue = s.BaseValue * multiplier * level,
                 ValuePerLevel = s.ValuePerLevel * multiplier,
-                Mode = s.Mode
             }).ToArray();
         }
         #endregion
