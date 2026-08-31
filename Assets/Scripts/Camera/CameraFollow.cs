@@ -6,8 +6,8 @@ using IdleDefenseSurvival.Stats;
 namespace IdleDefenseSurvival.Camera
 {
     /// <summary>
-    /// Camera that follows player and adjusts orthographic size based on player's attack range.
-    /// Provides visual feedback: enemies entering the attack range are visible on screen.
+    /// Camera that stays fixed at origin and adjusts orthographic size based on player's attack range.
+    /// Does NOT follow player position — player moves within static camera view.
     /// </summary>
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class CameraFollow : MonoBehaviour
@@ -26,15 +26,8 @@ namespace IdleDefenseSurvival.Camera
         [Tooltip("Maximum camera size (zoom out limit).")]
         [SerializeField] private float _maxSize = 30f;
 
-        [Header("Follow Settings")]
-        [Tooltip("Smoothing speed for position following.")]
-        [SerializeField] private float _followSpeed = 10f;
-        [Tooltip("Offset from player position (useful for 2D top-down).")]
-        [SerializeField] private Vector3 _positionOffset = new(0f, 0f, -10f);
-
         private UnityEngine.Camera _camera;
         private float _targetSize;
-        private Vector3 _targetPosition;
 
         private void Awake()
         {
@@ -44,6 +37,9 @@ namespace IdleDefenseSurvival.Camera
                 Debug.LogError("CameraFollow requires a Camera component!");
                 return;
             }
+
+            // Camera stays fixed at origin
+            transform.position = new Vector3(0f, 0f, -10f);
 
             // If player reference not set, try to find it
             if (_player == null)
@@ -74,8 +70,7 @@ namespace IdleDefenseSurvival.Camera
                 if (_player == null) return;
             }
 
-            UpdateTargets();
-            SmoothFollow();
+            UpdateZoom();
         }
 
         /// <summary>
@@ -89,30 +84,14 @@ namespace IdleDefenseSurvival.Camera
         }
 
         /// <summary>
-        /// Update target position and size.
+        /// Update only orthographic size based on player attack range.
+        /// Camera position stays fixed at origin.
         /// </summary>
-        private void UpdateTargets()
+        private void UpdateZoom()
         {
-            // Target position follows player
-            _targetPosition = _player.transform.position + _positionOffset;
-
-            // Target size based on player attack range
             _targetSize = CalculateTargetSize();
-        }
 
-        /// <summary>
-        /// Smoothly move camera position and adjust orthographic size.
-        /// </summary>
-        private void SmoothFollow()
-        {
-            // Smooth position
-            transform.position = Vector3.Lerp(
-                transform.position,
-                _targetPosition,
-                _followSpeed * Time.deltaTime
-            );
-
-            // Smooth orthographic size
+            // Smooth orthographic size only
             _camera.orthographicSize = Mathf.Lerp(
                 _camera.orthographicSize,
                 _targetSize,
@@ -127,9 +106,8 @@ namespace IdleDefenseSurvival.Camera
         {
             if (_player != null)
             {
-                UpdateTargets();
+                _targetSize = CalculateTargetSize();
                 _camera.orthographicSize = _targetSize;
-                transform.position = _targetPosition;
             }
         }
 

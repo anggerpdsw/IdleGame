@@ -76,6 +76,10 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private AudioSource _sfxSource;
         public AudioSource SfxSource => _sfxSource;
 
+        // Movement
+        [SerializeField] private Joystick _joyStick;
+        private Rigidbody2D rb;
+
         public float AttackRange;
 
         private void Awake()
@@ -123,6 +127,7 @@ namespace IdleDefenseSurvival.Player
 
         private void Start()
         {
+            rb = GetComponent<Rigidbody2D>();
             // Use a coroutine to wait until essential singletons are initialized.
             StartCoroutine(InitializePlayer());
         }
@@ -159,6 +164,18 @@ namespace IdleDefenseSurvival.Player
             // Aura effects now handled by AuraCollider trigger system
 
             _attackRangeRenderer.transform.Rotate(0, 0, _attackRangeSpeedRotate * Time.deltaTime);
+        }
+
+        private void FixedUpdate()
+        {
+            if (_joyStick.joyStickVec.y != 0)
+            {
+                float playerspeed = PlayerStatsManager.Instance.GetStat(SkillType.MoveSpeed) * 0.5f;
+                rb.linearVelocity = new Vector2(_joyStick.joyStickVec.x * playerspeed, _joyStick.joyStickVec.y * playerspeed);
+            } else
+            {
+                rb.linearVelocity = Vector2.zero;
+            }
         }
 
         private void FaceTarget(Transform target)
