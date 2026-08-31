@@ -227,12 +227,9 @@ namespace IdleDefenseSurvival.Items
         public float ValuePerLevel = 0f; // Scaling per level
         public SecondaryStatMode Mode = SecondaryStatMode.Flat;
         public bool IsPercent = false; // Legacy - use Mode instead
-
+        // percentage points flow through unchanged
         public float GetValue(int level)
-        {
-            float value = BaseValue + ValuePerLevel * (level - 1);
-            return Mode == SecondaryStatMode.Percent ? value * 0.01f : value;
-        }
+            => BaseValue + ValuePerLevel * (level - 1);
     }
 
     /// <summary>
@@ -246,11 +243,9 @@ namespace IdleDefenseSurvival.Items
         public float ValuePerLevel = 0f; // Scaling per level
         public SecondaryStatMode Mode = SecondaryStatMode.Flat;        
         public bool IsPercent = false; // Legacy - use Mode instead
+        // additive for all modes; Mode only affects ModifierManager
         public float GetValue(int level)
-        {
-            float value = ValuePerLevel * (level - 1);
-            return Mode.Calculate(BaseValue, value);
-        }
+            => BaseValue + ValuePerLevel * (level - 1);
     }
 
     /// <summary>

@@ -183,7 +183,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                 {
                     float value = stat.GetValue(item.Level);
                     string sign = value >= 0 ? "+" : "";
-                    lines.Add($"{stat.Stat.GetSkillDisplayName()}: {sign}{value:F1}");
+                    lines.Add($"{stat.Stat.GetSkillDisplayName()}: {sign}{value:F2}");
                 }
             }
 
@@ -197,7 +197,7 @@ namespace IdleDefenseSurvival.UI.Inventory
                     {
                         if (attr.BaseValue == 0f) continue;
                         string sign = attr.BaseValue >= 0 ? "+" : "";
-                        lines.Add($"{attr.Attribute.GetMainDisplayName()}: {sign}{attr.BaseValue:F1}");
+                        lines.Add($"{attr.Attribute.GetMainDisplayName()}: {sign}{attr.BaseValue:F2}");
                     }
                 }
 
@@ -210,11 +210,9 @@ namespace IdleDefenseSurvival.UI.Inventory
                         var secStat = (SecondaryStat)(int)attr.Attribute;
                         if (secStat == SecondaryStat.None) continue;
                         bool isPercent = secStat.IsPercentage();
-                        float value = isPercent
-                            ? attr.BaseValue * 100f : attr.BaseValue;
-                        string sign = value >= 0  && !isPercent ? "+" : "";
+                        string sign = attr.BaseValue >= 0  && !isPercent ? "+" : "";
                         string suffix = isPercent ? "%" : "";
-                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{value:F1}{suffix}");
+                        lines.Add($"{secStat.GetSkillDisplayName()}: {sign}{attr.BaseValue:F2}{suffix}");
                     }
                 }
 

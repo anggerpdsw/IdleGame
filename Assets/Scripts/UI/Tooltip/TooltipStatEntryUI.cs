@@ -20,19 +20,17 @@ namespace IdleDefenseSurvival.UI.Tooltip
             if (_statValueText != null)
             {
                 string sign = value >= 0  && !isPercent ? "+" : "";
-                float displayValue = isPercent ? value * 100f : value;
                 string suffix = isPercent ? "%" : "";
-                _statValueText.text = $"{sign}{displayValue:F1}{suffix}";
+                _statValueText.text = $"{sign}{value:F2}{suffix}";
                 _statValueText.color = value >= 0 ? Color.green : Color.red;
             }
 
             if (_comparisonText != null && comparisonValue != 0)
             {
                 float diff = comparisonValue - value;
-                float displayDiff = isPercent ? diff * 100f : diff;
-                string sign = displayDiff >= 0 && !isPercent ? "+" : "";
+                string sign = diff >= 0 && !isPercent ? "+" : "";
                 string suffix = isPercent ? "%" : "";
-                _comparisonText.text = $"({sign}{displayDiff:F1}{suffix})";
+                _comparisonText.text = $"({sign}{diff:F2}{suffix})";
                 _comparisonText.color = diff >= 0 ? Color.green : Color.red;
             }
             else if (_comparisonText != null)
