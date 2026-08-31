@@ -1477,7 +1477,7 @@
       "attackSpeed": 1,
       "damage": 8,
       "health": 64.6,
-      "moveSpeed": 0.25,
+      "moveSpeed": 0.45,
       "spawnWeight": 7,
       "evasion": 69,
       "element": "None",

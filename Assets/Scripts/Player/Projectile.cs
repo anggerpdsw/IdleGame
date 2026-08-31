@@ -350,13 +350,13 @@ namespace IdleDefenseSurvival.Player
                             if (Utilityku.Chance(crit * 0.5f))
                             {
                                 critTier = CriticalType.SuperCritical;
-                                _damageMultiplier += critDMG * 1.1f;
+                                _damageMultiplier += critDMG * 1.05f;
 
                                 // UltraCritical roll - nested Chance as specified
                                 if (Utilityku.Chance(crit * 0.125f))
                                 {
                                     critTier = CriticalType.UltraCritical;
-                                    _damageMultiplier += critDMG * 1.7f;
+                                    _damageMultiplier += critDMG * 1.35f;
                                 }
                             }
                         }
@@ -374,7 +374,7 @@ namespace IdleDefenseSurvival.Player
                             DamageMultiplier = _damageMultiplier,
                             Element = Utilityku.RandomElement(),
                             HasKnockback = Utilityku.Chance(_knockbackChance),
-                            KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.5f, _bounceIndex),
+                            KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.35f, _bounceIndex),
                             HasStunt = Utilityku.Chance(_stuntChance),
                             HasBounce = Utilityku.Chance(_bounceChance),
 
@@ -442,7 +442,6 @@ namespace IdleDefenseSurvival.Player
             float distance = Vector2.Distance(frompos, _target.position);
             // contoh: +2% damage setiap 1 unit jarak
             float rangeMultiplier = 1f + (distance * _basePerRange / 100f);
-
             return rangeMultiplier;
         }
 

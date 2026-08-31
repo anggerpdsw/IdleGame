@@ -104,7 +104,7 @@
         "shortName": "KCH"
       },
       "knockbackForce": {
-        "baseValue": 1.5,
+        "baseValue": 2.5,
         "ValuePerLevel": 0.05,
         "ValuePerEnhance": 0.05,
         "description": "Force applied to knockbacked enemies",

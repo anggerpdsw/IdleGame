@@ -28,7 +28,7 @@
     {
       "stat": "KnockbackChance",
       "flat": 0,
-      "percent": 0.152
+      "percent": 0.132
     },
     {
       "stat": "Penetration",
@@ -53,7 +53,7 @@
     },
     {
       "stat": "ElementMastery",
-      "flat": 0.077,
+      "flat": 0.067,
       "percent": 0
     },
     {

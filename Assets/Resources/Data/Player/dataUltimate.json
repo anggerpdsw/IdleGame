@@ -23,7 +23,7 @@
         {
             "id": "Root",
             "active": true,
-            "manaCost": 10,
+            "manaCost": 11,
             "cooldown": 17,
             "duration": 8.5,
             "element": "Wood"
@@ -31,9 +31,9 @@
         {
             "id": "Bomb",
             "active": true,
-            "manaCost": 22,
-            "chance": 73,
-            "count": 5,
+            "manaCost": 24,
+            "chance": 43,
+            "count": 3,
             "duration": 13.5,
             "damageMultiplier": 2.3,
             "knockbackMultiplier": 1.2,

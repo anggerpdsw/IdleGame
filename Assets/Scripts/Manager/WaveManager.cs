@@ -358,7 +358,8 @@ namespace IdleDefenseSurvival.Manager
         /// Wave progress from 0 (wave 1) to 1 (wave 350).
         /// </summary>
         private float GetWaveProgressMultiplier() => Mathf.Clamp01((CurrentWave - 1f) / (_maxWave - 1f));
-        private float GetTierMultiplier() => 1f + (CurrentTier - 1) * _tierMultiplier;
+        // EXPONENTIAL (recommended) - idle game standard
+        private float GetTierMultiplier() => Mathf.Pow(1.19f, CurrentTier - 1);
         private float GetWaveSpeedMultiplier()
         {
             return Mathf.Lerp(1f, 1.413f, GetWaveProgressMultiplier());
@@ -366,7 +367,7 @@ namespace IdleDefenseSurvival.Manager
         private float GetWaveHealthMultiplier()
             => Mathf.Lerp(1f, 2.37f, Mathf.Pow(GetWaveProgressMultiplier(), 1.2f)) * GetTierMultiplier();
         private float GetWaveDamageMultiplier() => 
-            Mathf.Lerp(1f, 1.15f, Mathf.Pow(GetWaveProgressMultiplier(), 1.2f)) * GetTierMultiplier();
+            Mathf.Lerp(1f, 1.15f, Mathf.Pow(GetWaveProgressMultiplier(), 0.7f)) * GetTierMultiplier();
 
         public float CurrentWaveDuration => _waveDuration * ProgressionSpeed;
         public float CurrentInterWaveDuration => _interWaveDuration * ProgressionSpeed;
