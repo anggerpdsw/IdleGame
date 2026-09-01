@@ -30,6 +30,7 @@ namespace IdleDefenseSurvival.Ultimate
         [Tooltip("Audio clip for explosion")]
         [SerializeField] private AudioClip _explosionSoundClip;
         [SerializeField] private float _soundVolume = 1f;
+        [SerializeField] private float _zoomSize = 1f;
 
         // Runtime references
         private Player.Player _player;
@@ -52,7 +53,7 @@ namespace IdleDefenseSurvival.Ultimate
             rb.gravityScale = 0f;
 
             _enemyLayerMask = LayerMask.GetMask("Enemy");
-            transform.localScale = new Vector3(3f, 3f, 1f);
+            transform.localScale = new Vector3(_zoomSize, _zoomSize, 1f);
         }
 
         /// <summary>

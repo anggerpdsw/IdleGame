@@ -11,13 +11,14 @@ namespace IdleDefenseSurvival.UI
     {
         [SerializeField] private TextMeshProUGUI _statNameText;
         [SerializeField] private TextMeshProUGUI _statValueText;
+        private const string ValueFormat = "0.##";
 
         /// <summary>
         /// Update the displayed stat name and value.
         /// </summary>
         public void SetValue(string statName, float value)
         {
-            // if (value < 0.5f) this.gameObject.SetActive(false);
+            if (value < 0.05f) this.gameObject.SetActive(false);
             if (_statNameText != null) _statNameText.text = statName;
             if (_statValueText != null) _statValueText.text = FormatValue(value);
         }
@@ -28,7 +29,7 @@ namespace IdleDefenseSurvival.UI
             if (Mathf.Approximately(value, Mathf.Floor(value)))
                 return value.ToString("0");
 
-            return value.ToString();
+            return value.ToString(ValueFormat);
         }
     }
 }

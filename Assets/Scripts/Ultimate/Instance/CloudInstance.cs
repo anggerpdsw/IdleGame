@@ -22,6 +22,7 @@ namespace IdleDefenseSurvival.Ultimate
         [Tooltip("Audio clip for cloud damage")]
         [SerializeField] private AudioClip _cloudSoundClip;
         [SerializeField] private float _soundVolume = 0.25f;
+        [SerializeField] private float _zoomSize = 1f;
 
         // Runtime references
         private Player.Player _player;
@@ -42,7 +43,7 @@ namespace IdleDefenseSurvival.Ultimate
         {
             _enemyLayerMask = LayerMask.GetMask("Enemy");
             _nextDamageTime = Time.time + _damageTickInterval;
-            transform.localScale = new Vector3(3f, 3f, 1f);
+            transform.localScale = new Vector3(_zoomSize, _zoomSize, 1f);
         }
 
         public void Initialize(Player.Player player, UltimateData cloudData)

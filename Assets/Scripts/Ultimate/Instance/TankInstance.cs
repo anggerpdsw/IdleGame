@@ -31,6 +31,7 @@ namespace IdleDefenseSurvival.Ultimate
         [SerializeField] private SpriteRenderer _attackRangeRenderer;
         [SerializeField] private float _rotationSpeed = 1.5f;
         [SerializeField] private float _turnSpeed = 720f;
+        [SerializeField] private float _scaleRange = 3f;
 
         // Runtime references
         private Player.Player _player;
@@ -191,7 +192,7 @@ namespace IdleDefenseSurvival.Ultimate
             Sprite sprite = _attackRangeRenderer.sprite;
             if (sprite != null)
             {
-                float range = diameter * 3;
+                float range = diameter * _scaleRange;
                 _attackRangeRenderer.transform.localScale = new Vector3(range, range, 1f);
             }
             _attackRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);

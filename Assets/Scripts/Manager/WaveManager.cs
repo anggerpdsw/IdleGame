@@ -49,7 +49,7 @@ namespace IdleDefenseSurvival.Manager
         [SerializeField] private float _waveDuration = 30f;
         [SerializeField] private float _interWaveDuration = 10f;
         [SerializeField] private int _maxWave = GameConstants.MAX_WAVE_PER_TIER;
-        [SerializeField] private float _tierMultiplier = 0.15f;
+        [SerializeField] private float _tierMultiplier = 1.175f;
         [SerializeField] private float _healthMultiplier = 1.008f;
         [SerializeField] private float _speedMultiplier = 1.0015f;
         [SerializeField] private float _damageMultiplier = 1.005f;
@@ -359,7 +359,7 @@ namespace IdleDefenseSurvival.Manager
         /// </summary>
         private float GetWaveProgressMultiplier() => Mathf.Clamp01((CurrentWave - 1f) / (_maxWave - 1f));
         // EXPONENTIAL (recommended) - idle game standard
-        private float GetTierMultiplier() => Mathf.Pow(1.19f, CurrentTier - 1);
+        private float GetTierMultiplier() => Mathf.Pow(_tierMultiplier, CurrentTier - 1);
         private float GetWaveSpeedMultiplier()
         {
             return Mathf.Lerp(1f, 1.413f, GetWaveProgressMultiplier());

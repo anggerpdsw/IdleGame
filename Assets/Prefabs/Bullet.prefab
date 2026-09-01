@@ -177,4 +177,4 @@ MonoBehaviour:
   _playerBulletSprite: {fileID: -8303968428360318273, guid: 2337f2b482efb4c4da490e76cb5ffbd0, type: 3}
   _tankBulletSprite: {fileID: 40735755952194678, guid: 53de9b299f96ee049b9e16d4a2a63227, type: 3}
   _enemyBulletSprite: {fileID: 1675107215452118367, guid: c9e05e6584f1f044e9b230cf11686729, type: 3}
-  _visualSize: 1.73
+  _visualSize: 1

@@ -127,7 +127,7 @@ MonoBehaviour:
   _attackRangeRenderer: {fileID: 2909558296483736377}
   _rotationSpeed: 1.5
   _turnSpeed: 720
-  _projectilePrefab: {fileID: 5909047843300642554, guid: 12269f2492466984aa326cf7daa4e887, type: 3}
+  _scaleRange: 1
 --- !u!1 &6527356191455362235
 GameObject:
   m_ObjectHideFlags: 0

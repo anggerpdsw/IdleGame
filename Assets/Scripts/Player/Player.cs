@@ -168,19 +168,47 @@ namespace IdleDefenseSurvival.Player
 
         private void FixedUpdate()
         {
-            if (_joyStick.joyStickVec.y != 0)
+            if (_joyStick.joyStickVec.y != 0 || _joyStick.joyStickVec.x != 0)
                 MoveTo();
             else
                 rb.linearVelocity = Vector2.zero;
         }
 
+        private float _movementManaAccumulator;
         private void MoveTo()
         {
-            if (!UltimateManager.Instance.TryGetUltimate("Movement", out var ultimateData)) return;
-            if(!CanAfford(ultimateData.manaCost)) return;
-            float playerspeed = PlayerStatsManager.Instance.GetStat(SkillType.MoveSpeed) * 0.03f;
-            rb.linearVelocity = new Vector2(_joyStick.joyStickVec.x * playerspeed, _joyStick.joyStickVec.y * playerspeed);
-            SpendMana(ultimateData.manaCost);
+            if (!UltimateManager.Instance.TryGetUltimate("Movement", out var ultimateData))
+                return;
+
+            Vector2 moveDirection = _joyStick.joyStickVec;
+
+            if (moveDirection.sqrMagnitude <= 0.001f)
+            {
+                rb.linearVelocity = Vector2.zero;
+                _movementManaAccumulator = 0f;
+                return;
+            }
+
+            float playerSpeed = PlayerStatsManager.Instance.GetStat(SkillType.MoveSpeed);
+
+            rb.linearVelocity = moveDirection * playerSpeed;
+
+            // Mana cost per second
+            _movementManaAccumulator += ultimateData.manaCost * Time.fixedDeltaTime;
+
+            int manaToSpend = Mathf.FloorToInt(_movementManaAccumulator);
+
+            if (manaToSpend <= 0) return;
+
+            if (!CanAfford(manaToSpend))
+            {
+                rb.linearVelocity = Vector2.zero;
+                _movementManaAccumulator = 0f;
+                return;
+            }
+
+            SpendMana(manaToSpend);
+            _movementManaAccumulator -= manaToSpend;
         }
 
         private void FaceTarget(Transform target)

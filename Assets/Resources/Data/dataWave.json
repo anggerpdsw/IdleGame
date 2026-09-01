@@ -5,7 +5,7 @@
     "maxWave": 350
   },
   "difficulty": {
-    "tierMultiplier": 0.15,
+    "tierMultiplier": 1.175,
     "healthMultiplier": 1.008,
     "speedMultiplier": 1.0015,
     "damageMultiplier": 1.005
