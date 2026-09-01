@@ -129,6 +129,7 @@ namespace IdleDefenseSurvival.Data
     public class SkillData
     {
         public float baseValue;
+        public float bonusPerPoint;      // Bonus per skill point allocated in SkillTreeBonus
         public float ValuePerLevel;
         public float ValuePerEnhance;
         public string description;

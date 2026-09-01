@@ -8,6 +8,7 @@ using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.UI.Tooltip;
 using System.Collections;
+using IdleDefenseSurvival.SkillTree;
 
 namespace IdleDefenseSurvival.UI.Upgrade
 {
@@ -30,6 +31,8 @@ namespace IdleDefenseSurvival.UI.Upgrade
         [Header("Points remaining")]
         [SerializeField] private TextMeshProUGUI _unspentStatPoints;
         [SerializeField] private GameObject _profileBadge;
+        [SerializeField] private TextMeshProUGUI _unspentSkillTreePoints;
+        [SerializeField] private Button _plusSkillButton;
 
         [System.Serializable]
         private class AttributeRow
@@ -67,10 +70,15 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             // Wait until AccountManager has been created.
             while (AccountManager.Instance == null) yield return null;
+            while (SkillTreeBonusManager.Instance == null) yield return null;
             var account = AccountManager.Instance;
             account.OnDataLoaded += Refresh;
             account.OnAttributeChanged += Refresh;
             account.OnLevelUp += OnLevelUp;
+
+            var skill = SkillTreeBonusManager.Instance;
+            skill.OnConfirmed += Refresh;
+            
             // Important:
             // Refresh immediately in case SaveManager already finished loading
             // before this panel became enabled.
@@ -94,11 +102,9 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             var account = AccountManager.Instance;
             if (account == null) return;
-
             int point = account.UnspentStatPoints;
             if (_unspentStatPoints != null) _unspentStatPoints.text = $"Points: {point}";
             if (_profileBadge != null) _profileBadge.SetActive(point > 0);
-
             if (_rows == null) return;
             for (int i = 0; i < _rows.Length && i < _order.Length; i++)
             {
@@ -124,6 +130,13 @@ namespace IdleDefenseSurvival.UI.Upgrade
                     row.plusButton.interactable = account.UnspentStatPoints > 0;
                 }
             }
+            
+            var skill = SkillTreeBonusManager.Instance;
+            if (skill == null) return;
+            int pointSkill = skill.UnspentSkillPoints;
+            if (_unspentSkillTreePoints != null) _unspentSkillTreePoints.text = $"Skill Points: {pointSkill}";
+            if (_plusSkillButton != null)
+                _plusSkillButton.interactable = skill.UnspentSkillPoints > 0;
         }
 
         /// <summary>Shows a hover tooltip listing what this attribute boosts per point.</summary>

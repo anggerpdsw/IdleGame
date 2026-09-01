@@ -19,7 +19,7 @@ namespace IdleDefenseSurvival
     /// </summary>
     public enum BuildProfile { All, Tank, Warrior, Mage, Assassin }
     public enum ModifierMode { Flat, Percent }
-    public enum ModifierSource { AccountLevel, Buff, Card, Equipment, Event, Pet, Quest, Skin, Upgrade, Ultimate }
+    public enum ModifierSource { AccountLevel, Buff, Card, Equipment, Event, Pet, Quest, Skin, Upgrade, Ultimate, SkillTreeBonus }
 
     public enum DefenseBreakSource { None, Lightning, PlayerProjectile, TankProjectile }
     public enum DefenseBreakType { None, Aura, Permanent, Temporary}

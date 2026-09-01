@@ -34,5 +34,8 @@ namespace IdleDefenseSurvival.Data
 
         // Mission System
         public List<MissionInstance> missions = new();
+
+        // SkillTreeBonus System
+        public SkillTreeBonusData skillTreeBonus = new();
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.SkillTree;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -63,6 +64,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<ManaManager>();
             EnsureSingleton<CraftingManager>();
             EnsureSingleton<UpgradeService>();
+            EnsureSingleton<SkillTreeBonusManager>();
 
             // Right After SaveData Loaded do this
             if (SaveManager.Instance?.IsSaveLoaded == true) {
