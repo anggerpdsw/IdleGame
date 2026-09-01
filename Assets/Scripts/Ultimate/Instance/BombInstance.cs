@@ -141,8 +141,8 @@ namespace IdleDefenseSurvival.Ultimate
                     // Attack Enemies
                     enemy.TakeDamage(damageData, false);
 
-                    // Apply knockback
-                    Vector2 knockbackDirection = ((Vector2)col.transform.position - (Vector2)transform.position).normalized;
+                    // Apply knockback - push away from player, not from bomb
+                    Vector2 knockbackDirection = ((Vector2)col.transform.position - (Vector2)_player.transform.position).normalized;
                     enemy.ApplyKnockback(knockbackDirection, damageData.KnockbackForce);
                 }
             }

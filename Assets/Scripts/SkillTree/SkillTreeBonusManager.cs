@@ -31,7 +31,7 @@ namespace IdleDefenseSurvival.SkillTree
     public class SkillTreeBonusManager : MonoBehaviour
     {
         #region Singleton
-
+        [SerializeField] private bool _debug = false;
         private static SkillTreeBonusManager _instance;
         public static SkillTreeBonusManager Instance => _instance;
 
@@ -163,7 +163,7 @@ namespace IdleDefenseSurvival.SkillTree
             account.unspentSkillPoints = correct;
             if (correct > 0)
             {
-                Debug.Log($"[SkillTreeBonus] Recovered {correct} unspent skill points for Level {account.level} player");
+                if (_debug) Debug.Log($"[SkillTreeBonus] Recovered {correct} unspent skill points for Level {account.level} player");
                 SaveManager.Instance.SaveAll();
             }
         }
@@ -359,7 +359,7 @@ namespace IdleDefenseSurvival.SkillTree
             var validPool = GetValidSkillPool();
             if (validPool.Count < 6)
             {
-                Debug.LogError("[SkillTreeBonus] Valid skill pool has fewer than 6 skills!");
+                if (_debug) Debug.LogError("[SkillTreeBonus] Valid skill pool has fewer than 6 skills!");
                 return false;
             }
 
@@ -508,10 +508,10 @@ namespace IdleDefenseSurvival.SkillTree
             var loader = BaseStatLoader.Instance;
             if (loader == null) return;
             var data = Data;
-            if (data == null) { Debug.Log("[SkillTree] Data null"); return; }
+            if (data == null) { if (_debug) Debug.Log("[SkillTree] Data null"); return; }
 
             // Remove all existing SkillTreeBonus modifiers first
-            Debug.Log($"[SkillTree] allocatedSkills count: {data.allocatedSkills.Count}");
+            if (_debug) Debug.Log($"[SkillTree] allocatedSkills count: {data.allocatedSkills.Count}");
             foreach (var kvp in data.allocatedSkills)
             {
                 if (!Enum.TryParse<SkillType>(kvp.Key, out var skillType))
@@ -523,7 +523,7 @@ namespace IdleDefenseSurvival.SkillTree
             // Now add all current bonuses
             foreach (var kvp in data.allocatedSkills)
             {
-                Debug.Log($"[SkillTree]   {kvp.Key} = {kvp.Value}");
+                if (_debug) Debug.Log($"[SkillTree]   {kvp.Key} = {kvp.Value}");
                 if (!Enum.TryParse<SkillType>(kvp.Key, out var skillType))
                     continue;
 
