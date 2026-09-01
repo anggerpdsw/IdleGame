@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -45,8 +46,15 @@ namespace IdleDefenseSurvival.SkillTree
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Initialize from SaveData on Awake
-            InitializeFromSaveData();
+            // Tunggu save load
+            if (SaveManager.Instance != null && SaveManager.Instance.IsSaveLoaded)
+            {
+                InitializeFromSaveData();
+            }
+            else
+            {
+                SaveManager.OnSaveLoaded += OnSaveLoadedInitialize;
+            }
 
             // Subscribe to level-up event
             if (AccountManager.Instance != null)
@@ -57,8 +65,14 @@ namespace IdleDefenseSurvival.SkillTree
         {
             if (AccountManager.Instance != null)
                 AccountManager.Instance.OnLevelUp -= OnPlayerLevelUp;
+            SaveManager.OnSaveLoaded -= OnSaveLoadedInitialize;
         }
-
+                
+        private void OnSaveLoadedInitialize()
+        {
+            SaveManager.OnSaveLoaded -= OnSaveLoadedInitialize;
+            InitializeFromSaveData();
+        }
         #endregion
 
         #region Data Access
@@ -184,7 +198,7 @@ namespace IdleDefenseSurvival.SkillTree
         }
 
         /// <summary>
-        /// Get the current pending choices as SkillType enum.
+        /// Get the current pending choices as SkillType enum in SkillType.cs.
         /// </summary>
         public IReadOnlyList<SkillType> GetPendingChoices()
         {
@@ -485,24 +499,31 @@ namespace IdleDefenseSurvival.SkillTree
         private void ApplySkillTreeBonusesToModifiers()
         {
             var modifierMgr = ModifierManager.Instance;
-            if (modifierMgr == null) return;
+            if (modifierMgr == null)
+            {
+                // ModifierManager not ready yet, defer to next frame
+                StartCoroutine(ApplySkillTreeBonusesToModifiersDeferred());
+                return;
+            }
             var loader = BaseStatLoader.Instance;
             if (loader == null) return;
             var data = Data;
-            if (data == null) return;
+            if (data == null) { Debug.Log("[SkillTree] Data null"); return; }
+
             // Remove all existing SkillTreeBonus modifiers first
+            Debug.Log($"[SkillTree] allocatedSkills count: {data.allocatedSkills.Count}");
             foreach (var kvp in data.allocatedSkills)
             {
                 if (!Enum.TryParse<SkillType>(kvp.Key, out var skillType))
                     continue;
                 var modifierId = $"SkillTreeBonus_{kvp.Key}";
-                // Note: ModifierManager doesn't have a public RemoveModifier with just ID,
-                // so we'll overwrite by adding a new one with zero value, or rely on replacement logic
+                modifierMgr.RemoveModifier(modifierId);
             }
 
             // Now add all current bonuses
             foreach (var kvp in data.allocatedSkills)
             {
+                Debug.Log($"[SkillTree]   {kvp.Key} = {kvp.Value}");
                 if (!Enum.TryParse<SkillType>(kvp.Key, out var skillType))
                     continue;
 
@@ -526,6 +547,12 @@ namespace IdleDefenseSurvival.SkillTree
 
                 modifierMgr.AddModifier(modifier);
             }
+        }
+
+        private IEnumerator ApplySkillTreeBonusesToModifiersDeferred()
+        {
+            yield return null; // Wait one frame for ModifierManager to initialize
+            ApplySkillTreeBonusesToModifiers();
         }
 
         #endregion

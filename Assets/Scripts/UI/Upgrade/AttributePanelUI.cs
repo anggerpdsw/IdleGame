@@ -33,7 +33,6 @@ namespace IdleDefenseSurvival.UI.Upgrade
         [SerializeField] private GameObject _profileBadge;
         [SerializeField] private TextMeshProUGUI _unspentSkillTreePoints;
         [SerializeField] private Button _plusSkillButton;
-        [SerializeField] private SkillTreeBonusUIController _skillTreeBonusUI;
 
         [System.Serializable]
         private class AttributeRow
@@ -137,13 +136,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             int pointSkill = skill.UnspentSkillPoints;
             if (_unspentSkillTreePoints != null) _unspentSkillTreePoints.text = $"Skill Points: {pointSkill}";
             if (_plusSkillButton != null)
-            {
                 _plusSkillButton.interactable = skill.UnspentSkillPoints > 0;
-                // Add click listener to open SkillTreeBonus UI
-                _plusSkillButton.onClick.RemoveAllListeners();
-                if (_skillTreeBonusUI != null)
-                    _plusSkillButton.onClick.AddListener(() => _skillTreeBonusUI.Open());
-            }
         }
 
         /// <summary>Shows a hover tooltip listing what this attribute boosts per point.</summary>

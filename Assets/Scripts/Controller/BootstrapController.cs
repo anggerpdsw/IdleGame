@@ -56,7 +56,6 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<InventoryService>();
             EnsureSingleton<DropBagManager>();
             EnsureSingleton<EquipmentService>();
-            EnsureSingleton<SkillTreeBonusManager>();
             EnsureSingleton<SaveManager>();
             // Attribute stat modifiers need SaveManager (AccountData) to exist; it is created above.
             // If the save has not loaded yet, AttributeModifierManager re-applies on OnSaveLoaded.
@@ -65,6 +64,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<ManaManager>();
             EnsureSingleton<CraftingManager>();
             EnsureSingleton<UpgradeService>();
+            EnsureSingleton<SkillTreeBonusManager>();
 
             // Right After SaveData Loaded do this
             if (SaveManager.Instance?.IsSaveLoaded == true) {
