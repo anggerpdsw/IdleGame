@@ -16,6 +16,7 @@ using IdleDefenseSurvival.Core.Interfaces;
 using IdleDefenseSurvival.Mission;
 using System.Linq;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.SkillTree;
 // ponytail: CraftTransactionJournal removed; re-add when journal feature returns.
 
 namespace IdleDefenseSurvival.Manager
@@ -686,6 +687,7 @@ namespace IdleDefenseSurvival.Manager
             var equipmentData = EquipmentService.Instance != null ? EquipmentService.Instance.GetSaveData() : null;
             var craftQueue = CraftingManager.Instance != null ? CraftingManager.Instance.GetQueueSaveData() : null;
             var missions = MissionService.Instance != null ? MissionService.Instance.GetAllMissions().ToList() : new List<MissionInstance>();
+            var skillTreeBonus = SkillTreeBonusManager.Instance != null ? SkillTreeBonusManager.Instance.GetSaveData() : null;
 
             return new SaveData
             {
@@ -704,7 +706,8 @@ namespace IdleDefenseSurvival.Manager
                 inventoryData = inventoryData,
                 equipmentData = equipmentData,
                 craftQueue = craftQueue,
-                missions = missions
+                missions = missions,
+                skillTreeBonus = skillTreeBonus
             };
         }
 

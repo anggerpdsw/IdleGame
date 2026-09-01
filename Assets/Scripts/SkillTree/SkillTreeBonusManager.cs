@@ -70,6 +70,15 @@ namespace IdleDefenseSurvival.SkillTree
         /// <summary>Get the current AccountData.</summary>
         private AccountData Account => SaveManager.Instance.GetAccountData();
 
+        /// <summary>
+        /// Get the current SkillTreeBonusData from SaveData.
+        /// Used by SaveManager to persist state.
+        /// </summary>
+        public SkillTreeBonusData GetSaveData()
+        {
+            return Data ?? new SkillTreeBonusData();
+        }
+
         #endregion
 
         #region Events

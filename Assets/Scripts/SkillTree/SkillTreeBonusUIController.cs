@@ -150,7 +150,7 @@ namespace IdleDefenseSurvival.SkillTree
             if (_manager == null) return;
             var selected = _manager.GetSelectedCount();
             if (_selectionCountText != null)
-                _selectionCountText.text = $"Selected: {selected} / 3";
+                _selectionCountText.text = $"Confirm: {selected} / 3";
             // Update confirm button state - only enabled when EXACTLY 3 selected
             if (_confirmButton != null)
                 _confirmButton.interactable = selected == 3;
