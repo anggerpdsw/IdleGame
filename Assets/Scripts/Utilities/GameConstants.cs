@@ -6,7 +6,7 @@ namespace IdleDefenseSurvival
         public const int MAX_WAVE_PER_TIER = 350;
         public const int BASE_LEVEL = 8903;
         public const int BASE_LEVEL_BLACKSMITH = 69;
-        public const int BASE_LEVEL_CRAFTING = 96;
+        public const int BASE_LEVEL_ALCHEMIST = 96;
         public const int RARITY_COUNT = 6;
         public const int STARTING_STAT_POINTS = 5;  // Level 1 start
         public const int POINTS_PER_LEVEL = 5;      // Bonus per level-up
