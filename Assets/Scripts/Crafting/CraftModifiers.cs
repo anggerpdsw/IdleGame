@@ -300,8 +300,8 @@ namespace IdleDefenseSurvival.Crafting
     public class PlayerCraftStats
     {
         public int CraftingLevel = 1;
-        public int BlacksmithLevel = 0;
-        public int JobCount = 1;           // ← tambahkan
+        public int BlacksmithLevel = 1;
+        public int JobCount = 1; 
     }
 
     [Serializable]

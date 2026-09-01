@@ -238,7 +238,7 @@ namespace IdleDefenseSurvival.Manager
             if (_repository == null || _saveManager == null) return;
             var account = _saveManager.GetAccountData();
             if (account == null) return;
-            _repository.UnlockRecipesByCraftingLevel(account.craftingLevel);
+            _repository.UnlockRecipesByCraftingLevel(account.blacksmithLevel);
         }
 
         // ---------- Misc ----------

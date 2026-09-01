@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using IdleDefenseSurvival.Controller;
 using System.Linq;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Enemy;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -243,14 +244,51 @@ namespace IdleDefenseSurvival.Ultimate
             // For chance-based ultimates only
             float chance = ultimateData.GetChance();
             if (chance <= 0f) return false;
-            // Roll chance stack
             if (!Utilityku.Chance(chance)) return false;
-            // Store the actual spawn position (enemy position for Bomb/Cloud)
+
+            // Determine spawn position: for Bomb/Cloud, first stack spawns on nearest enemy
             Vector3 spawnPos = overridePosition ?? player.transform.position;
+            if (ultimateId == UltimateDMG.Bomb.ToString() || ultimateId == UltimateDMG.Cloud.ToString())
+            {
+                // Only use nearest enemy if no override position provided (i.e., first stack)
+                if (!overridePosition.HasValue)
+                {
+                    var nearestEnemyPos = FindNearestEnemyPosition(player.transform.position);
+                    if (nearestEnemyPos.HasValue) spawnPos = nearestEnemyPos.Value;
+                }
+            }
+
             if (!TryAddStack(ultimateId, spawnPos)) return false;
-            // Auto cast check here
-            HandleAutoCast(ultimateId, player, overridePosition);
+            HandleAutoCast(ultimateId, player, spawnPos);
             return true;
+        }
+
+        /// <summary>
+        /// Find the nearest enemy position to the given reference point.
+        /// Returns null if no enemies exist.
+        /// </summary>
+        private Vector3? FindNearestEnemyPosition(Vector2 referencePoint)
+        {
+            int enemyLayer = LayerMask.GetMask("Enemy");
+            Collider2D[] enemies = Physics2D.OverlapCircleAll(referencePoint, 9999f, enemyLayer);
+            float closestDist = float.MaxValue;
+            Vector3 nearestPos = Vector3.zero;
+            bool found = false;
+
+            foreach (var col in enemies)
+            {
+                if (col.TryGetComponent(out EnemyAi enemy))
+                {
+                    float dist = Vector2.Distance(referencePoint, enemy.transform.position);
+                    if (dist < closestDist)
+                    {
+                        closestDist = dist;
+                        nearestPos = enemy.transform.position;
+                        found = true;
+                    }
+                }
+            }
+            return found ? nearestPos : null;
         }
 
         /// <summary>
@@ -365,14 +403,35 @@ namespace IdleDefenseSurvival.Ultimate
         }
 
         /// <summary>
-        /// Get next stored position (FIFO). Falls back to player position if empty.
+        /// Get next stored position (FIFO) WITHOUT removing it.
+        /// For Bomb/Cloud: if no active instances, use current nearest enemy position (max 1 on nearest enemy).
+        /// Caller must call ConsumeThenRemoveStack after successful spawn to advance the queue.
         /// </summary>
         private Vector3 GetNextStackPosition(string ultimateId, Player.Player player)
         {
-            if (_stackPositions.TryGetValue(ultimateId, out var list) 
-                && list.Count > 0) return list[0];
-            // Fallback - should not happen if stack > 0
-            return player != null ? player.transform.position : Vector3.zero;
+            if (!_stackPositions.TryGetValue(ultimateId, out var list) || list.Count == 0)
+            {
+                // Fallback - should not happen if stack > 0
+                var fallbackPos = FindNearestEnemyPosition(player != null ? player.transform.position : Vector2.zero);
+                return fallbackPos.HasValue ? fallbackPos.Value : (player != null ? player.transform.position : Vector3.zero);
+            }
+
+            // For Bomb/Cloud: first cast (no active instances) uses current nearest enemy
+            // Subsequent casts use stored positions (FIFO)
+            if (ultimateId == UltimateDMG.Bomb.ToString() || ultimateId == UltimateDMG.Cloud.ToString())
+            {
+                int activeCount = UltimateFactory.GetActiveCount(ultimateId);
+                if (activeCount == 0)
+                {
+                    // No active instances → use current nearest enemy position
+                    var nearestEnemyPos = FindNearestEnemyPosition(player.transform.position);
+                    if (nearestEnemyPos.HasValue)
+                        return nearestEnemyPos.Value;
+                }
+            }
+
+            // Default: use stored position (FIFO) - PEEK only, no removal
+            return list[0];
         }
 
         /// <summary>

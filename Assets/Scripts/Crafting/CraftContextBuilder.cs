@@ -42,7 +42,7 @@ namespace IdleDefenseSurvival.Crafting
         // ============ Player state sources ============
         private int GetPlayerBlacksmithLevel()
         {
-            return _saveManager?.GetAccountData()?.craftingLevel ?? 1;
+            return _saveManager?.GetAccountData()?.blacksmithLevel ?? 1;
         }
 
         private int GetPlayerCraftingLevel()
