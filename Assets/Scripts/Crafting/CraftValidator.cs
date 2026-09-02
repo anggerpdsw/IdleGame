@@ -28,29 +28,34 @@ namespace IdleDefenseSurvival.Crafting
         }
 
         // ============ Public API ============
-        public ValidationResult CanCraft(string recipeId, int count = 1)
+        public ValidationResult CanCraft(CraftType type, string recipeId, int count = 1)
         {
             // 1. Check recipe exists
             if (!_repository.TryGetRecipe(recipeId, out var recipe))
-            {
                 return ValidationResult.Fail("Recipe not found");
-            }
 
             // 2. Check recipe is unlocked
             if (!_repository.IsUnlocked(recipeId))
-            {
                 return ValidationResult.Fail("Recipe not unlocked");
-            }
 
-            // 3. Check blacksmith level requirement
+            // 3. Check level requirement
             int playerBlacksmithLevel = GetPlayerBlacksmithLevel();
-            if (playerBlacksmithLevel < recipe.RequiredBlacksmithLevel)
+            int playerAlchemistLevel = GetPlayerAlchemistLevel();
+            switch (type)
             {
-                return ValidationResult.Fail($"Requires blacksmith level {recipe.RequiredBlacksmithLevel} (current: {playerBlacksmithLevel})");
-            }
+                case CraftType.Equipment:
+                if (playerBlacksmithLevel < recipe.RequiredBlacksmithLevel)
+                    return ValidationResult.Fail($"Requires Blacksmith level {recipe.RequiredBlacksmithLevel} (current: {playerBlacksmithLevel})");
+                break;
 
-            // Check crafting level for conditions
-            int playerCraftLevel = GetPlayerCraftLevel();
+                case CraftType.Potion:
+                if (playerAlchemistLevel < recipe.RequiredAlchemistLevel)
+                    return ValidationResult.Fail($"Requires Alchemist level {recipe.RequiredAlchemistLevel} (current: {playerAlchemistLevel})");
+                break;
+
+                default: return ValidationResult.Fail("Level check requirement");
+            }
+            
 
             // 4. Tier requirement removed - tier no longer a crafting gate
 
@@ -72,9 +77,7 @@ namespace IdleDefenseSurvival.Crafting
                 foreach (var questId in recipe.RequiredQuests)
                 {
                     if (!IsQuestCompleted(questId))
-                    {
                         return ValidationResult.Fail($"Requires quest '{questId}' completion");
-                    }
                 }
             }
 
@@ -121,42 +124,37 @@ namespace IdleDefenseSurvival.Crafting
                 {
                     long totalCost = cost.Amount * count;
                     if (!_economy.HasEnoughCurrency(cost.Currency, totalCost))
-                    {
                         return ValidationResult.Fail($"Not enough {cost.Currency} (need {totalCost}, have {_economy.GetCurrency(cost.Currency)})");
-                    }
                 }
             }
 
             // 11. Check special conditions (time of day, biome, weather, etc.)
             if (recipe.Conditions != null)
             {
+                int cons = playerAlchemistLevel + playerBlacksmithLevel;
                 foreach (var condition in recipe.Conditions)
                 {
-                    if (!condition.Check(playerCraftLevel, GetPlayerLuck()))
-                    {
+                    if (!condition.Check(cons, GetPlayerLuck()))
                         return ValidationResult.Fail($"Condition not met: {condition.Type}");
-                    }
                 }
             }
 
             // 12. Check inventory space for results
             if (!HasInventorySpaceForResults(recipe, count))
-            {
                 return ValidationResult.Fail("Not enough inventory space for results");
-            }
 
             return ValidationResult.Success();
         }
 
         // ============ Helper Methods ============
+        private int GetPlayerAlchemistLevel()
+        {
+            return _saveManager?.GetAccountData()?.alchemistLevel ?? 1;
+        }
+
         private int GetPlayerBlacksmithLevel()
         {
             return _saveManager?.GetAccountData()?.blacksmithLevel ?? 1;
-        }
-
-        private int GetPlayerCraftLevel()
-        {
-            return _saveManager?.GetAccountData()?.craftingLevel ?? 1;
         }
 
         private long GetPlayerLuck()
@@ -190,7 +188,6 @@ namespace IdleDefenseSurvival.Crafting
             // Deterministic: 1 equipment item per craft (plus possible mastery/critical extras)
             // Estimate: 1 base + 1 mastery + up to 2 critical = max 4 per craft
             int maxItems = count * 4;
-
             return _inventory.FreeSlots >= maxItems || _inventory.HasSpaceFor("", maxItems);
         }
 

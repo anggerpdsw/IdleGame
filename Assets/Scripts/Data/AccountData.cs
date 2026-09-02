@@ -12,10 +12,10 @@ namespace IdleDefenseSurvival.Data
         // Mission System
         public int maxMission = 1;
 
-        // Crafting & Blacksmithing
-        public int craftingLevel = 1;
-        public long craftingCurrentExp = 0;
-        public long craftingTotalExp = 0;
+        // alchemist & Blacksmithing
+        public int alchemistLevel = 1;
+        public long alchemistCurrentExp = 0;
+        public long alchemistTotalExp = 0;
         public int blacksmithLevel = 1;
         public long blacksmithCurrentExp = 0;
         public long blacksmithTotalExp = 0;

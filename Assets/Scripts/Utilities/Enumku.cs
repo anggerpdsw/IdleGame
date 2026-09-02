@@ -3,6 +3,8 @@ namespace IdleDefenseSurvival
 {
     public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
     public enum SceneState { CardCollection, Crafting, Game, Inventory, MainMenu }
+    public enum LevelType { Alchemist, Blacksmith, Level }
+    public enum CraftType { Equipment, Potion }
     public enum CriticalType { None, Critical, SuperCritical, UltraCritical }
     public enum CurrencyType { Gold, Gem, Meat }
     public enum DailyRewardState { Locked, Waiting, Claimable, Claimed, CompletedToday }

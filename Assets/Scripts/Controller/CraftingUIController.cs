@@ -9,7 +9,6 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -419,7 +418,7 @@ namespace IdleDefenseSurvival.Controller
             var svc = CraftingManager.Instance;
             if (svc == null || string.IsNullOrEmpty(_selectedRecipeId)) return;
 
-            var jobId = svc.StartCraft(_selectedRecipeId, _quantity);
+            var jobId = svc.StartCraft(CraftType.Equipment, _selectedRecipeId, _quantity);
             if (!string.IsNullOrEmpty(jobId))
             {
                 PopulateJobList(); // Show new job immediately in list

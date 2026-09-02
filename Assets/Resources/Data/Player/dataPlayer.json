@@ -173,7 +173,7 @@
         "shortName": "HRG"
       },
       "defenseAmount": {
-        "baseValue": 0,
+        "baseValue": 1,
         "bonusPerPoint": 0.5,
         "ValuePerLevel": 1,
         "ValuePerEnhance": 0.1,

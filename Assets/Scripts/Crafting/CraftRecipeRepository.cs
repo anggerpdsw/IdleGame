@@ -216,7 +216,7 @@ namespace IdleDefenseSurvival.Crafting
         {
             foreach (var recipe in _allRecipes.Values)
             {
-                if (recipe.UnlockSource == UnlockSource.CraftingLevel
+                if (recipe.UnlockSource == UnlockSource.BlacksmithLevel
                     && recipe.RequiredBlacksmithLevel <= craftingLevel
                     && !_unlockedRecipeIds.Contains(recipe.RecipeId))
                 {

@@ -32,6 +32,7 @@ namespace IdleDefenseSurvival.Crafting
         public int RecipeVersion = 1; // v3.5 §8.1 — defaults to 1 when JSON omits the field
 
         // ============ Requirements ============
+        public int RequiredAlchemistLevel = 1;
         public int RequiredBlacksmithLevel = 1;
         public string[] RequiredQuests;
         // ponytail: RequiredTier removed - tier no longer a crafting gate
@@ -153,14 +154,15 @@ namespace IdleDefenseSurvival.Crafting
     {
         None = 0,
         Default = 1,         // Unlocked by default
-        CraftingLevel = 2,   // Unlocked at crafting level
-        Quest = 3,           // Unlocked by quest completion
+        BlacksmithLevel = 2,   // Unlocked at blacksmith level
+        AlchemistLevel = 2,   // Unlocked at alchemist level
         Tier = 4,            // Unlocked at wave tier
         Discovery = 5,       // Unlocked by discovering item
         Purchase = 6,        // Purchased from shop
         Event = 7,           // Limited-time event
         VIP = 8,             // VIP perk
         Manual = 9,
+        Quest = 10,           // Unlocked by quest completion
     }
 
     /// <summary>

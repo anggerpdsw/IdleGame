@@ -167,7 +167,7 @@ namespace IdleDefenseSurvival.Manager
                     EconomyManager.Instance?.AddCurrency(CurrencyType.Meat, reward.Amount, RewardSource);
                     break;
                 case RewardType.Exp:
-                    AccountManager.Instance?.AddExp(reward.Amount, RewardSource);
+                    AccountManager.Instance?.AddExp(reward.Amount, LevelType.Level, RewardSource);
                     break;
                 case RewardType.Item:
                     if (reward.Id == "UltimateStone")

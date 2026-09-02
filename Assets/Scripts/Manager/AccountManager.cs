@@ -46,67 +46,125 @@ namespace IdleDefenseSurvival.Manager
 
         /// <summary>Current player level.</summary>
         public int Level => Data.level;
+        public int LevelAlchemist => Data.alchemistLevel;
+        public int LevelBlacksmith => Data.blacksmithLevel;
         /// <summary>EXP accumulated in the current level.</summary>
         public long CurrentExp => Data.currentExp;
+        public long CurrentExpAlchemist => Data.alchemistCurrentExp;
+        public long CurrentExpBlacksmith => Data.blacksmithCurrentExp;
         /// <summary>Total EXP ever earned (including spent on level‑ups).</summary>
         public long TotalExp => Data.totalExp;
+        public long TotalExpAlchemist  => Data.alchemistTotalExp;
+        public long TotalExpBlacksmith => Data.blacksmithTotalExp;
 
         /// <summary>
         /// EXP required to reach the *next* level.
         /// Formula: <c>100 * level^1.5</c> (rounded down).
         /// </summary>
-        public long RequiredExp => GetRequiredExp(Data.level);
+        public long RequiredExp => GetRequiredExp(Data.level, LevelType.Level);
+        public long RequiredExpAlchemist => GetRequiredExp(Data.alchemistLevel, LevelType.Alchemist);
+        public long RequiredExpBlacksmith => GetRequiredExp(Data.blacksmithLevel, LevelType.Blacksmith);
 
         /// <summary>
         /// Normalised progress (0‑1) towards the next level.
         /// UI can bind to this value for a progress bar.
         /// </summary>
         public float Progress => (float)Data.currentExp / RequiredExp;
+        public float ProgressAlchemist => (float)Data.alchemistCurrentExp / RequiredExpAlchemist;
+        public float ProgressBlacksmith => (float)Data.blacksmithCurrentExp / RequiredExpBlacksmith;
 
         #endregion
 
         #region Events (UI hook)
-        public event Action OnExpChanged;
+        /// <summary>Fired when Player levels up.</summary>
         public event Action<int> OnLevelUp;
+        /// <summary>Fired when Player EXP changes.</summary>
+        public event Action OnExpChanged;
         /// <summary>Fired when any attribute changes (UI hook).</summary>
         public event Action OnAttributeChanged;
         public event Action OnDataLoaded;
+
+        /// <summary>Fired when blacksmith levels up.</summary>
+        public event Action<int> OnBlacksmithLevelUp;
+        /// <summary>Fired when blacksmith EXP changes.</summary>
+        public event Action OnBlacksmithExpChanged;
+
+        /// <summary>Fired when alchemist levels up.</summary>
+        public event Action<int> OnAlchemistLevelUp;
+        /// <summary>Fired when alchemist EXP changes.</summary>
+        public event Action OnAlchemistExpChanged;
         #endregion
 
         public void NotifyDataLoaded() => OnDataLoaded?.Invoke();
 
         #region EXP Management
         /// <summary>
-        /// Add permanent account EXP. Handles multi‑level‑ups in a single call.
-        /// The method persists the updated data immediately via <see cref="SaveManager"/>.
+        /// Adds EXP to the specified progression type.
+        /// Handles multiple level-ups in a single call.
         /// </summary>
-        /// <param name="amount">Amount of EXP to add (must be positive).</param>
-        public void AddExp(long amount, string reason = "")
+        /// <param name="amount">Amount of EXP to add.</param>
+        /// <param name="type">Progression type receiving the EXP.</param>
+        /// <param name="reason">Optional reason for debugging.</param>
+        public void AddExp(long amount, LevelType type = LevelType.Level, string reason = "")
         {
             if (amount <= 0) return;
+            switch (type)
+            {
+                case LevelType.Level: AddPlayerExp(amount, reason); break;
+                case LevelType.Alchemist: AddAlchemistExp(amount, reason); break;
+                case LevelType.Blacksmith: AddBlacksmithExp(amount, reason); break;
+            }
+        }
 
+        private void AddPlayerExp(long amount, string reason)
+        {
             Data.currentExp += amount;
-            Data.totalExp   += amount;
-
-            // Process possible multiple level‑ups.
+            Data.totalExp += amount;
             while (Data.currentExp >= RequiredExp)
             {
                 Data.currentExp -= RequiredExp;
                 Data.level++;
-
-                // Each level-up grants 5 allocatable attribute points.
+                // Normal player level
                 Data.unspentStatPoints += GameConstants.POINTS_PER_LEVEL;
-
-                // Notify listeners about the new level.
                 OnLevelUp?.Invoke(Data.level);
             }
-
             SaveManager.Instance.SaveAll();
-
-            // Notify listeners that EXP changed (either amount or level changed).
             OnExpChanged?.Invoke();
+            if (_debug) Debug.Log($"[AccountManager] +{amount} Player EXP {reason}");
+        }
 
-            if(_debug) Debug.Log($"[AccountManager] +{amount} Exp {reason}");
+        private void AddAlchemistExp(long amount, string reason)
+        {
+            Data.alchemistCurrentExp += amount;
+            Data.alchemistTotalExp += amount;
+            while (Data.alchemistCurrentExp >= RequiredExpAlchemist)
+            {
+                Data.alchemistCurrentExp -= RequiredExpAlchemist;
+                Data.alchemistLevel++;
+                // Alchemist level-up logic
+                // Tambahkan reward/bonus Alchemist di sini jika diperlukan.
+                OnAlchemistLevelUp?.Invoke(Data.alchemistLevel);
+            }
+            SaveManager.Instance.SaveAll();
+            OnAlchemistExpChanged?.Invoke();
+            if (_debug) Debug.Log($"[AccountManager] +{amount} Alchemist EXP {reason}");
+        }
+
+        private void AddBlacksmithExp(long amount, string reason)
+        {
+            Data.blacksmithCurrentExp += amount;
+            Data.blacksmithTotalExp += amount;
+            while (Data.blacksmithCurrentExp >= RequiredExpBlacksmith)
+            {
+                Data.blacksmithCurrentExp -= RequiredExpBlacksmith;
+                Data.blacksmithLevel++;
+                // Blacksmith level-up logic
+                // Tambahkan reward/bonus Blacksmith di sini jika diperlukan.
+                OnBlacksmithLevelUp?.Invoke(Data.blacksmithLevel);
+            }
+            SaveManager.Instance.SaveAll();
+            OnBlacksmithExpChanged?.Invoke();
+            if (_debug) Debug.Log($"[AccountManager] +{amount} Blacksmith EXP {reason}");
         }
 
         /// <summary>
@@ -116,14 +174,21 @@ namespace IdleDefenseSurvival.Manager
         /// </summary>
         /// <param name="level">Target level (must be &gt;0).</param>
         /// <returns>Required EXP as a <c>long</c>.</returns>
-        public long GetRequiredExp(int level)
+        public long GetRequiredExp(int level, LevelType type)
         {
             if (level <= 0) return 0;
+            long baseValue = 1L;
+            switch (type)
+            {
+                case LevelType.Alchemist: baseValue = GameConstants.BASE_LEVEL_ALCHEMIST; break;
+                case LevelType.Blacksmith: baseValue = GameConstants.BASE_LEVEL_BLACKSMITH; break;
+                case LevelType.Level: baseValue = GameConstants.BASE_LEVEL; break;
+                default: return baseValue;
+            }
             // BASE_LEVEL * level^1.5 – Math.Pow returns double, floor to long.
-            double value = GameConstants.BASE_LEVEL * Math.Pow(level, 1.5);
+            double value = baseValue * Math.Pow(level, 1.5);
             return (long)Math.Floor(value);
         }
-
         #endregion
 
         #region Attribute Allocation

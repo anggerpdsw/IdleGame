@@ -115,12 +115,12 @@ namespace IdleDefenseSurvival.Manager
         public void LoadQueueSaveData(CraftQueueSaveData data) => _persistenceService?.RestoreSaveData(data);
 
         // ---------- Public API ----------
-        public ValidationResult CanCraft(string recipeId, int count = 1) =>
-            _validator?.CanCraft(recipeId, count) ?? ValidationResult.Fail("Service not initialized");
+        public ValidationResult CanCraft(CraftType type, string recipeId, int count = 1) =>
+            _validator?.CanCraft(type, recipeId, count) ?? ValidationResult.Fail("Service not initialized");
 
-        public string StartCraft(string recipeId, int count = 1)
+        public string StartCraft(CraftType type, string recipeId, int count = 1)
         {
-            var validation = _validator.CanCraft(recipeId, count);
+            var validation = _validator.CanCraft(type, recipeId, count);
             if (!validation.IsSuccess) return null;
             if (!_repository.TryGetRecipe(recipeId, out var recipe)) return null;
 
@@ -170,12 +170,12 @@ namespace IdleDefenseSurvival.Manager
             return job.JobId;
         }
 
-        public IReadOnlyList<string> StartBatchCraft(string recipeId, int count)
+        public IReadOnlyList<string> StartBatchCraft(CraftType type, string recipeId, int count)
         {
             var ids = new List<string>();
             for (int i = 0; i < count; i++)
             {
-                var id = StartCraft(recipeId, 1);
+                var id = StartCraft(type, recipeId, 1);
                 if (!string.IsNullOrEmpty(id)) ids.Add(id);
             }
             return ids;

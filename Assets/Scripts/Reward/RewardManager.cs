@@ -147,7 +147,7 @@ namespace IdleDefenseSurvival.Manager
 
             // Add permanent account EXP reward
             if (expReward > 0) WaveManager.Instance.RecordExp(expReward);
-            AccountManager.Instance.AddExp(expReward, $"From kill {enemy}");
+            AccountManager.Instance.AddExp(expReward, LevelType.Level, $"From kill {enemy}");
         }
 
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Core.Interfaces;
 using UnityEngine;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Crafting
 {
@@ -142,6 +143,8 @@ namespace IdleDefenseSurvival.Crafting
                     }
                     else
                     {
+                        var account = AccountManager.Instance;
+                        if (account != null) account.AddExp((int)item.GetRarity(), LevelType.Blacksmith, $"Craft Equipment: {item.GetRarity()} {item.GetEquipmentType()}");
                         appliedItems.Add(item);
                     }
                 }
