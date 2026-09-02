@@ -275,15 +275,15 @@ namespace IdleDefenseSurvival.Manager
                     else
                         File.Move(SaveFile, SaveFile + ".corrupt");
                     Debug.LogWarning("[SaveManager] Save file corrupted or empty - start with fresh save.");
-                    var initialData = new SaveData
+                    saveData = new SaveData
                     {
                         currency = GatherCurrency()
                     };
-                    PersistDurably(initialData);
+                    PersistDurably(saveData);
                     Debug.Log("[SaveManager] Initial save created.");
                     NotifySaveLoaded();
                     AccountManager.Instance?.NotifyDataLoaded();
-                    return;
+                    // return;
                 }
 
                 // Validate + migrate + repair old save files before applying

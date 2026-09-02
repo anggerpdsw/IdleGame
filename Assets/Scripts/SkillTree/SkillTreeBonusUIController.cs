@@ -39,42 +39,52 @@ namespace IdleDefenseSurvival.SkillTree
         private List<SkillTreeChoiceSkillUI> _choiceSkills = new();
         private bool _isOpen = false;
 
-        private void Start() => RefreshSkillTreeBonus();   
+        private void Start()
+        {
+            EnsureManager();
+            RefreshSkillTreeBonus();
+        }
+
         private void OnEnable()
         {
-            // Subscribe to manager events
-            if (SkillTreeBonusManager.Instance != null)
-            {
-                _manager = SkillTreeBonusManager.Instance;
-                _manager.OnPendingChoicesUpdated += RefreshChoicesDisplay;
-                _manager.OnSelectionChanged += RefreshSelectionCount;
-                _manager.OnConfirmed += OnConfirmedInternal;
-            }
-
-            // Setup button listeners
-            if (_confirmButton != null)
-                _confirmButton.onClick.AddListener(OnConfirmClicked);
-
-            if (_closeButton != null)
-                _closeButton.onClick.AddListener(OnCloseClicked);
+            EnsureManager();
+            SetupButtonListeners();
+            SubscribeManagerEvents();
         }
 
         private void OnDisable()
         {
-            // Unsubscribe
-            if (_manager != null)
-            {
-                _manager.OnPendingChoicesUpdated -= RefreshChoicesDisplay;
-                _manager.OnSelectionChanged -= RefreshSelectionCount;
-                _manager.OnConfirmed -= OnConfirmedInternal;
-            }
+            UnsubscribeManagerEvents();
+            if (_confirmButton != null) _confirmButton.onClick.RemoveListener(OnConfirmClicked);
+            if (_closeButton  != null) _closeButton.onClick.RemoveListener(OnCloseClicked);
+        }
 
-            // Remove button listeners
-            if (_confirmButton != null)
-                _confirmButton.onClick.RemoveListener(OnConfirmClicked);
+        private void EnsureManager()
+        {
+            if (_manager != null) return;
+            _manager = SkillTreeBonusManager.Instance;
+        }
 
-            if (_closeButton != null)
-                _closeButton.onClick.RemoveListener(OnCloseClicked);
+        private void SetupButtonListeners()
+        {
+            if (_confirmButton != null) _confirmButton.onClick.AddListener(OnConfirmClicked);
+            if (_closeButton   != null) _closeButton.onClick.AddListener(OnCloseClicked);
+        }
+
+        private void SubscribeManagerEvents()
+        {
+            if (_manager == null) return;
+            _manager.OnPendingChoicesUpdated += RefreshChoicesDisplay;
+            _manager.OnSelectionChanged      += RefreshSelectionCount;
+            _manager.OnConfirmed               += OnConfirmedInternal;
+        }
+
+        private void UnsubscribeManagerEvents()
+        {
+            if (_manager == null) return;
+            _manager.OnPendingChoicesUpdated -= RefreshChoicesDisplay;
+            _manager.OnSelectionChanged      -= RefreshSelectionCount;
+            _manager.OnConfirmed               -= OnConfirmedInternal;
         }
 
         private void RefreshSkillTreeBonus()
@@ -94,13 +104,13 @@ namespace IdleDefenseSurvival.SkillTree
                 $"Content Height: {_content.rect.height}"
             );
 
-            if (_content != null)
+            if (_content != null && _debug)
             {
                 for (int i = 0; i < _content.childCount; i++)
                 {
                     var child = _content.GetChild(i) as RectTransform;
 
-                    if (_debug) Debug.Log(
+                    Debug.Log(
                         $"[Content Child] {child.name} | " +
                         $"Active={child.gameObject.activeSelf} | " +
                         $"Height={child.rect.height} | " +
@@ -118,8 +128,15 @@ namespace IdleDefenseSurvival.SkillTree
         /// </summary>
         public void Open()
         {
+            // Lazy-fetch manager (handles fresh game where manager initializes after UI)
+            EnsureManager();
+            if (_manager == null)
+            {
+                if (_debug) Debug.LogError("[SkillTreeBonusUI] Manager missing – cannot open UI");
+                return;
+            }
+            
             if (_isOpen) return;
-            if (_manager == null) return;
 
             if (!_manager.OpenSkillTreeSelection())
             {
