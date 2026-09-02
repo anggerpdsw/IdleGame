@@ -23,6 +23,7 @@ namespace IdleDefenseSurvival.SkillTree
     /// </summary>
     public class SkillTreeBonusUIController : MonoBehaviour
     {
+        [SerializeField] private bool _debug = false;
         [SerializeField] private GameObject _skillTreeBonus;
         [SerializeField] private TextMeshProUGUI _titleText;
         [SerializeField] private Transform _choicesSkillContainer;
@@ -87,9 +88,9 @@ namespace IdleDefenseSurvival.SkillTree
             if (_content == null) return;
             Canvas.ForceUpdateCanvases();
 
-            Debug.Log(
+            if (_debug) Debug.Log(
                 $"[SkillTreeBonusUI] " +
-                $"PanelRoot Active: {_skillTreeBonus != null && _skillTreeBonus.activeSelf}, " +
+                $"_skillTreeBonus Active: {_skillTreeBonus != null && _skillTreeBonus.activeSelf}, " +
                 $"Content Height: {_content.rect.height}"
             );
 
@@ -99,7 +100,7 @@ namespace IdleDefenseSurvival.SkillTree
                 {
                     var child = _content.GetChild(i) as RectTransform;
 
-                    Debug.Log(
+                    if (_debug) Debug.Log(
                         $"[Content Child] {child.name} | " +
                         $"Active={child.gameObject.activeSelf} | " +
                         $"Height={child.rect.height} | " +
@@ -122,7 +123,7 @@ namespace IdleDefenseSurvival.SkillTree
 
             if (!_manager.OpenSkillTreeSelection())
             {
-                Debug.LogWarning("[SkillTreeBonusUI] Failed to open skill tree selection");
+                if (_debug) Debug.LogWarning("[SkillTreeBonusUI] Failed to open skill tree selection");
                 return;
             }
 
@@ -198,7 +199,7 @@ namespace IdleDefenseSurvival.SkillTree
             if (_manager == null) return;
             if (!_manager.ConfirmSelection())
             {
-                Debug.LogWarning("[SkillTreeBonusUI] Failed to confirm selection");
+                if (_debug) Debug.LogWarning("[SkillTreeBonusUI] Failed to confirm selection");
                 return;
             }
 

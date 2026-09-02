@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Manager;
@@ -36,6 +38,8 @@ namespace IdleDefenseSurvival.SkillTree
         {
             if (_selectButton != null)
                 _selectButton.onClick.RemoveListener(OnSelectClicked);
+            if (_manager != null)
+                _manager.OnSelectionChanged -= RefreshDisplay;
         }
 
         /// <summary>
@@ -47,6 +51,9 @@ namespace IdleDefenseSurvival.SkillTree
             _manager = manager;
             _isSelected = false;
 
+            if (_manager != null)
+                _manager.OnSelectionChanged += RefreshDisplay;
+
             RefreshDisplay();
         }
 
@@ -55,21 +62,16 @@ namespace IdleDefenseSurvival.SkillTree
         /// </summary>
         public void RefreshDisplay()
         {
-            if (_manager == null)
-                return;
+            if (_manager == null) return;
 
             // Update skill name
             if (_skillNameText != null)
-            {
                 _skillNameText.text = _skillType.GetSkillDisplayName();
-            }
 
             // Update allocated points
             var allocatedPoints = _manager.GetAllocatedPoints(_skillType);
             if (_allocatedPointsText != null)
-            {
                 _allocatedPointsText.text = $"Points: {allocatedPoints}";
-            }
 
             // Update bonus per point
             var loader = BaseStatLoader.Instance;
@@ -85,24 +87,20 @@ namespace IdleDefenseSurvival.SkillTree
             // Update total bonus
             var totalBonus = _manager.GetTotalBonus(_skillType);
             if (_totalBonusText != null)
-            {
                 _totalBonusText.text = $"Total: +{totalBonus:F1}";
-            }
 
             // Update selection indicator
-            var selectedChoices = new List<SkillType>(_manager.GetSelectedChoices());
+            var selectedChoices = _manager.GetSelectedChoices();
             _isSelected = selectedChoices.Contains(_skillType);
 
             if (_selectionIndicator != null)
-            {
                 _selectionIndicator.color = _isSelected ? _selectedColor : _unselectedColor;
-            }
 
             // Update button interactability
+            // Selected: always interactable (can deselect)
+            // Unselected: only interactable if under selection limit (< 3)
             if (_selectButton != null)
-            {
                 _selectButton.interactable = _isSelected || _manager.CanSelectMoreSkills();
-            }
         }
 
         /// <summary>
@@ -110,8 +108,7 @@ namespace IdleDefenseSurvival.SkillTree
         /// </summary>
         private void OnSelectClicked()
         {
-            if (_manager == null)
-                return;
+            if (_manager == null) return;
 
             if (_isSelected)
             {
