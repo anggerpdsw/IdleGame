@@ -23,12 +23,13 @@ namespace IdleDefenseSurvival.SkillTree
     /// </summary>
     public class SkillTreeBonusUIController : MonoBehaviour
     {
-        [SerializeField] private GameObject _panelRoot;
+        [SerializeField] private GameObject _skillTreeBonus;
         [SerializeField] private TextMeshProUGUI _titleText;
         [SerializeField] private Transform _choicesSkillContainer;
         [SerializeField] private TextMeshProUGUI _selectionCountText;
         [SerializeField] private Button _confirmButton;
         [SerializeField] private Button _closeButton;
+        [SerializeField] private RectTransform _content;
 
         /// <summary>Prefab for a single skill choice skill.</summary>
         [SerializeField] private SkillTreeChoiceSkillUI _choiceSkillPrefab;
@@ -37,11 +38,7 @@ namespace IdleDefenseSurvival.SkillTree
         private List<SkillTreeChoiceSkillUI> _choiceSkills = new();
         private bool _isOpen = false;
 
-        private void Start()
-        {
-            Close();    
-        }
-
+        private void Start() => RefreshSkillTreeBonus();   
         private void OnEnable()
         {
             // Subscribe to manager events
@@ -79,6 +76,42 @@ namespace IdleDefenseSurvival.SkillTree
                 _closeButton.onClick.RemoveListener(OnCloseClicked);
         }
 
+        private void RefreshSkillTreeBonus()
+        {
+            if (_skillTreeBonus != null) _skillTreeBonus.SetActive(_isOpen);
+            RefreshLayout();
+        }
+
+        private void RefreshLayout()
+        {
+            if (_content == null) return;
+            Canvas.ForceUpdateCanvases();
+
+            Debug.Log(
+                $"[SkillTreeBonusUI] " +
+                $"PanelRoot Active: {_skillTreeBonus != null && _skillTreeBonus.activeSelf}, " +
+                $"Content Height: {_content.rect.height}"
+            );
+
+            if (_content != null)
+            {
+                for (int i = 0; i < _content.childCount; i++)
+                {
+                    var child = _content.GetChild(i) as RectTransform;
+
+                    Debug.Log(
+                        $"[Content Child] {child.name} | " +
+                        $"Active={child.gameObject.activeSelf} | " +
+                        $"Height={child.rect.height} | " +
+                        $"Preferred={LayoutUtility.GetPreferredHeight(child)} | " +
+                        $"Min={LayoutUtility.GetMinHeight(child)}"
+                    );
+                }
+            }
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_content);
+        }
+
         /// <summary>
         /// Open the SkillTreeBonus selection UI.
         /// </summary>
@@ -95,8 +128,7 @@ namespace IdleDefenseSurvival.SkillTree
 
             _isOpen = true;
 
-            if (_panelRoot != null) _panelRoot.SetActive(true);
-
+            RefreshSkillTreeBonus();
             RefreshChoicesDisplay();
             RefreshSelectionCount();
         }
@@ -107,7 +139,7 @@ namespace IdleDefenseSurvival.SkillTree
         public void Close()
         {
             _isOpen = false;
-            if (_panelRoot != null) _panelRoot.SetActive(false);
+            RefreshSkillTreeBonus();
         }
 
         /// <summary>
@@ -116,17 +148,17 @@ namespace IdleDefenseSurvival.SkillTree
         private void RefreshChoicesDisplay()
         {
             if (_manager == null) return;
-
             var choices = _manager.GetPendingChoices();
-
             // Clear old skills
             foreach (var skill in _choiceSkills)
-            {
-                Destroy(skill.gameObject);
-            }
+                if (skill != null) Destroy(skill.gameObject);
             _choiceSkills.Clear();
 
             if (_choicesSkillContainer == null) return;
+
+            // Clear existing skills
+            foreach (Transform child in _choicesSkillContainer)
+                Destroy(child.gameObject);
 
             // Create skills for each choice
             foreach (var choice in choices)
@@ -139,6 +171,8 @@ namespace IdleDefenseSurvival.SkillTree
             // Update title
             if (_titleText != null)
                 _titleText.text = $"Skill Tree Bonus (Select up to 3)";
+
+            RefreshLayout();
         }
 
         /// <summary>
