@@ -172,6 +172,7 @@ namespace IdleDefenseSurvival.Enemy
             if (Time.time < _stuntEndTime) return;
 
             ApplyMovement();
+            UpdateFacing();
         }
 
         private void ApplyMovement()
@@ -182,6 +183,21 @@ namespace IdleDefenseSurvival.Enemy
 
             // Apply damping untuk smooth transition, hindari "snap" ke velocity baru
             _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, finalVelocity, _velocityDamping);
+        }
+
+        /// <summary>
+        /// Flip sprite supaya enemy selalu menghadap player.
+        /// </summary>
+        private void UpdateFacing()
+        {
+            if (_spriteRenderer == null || _player == null) return;
+            // Enemy di kiri player (dx < 0) → menghadap kanan (flipX = false)
+            // Enemy di kanan player (dx > 0) → menghadap kiri (flipX = true)
+            const float epsilon = 0.01f;
+            bool shouldFaceLeft = transform.position.x > _player.position.x + epsilon;
+            // Hanya flip kalau benar-benar berubah (hindari call berulang)
+            if (_spriteRenderer.flipX != shouldFaceLeft)
+                SetFacing(shouldFaceLeft);
         }
 
         /// <summary>

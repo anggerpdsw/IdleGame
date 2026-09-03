@@ -496,13 +496,6 @@ namespace IdleDefenseSurvival.Player
         {
             if (_ultimateManager == null || string.IsNullOrEmpty(ultimateId)) 
                 return false;
-            // Tank has special spawn position (attack range boundary)
-            // if (ultimateId == UltimateDMG.Tank.ToString())
-            // {
-            //     if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return false;
-            //     return _ultimateManager.TrySpawnManual(ultimateId, spawnPos, this);
-            // }
-            // Stack-based ultimates (Bomb, Cloud, Lightning): cast all ready stacks
             return _ultimateManager.TryCastAllReadyStacks(ultimateId, this);
         }
 
