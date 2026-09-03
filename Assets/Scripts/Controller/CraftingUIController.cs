@@ -23,21 +23,25 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private RectTransform _recipeContent;
         [SerializeField] private CraftingRecipeEntry _recipeEntryPrefabs;
 
-        [Header("Category")]
-        [SerializeField] private Button _equipment;
-        [SerializeField] private Button _potion;
+        [Header("Category Tabs")]
+        [SerializeField] private Button _equipmentTabButton;
+        [SerializeField] private Button _potionTabButton;
+        [SerializeField] private Image _equipmentTabSelection;
+        [SerializeField] private Image _potionTabSelection;
 
-        [Header("Equipment Filters")]
+        [Header("Equipment Sub-Filters")]
         [SerializeField] private Button _categoryAllEquipmentButton;
         [SerializeField] private Button[] _categoryEquipmentButtons;
         [SerializeField] private Image _categoryAllEquipmentSelection;
         [SerializeField] private Image[] _categoryEquipmentSelections;
+        [SerializeField] private GameObject _equipmentFilterPanel;
 
-        [Header("Potion Filters")]
+        [Header("Potion Sub-Filters")]
         [SerializeField] private Button _categoryAllPotionButton;
         [SerializeField] private Button[] _categoryPotionButtons;
         [SerializeField] private Image _categoryAllPotionSelection;
         [SerializeField] private Image[] _categoryPotionSelections;
+        [SerializeField] private GameObject _potionFilterPanel;
 
         [Header("Detail Panel")]
         [SerializeField] private Image _resultIcon;
@@ -61,10 +65,13 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private RectTransform _jobList;
         [SerializeField] private JobEntryUI _jobEntryPrefab;
 
+        private enum CategoryTab { Equipment, Potion }
+
+        private CategoryTab _currentTab = CategoryTab.Equipment;
         private string _selectedRecipeId;
         private int _quantity = 1;
-        private EquipmentType _currentCategoryEquipmentFilter = EquipmentType.None; // None = All
-        private PotionType _currentCategoryPotionFilter = PotionType.None; // None = All
+        private EquipmentType _currentCategoryEquipmentFilter = EquipmentType.None;
+        private PotionType _currentCategoryPotionFilter = PotionType.None;
         private readonly List<CraftingRecipeEntry> _entries = new();
         private readonly List<GameObject> _materialRows = new();
         private readonly List<JobEntryUI> _jobEntries = new();
@@ -123,48 +130,73 @@ namespace IdleDefenseSurvival.Controller
             if (_minusButton != null) _minusButton.onClick.AddListener(OnMinusClicked);
             if (_craftButton != null) _craftButton.onClick.AddListener(OnCraftClicked);
 
+            BindCategoryTabs();
             BindCategoryButtons();
             PopulateRecipeList();
             PopulateJobList();
-            UpdateCategorySelection(); // init selection highlight (All active by default)
+            UpdateTabSelection();
+            UpdateCategorySelection();
+        }
+
+        private void BindCategoryTabs()
+        {
+            if (_equipmentTabButton != null)
+                _equipmentTabButton.onClick.AddListener(() => OnTabChanged(CategoryTab.Equipment));
+            if (_potionTabButton != null)
+                _potionTabButton.onClick.AddListener(() => OnTabChanged(CategoryTab.Potion));
         }
 
         private void BindCategoryButtons()
         {
-            // All Equipment
+            // Equipment All
             if (_categoryAllEquipmentButton != null)
                 _categoryAllEquipmentButton.onClick.AddListener(
                     () => OnCategoryEquipmentFilterChanged(EquipmentType.None)
                 );
 
-            // Category Equipment buttons
-            // Array index 0 corresponds to enum value 1.
-            if (_categoryEquipmentButtons == null) return;
-            for (int i = 0; i < _categoryEquipmentButtons.Length; i++)
+            // Equipment sub-filters
+            if (_categoryEquipmentButtons != null)
             {
-                var button = _categoryEquipmentButtons[i];
-                if (button == null) continue;
-                EquipmentType category = (EquipmentType)(i + 1);
-                button.onClick.AddListener(() => OnCategoryEquipmentFilterChanged(category));
+                for (int i = 0; i < _categoryEquipmentButtons.Length; i++)
+                {
+                    var button = _categoryEquipmentButtons[i];
+                    if (button == null) continue;
+                    EquipmentType category = (EquipmentType)(i + 1);
+                    button.onClick.AddListener(() => OnCategoryEquipmentFilterChanged(category));
+                }
             }
-            
-            // All Potion
+
+            // Potion All
             if (_categoryAllPotionButton != null)
                 _categoryAllPotionButton.onClick.AddListener(
                     () => OnCategoryPotionFilterChanged(PotionType.None)
                 );
 
-            // Category Potion buttons
-            // Array index 0 corresponds to enum value 1.
-            if (_categoryPotionButtons == null) return;
-            for (int i = 0; i < _categoryPotionButtons.Length; i++)
+            // Potion sub-filters
+            if (_categoryPotionButtons != null)
             {
-                var button = _categoryPotionButtons[i];
-                if (button == null) continue;
-                PotionType category = (PotionType)(i + 1);
-                button.onClick.AddListener(() => OnCategoryPotionFilterChanged(category));
+                for (int i = 0; i < _categoryPotionButtons.Length; i++)
+                {
+                    var button = _categoryPotionButtons[i];
+                    if (button == null) continue;
+                    PotionType category = (PotionType)(i + 1);
+                    button.onClick.AddListener(() => OnCategoryPotionFilterChanged(category));
+                }
             }
-            
+        }
+
+        private void OnTabChanged(CategoryTab tab)
+        {
+            if (_currentTab == tab) return;
+            _currentTab = tab;
+
+            // Reset sub-filters when switching tabs
+            _currentCategoryEquipmentFilter = EquipmentType.None;
+            _currentCategoryPotionFilter = PotionType.None;
+
+            UpdateTabSelection();
+            UpdateCategorySelection();
+            PopulateRecipeList();
         }
 
         private void OnCategoryEquipmentFilterChanged(EquipmentType category)
@@ -181,9 +213,23 @@ namespace IdleDefenseSurvival.Controller
             PopulateRecipeList();
         }
 
+        private void UpdateTabSelection()
+        {
+            if (_equipmentTabSelection != null)
+                _equipmentTabSelection.gameObject.SetActive(_currentTab == CategoryTab.Equipment);
+            if (_potionTabSelection != null)
+                _potionTabSelection.gameObject.SetActive(_currentTab == CategoryTab.Potion);
+
+            // Show/hide filter panels
+            if (_equipmentFilterPanel != null)
+                _equipmentFilterPanel.SetActive(_currentTab == CategoryTab.Equipment);
+            if (_potionFilterPanel != null)
+                _potionFilterPanel.SetActive(_currentTab == CategoryTab.Potion);
+        }
+
         private void UpdateCategorySelection()
         {
-            // Equipment selection
+            // Equipment sub-filter selection
             if (_categoryAllEquipmentSelection != null)
             {
                 _categoryAllEquipmentSelection.gameObject.SetActive(
@@ -201,7 +247,7 @@ namespace IdleDefenseSurvival.Controller
                 }
             }
 
-            // Potion selection
+            // Potion sub-filter selection
             if (_categoryAllPotionSelection != null)
             {
                 _categoryAllPotionSelection.gameObject.SetActive(
@@ -232,6 +278,8 @@ namespace IdleDefenseSurvival.Controller
             if (_plusButton != null) _plusButton.onClick.RemoveListener(OnPlusClicked);
             if (_minusButton != null) _minusButton.onClick.RemoveListener(OnMinusClicked);
             if (_craftButton != null) _craftButton.onClick.RemoveListener(OnCraftClicked);
+            if (_equipmentTabButton != null) _equipmentTabButton.onClick.RemoveAllListeners();
+            if (_potionTabButton != null) _potionTabButton.onClick.RemoveAllListeners();
 
             ClearRecipeEntries();
             ClearMaterialRows();
@@ -254,15 +302,26 @@ namespace IdleDefenseSurvival.Controller
             if (_plusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _plusButton");
             if (_minusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _minusButton");
             if (_craftButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _craftButton");
+
+            // Tab buttons
+            if (_equipmentTabButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _equipmentTabButton");
+            if (_potionTabButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _potionTabButton");
+            if (_equipmentTabSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _equipmentTabSelection");
+            if (_potionTabSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _potionTabSelection");
+
+            // Equipment filters
             if (_categoryAllEquipmentButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllEquipmentButton");
             if (_categoryEquipmentButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryEquipmentButtons");
             if (_categoryAllEquipmentSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllEquipmentSelection");
             if (_categoryEquipmentSelections == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryEquipmentSelections");
-            if (_craftButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _craftButton");
+            if (_equipmentFilterPanel == null) Debug.LogError("[CraftingUIController] Missing required reference: _equipmentFilterPanel");
+
+            // Potion filters
             if (_categoryAllPotionButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllPotionButton");
             if (_categoryPotionButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryPotionButtons");
             if (_categoryAllPotionSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllPotionSelection");
             if (_categoryPotionSelections == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryPotionSelections");
+            if (_potionFilterPanel == null) Debug.LogError("[CraftingUIController] Missing required reference: _potionFilterPanel");
         }
 
         #endregion
@@ -275,15 +334,28 @@ namespace IdleDefenseSurvival.Controller
             var recipes = CraftingManager.Instance.GetKnownRecipes();
             if (recipes == null) return;
 
-            // Filter by category (EquipmentType.None = All, PotionType.None = All)
-            var filteredRecipes = recipes.Where(r =>
-                r != null &&
-                !string.IsNullOrEmpty(r.RecipeId) &&
-                // equipment filter
-                (_currentCategoryEquipmentFilter == EquipmentType.None || r.EquipmentType == _currentCategoryEquipmentFilter) &&
-                // potion filter
-                (_currentCategoryPotionFilter == PotionType.None || r.PotionType == _currentCategoryPotionFilter)
-            );
+            IEnumerable<CraftRecipeData> filteredRecipes;
+
+            if (_currentTab == CategoryTab.Equipment)
+            {
+                // Show equipment recipes only, filtered by equipment sub-filter
+                filteredRecipes = recipes.Where(r =>
+                    r != null &&
+                    !string.IsNullOrEmpty(r.RecipeId) &&
+                    r.EquipmentType != EquipmentType.None &&
+                    (_currentCategoryEquipmentFilter == EquipmentType.None || r.EquipmentType == _currentCategoryEquipmentFilter)
+                );
+            }
+            else
+            {
+                // Show potion recipes only, filtered by potion sub-filter
+                filteredRecipes = recipes.Where(r =>
+                    r != null &&
+                    !string.IsNullOrEmpty(r.RecipeId) &&
+                    r.PotionType != PotionType.None &&
+                    (_currentCategoryPotionFilter == PotionType.None || r.PotionType == _currentCategoryPotionFilter)
+                );
+            }
 
             // Sort by rarity (highest first: Divine=6, Mythic=5, Legendary=4, Epic=3, Rare=2, Common=1)
             var sortedRecipes = filteredRecipes.OrderByDescending(r => r.Rarity).ToList();
@@ -291,10 +363,8 @@ namespace IdleDefenseSurvival.Controller
             {
                 var entry = Instantiate(_recipeEntryPrefabs, _recipeContent);
                 entry.gameObject.SetActive(true);
-                // Template already carries the entry component; re-init the clone
                 entry.Initialize(recipe.RecipeId, ResolveRecipeIcon(recipe), (Rarity)recipe.Rarity, this);
                 _entries.Add(entry);
-                // Check material affordability and dim if insufficient
                 UpdateEntryAffordability(entry, recipe);
             }
         }
@@ -334,7 +404,6 @@ namespace IdleDefenseSurvival.Controller
             // Potion recipes
             if (recipe.PotionType != PotionType.None)
             {
-                // ex: Potion/potion/hp or Potion/potion/mp
                 string potionTypeName = recipe.PotionType == PotionType.Health ? "hp" : "mp";
                 return ItemResources.GetItemSource($"Potion/potion/{potionTypeName}");
             }
@@ -342,7 +411,6 @@ namespace IdleDefenseSurvival.Controller
             // Equipment recipes
             if (recipe.EquipmentType != EquipmentType.None)
             {
-                // ex: Equipment/Hat/cotton_hat
                 string type = recipe.EquipmentType.ToString();
                 string name = Utilityku.ToItemId(recipe.DisplayName);
                 return ItemResources.GetItemSource($"Equipment/{type}/{name}");
@@ -487,7 +555,7 @@ namespace IdleDefenseSurvival.Controller
             var svc = CraftingManager.Instance;
             if (svc == null || string.IsNullOrEmpty(_selectedRecipeId)) return;
 
-            // Determine craft type from selected recipe (equipment vs potion)
+            // Determine craft type from selected recipe
             CraftType craftType = CraftType.Equipment;
             var recipe = svc.TryGetRecipe(_selectedRecipeId, out var r) ? r : null;
             if (recipe != null && recipe.PotionType != PotionType.None)
@@ -496,7 +564,7 @@ namespace IdleDefenseSurvival.Controller
             var jobId = svc.StartCraft(craftType, _selectedRecipeId, _quantity);
             if (!string.IsNullOrEmpty(jobId))
             {
-                PopulateJobList(); // Show new job immediately in list
+                PopulateJobList();
             }
             else
             {
@@ -511,7 +579,6 @@ namespace IdleDefenseSurvival.Controller
 
         private void OnJobStartedForList(string jobId)
         {
-            // Job has entered crafting state; ensure it appears in list
             RefreshJobEntry(jobId);
         }
 
@@ -526,7 +593,6 @@ namespace IdleDefenseSurvival.Controller
 
         private void OnJobReadyToClaimForList(string jobId)
         {
-            // Job timer finished, now ready to claim
             var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
             if (entry != null)
             {
@@ -536,34 +602,15 @@ namespace IdleDefenseSurvival.Controller
             }
             else
             {
-                // Entry doesn't exist yet (e.g., loaded before UI built) - create it
                 RefreshJobEntry(jobId);
             }
         }
 
         private void OnJobClaimedForList(string jobId, InventoryItem[] items)
         {
-            // Job claimed and removed - refresh list
             PopulateJobList();
             RebuildMaterials();
             RefreshCost();
-            RefreshControls();
-        }
-
-        private void OnJobCancelledForList(string jobId)
-        {
-            // Job cancelled - remove from list
-            var entry = _jobEntries.FirstOrDefault(e => e.JobId == jobId);
-            if (entry != null)
-            {
-                _jobEntries.Remove(entry);
-                Destroy(entry.gameObject);
-            }
-        }
-
-        private void OnCraftFailed(string jobId, string reason)
-        {
-            // Craft start failed - refresh controls
             RefreshControls();
         }
 
@@ -602,7 +649,6 @@ namespace IdleDefenseSurvival.Controller
             var svc = CraftingManager.Instance;
             if (svc == null) return;
 
-            // Order: Active jobs first (by start time), then ReadyToClaim, then Queued
             var allJobs = svc.GetAllJobs();
             var orderedJobs = allJobs
                 .OrderByDescending(j => j.IsCrafting ? 0 : (j.IsReadyToClaim ? 1 : 2))
@@ -638,7 +684,6 @@ namespace IdleDefenseSurvival.Controller
                 return;
             }
 
-            // Job list refreshed via OnJobClaimed event
             Debug.Log($"[CraftingUIController] Claim requested | JobId={jobId}");
             svc.ClaimJob(jobId);
         }
