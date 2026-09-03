@@ -103,14 +103,46 @@ namespace IdleDefenseSurvival.Crafting
                     {
                         if (string.IsNullOrEmpty(recipe.RecipeId)) continue;
 
-                        // Inject decomposed requirements into Ingredients array
-                        var decomposed = DecomposedRequirementResolver.Compute(recipe.Rarity);
-                        if (decomposed.Count > 0)
+                        // Inject requirements into Ingredients array
+                        var extraIngredients = new List<CraftIngredient>();
+
+                        // Potion-specific: require common-tier potion of same type instead of decomposed materials
+                        if (recipe.PotionType > 0 && recipe.Rarity > 1)
                         {
-                            var extra = new List<CraftIngredient>();
+                            // Map PotionType to actual ItemId prefix
+                            // PotionType enum: 1=Health (hp), 2=Mana (mp), 3=Stamina, 4=DebuffCleanse
+                            // ItemId pattern: "potion_{prefix}_1"
+                            string potionPrefix = recipe.PotionType switch
+                            {
+                                PotionType.Health => "hp",
+                                PotionType.Mana => "mp",
+                                PotionType.Stamina => "sp",
+                                PotionType.DebuffCleanse => "ap",
+                                _ => "hp"
+                            };
+
+                            string commonPotionId = $"potion_{potionPrefix}_1";
+
+                            // Count = (rarity - 1) * 5 per specification
+                            // R2: 5, R3: 10, R4: 15, R5: 20, R6: 25
+                            int commonCount = (recipe.Rarity - 1) * 5;
+
+                            extraIngredients.Add(new CraftIngredient
+                            {
+                                ItemId = commonPotionId,
+                                Count = commonCount,
+                                Consumed = true,
+                                MinQuality = 0,
+                                MinLevel = 0
+                            });
+                        }
+                        // Equipment: use decomposed material requirements
+                        else
+                        {
+                            var decomposed = DecomposedRequirementResolver.Compute(recipe.Rarity);
                             foreach (var d in decomposed)
                             {
-                                extra.Add(new CraftIngredient
+                                extraIngredients.Add(new CraftIngredient
                                 {
                                     ItemId = d.ItemId,
                                     Count = d.Quantity,
@@ -119,9 +151,10 @@ namespace IdleDefenseSurvival.Crafting
                                     MinLevel = 0
                                 });
                             }
-                            // Merge: original ingredients + decomposed
-                            recipe.Ingredients = recipe.Ingredients?.Concat(extra).ToArray() ?? extra.ToArray();
                         }
+
+                        // Merge: original ingredients + extra
+                        recipe.Ingredients = recipe.Ingredients?.Concat(extraIngredients).ToArray() ?? extraIngredients.ToArray();
 
                         // Set category for potion recipes
                         if (recipe.PotionType > 0)

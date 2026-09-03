@@ -9,6 +9,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.UI.Tooltip;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -404,8 +405,17 @@ namespace IdleDefenseSurvival.Controller
             // Potion recipes
             if (recipe.PotionType != PotionType.None)
             {
-                string potionTypeName = recipe.PotionType == PotionType.Health ? "hp" : "mp";
-                return ItemResources.GetItemSource($"Potion/potion/{potionTypeName}");
+                string potionTypeName = recipe.PotionType switch
+                {
+                    PotionType.Health => "hp",
+                    PotionType.Mana => "mp",
+                    PotionType.Stamina => "sp",
+                    PotionType.DebuffCleanse => "ap",
+                    _ => "??"
+                };
+                return ItemResources.GetItemSource(
+                    $"Potion/potion_r{recipe.Rarity}/{potionTypeName}"
+                );
             }
 
             // Equipment recipes
@@ -474,15 +484,24 @@ namespace IdleDefenseSurvival.Controller
 
             foreach (var req in reqs)
             {
+                string _id = req.ItemId;
                 var row = Instantiate(_materialRowTemplate, _materialList);
                 row.SetActive(true);
+
+                // Add tooltip component for hover info
+                var tooltip = row.AddComponent<MaterialTooltip>();
+                tooltip.ItemId = _id;
+
                 var icon = row.GetComponentInChildren<Image>();
                 if (icon != null)
-                    icon.sprite = ItemResources.GetItemSource($"Material/{req.ItemId}");
+                {   
+                    Sprite showMaterial= ItemResources.GetItemSource($"Material/{_id}") ?? ItemResources.GetItemSource($"Herb/{_id}") ?? ItemResources.GetItemSource($"Potion/base/{_id}");
+                    icon.sprite = showMaterial;
+                }
                 var text = row.GetComponentInChildren<TextMeshProUGUI>();
                 if (text != null)
                 {
-                    int owned = InventoryService.Instance != null ? InventoryService.Instance.GetTotalQuantity(req.ItemId) : 0;
+                    int owned = InventoryService.Instance != null ? InventoryService.Instance.GetTotalQuantity(_id) : 0;
                     text.text = $"{owned} / {req.Count}";
                     text.color = owned >= req.Count ? GameColors.white : GameColors.red;
                 }
