@@ -78,7 +78,9 @@ namespace IdleDefenseSurvival.Crafting
                 "Data/Crafting/Equipment/dataRecipeRing",
                 "Data/Crafting/Equipment/dataRecipeEarring",
                 "Data/Crafting/Equipment/dataRecipeBracelet",
-                "Data/Crafting/Equipment/dataRecipeShoes"
+                "Data/Crafting/Equipment/dataRecipeShoes",
+                "Data/Crafting/Potion/dataRecipeHealthPotion",
+                "Data/Crafting/Potion/dataRecipeManaPotion"
             };
 
             int totalLoaded = 0;
@@ -120,7 +122,11 @@ namespace IdleDefenseSurvival.Crafting
                             // Merge: original ingredients + decomposed
                             recipe.Ingredients = recipe.Ingredients?.Concat(extra).ToArray() ?? extra.ToArray();
                         }
-                        
+
+                        // Set category for potion recipes
+                        if (recipe.PotionType > 0)
+                            recipe.Category = ItemCategory.Consumable;
+
                         _allRecipes[recipe.RecipeId] = recipe;
                         totalLoaded++;
 

@@ -11,7 +11,7 @@
       "Ingredients": [
         { "ItemId": "red_berry", "Count": 6 },
         { "ItemId": "ginger", "Count": 3 },
-        { "ItemId": "water", "Count": 10 }
+        { "ItemId": "water", "Count": 1 }
       ],
       "BaseCraftTime": 15.0,
       "TimePerAdditionalUnit": 15.0
@@ -27,7 +27,7 @@
         { "ItemId": "hibiscus", "Count": 6 },
         { "ItemId": "crane_herb", "Count": 5 },
         { "ItemId": "ginger", "Count": 3 },
-        { "ItemId": "water", "Count": 20 }
+        { "ItemId": "water", "Count": 2 }
       ],
       "BaseCraftTime": 25.0,
       "TimePerAdditionalUnit": 25.0
@@ -43,7 +43,7 @@
         { "ItemId": "tiger_ear_herb", "Count": 8 },
         { "ItemId": "elecampane", "Count": 6 },
         { "ItemId": "fleece_flower", "Count": 4 },
-        { "ItemId": "water", "Count": 30 }
+        { "ItemId": "water", "Count": 3 }
       ],
       "BaseCraftTime": 40.0,
       "TimePerAdditionalUnit": 40.0
@@ -59,7 +59,7 @@
         { "ItemId": "golden_herb", "Count": 8 },
         { "ItemId": "nectar", "Count": 6 },
         { "ItemId": "salvia_root", "Count": 5 },
-        { "ItemId": "water", "Count": 50 }
+        { "ItemId": "water", "Count": 4 }
       ],
       "BaseCraftTime": 60.0,
       "TimePerAdditionalUnit": 60.0
@@ -76,7 +76,7 @@
         { "ItemId": "fleece_flower", "Count": 10 },
         { "ItemId": "golden_herb", "Count": 10 },
         { "ItemId": "nectar", "Count": 8 },
-        { "ItemId": "water", "Count": 80 }
+        { "ItemId": "water", "Count": 5 }
       ],
       "BaseCraftTime": 90.0,
       "TimePerAdditionalUnit": 90.0
@@ -94,7 +94,7 @@
         { "ItemId": "perfumedew_herb", "Count": 10 },
         { "ItemId": "nectar", "Count": 12 },
         { "ItemId": "fleece_flower", "Count": 12 },
-        { "ItemId": "water", "Count": 120 }
+        { "ItemId": "water", "Count": 6 }
       ],
       "BaseCraftTime": 120.0,
       "TimePerAdditionalUnit": 120.0

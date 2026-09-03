@@ -59,7 +59,8 @@ namespace IdleDefenseSurvival.Controller
 
         private string _selectedRecipeId;
         private int _quantity = 1;
-        private EquipmentType _currentCategoryFilter = EquipmentType.None; // None = All
+        private EquipmentType _currentCategoryEquipmentFilter = EquipmentType.None; // None = All
+        private PotionType _currentCategoryPotionFilter = PotionType.None; // None = All
         private readonly List<CraftingRecipeEntry> _entries = new();
         private readonly List<GameObject> _materialRows = new();
         private readonly List<JobEntryUI> _jobEntries = new();
@@ -126,15 +127,13 @@ namespace IdleDefenseSurvival.Controller
 
         private void BindCategoryButtons()
         {
-            // All
+            // All Equipment
             if (_categoryAllEquipmentButton != null)
-            {
                 _categoryAllEquipmentButton.onClick.AddListener(
-                    () => OnCategoryFilterChanged(EquipmentType.None)
+                    () => OnCategoryEquipmentFilterChanged(EquipmentType.None)
                 );
-            }
 
-            // Category buttons
+            // Category Equipment buttons
             // Array index 0 corresponds to enum value 1.
             if (_categoryEquipmentButtons == null) return;
             for (int i = 0; i < _categoryEquipmentButtons.Length; i++)
@@ -142,13 +141,38 @@ namespace IdleDefenseSurvival.Controller
                 var button = _categoryEquipmentButtons[i];
                 if (button == null) continue;
                 EquipmentType category = (EquipmentType)(i + 1);
-                button.onClick.AddListener(() => OnCategoryFilterChanged(category));
+                button.onClick.AddListener(() => OnCategoryEquipmentFilterChanged(category));
             }
+            
+            // All Potion
+            if (_categoryAllPotionButton != null)
+                _categoryAllPotionButton.onClick.AddListener(
+                    () => OnCategoryPotionFilterChanged(PotionType.None)
+                );
+
+            // Category Potion buttons
+            // Array index 0 corresponds to enum value 1.
+            if (_categoryPotionButtons == null) return;
+            for (int i = 0; i < _categoryPotionButtons.Length; i++)
+            {
+                var button = _categoryPotionButtons[i];
+                if (button == null) continue;
+                PotionType category = (PotionType)(i + 1);
+                button.onClick.AddListener(() => OnCategoryPotionFilterChanged(category));
+            }
+            
         }
 
-        private void OnCategoryFilterChanged(EquipmentType category)
+        private void OnCategoryEquipmentFilterChanged(EquipmentType category)
         {
-            _currentCategoryFilter = category;
+            _currentCategoryEquipmentFilter = category;
+            UpdateCategorySelection();
+            PopulateRecipeList();
+        }
+
+        private void OnCategoryPotionFilterChanged(PotionType category)
+        {
+            _currentCategoryPotionFilter = category;
             UpdateCategorySelection();
             PopulateRecipeList();
         }
@@ -159,7 +183,7 @@ namespace IdleDefenseSurvival.Controller
             if (_categoryAllEquipmentSelection != null)
             {
                 _categoryAllEquipmentSelection.gameObject.SetActive(
-                    _currentCategoryFilter == EquipmentType.None
+                    _currentCategoryEquipmentFilter == EquipmentType.None
                 );
             }
             if (_categoryEquipmentSelections == null) return;
@@ -169,7 +193,7 @@ namespace IdleDefenseSurvival.Controller
                 var selection = _categoryEquipmentSelections[i];
                 if (selection == null) continue;
                 EquipmentType category = (EquipmentType)(i + 1);
-                selection.gameObject.SetActive(_currentCategoryFilter == category);
+                selection.gameObject.SetActive(_currentCategoryEquipmentFilter == category);
             }
         }
 
@@ -232,7 +256,7 @@ namespace IdleDefenseSurvival.Controller
             var filteredRecipes = recipes.Where(r =>
                 r != null &&
                 !string.IsNullOrEmpty(r.RecipeId) &&
-                (_currentCategoryFilter == EquipmentType.None || r.EquipmentType == _currentCategoryFilter)
+                (_currentCategoryEquipmentFilter == EquipmentType.None || r.EquipmentType == _currentCategoryEquipmentFilter)
             );
 
             // Sort by rarity (highest first: Divine=6, Mythic=5, Legendary=4, Epic=3, Rare=2, Common=1)

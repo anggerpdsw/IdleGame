@@ -118,6 +118,7 @@ namespace IdleDefenseSurvival.Crafting
         public override void Execute(CraftPipelineContext ctx)
         {
             if (!ctx.Success) return;
+            if (ctx.Recipe.Category != ItemCategory.Equipment) return;
             int count = Mathf.Max(1, ctx.Context?.PlayerStats?.JobCount ?? 1);
             ctx.Entries.Add(new CraftResultEntry
             {
@@ -126,6 +127,31 @@ namespace IdleDefenseSurvival.Crafting
                 Quality = ctx.Recipe.Rarity, // Recipe rarity is the quality tier
                 Source = CraftRewardSource.Normal.ToString(),
                 FixedLevel = 0 // Level determined by recipe progression
+            });
+        }
+    }
+
+    /// <summary>
+    /// Stage 3b: Add base potion/consumable result for potion recipes.
+    /// Uses placeholder resolved in CraftRewardService.
+    /// </summary>
+    public class BasePotionStage : CraftPipelineStageBase
+    {
+        public override string StageName => "BasePotion";
+        public override int Order => 110;
+
+        public override void Execute(CraftPipelineContext ctx)
+        {
+            if (!ctx.Success) return;
+            if (ctx.Recipe.Category != ItemCategory.Consumable && ctx.Recipe.Category != ItemCategory.Material) return;
+            int count = Mathf.Max(1, ctx.Context?.PlayerStats?.JobCount ?? 1);
+            ctx.Entries.Add(new CraftResultEntry
+            {
+                ItemId = "crafted_potion", // Placeholder - resolved in CraftRewardService based on recipe
+                Count = count,
+                Quality = ctx.Recipe.Rarity,
+                Source = CraftRewardSource.Normal.ToString(),
+                FixedLevel = 0
             });
         }
     }
@@ -214,7 +240,7 @@ namespace IdleDefenseSurvival.Crafting
                 return false;
 
             // Allow placeholder IDs that will be resolved by CraftRewardService later
-            if (entry.ItemId == "crafted_equipment" || entry.ItemId == "mastery_extra")
+            if (entry.ItemId == "crafted_equipment" || entry.ItemId == "crafted_potion" || entry.ItemId == "mastery_extra")
                 return true;
 
             if (_itemDatabase != null && !_itemDatabase.IsValidItemId(entry.ItemId))
@@ -299,6 +325,7 @@ namespace IdleDefenseSurvival.Crafting
             RegisterStage(new ValidationStage());
             RegisterStage(new SuccessStage(_config));
             RegisterStage(new BaseEquipmentStage());
+            RegisterStage(new BasePotionStage());
             RegisterStage(new EventStage());
             RegisterStage(new ValidationFinalStage(_itemDatabase));
             RegisterStage(new ExperienceStage());

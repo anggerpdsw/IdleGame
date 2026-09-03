@@ -301,7 +301,8 @@ namespace IdleDefenseSurvival.Crafting
     {
         public int CraftingLevel = 1;
         public int BlacksmithLevel = 1;
-        public int JobCount = 1; 
+        public int AlchemistLevel = 1;
+        public int JobCount = 1;
     }
 
     [Serializable]
@@ -338,6 +339,7 @@ namespace IdleDefenseSurvival.Crafting
         // Backward compatibility helpers
         public int CraftingLevel => PlayerStats.CraftingLevel;
         public int BlacksmithLevel => PlayerStats.BlacksmithLevel;
+        public int AlchemistLevel => PlayerStats.AlchemistLevel;
         public float ExpMultiplier => Buffs.ExpMultiplier;
         public float ExtraItemChance => Buffs.ExtraItemChance;
         public List<ICraftModifier> ActiveEventModifiers => Events.ActiveModifiers;

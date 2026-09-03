@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items.Random;
+using UnityEngine;
 
 namespace IdleDefenseSurvival.Items.Generation
 {
@@ -48,9 +49,7 @@ namespace IdleDefenseSurvival.Items.Generation
             // 5. Validate
             var validation = _validator.Validate(item, baseItem);
             if (!validation.IsValid)
-            {
-                UnityEngine.Debug.LogWarning($"[ConsumableGenerator] Validation failed for {baseItem.Id}: {validation}");
-            }
+                Debug.LogWarning($"[ConsumableGenerator] Validation failed for {baseItem.Id}: {validation}");
 
             return item;
         }
@@ -83,17 +82,19 @@ namespace IdleDefenseSurvival.Items.Generation
 
         private int CalculateQuantity(ItemData baseItem, ItemGenerationContext context)
         {
+            // Crafted potions produce full batch (99 per craft).
+            // Only applies when Source == Craft; drops/loots keep normal logic.
+            if (context.Source == ItemSource.Craft && baseItem.Category == ItemCategory.Consumable)
+                return Math.Min(baseItem.StackSize, 99);
+
             int baseQty = 1;
 
-            // Stackable items can have more quantity
-            if (baseItem.IsStackable)
-            {
-                baseQty = _rng.Range(1, Math.Max(2, baseItem.StackSize / 10));
-            }
-
-            // Tier/wave bonus for materials
+            // Materials can have bonus quantity based on tier/wave
             if (baseItem.Category == ItemCategory.Material)
             {
+                // Stackable materials can have more quantity
+                if (baseItem.IsStackable)
+                    baseQty = _rng.Range(1, Math.Max(2, baseItem.StackSize / 10));
                 baseQty += context.Tier / 5;
                 baseQty += context.Wave / 50;
             }
@@ -106,12 +107,8 @@ namespace IdleDefenseSurvival.Items.Generation
             if (context.EventModifiers == null) return;
 
             foreach (var modifier in context.EventModifiers)
-            {
                 if (modifier is IConsumableModifier consumableMod)
-                {
                     consumableMod.ModifyConsumable(item, baseItem, context);
-                }
-            }
         }
     }
 

@@ -27,6 +27,7 @@ namespace IdleDefenseSurvival.Crafting
                 {
                     BlacksmithLevel = GetPlayerBlacksmithLevel(),
                     CraftingLevel = GetPlayerCraftingLevel(),
+                    AlchemistLevel = GetPlayerAlchemistLevel(),
                 },
                 Buffs = new CraftBuffContext
                 {
@@ -48,6 +49,11 @@ namespace IdleDefenseSurvival.Crafting
         private int GetPlayerCraftingLevel()
         {
             return 0; // Simplified
+        }
+
+        private int GetPlayerAlchemistLevel()
+        {
+            return _saveManager?.GetAccountData()?.alchemistLevel ?? 1;
         }
 
         private float GetExpMultiplier()

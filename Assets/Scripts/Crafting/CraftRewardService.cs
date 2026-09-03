@@ -38,8 +38,7 @@ namespace IdleDefenseSurvival.Crafting
                 for (int i = 0; i < entry.Count; i++)
                 {
                     var item = GenerateSingleItem(entry, recipe, context, seed + i);
-                    if (item != null)
-                        items.Add(item);
+                    if (item != null) items.Add(item);
                 }
             }
 
@@ -53,11 +52,11 @@ namespace IdleDefenseSurvival.Crafting
             bool isPlaceholder = entry.ItemId.StartsWith("crafted_") || entry.ItemId == "mastery_extra";
             if (isPlaceholder)
             {
+                if (entry.ItemId == "crafted_potion")
+                    return GeneratePotionFromRecipe(recipe, context, seed);
                 var slot = InferSlotFromRecipe(recipe);
                 if (slot.HasValue)
-                {
                     return GenerateEquipmentFromBase(recipe, context, slot.Value, seed);
-                }
                 // No slot inference → cannot generate equipment, skip.
                 return null;
             }
@@ -66,9 +65,7 @@ namespace IdleDefenseSurvival.Crafting
             // Resolve via the 11 base templates (equip_<slot>_base); rarity/level from the recipe.
             var slotFromRecipe = InferSlotFromRecipe(recipe);
             if (slotFromRecipe.HasValue && recipe.Category == ItemCategory.Equipment)
-            {
                 return GenerateEquipmentFromBase(recipe, context, slotFromRecipe.Value, seed);
-            }
 
             // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
             // Only EventCraftModifier instances are relevant for item generation; other modifiers
@@ -77,9 +74,7 @@ namespace IdleDefenseSurvival.Crafting
             foreach (var mod in context.ActiveEventModifiers)
             {
                 if (mod is EventCraftModifier ev)
-                {
                     eventModifiers.Add(ev);
-                }
             }
 
             // Build generation context for non‑equipment items
@@ -180,6 +175,49 @@ namespace IdleDefenseSurvival.Crafting
             if (id.Contains("_ring")) return EquipmentType.Ring;
             if (id.Contains("_shoes")) return EquipmentType.Shoes;
             return null;
+        }
+
+        /// <summary>
+        /// Generates potion items from a potion recipe.
+        /// Uses the Alchemist level from the CraftContext for the resulting item level.
+        /// Maps recipe.PotionType to a base potion ItemId (e.g., health_potion_small).
+        /// </summary>
+        private InventoryItem GeneratePotionFromRecipe(CraftRecipeData recipe, CraftContext context, long seed)
+        {
+            // Determine base potion ItemId based on PotionType and rarity.
+            // Recipe DisplayName usually contains a readable name; we map it to a known base ID.
+            string basePotionId = recipe.PotionType switch
+            {
+                PotionType.Health => "health_potion_small",
+                PotionType.Mana => "mana_potion_small",
+                PotionType.Stamina => "stamina_potion_small",
+                PotionType.DebuffCleanse => "cleanse_potion_small",
+                _ => null
+            };
+
+            if (string.IsNullOrEmpty(basePotionId))
+                return null;
+
+            // Resolve the base potion ItemData.
+            var basePotion = ItemDatabase.Instance.GetPotion(basePotionId);
+            if (basePotion == null)
+                return null;
+
+            // Determine level from Alchemist level (capped to a reasonable range).
+            int level = Mathf.Max(1, context.AlchemistLevel);
+
+            // Build generation context with forced quality (rarity) and fixed level.
+            var genContext = ItemGenerationContext.Consumable(
+                                 potionType: recipe.PotionType,
+                                 rarity: (Rarity)recipe.Rarity,
+                                 level: level)
+                             .With(
+                                 seed: (int)seed,
+                                 forcedQuality: recipe.Rarity - 1,
+                                 fixedLevel: level);
+
+            // Use ItemGenerator to create the potion instance.
+            return _itemGenerator.GenerateConsumableFromBase(basePotion, genContext);
         }
     }
 }

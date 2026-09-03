@@ -139,6 +139,27 @@ namespace IdleDefenseSurvival.Items.Generation
         }
 
         /// <summary>
+        /// Creates a context for consumable/potion generation.
+        /// </summary>
+        public static ItemGenerationContext Consumable(
+            PotionType potionType,
+            Rarity rarity,
+            int level,
+            int? seed = null)
+        {
+            return new ItemGenerationContext
+            {
+                Source = ItemSource.Craft,
+                Category = ItemCategory.Consumable,
+                PlayerLevel = level,
+                ForcedQuality = (int)rarity,
+                FixedLevel = level,
+                Seed = seed,
+                CustomData = new Dictionary<string, object> { { "PotionType", potionType } }
+            };
+        }
+
+        /// <summary>
         /// Creates a derived context with modifications.
         /// </summary>
         public ItemGenerationContext With(

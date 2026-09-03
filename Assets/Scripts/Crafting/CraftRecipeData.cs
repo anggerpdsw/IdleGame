@@ -30,6 +30,7 @@ namespace IdleDefenseSurvival.Crafting
         public bool IsEquipment => EquipmentType != EquipmentType.None;
         public int Rarity = 1; // 1=Common, 2=Rare, 3=Epic, 4=Legendary, 5=Mythic, 6=Divine
         public int RecipeVersion = 1; // v3.5 §8.1 — defaults to 1 when JSON omits the field
+        public PotionType PotionType = PotionType.None; // For potion recipes
 
         // ============ Requirements ============
         public int RequiredAlchemistLevel = 1;
@@ -99,6 +100,7 @@ namespace IdleDefenseSurvival.Crafting
                 Description = source.Description,
                 Category = source.Category,
                 EquipmentType = source.EquipmentType,
+                PotionType = source.PotionType,
                 Rarity = source.Rarity,
                 RecipeVersion = source.RecipeVersion,
 
@@ -155,7 +157,7 @@ namespace IdleDefenseSurvival.Crafting
         None = 0,
         Default = 1,         // Unlocked by default
         BlacksmithLevel = 2,   // Unlocked at blacksmith level
-        AlchemistLevel = 2,   // Unlocked at alchemist level
+        AlchemistLevel = 3,   // Unlocked at alchemist level
         Tier = 4,            // Unlocked at wave tier
         Discovery = 5,       // Unlocked by discovering item
         Purchase = 6,        // Purchased from shop
