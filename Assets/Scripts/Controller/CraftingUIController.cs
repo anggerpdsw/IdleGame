@@ -23,6 +23,10 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private RectTransform _recipeContent;
         [SerializeField] private CraftingRecipeEntry _recipeEntryPrefabs;
 
+        [Header("Category")]
+        [SerializeField] private Button _equipment;
+        [SerializeField] private Button _potion;
+
         [Header("Equipment Filters")]
         [SerializeField] private Button _categoryAllEquipmentButton;
         [SerializeField] private Button[] _categoryEquipmentButtons;
@@ -179,21 +183,40 @@ namespace IdleDefenseSurvival.Controller
 
         private void UpdateCategorySelection()
         {
-            // All
+            // Equipment selection
             if (_categoryAllEquipmentSelection != null)
             {
                 _categoryAllEquipmentSelection.gameObject.SetActive(
                     _currentCategoryEquipmentFilter == EquipmentType.None
                 );
             }
-            if (_categoryEquipmentSelections == null) return;
-            // Array index 0 corresponds to enum value 1.
-            for (int i = 0; i < _categoryEquipmentSelections.Length; i++)
+            if (_categoryEquipmentSelections != null)
             {
-                var selection = _categoryEquipmentSelections[i];
-                if (selection == null) continue;
-                EquipmentType category = (EquipmentType)(i + 1);
-                selection.gameObject.SetActive(_currentCategoryEquipmentFilter == category);
+                for (int i = 0; i < _categoryEquipmentSelections.Length; i++)
+                {
+                    var selection = _categoryEquipmentSelections[i];
+                    if (selection == null) continue;
+                    EquipmentType category = (EquipmentType)(i + 1);
+                    selection.gameObject.SetActive(_currentCategoryEquipmentFilter == category);
+                }
+            }
+
+            // Potion selection
+            if (_categoryAllPotionSelection != null)
+            {
+                _categoryAllPotionSelection.gameObject.SetActive(
+                    _currentCategoryPotionFilter == PotionType.None
+                );
+            }
+            if (_categoryPotionSelections != null)
+            {
+                for (int i = 0; i < _categoryPotionSelections.Length; i++)
+                {
+                    var selection = _categoryPotionSelections[i];
+                    if (selection == null) continue;
+                    PotionType category = (PotionType)(i + 1);
+                    selection.gameObject.SetActive(_currentCategoryPotionFilter == category);
+                }
             }
         }
 
@@ -252,11 +275,14 @@ namespace IdleDefenseSurvival.Controller
             var recipes = CraftingManager.Instance.GetKnownRecipes();
             if (recipes == null) return;
 
-            // Filter by category (EquipmentType.None = All)
+            // Filter by category (EquipmentType.None = All, PotionType.None = All)
             var filteredRecipes = recipes.Where(r =>
                 r != null &&
                 !string.IsNullOrEmpty(r.RecipeId) &&
-                (_currentCategoryEquipmentFilter == EquipmentType.None || r.EquipmentType == _currentCategoryEquipmentFilter)
+                // equipment filter
+                (_currentCategoryEquipmentFilter == EquipmentType.None || r.EquipmentType == _currentCategoryEquipmentFilter) &&
+                // potion filter
+                (_currentCategoryPotionFilter == PotionType.None || r.PotionType == _currentCategoryPotionFilter)
             );
 
             // Sort by rarity (highest first: Divine=6, Mythic=5, Legendary=4, Epic=3, Rare=2, Common=1)
@@ -303,11 +329,26 @@ namespace IdleDefenseSurvival.Controller
 
         private Sprite ResolveRecipeIcon(CraftRecipeData recipe)
         {
-            // ex: Equipment/Hat/cotton_hat
             if (recipe == null) return null;
-            string type = recipe.EquipmentType.ToString();
-            string name = Utilityku.ToItemId(recipe.DisplayName);
-            return ItemResources.GetItemSource($"Equipment/{type}/{name}");
+
+            // Potion recipes
+            if (recipe.PotionType != PotionType.None)
+            {
+                // ex: Potion/potion/hp or Potion/potion/mp
+                string potionTypeName = recipe.PotionType == PotionType.Health ? "hp" : "mp";
+                return ItemResources.GetItemSource($"Potion/potion/{potionTypeName}");
+            }
+
+            // Equipment recipes
+            if (recipe.EquipmentType != EquipmentType.None)
+            {
+                // ex: Equipment/Hat/cotton_hat
+                string type = recipe.EquipmentType.ToString();
+                string name = Utilityku.ToItemId(recipe.DisplayName);
+                return ItemResources.GetItemSource($"Equipment/{type}/{name}");
+            }
+
+            return null;
         }
 
         public void OnRecipeSelected(string recipeId)
@@ -446,7 +487,13 @@ namespace IdleDefenseSurvival.Controller
             var svc = CraftingManager.Instance;
             if (svc == null || string.IsNullOrEmpty(_selectedRecipeId)) return;
 
-            var jobId = svc.StartCraft(CraftType.Equipment, _selectedRecipeId, _quantity);
+            // Determine craft type from selected recipe (equipment vs potion)
+            CraftType craftType = CraftType.Equipment;
+            var recipe = svc.TryGetRecipe(_selectedRecipeId, out var r) ? r : null;
+            if (recipe != null && recipe.PotionType != PotionType.None)
+                craftType = CraftType.Potion;
+
+            var jobId = svc.StartCraft(craftType, _selectedRecipeId, _quantity);
             if (!string.IsNullOrEmpty(jobId))
             {
                 PopulateJobList(); // Show new job immediately in list
