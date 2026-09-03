@@ -23,18 +23,17 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private RectTransform _recipeContent;
         [SerializeField] private CraftingRecipeEntry _recipeEntryPrefabs;
 
-        [Header("Category Filters")]
-        [SerializeField] private Button _categoryAllButton;
-        [SerializeField] private Button[] _categoryButtons;
-        // Array index 0 = EquipmentType.Hat (enum value 1)
-        // Array index 1 = EquipmentType.Armor (enum value 2)
-        // dst.
-        [SerializeField] private Image _categoryAllSelection;
-        // Selection image untuk tombol All
-        [SerializeField] private Image[] _categorySelections;
-        // Array index 0 = Selection Hat
-        // Array index 1 = Selection Armor
-        // dst.
+        [Header("Equipment Filters")]
+        [SerializeField] private Button _categoryAllEquipmentButton;
+        [SerializeField] private Button[] _categoryEquipmentButtons;
+        [SerializeField] private Image _categoryAllEquipmentSelection;
+        [SerializeField] private Image[] _categoryEquipmentSelections;
+
+        [Header("Potion Filters")]
+        [SerializeField] private Button _categoryAllPotionButton;
+        [SerializeField] private Button[] _categoryPotionButtons;
+        [SerializeField] private Image _categoryAllPotionSelection;
+        [SerializeField] private Image[] _categoryPotionSelections;
 
         [Header("Detail Panel")]
         [SerializeField] private Image _resultIcon;
@@ -128,19 +127,19 @@ namespace IdleDefenseSurvival.Controller
         private void BindCategoryButtons()
         {
             // All
-            if (_categoryAllButton != null)
+            if (_categoryAllEquipmentButton != null)
             {
-                _categoryAllButton.onClick.AddListener(
+                _categoryAllEquipmentButton.onClick.AddListener(
                     () => OnCategoryFilterChanged(EquipmentType.None)
                 );
             }
 
             // Category buttons
             // Array index 0 corresponds to enum value 1.
-            if (_categoryButtons == null) return;
-            for (int i = 0; i < _categoryButtons.Length; i++)
+            if (_categoryEquipmentButtons == null) return;
+            for (int i = 0; i < _categoryEquipmentButtons.Length; i++)
             {
-                var button = _categoryButtons[i];
+                var button = _categoryEquipmentButtons[i];
                 if (button == null) continue;
                 EquipmentType category = (EquipmentType)(i + 1);
                 button.onClick.AddListener(() => OnCategoryFilterChanged(category));
@@ -157,17 +156,17 @@ namespace IdleDefenseSurvival.Controller
         private void UpdateCategorySelection()
         {
             // All
-            if (_categoryAllSelection != null)
+            if (_categoryAllEquipmentSelection != null)
             {
-                _categoryAllSelection.gameObject.SetActive(
+                _categoryAllEquipmentSelection.gameObject.SetActive(
                     _currentCategoryFilter == EquipmentType.None
                 );
             }
-            if (_categorySelections == null) return;
+            if (_categoryEquipmentSelections == null) return;
             // Array index 0 corresponds to enum value 1.
-            for (int i = 0; i < _categorySelections.Length; i++)
+            for (int i = 0; i < _categoryEquipmentSelections.Length; i++)
             {
-                var selection = _categorySelections[i];
+                var selection = _categoryEquipmentSelections[i];
                 if (selection == null) continue;
                 EquipmentType category = (EquipmentType)(i + 1);
                 selection.gameObject.SetActive(_currentCategoryFilter == category);
@@ -208,10 +207,15 @@ namespace IdleDefenseSurvival.Controller
             if (_plusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _plusButton");
             if (_minusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _minusButton");
             if (_craftButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _craftButton");
-            if (_categoryAllButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllButton");
-            if (_categoryButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryButtons");
-            if (_categoryAllSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllSelection");
-            if (_categorySelections == null) Debug.LogError("[CraftingUIController] Missing required reference: _categorySelections");
+            if (_categoryAllEquipmentButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllEquipmentButton");
+            if (_categoryEquipmentButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryEquipmentButtons");
+            if (_categoryAllEquipmentSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllEquipmentSelection");
+            if (_categoryEquipmentSelections == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryEquipmentSelections");
+            if (_craftButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _craftButton");
+            if (_categoryAllPotionButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllPotionButton");
+            if (_categoryPotionButtons == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryPotionButtons");
+            if (_categoryAllPotionSelection == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryAllPotionSelection");
+            if (_categoryPotionSelections == null) Debug.LogError("[CraftingUIController] Missing required reference: _categoryPotionSelections");
         }
 
         #endregion

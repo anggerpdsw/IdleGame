@@ -12,7 +12,7 @@
                 "gem": 3,
                 "meat": 10
             },
-            "claimCooldownMinutes": 30,
+            "claimCooldownMinutes": 1,
             "cancelCooldownMinutes": 15
         },
         {
@@ -28,7 +28,7 @@
                 "gem": 7,
                 "meat": 25
             },
-            "claimCooldownMinutes": 40,
+            "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 20
         },
         {
@@ -44,7 +44,7 @@
                 "gem": 9,
                 "meat": 50
             },
-            "claimCooldownMinutes": 60,
+            "claimCooldownMinutes": 3,
             "cancelCooldownMinutes": 30
         },
         {
@@ -60,7 +60,7 @@
                 "gem": 1,
                 "meat": 20
             },
-            "claimCooldownMinutes": 45,
+            "claimCooldownMinutes": 4,
             "cancelCooldownMinutes": 20
         },
         {
@@ -76,7 +76,7 @@
                 "gem": 3,
                 "meat": 300
             },
-            "claimCooldownMinutes": 60,
+            "claimCooldownMinutes": 5,
             "cancelCooldownMinutes": 30
         },
         {
@@ -92,7 +92,7 @@
                 "gem": 2,
                 "meat": 10
             },
-            "claimCooldownMinutes": 30,
+            "claimCooldownMinutes": 1,
             "cancelCooldownMinutes": 15
         },
         {
@@ -108,7 +108,7 @@
                 "gem": 6,
                 "meat": 30
             },
-            "claimCooldownMinutes": 45,
+            "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 25
         },
         {
@@ -124,7 +124,7 @@
                 "gem": 4,
                 "meat": 300
             },
-            "claimCooldownMinutes": 15,
+            "claimCooldownMinutes": 3,
             "cancelCooldownMinutes": 10
         }
     ]
