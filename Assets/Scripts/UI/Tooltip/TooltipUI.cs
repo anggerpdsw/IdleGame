@@ -501,26 +501,23 @@ namespace IdleDefenseSurvival.UI.Tooltip
             else if (leftEdge < canvasBounds.xMin)
                 desiredX = canvasBounds.xMin + tooltipWidth * pivotX;
 
-            // --- Vertical: prefer below cursor (offset.y negative), flip above if no room ---
-            float offsetY = _offset.y; // negative = below cursor
-            float spaceBelow = canvasBounds.yMax - localPos.y;      // space from cursor to bottom of canvas
-            float spaceAbove = localPos.y - canvasBounds.yMin;      // space from cursor to top of canvas
-            float neededSpace = tooltipHeight + Mathf.Abs(offsetY); // tooltip height + gap from cursor
+            // --- Vertical: prefer below cursor (negative offset), flip above only when tooltip would overflow bottom ---
+            float desiredY = localPos.y + _offset.y; // _offset.y negative = below cursor
 
-            bool flipUp = offsetY < 0 && spaceBelow < neededSpace && spaceAbove >= neededSpace;
-
-            float desiredY = flipUp
-                ? localPos.y - offsetY          // place above cursor (offsetY is negative, so minus = plus)
-                : localPos.y + offsetY;         // place below cursor
-
-            // Clamp vertical so whole tooltip stays inside canvas (fallback if both sides tight)
-            float topEdge = desiredY + tooltipHeight * (1f - pivotY);
+            // Compute bottom edge of tooltip with current desiredY
             float bottomEdge = desiredY - tooltipHeight * pivotY;
 
+            // If bottom edge goes below canvas bottom, flip to above cursor
+            if (bottomEdge < canvasBounds.yMin)
+            {
+                // Flip: place tooltip above cursor (invert offset sign)
+                desiredY = localPos.y - _offset.y;
+            }
+
+            // Clamp top edge to stay inside canvas (fallback safety)
+            float topEdge = desiredY + tooltipHeight * (1f - pivotY);
             if (topEdge > canvasBounds.yMax)
                 desiredY = canvasBounds.yMax - tooltipHeight * (1f - pivotY);
-            else if (bottomEdge < canvasBounds.yMin)
-                desiredY = canvasBounds.yMin + tooltipHeight * pivotY;
 
             _tooltipRect.localPosition = new Vector2(desiredX, desiredY);
         }

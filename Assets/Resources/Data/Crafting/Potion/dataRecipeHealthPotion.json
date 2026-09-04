@@ -9,8 +9,8 @@
       "Rarity": 1,
       "RequiredAlchemistLevel": 1,
       "Ingredients": [
-        { "ItemId": "red_berry", "Count": 6 },
-        { "ItemId": "ginger", "Count": 3 },
+        { "ItemId": "red_berry", "Count": 1 },
+        { "ItemId": "ginger", "Count": 2 },
         { "ItemId": "water", "Count": 1 }
       ],
       "BaseCraftTime": 15.0,

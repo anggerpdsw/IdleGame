@@ -9,8 +9,8 @@
       "Rarity": 1,
       "RequiredAlchemistLevel": 1,
       "Ingredients": [
-        { "ItemId": "nectar", "Count": 4 },
-        { "ItemId": "tulip", "Count": 5 },
+        { "ItemId": "nectar", "Count": 1 },
+        { "ItemId": "tulip", "Count": 2 },
         { "ItemId": "water", "Count": 1 }
       ],
       "BaseCraftTime": 15.0,

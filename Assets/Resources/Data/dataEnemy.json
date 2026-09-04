@@ -441,14 +441,14 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 1,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         },
         {
@@ -939,7 +939,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -953,7 +953,7 @@
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         },
         {
@@ -1246,7 +1246,7 @@
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         },
         {
@@ -1453,7 +1453,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -1467,7 +1467,7 @@
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         },
         {
@@ -1895,7 +1895,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -1966,7 +1966,7 @@
           "ItemId": "red_berry",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         }
       ]
@@ -2002,7 +2002,7 @@
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         },
         {
@@ -2016,7 +2016,7 @@
           "ItemId": "red_berry",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         }
       ]
@@ -2066,7 +2066,7 @@
           "ItemId": "red_berry",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         }
       ]
@@ -2123,7 +2123,7 @@
           "ItemId": "red_berry",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         }
       ]
@@ -2381,7 +2381,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -3109,7 +3109,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -3900,7 +3900,7 @@
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.7,
           "MinTier": 1
         },
         {
@@ -4278,7 +4278,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -4392,7 +4392,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
@@ -4556,7 +4556,7 @@
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.5,
+          "Weight": 0.6,
           "MinTier": 1
         },
         {
