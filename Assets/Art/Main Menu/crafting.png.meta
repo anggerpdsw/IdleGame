@@ -113,15 +113,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: crafting
+      name: crafting_0
       rect:
         serializedVersion: 2
-        x: 31
-        y: 205
-        width: 1557
-        height: 620
+        x: 4
+        y: 145
+        width: 1668
+        height: 698
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: fd9e6db9b83bb2e4db13f537476f33db
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      crafting: 3733011299380660128
+      crafting_0: 3733011299380660128
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

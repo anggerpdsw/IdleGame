@@ -725,6 +725,7 @@ namespace IdleDefenseSurvival.Enemy
         /// Each entry rolls independently; Weight is a percent (0-100), consistent with
         /// Utilityku.Chance and DropEntry.Weight semantics elsewhere. Uses InventoryService.AddItem
         /// so stacking, capacity, events, and save-dirty flow stay centralized.
+        /// Normal (non-boss) enemies are capped at 2 successful item drops to prevent inventory flooding.
         /// </summary>
         private void DropItemDrops()
         {
@@ -733,6 +734,8 @@ namespace IdleDefenseSurvival.Enemy
             if (inventory == null) return;
 
             int currentTier = WaveManager.Instance?.CurrentTier ?? 1;
+            int droppedCount = 0;
+
             foreach (var entry in EnemyData.dropItems)
             {
                 if (entry == null || string.IsNullOrEmpty(entry.ItemId)) continue;
@@ -751,11 +754,15 @@ namespace IdleDefenseSurvival.Enemy
                 }
 
                 inventory.AddItem(entry.ItemId, quantity);
+                droppedCount++;
 
                 // Drop Bag: record ONLY after the drop truly succeeded (Chance + MinTier passed,
                 // AddItem executed). Single authoritative point — no duplicate events.
                 if (DropBagManager.Instance != null)
                     DropBagManager.Instance.AddDrop(entry.ItemId, quantity);
+
+                // Cap normal enemies at 2 item drops; bosses keep full drop potential.
+                if (!EnemyData.isBoss && droppedCount >= 2) break;
             }
         }
 
