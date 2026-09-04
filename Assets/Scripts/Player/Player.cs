@@ -594,46 +594,74 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public float TakeDamage(DamageData damageData, bool canEvade = true)
         {
-            // Immunity & Evasion check – if player is currently immune, ignore damage.
-            if (_isImmune || (canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.Evasion))))
+            // --------------------------------------------------
+            // 1. Immunity / Evasion
+            // --------------------------------------------------
+            bool evaded = canEvade && Utilityku.Chance( PlayerStatsManager.Instance.GetStat(SkillType.Evasion));
+            if (_isImmune || evaded)
             {
-                ShowDamagePopup(1f, DamageType.Miss, CriticalType.None);
-                return 1f;
+                ShowDamagePopup(0f, DamageType.Miss, CriticalType.None);
+                return 0f;
             }
 
+            // --------------------------------------------------
+            // 2. Get damage
+            // --------------------------------------------------
+            float remainingDamage = Mathf.Max(0f, damageData.Damage);
+            if (remainingDamage <= 0f) return 0f;
+                
+            // --------------------------------------------------
+            // 3. Apply Defense FIRST
+            // --------------------------------------------------
             float rawDamage = damageData.Damage;
-
-            // Apply shield first
-            if (_currentShield > 0)
+            float defense = PlayerStatsManager.Instance.GetStat(SkillType.DefenseAmount);
+            float finalDamage = Utilityku.FinalDamage(rawDamage, defense);
+            finalDamage = Mathf.Max(0f, finalDamage);
+                    
+            // --------------------------------------------------
+            // 4. Shield absorbs damage AFTER Defense
+            // --------------------------------------------------
+            if (_currentShield > 0f && finalDamage > 0f)
             {
-                float shieldAbsorb = Mathf.Min(_currentShield, rawDamage);
+                float shieldAbsorb = Mathf.Min(_currentShield, finalDamage);
                 _currentShield -= shieldAbsorb;
-                rawDamage -= shieldAbsorb;
+                finalDamage -= shieldAbsorb;
 
-                if (shieldAbsorb > 0)
+                if (shieldAbsorb > 0f)
                     ShowDamagePopup(shieldAbsorb, DamageType.Miss, CriticalType.None, "⛨ ");
 
                 // Shield depleted - start cooldown
-                if (_currentShield <= 0)
+                if (_currentShield <= 0f)
                 {
+                    _currentShield = 0f;
                     _isShieldOnCooldown = true;
                     _shieldCooldownTimer = ShieldCooldownDuration;
                     _shieldGranted = false;
                 }
+
+                UpdateShieldVisual();
             }
 
-            float finalDamage = Utilityku.FinalDamage(rawDamage, PlayerStatsManager.Instance.GetStat(SkillType.DefenseAmount));
-            _currentHealth -= finalDamage;
-            _currentHealth = Mathf.Clamp(_currentHealth, 0, PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
+            // --------------------------------------------------
+            // 5. Apply remaining damage to HP
+            // --------------------------------------------------
+            if (finalDamage > 0f)
+            {
+                _currentHealth -= finalDamage;
+                _currentHealth = Mathf.Clamp(_currentHealth, 0, PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
+                ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
+            }
 
+            // --------------------------------------------------
+            // 6. Update UI
+            // --------------------------------------------------
             UpdateHealthUI();
             UpdateShieldVisual();
 
-            // Check if dead
+            // --------------------------------------------------
+            // 7. Death check
+            // --------------------------------------------------
             if (_currentHealth <= 0) Die();
-
-            if (finalDamage > 0)
-                ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
 
             return finalDamage;
         }
@@ -738,14 +766,13 @@ namespace IdleDefenseSurvival.Player
             if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
             {
                 // Heal a small amount and grant temporary immunity with visual barrier.
-                float heal = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint) * 0.05f;
+                float heal = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint) * 0.1f;
                 Heal(heal);
 
                 // Start immunity coroutine (5 seconds) and enable barrier visual.
-                if (gameObject.activeInHierarchy) // ensure we can start coroutine
-                {
+                // ensure we can start coroutine
+                if (gameObject.activeInHierarchy)
                     StartCoroutine(ImmunityRoutine(5f));
-                }
                 return;
             }
 

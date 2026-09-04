@@ -11,7 +11,9 @@ public static class Utilityku
     public static float FinalDamage(float damage, float defense, float armorPenetration = 0f)
     {
         float effectiveDefense = defense - armorPenetration;
-        return damage * (100f / (100f + effectiveDefense));
+        float finalDamage = damage * (100f / (100f + effectiveDefense));
+        // Damage minimal 2
+        return Mathf.Max(2f, finalDamage);
     }
 
     public static int FinalDefense(Role role, float health)
