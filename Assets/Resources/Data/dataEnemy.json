@@ -41,6 +41,27 @@
           "MinTier": 4
         },
         {
+          "ItemId": "legendary_diamond",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.02,
+          "MinTier": 5
+        },
+        {
+          "ItemId": "mythic_ruby",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.01,
+          "MinTier": 6
+        },
+        {
+          "ItemId": "essence_of_hope",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.01,
+          "MinTier": 6
+        },
+        {
           "ItemId": "black_henbane",
           "MinCount": 1,
           "MaxCount": 2,
@@ -96,6 +117,41 @@
           "MaxCount": 1,
           "Weight": 0.375,
           "MinTier": 3
+        },
+        {
+          "ItemId": "rough_quartz",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.12,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "normal_ruby",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 2
+        },
+        {
+          "ItemId": "legendary_diamond",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.02,
+          "MinTier": 5
+        },
+        {
+          "ItemId": "essence_of_hope",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.015,
+          "MinTier": 6
+        },
+        {
+          "ItemId": "rubstone_powder",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.025,
+          "MinTier": 6
         },
         {
           "ItemId": "elemental_essence",
@@ -169,6 +225,27 @@
           "MinTier": 4
         },
         {
+          "ItemId": "refined_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 3
+        },
+        {
+          "ItemId": "steel_alloy",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.06,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "essence_of_hope",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.01,
+          "MinTier": 6
+        },
+        {
           "ItemId": "scented_fungus",
           "MinCount": 1,
           "MaxCount": 1,
@@ -212,11 +289,11 @@
           "MinTier": 3
         },
         {
-          "ItemId": "black_henbane",
+          "ItemId": "colored_glue",
           "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 0.25,
-          "MinTier": 1
+          "MaxCount": 1,
+          "Weight": 0.15,
+          "MinTier": 4
         },
         {
           "ItemId": "chocolate_additive",
@@ -281,6 +358,20 @@
           "MaxCount": 1,
           "Weight": 0.125,
           "MinTier": 4
+        },
+        {
+          "ItemId": "super_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.06,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "compound_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.04,
+          "MinTier": 5
         },
         {
           "ItemId": "serpentine_herb",
@@ -354,13 +445,6 @@
           "MinTier": 1
         },
         {
-          "ItemId": "hibiscus",
-          "MinCount": 1,
-          "MaxCount": 2,
-          "Weight": 0.25,
-          "MinTier": 1
-        },
-        {
           "ItemId": "nectar",
           "MinCount": 1,
           "MaxCount": 1,
@@ -425,6 +509,20 @@
           "MinTier": 3
         },
         {
+          "ItemId": "rough_quartz",
+          "MinCount": 1,
+          "MaxCount": 2,
+          "Weight": 0.15,
+          "MinTier": 1
+        },
+        {
+          "ItemId": "normal_ruby",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 2
+        },
+        {
           "ItemId": "tiery_herb",
           "MinCount": 1,
           "MaxCount": 2,
@@ -436,13 +534,6 @@
           "MinCount": 1,
           "MaxCount": 1,
           "Weight": 0.15,
-          "MinTier": 1
-        },
-        {
-          "ItemId": "realgar",
-          "MinCount": 1,
-          "MaxCount": 1,
-          "Weight": 0.19,
           "MinTier": 1
         },
         {
@@ -496,6 +587,13 @@
           "MinTier": 3
         },
         {
+          "ItemId": "lumber_essence",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.20,
+          "MinTier": 6
+        },
+        {
           "ItemId": "leather",
           "MinCount": 1,
           "MaxCount": 1,
@@ -517,13 +615,6 @@
           "MinTier": 1
         },
         {
-          "ItemId": "crane_herb",
-          "MinCount": 1,
-          "MaxCount": 1,
-          "Weight": 0.2,
-          "MinTier": 1
-        },
-        {
           "ItemId": "tiger_ear_herb",
           "MinCount": 1,
           "MaxCount": 2,
@@ -541,7 +632,7 @@
           "ItemId": "crane_herb",
           "MinCount": 1,
           "MaxCount": 2,
-          "Weight": 0.226,
+          "Weight": 0.196,
           "MinTier": 1
         }
       ]
@@ -579,6 +670,13 @@
           "MaxCount": 1,
           "Weight": 0.188,
           "MinTier": 3
+        },
+        {
+          "ItemId": "normal_ruby",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 2
         },
         {
           "ItemId": "scented_fungus",
@@ -745,6 +843,13 @@
           "MinTier": 2
         },
         {
+          "ItemId": "refined_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.12,
+          "MinTier": 3
+        },
+        {
           "ItemId": "tumeric_root",
           "MinCount": 1,
           "MaxCount": 2,
@@ -888,6 +993,13 @@
           "MinTier": 2
         },
         {
+          "ItemId": "compound_thread",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.12,
+          "MinTier": 4
+        },
+        {
           "ItemId": "scented_fungus",
           "MinCount": 1,
           "MaxCount": 1,
@@ -920,8 +1032,15 @@
           "ItemId": "strong_glue",
           "MinCount": 1,
           "MaxCount": 1,
-          "Weight": 0.5,
-          "MinTier": 2
+          "Weight": 0.08,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "compound_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.05,
+          "MinTier": 5
         },
         {
           "ItemId": "ox_bezoar",
@@ -1022,6 +1141,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "refined_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.12,
+          "MinTier": 3
         },
         {
           "ItemId": "scented_fungus",
@@ -1310,6 +1436,20 @@
           "MinTier": 2
         },
         {
+          "ItemId": "refined_sapphire",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 3
+        },
+        {
+          "ItemId": "rare_emerald",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.05,
+          "MinTier": 4
+        },
+        {
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
@@ -1365,6 +1505,41 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 1
+        },
+        {
+          "ItemId": "rare_emerald",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.04,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "legendary_diamond",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.01,
+          "MinTier": 5
+        },
+        {
+          "ItemId": "mythic_ruby",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.005,
+          "MinTier": 6
+        },
+        {
+          "ItemId": "mythic_sapphire",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.005,
+          "MinTier": 6
+        },
+        {
+          "ItemId": "mythic_emerald",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.005,
+          "MinTier": 6
         },
         {
           "ItemId": "serpentine_herb",
@@ -1679,6 +1854,13 @@
           "MaxCount": 1,
           "Weight": 0.375,
           "MinTier": 2
+        },
+        {
+          "ItemId": "compound_thread",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.12,
+          "MinTier": 4
         },
         {
           "ItemId": "golden_herb",
@@ -2118,6 +2300,34 @@
           "MinTier": 2
         },
         {
+          "ItemId": "steel_alloy",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.12,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "high_alloy_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 5
+        },
+        {
+          "ItemId": "rare_emerald",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.03,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "mythic_sapphire",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.005,
+          "MinTier": 6
+        },
+        {
           "ItemId": "realgar",
           "MinCount": 1,
           "MaxCount": 1,
@@ -2247,6 +2457,13 @@
           "MinTier": 1
         },
         {
+          "ItemId": "vega_string",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 5
+        },
+        {
           "ItemId": "ligumaloes_wood",
           "MinCount": 1,
           "MaxCount": 1,
@@ -2281,6 +2498,13 @@
           "MaxCount": 1,
           "Weight": 0.1314,
           "MinTier": 1
+        },
+        {
+          "ItemId": "vega_string",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 5
         },
         {
           "ItemId": "serpentine_herb",
@@ -2433,6 +2657,13 @@
           "MinTier": 1
         },
         {
+          "ItemId": "vega_string",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 5
+        },
+        {
           "ItemId": "worm_sprouts",
           "MinCount": 1,
           "MaxCount": 1,
@@ -2533,6 +2764,13 @@
           "MinTier": 1
         },
         {
+          "ItemId": "lumber_essence",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.20,
+          "MinTier": 6
+        },
+        {
           "ItemId": "ageratum",
           "MinCount": 1,
           "MaxCount": 2,
@@ -2597,6 +2835,13 @@
           "MinTier": 2
         },
         {
+          "ItemId": "high_alloy_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.06,
+          "MinTier": 5
+        },
+        {
           "ItemId": "tumeric_root",
           "MinCount": 1,
           "MaxCount": 2,
@@ -2624,6 +2869,20 @@
           "MaxCount": 2,
           "Weight": 0.375,
           "MinTier": 1
+        },
+        {
+          "ItemId": "steel_alloy",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "legendary_diamond",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.015,
+          "MinTier": 5
         },
         {
           "ItemId": "golden_herb",
@@ -2703,6 +2962,13 @@
           "MaxCount": 2,
           "Weight": 0.4125,
           "MinTier": 1
+        },
+        {
+          "ItemId": "colored_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 3
         },
         {
           "ItemId": "leather",
@@ -2810,6 +3076,13 @@
           "MaxCount": 1,
           "Weight": 0.0438,
           "MinTier": 1
+        },
+        {
+          "ItemId": "colored_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 3
         },
         {
           "ItemId": "water",
@@ -3019,6 +3292,20 @@
           "MinTier": 1
         },
         {
+          "ItemId": "super_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.06,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "compound_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.04,
+          "MinTier": 5
+        },
+        {
           "ItemId": "leather",
           "MinCount": 1,
           "MaxCount": 1,
@@ -3167,6 +3454,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "colored_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 3
         },
         {
           "ItemId": "leather",
@@ -3326,6 +3620,20 @@
           "MinTier": 1
         },
         {
+          "ItemId": "normal_ruby",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 2
+        },
+        {
+          "ItemId": "legendary_diamond",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.015,
+          "MinTier": 5
+        },
+        {
           "ItemId": "tumeric_root",
           "MinCount": 1,
           "MaxCount": 2,
@@ -3374,6 +3682,20 @@
           "MaxCount": 1,
           "Weight": 0.313,
           "MinTier": 2
+        },
+        {
+          "ItemId": "strong_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "compound_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.05,
+          "MinTier": 5
         },
         {
           "ItemId": "leather",
@@ -3433,6 +3755,13 @@
           "MinTier": 1
         },
         {
+          "ItemId": "compound_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.05,
+          "MinTier": 5
+        },
+        {
           "ItemId": "worm_sprouts",
           "MinCount": 1,
           "MaxCount": 1,
@@ -3483,6 +3812,20 @@
           "MinTier": 1
         },
         {
+          "ItemId": "steel_alloy",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 4
+        },
+        {
+          "ItemId": "legendary_diamond",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.015,
+          "MinTier": 5
+        },
+        {
           "ItemId": "tumeric_root",
           "MinCount": 1,
           "MaxCount": 2,
@@ -3517,6 +3860,13 @@
           "MaxCount": 1,
           "Weight": 0.375,
           "MinTier": 2
+        },
+        {
+          "ItemId": "compound_thread",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.12,
+          "MinTier": 4
         },
         {
           "ItemId": "leather",
@@ -3683,6 +4033,13 @@
           "MinTier": 2
         },
         {
+          "ItemId": "high_alloy_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.06,
+          "MinTier": 5
+        },
+        {
           "ItemId": "ox_bezoar",
           "MinCount": 1,
           "MaxCount": 1,
@@ -3717,6 +4074,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "lumber_essence",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.20,
+          "MinTier": 6
         },
         {
           "ItemId": "leather",
@@ -3883,6 +4247,13 @@
           "MinTier": 2
         },
         {
+          "ItemId": "refined_sapphire",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.08,
+          "MinTier": 3
+        },
+        {
           "ItemId": "water",
           "MinCount": 1,
           "MaxCount": 2,
@@ -3940,6 +4311,13 @@
           "MinTier": 1
         },
         {
+          "ItemId": "high_alloy_steel",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.06,
+          "MinTier": 5
+        },
+        {
           "ItemId": "tumeric_root",
           "MinCount": 1,
           "MaxCount": 2,
@@ -3974,6 +4352,20 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "refined_sapphire",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.10,
+          "MinTier": 3
+        },
+        {
+          "ItemId": "rare_emerald",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.05,
+          "MinTier": 4
         },
         {
           "ItemId": "water",
@@ -4195,6 +4587,13 @@
           "MaxCount": 1,
           "Weight": 0.5,
           "MinTier": 2
+        },
+        {
+          "ItemId": "compound_glue",
+          "MinCount": 1,
+          "MaxCount": 1,
+          "Weight": 0.05,
+          "MinTier": 5
         },
         {
           "ItemId": "golden_herb",
