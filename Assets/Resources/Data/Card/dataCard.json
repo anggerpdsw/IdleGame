@@ -51,8 +51,8 @@
             "EffectType": "",
             "SkillType": "AttackRange",
             "Mode": "Flat",
-            "BaseValue": 0.2,
-            "ValuePerLevel": 0.2,
+            "BaseValue": 0.45,
+            "ValuePerLevel": 0.21,
             "CardRarity": "Common"
         }, {
             "Id": "swift_strike",
@@ -261,7 +261,7 @@
             "EffectType": "Shield",
             "SkillType": "",
             "Mode": "Percent",
-            "BaseValue": 10,
+            "BaseValue": 15,
             "ValuePerLevel": 4,
             "CardRarity": "Rare"
         }, {

@@ -481,30 +481,48 @@ namespace IdleDefenseSurvival.UI.Tooltip
                 out Vector2 localPos
             );
 
-            // Mouse offset
-            localPos += _offset;
             // Actual tooltip size after ContentSizeFitter/LayoutGroup
             Vector2 size = _tooltipRect.rect.size;
             // Canvas boundaries
             Rect canvasBounds = canvasRect.rect;
 
-            float halfWidth = size.x * _tooltipRect.pivot.x;
-            float halfHeight = size.y * _tooltipRect.pivot.y;
+            float pivotX = _tooltipRect.pivot.x;
+            float pivotY = _tooltipRect.pivot.y;
+            float tooltipWidth = size.x;
+            float tooltipHeight = size.y;
 
-            // Keep right side inside canvas
-            if (localPos.x + (size.x * (1f - _tooltipRect.pivot.x)) > canvasBounds.xMax)
-                localPos.x = canvasBounds.xMax - size.x * (1f - _tooltipRect.pivot.x);
-            // Keep left side inside canvas
-            if (localPos.x - halfWidth < canvasBounds.xMin)
-                localPos.x = canvasBounds.xMin + halfWidth;
-            // Keep top side inside canvas
-            if (localPos.y + (size.y * (1f - _tooltipRect.pivot.y)) > canvasBounds.yMax)
-                localPos.y = canvasBounds.yMax - size.y * (1f - _tooltipRect.pivot.y);
-            // Keep bottom side inside canvas
-            if (localPos.y - halfHeight < canvasBounds.yMin)
-                localPos.y = canvasBounds.yMin + halfHeight;
+            // --- Horizontal: prefer right of cursor, flip left if no room ---
+            float desiredX = localPos.x + _offset.x;
+            float rightEdge = desiredX + tooltipWidth * (1f - pivotX);
+            float leftEdge = desiredX - tooltipWidth * pivotX;
 
-            _tooltipRect.localPosition = localPos;
+            if (rightEdge > canvasBounds.xMax)
+                desiredX = canvasBounds.xMax - tooltipWidth * (1f - pivotX);
+            else if (leftEdge < canvasBounds.xMin)
+                desiredX = canvasBounds.xMin + tooltipWidth * pivotX;
+
+            // --- Vertical: prefer below cursor (offset.y negative), flip above if no room ---
+            float offsetY = _offset.y; // negative = below cursor
+            float spaceBelow = canvasBounds.yMax - localPos.y;      // space from cursor to bottom of canvas
+            float spaceAbove = localPos.y - canvasBounds.yMin;      // space from cursor to top of canvas
+            float neededSpace = tooltipHeight + Mathf.Abs(offsetY); // tooltip height + gap from cursor
+
+            bool flipUp = offsetY < 0 && spaceBelow < neededSpace && spaceAbove >= neededSpace;
+
+            float desiredY = flipUp
+                ? localPos.y - offsetY          // place above cursor (offsetY is negative, so minus = plus)
+                : localPos.y + offsetY;         // place below cursor
+
+            // Clamp vertical so whole tooltip stays inside canvas (fallback if both sides tight)
+            float topEdge = desiredY + tooltipHeight * (1f - pivotY);
+            float bottomEdge = desiredY - tooltipHeight * pivotY;
+
+            if (topEdge > canvasBounds.yMax)
+                desiredY = canvasBounds.yMax - tooltipHeight * (1f - pivotY);
+            else if (bottomEdge < canvasBounds.yMin)
+                desiredY = canvasBounds.yMin + tooltipHeight * pivotY;
+
+            _tooltipRect.localPosition = new Vector2(desiredX, desiredY);
         }
         #endregion
 
