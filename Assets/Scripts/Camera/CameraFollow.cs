@@ -1,13 +1,11 @@
 using UnityEngine;
-using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Camera
 {
     /// <summary>
-    /// Camera that stays fixed at origin and adjusts orthographic size based on player's attack range.
-    /// Does NOT follow player position — player moves within static camera view.
+    /// Camera that follows player position and adjusts orthographic size based on player's attack range.
     /// </summary>
     [RequireComponent(typeof(UnityEngine.Camera))]
     public class CameraFollow : MonoBehaviour
@@ -15,6 +13,10 @@ namespace IdleDefenseSurvival.Camera
         [Header("References")]
         [Tooltip("Reference to the Player script to get attack range.")]
         [SerializeField] private Player.Player _player;
+
+        [Header("Follow Settings")]
+        [Tooltip("How smoothly the camera follows the player.")]
+        [SerializeField] private float _followSpeed = 8f;
 
         [Header("Zoom Settings")]
         [Tooltip("Margin added around attack range for better visibility.")]
@@ -38,9 +40,6 @@ namespace IdleDefenseSurvival.Camera
                 return;
             }
 
-            // Camera stays fixed at origin
-            transform.position = new Vector3(0f, 0f, -10f);
-
             // If player reference not set, try to find it
             if (_player == null)
             {
@@ -61,7 +60,7 @@ namespace IdleDefenseSurvival.Camera
             }
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (_player == null)
             {
@@ -70,7 +69,18 @@ namespace IdleDefenseSurvival.Camera
                 if (_player == null) return;
             }
 
+            FollowPlayer();
             UpdateZoom();
+        }
+
+        /// <summary>
+        /// Smoothly follow player position while keeping Z fixed for orthographic camera.
+        /// </summary>
+        private void FollowPlayer()
+        {
+            Vector3 targetPos = _player.transform.position;
+            targetPos.z = -10f;
+            transform.position = Vector3.Lerp(transform.position, targetPos, _followSpeed * Time.deltaTime);
         }
 
         /// <summary>
@@ -84,14 +94,13 @@ namespace IdleDefenseSurvival.Camera
         }
 
         /// <summary>
-        /// Update only orthographic size based on player attack range.
-        /// Camera position stays fixed at origin.
+        /// Update orthographic size based on player attack range.
         /// </summary>
         private void UpdateZoom()
         {
             _targetSize = CalculateTargetSize();
 
-            // Smooth orthographic size only
+            // Smooth orthographic size
             _camera.orthographicSize = Mathf.Lerp(
                 _camera.orthographicSize,
                 _targetSize,
