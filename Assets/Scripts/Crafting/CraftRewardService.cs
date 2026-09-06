@@ -180,28 +180,34 @@ namespace IdleDefenseSurvival.Crafting
         /// <summary>
         /// Generates potion items from a potion recipe.
         /// Uses the Alchemist level from the CraftContext for the resulting item level.
-        /// Maps recipe.PotionType to a base potion ItemId (e.g., health_potion_small).
+        /// Maps recipe.PotionType to the actual ItemId pattern used in dataHealthPotion.json / dataManaPotion.json:
+        /// Health → potion_hp_{rarity}, Mana → potion_mp_{rarity}, etc.
         /// </summary>
         private InventoryItem GeneratePotionFromRecipe(CraftRecipeData recipe, CraftContext context, long seed)
         {
-            // Determine base potion ItemId based on PotionType and rarity.
-            // Recipe DisplayName usually contains a readable name; we map it to a known base ID.
-            string basePotionId = recipe.PotionType switch
+            // Determine base potion ItemId prefix from PotionType; suffix is recipe.Rarity (1-6).
+            // Item IDs in JSON: potion_hp_1..potion_hp_6, potion_mp_1..potion_mp_6, etc.
+            string prefix = recipe.PotionType switch
             {
-                PotionType.Health => "health_potion_small",
-                PotionType.Mana => "mana_potion_small",
-                PotionType.Stamina => "stamina_potion_small",
-                PotionType.DebuffCleanse => "cleanse_potion_small",
+                PotionType.Health => "potion_hp",
+                PotionType.Mana => "potion_mp",
+                PotionType.Stamina => "potion_sp",
+                PotionType.DebuffCleanse => "potion_ap",
                 _ => null
             };
 
-            if (string.IsNullOrEmpty(basePotionId))
+            if (string.IsNullOrEmpty(prefix))
                 return null;
+
+            string basePotionId = $"{prefix}_{recipe.Rarity}";
 
             // Resolve the base potion ItemData.
             var basePotion = ItemDatabase.Instance.GetPotion(basePotionId);
             if (basePotion == null)
+            {
+                Debug.LogWarning($"[CraftRewardService] Base potion not found: {basePotionId}");
                 return null;
+            }
 
             // Determine level from Alchemist level (capped to a reasonable range).
             int level = Mathf.Max(1, context.AlchemistLevel);

@@ -118,7 +118,8 @@ namespace IdleDefenseSurvival.Crafting
         public override void Execute(CraftPipelineContext ctx)
         {
             if (!ctx.Success) return;
-            if (ctx.Recipe.Category != ItemCategory.Equipment) return;
+            // Use EquipmentType as the discriminator (JSON sets this correctly).
+            if (ctx.Recipe.EquipmentType == EquipmentType.None) return;
             int count = Mathf.Max(1, ctx.Context?.PlayerStats?.JobCount ?? 1);
             ctx.Entries.Add(new CraftResultEntry
             {
@@ -143,7 +144,8 @@ namespace IdleDefenseSurvival.Crafting
         public override void Execute(CraftPipelineContext ctx)
         {
             if (!ctx.Success) return;
-            if (ctx.Recipe.Category != ItemCategory.Consumable && ctx.Recipe.Category != ItemCategory.Material) return;
+            // Use PotionType as the discriminator (JSON sets this correctly).
+            if (ctx.Recipe.PotionType == PotionType.None) return;
             int count = Mathf.Max(1, ctx.Context?.PlayerStats?.JobCount ?? 1);
             ctx.Entries.Add(new CraftResultEntry
             {
