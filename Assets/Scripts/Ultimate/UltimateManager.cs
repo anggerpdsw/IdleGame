@@ -59,7 +59,6 @@ namespace IdleDefenseSurvival.Ultimate
         // Data & Tracking
         // -------------------------------------------------------------------
         private Dictionary<string, UltimateData> _ultimateDatabase = new();
-        private Dictionary<string, float> _lastSpawnTimeMap = new();
 
         // Stack system for chance/kill-count based ultimates
         // Bomb, Tank, Cloud: chance-based stacks
@@ -69,6 +68,8 @@ namespace IdleDefenseSurvival.Ultimate
         private Dictionary<string, List<Vector3>> _stackPositions = new();
         // cap 80%, supaya cooldown tidak pernah menjadi 0 akibat stacking CDR:
         private const float MAX_COOLDOWN_REDUCTION = 0.80f;
+        // Runtime cooldown end timestamps (Time.time when cooldown ends)
+        private readonly Dictionary<string, float> _cooldownEndTimeMap = new();
 
         private void Awake()
         {
@@ -131,8 +132,8 @@ namespace IdleDefenseSurvival.Ultimate
                 foreach (var data in _database.ultimate)
                 {
                     _ultimateDatabase[data.id] = data;
-                    _lastSpawnTimeMap[data.id] = Time.time;
-                    _currentStacks[data.id] = 0;    
+                    _cooldownEndTimeMap[data.id] = Time.time;
+                    _currentStacks[data.id] = 0;
                     _stackPositions[data.id] = new List<Vector3>();
                 }
             }
@@ -354,9 +355,8 @@ namespace IdleDefenseSurvival.Ultimate
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
 
-            // float cooldown = ultimateData.GetCooldown();
             float cooldown = GetEffectiveCooldown(ultimateData);
-            if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
+            if (cooldown > 0f && !IsOffCooldown(ultimateId)) return false;
 
             if (!player.CanAfford(ultimateData.manaCost)) return false;
 
@@ -376,7 +376,10 @@ namespace IdleDefenseSurvival.Ultimate
                 if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData)) return false;
             }
 
-            _lastSpawnTimeMap[ultimateId] = Time.time;
+            // Set cooldown END TIME (Time.time + effectiveCooldown) — CDR locked at cast.
+            if (cooldown > 0f)
+                _cooldownEndTimeMap[ultimateId] = Time.time + cooldown;
+
             player.SpendMana(ultimateData.manaCost);
             return true;
         }
@@ -408,7 +411,8 @@ namespace IdleDefenseSurvival.Ultimate
             while (GetStack(ultimateId) > 0)
             {
                 if (!player.CanAfford(data.manaCost)) break;
-                if (data.GetCooldown() > 0f && !IsOffCooldown(ultimateId, data.GetCooldown())) break;
+                float cd = GetEffectiveCooldown(data);
+                if (cd > 0f && !IsOffCooldown(ultimateId)) break;
                 Vector3 pos = GetNextStackPosition(ultimateId, player);
                 if (!TryCastReady(ultimateId, pos, player)) break;
                 anyCast = true;
@@ -476,15 +480,16 @@ namespace IdleDefenseSurvival.Ultimate
             {
                 if (!TryGetUltimate(ultimateId, out var ultimateData)) break;
                 if (!player.CanAfford(ultimateData.manaCost)) break;
-                if (ultimateData.GetCooldown() > 0f && !IsOffCooldown(ultimateId, ultimateData.GetCooldown())) break;
+                float cd = GetEffectiveCooldown(ultimateData);
+                if (cd > 0f && !IsOffCooldown(ultimateId)) break;
                 if (!TryCastReady(ultimateId, position, player)) break;
             }
         }
 
-        private bool IsOffCooldown(string ultimateId, float cooldown)
+        private bool IsOffCooldown(string ultimateId)
         {
-            if (!_lastSpawnTimeMap.TryGetValue(ultimateId, out float lastTime)) return true;
-            return Time.time - lastTime >= cooldown;
+            if (!_cooldownEndTimeMap.TryGetValue(ultimateId, out float endTime)) return true;
+            return Time.time >= endTime;
         }
 
         private bool IsAutoCastEnabled()
@@ -493,10 +498,8 @@ namespace IdleDefenseSurvival.Ultimate
         public float GetCooldownRemaining(string ultimateId)
         {
             if (!TryGetUltimate(ultimateId, out var data)) return 0f;
-            if (!_lastSpawnTimeMap.TryGetValue(ultimateId, out float lastTime)) return 0f;
-            float elapsed = Time.time - lastTime;
-            float cooldown = data.GetCooldown();
-            return Mathf.Max(0f, cooldown - elapsed);
+            if (!_cooldownEndTimeMap.TryGetValue(ultimateId, out float endTime)) return 0f;
+            return Mathf.Max(0f, endTime - Time.time);
         }
 
         // -------------------------------------------------------------------
