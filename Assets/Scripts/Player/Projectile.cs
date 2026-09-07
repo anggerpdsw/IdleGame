@@ -27,7 +27,7 @@ namespace IdleDefenseSurvival.Player
 
         [Header("Bounce Settings")]
         [Tooltip("Radius untuk mencari enemy terdekat saat bounce")]
-        [SerializeField] private float _bounceRadius = 4f;
+        [SerializeField] private float _bounceRadius = 8f;
                 
         [Header("Visual")]
         [SerializeField] private SpriteRenderer _spriteRenderer;
@@ -155,7 +155,7 @@ namespace IdleDefenseSurvival.Player
             _baseStuntDuration = PlayerStatsManager.Instance.GetStat(SkillType.StuntDuration);
             _bounceChance = PlayerStatsManager.Instance.GetStat(SkillType.BounceChance);
             _bounceCount = 0; // Set when bounce is approved (see HitTarget)
-            _bounceRadius = 4f;
+            _bounceRadius = 8f;
             _knockbackChance = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackChance);
             _lifeSteal = PlayerStatsManager.Instance.GetStat(SkillType.LifeSteal);
             _stuntChance = PlayerStatsManager.Instance.GetStat(SkillType.StuntChance);
