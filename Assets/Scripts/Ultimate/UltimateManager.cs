@@ -132,7 +132,7 @@ namespace IdleDefenseSurvival.Ultimate
                 foreach (var data in _database.ultimate)
                 {
                     _ultimateDatabase[data.id] = data;
-                    _cooldownEndTimeMap[data.id] = Time.time;
+                    _cooldownEndTimeMap[data.id] = Time.time + data.GetCooldown();
                     _currentStacks[data.id] = 0;
                     _stackPositions[data.id] = new List<Vector3>();
                 }
@@ -388,7 +388,7 @@ namespace IdleDefenseSurvival.Ultimate
         {
             float baseCooldown = ultimateData.GetCooldown();
             if (baseCooldown <= 0f) return 0f;
-            float cdr = PlayerStatsManager.Instance.GetStat(SkillType.CooldownReduction);
+            float cdr = PlayerStatsManager.Instance.GetStat(SkillType.CooldownReduction) * 0.01f;
             float cooldownReduction = Mathf.Clamp(cdr, 0f, MAX_COOLDOWN_REDUCTION);
             return baseCooldown * (1f - cooldownReduction);
         }

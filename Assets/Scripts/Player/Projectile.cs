@@ -311,7 +311,7 @@ namespace IdleDefenseSurvival.Player
                 {
                     // Kalkulasi damage dengan geometric reduction: baseDamage * (0.5 ^ bounceIndex)
                     // Bounce 0 (first hit): 100%, Bounce 1: 50%, Bounce 2: 25%, etc.
-                    float currentDamage = _baseDamage * Mathf.Pow(0.5f, _bounceIndex);
+                    float currentDamage = _baseDamage * Mathf.Pow(0.9f, _bounceIndex);
 
                     // Tambahkan target ke hit history
                     _hitEnemies.Add(_target);
@@ -392,7 +392,7 @@ namespace IdleDefenseSurvival.Player
                             DamageMultiplier = _damageMultiplier,
                             Element = Utilityku.RandomElement(),
                             HasKnockback = Utilityku.Chance(_knockbackChance),
-                            KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.35f, _bounceIndex),
+                            KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.9f, _bounceIndex),
                             HasStunt = Utilityku.Chance(_stuntChance),
                             HasBounce = _bounceApproved,
 
@@ -427,7 +427,7 @@ namespace IdleDefenseSurvival.Player
                         // --- Implementasi Stunt ---
                         if (damageData.HasStunt)
                         {
-                            float currentStuntDuration = _baseStuntDuration * Mathf.Pow(0.5f, _bounceIndex);
+                            float currentStuntDuration = _baseStuntDuration * Mathf.Pow(0.9f, _bounceIndex);
                             enemy.ApplyStunt(currentStuntDuration);
                         }
 

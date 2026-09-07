@@ -362,8 +362,8 @@
     "utility": {
       "cooldownReduction": {
         "baseValue": 0,
-        "bonusPerPoint": 0.005,
-        "ValuePerLevel": 0.006,
+        "bonusPerPoint": 0.1,
+        "ValuePerLevel": 0.2,
         "ValuePerEnhance": 0.03,
         "description": "Reduces the cooldown duration of skills and abilities",
         "displayName": "Cooldown Reduction",
