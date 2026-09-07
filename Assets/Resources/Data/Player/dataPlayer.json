@@ -362,9 +362,9 @@
     "utility": {
       "cooldownReduction": {
         "baseValue": 0,
-        "bonusPerPoint": 0.1,
-        "ValuePerLevel": 0.1,
-        "ValuePerEnhance": 0.25,
+        "bonusPerPoint": 0.005,
+        "ValuePerLevel": 0.006,
+        "ValuePerEnhance": 0.03,
         "description": "Reduces the cooldown duration of skills and abilities",
         "displayName": "Cooldown Reduction",
         "shortName": "CDR"

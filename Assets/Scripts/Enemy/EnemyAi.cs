@@ -368,8 +368,14 @@ namespace IdleDefenseSurvival.Enemy
 
             float penetration = PlayerStatsManager.Instance.GetStat(SkillType.Penetration);
             float rawDamage = damageData.GetFinalDamage(elementMultiplier);
-            float finalDamage = Utilityku.FinalDamage(rawDamage, _defenseAmount, penetration);
-            finalDamage = Mathf.Min(_currentHealth, finalDamage);
+            float damageAfterDefense = Utilityku.FinalDamage(rawDamage, _defenseAmount, penetration);
+            float damageBonus = EnemyData.IsBoss
+                ? PlayerStatsManager.Instance.GetStat(SkillType.BossDamage)
+                : EnemyData.IsElite
+                    ? PlayerStatsManager.Instance.GetStat(SkillType.EliteDamage)
+                    : 0f;
+            damageAfterDefense *= 1f + damageBonus * 0.01f;
+            float finalDamage = Mathf.Min(_currentHealth, damageAfterDefense);
             _currentHealth -= finalDamage;
 
             // Apply Defense Break after hit enemy if damage data has it
@@ -670,7 +676,7 @@ namespace IdleDefenseSurvival.Enemy
 
             // Any enemy whose Role == BOSS
             // counts toward BossKilled missions.
-            if (EnemyData.isBoss)
+            if (EnemyData.IsBoss)
             {
                 missionService.UpdateProgress(MissionEventType.BossKilled, EnemyData.id, 1);
                 return;
@@ -741,7 +747,11 @@ namespace IdleDefenseSurvival.Enemy
                 if (entry == null || string.IsNullOrEmpty(entry.ItemId)) continue;
                 // Tier gate: material rarity tier must already be reachable (T1=rare1, T2=rare2, ...)
                 if (entry.MinTier > currentTier) continue;
-                if (!Utilityku.Chance(entry.Weight)) continue;
+
+                // DropRate increases drop chance directly.
+                float dropRate = PlayerStatsManager.Instance.GetStat(SkillType.DropRate);
+                float finalWeight = entry.Weight * (1f + dropRate * 0.01f);
+                if (!Utilityku.Chance(finalWeight)) continue;
 
                 int min = Mathf.Max(1, entry.MinCount);
                 int max = Mathf.Max(min, entry.MaxCount);
@@ -762,7 +772,7 @@ namespace IdleDefenseSurvival.Enemy
                     DropBagManager.Instance.AddDrop(entry.ItemId, quantity);
 
                 // Cap normal enemies at 2 item drops; bosses keep full drop potential.
-                if (!EnemyData.isBoss && droppedCount >= 2) break;
+                if (!EnemyData.IsBoss && droppedCount >= 2) break;
             }
         }
 

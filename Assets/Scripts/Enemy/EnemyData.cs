@@ -59,7 +59,8 @@ namespace IdleDefenseSurvival.Data
         [Tooltip("Per-enemy drop entries (materials/items). Each entry rolls independently; Weight is a percent (0-100).")]
         public DropEntry[] dropItems;
 
-        public bool isBoss => role == Role.BOSS;
+        public bool IsElite => role == Role.Agile ||  role == Role.Caster ||  role == Role.Ranger;
+        public bool IsBoss => role == Role.BOSS;
     }
 
     /// <summary>

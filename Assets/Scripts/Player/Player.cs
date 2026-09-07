@@ -244,7 +244,13 @@ namespace IdleDefenseSurvival.Player
 
             // Determine how many distinct targets to fire at based on multi‑shoot chance
             bool multiShoot = Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.MultiShootChance));
-            int maxTargets = multiShoot ? Mathf.Min(PlayerStatsManager.Instance.GetStatInt(SkillType.MultiShootCount), targets.Count) : 1;
+            int maxTargets = 1;
+            if (multiShoot)
+            {
+                float rawMultiShootCount = PlayerStatsManager.Instance.GetStat(SkillType.MultiShootCount);
+                int accumulatedCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawMultiShootCount, AccumulatedCountType.Multi);
+                maxTargets = Mathf.Min(accumulatedCount, targets.Count);
+            }
 
             // Get projectile from pool for each distinct target (no duplicate targeting)
             for (int i = 0; i < maxTargets; i++)

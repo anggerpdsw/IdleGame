@@ -6,6 +6,8 @@ using IdleDefenseSurvival.Controller;
 using System.Linq;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Enemy;
+using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -65,6 +67,8 @@ namespace IdleDefenseSurvival.Ultimate
         private Dictionary<string, int> _currentStacks = new();
         // Position queue per ultimate (FIFO - first stack in = first position out)
         private Dictionary<string, List<Vector3>> _stackPositions = new();
+        // cap 80%, supaya cooldown tidak pernah menjadi 0 akibat stacking CDR:
+        private const float MAX_COOLDOWN_REDUCTION = 0.80f;
 
         private void Awake()
         {
@@ -350,7 +354,8 @@ namespace IdleDefenseSurvival.Ultimate
             if (!TryGetUltimate(ultimateId, out var ultimateData)) return false;
             if (!ultimateData.GetActive()) return false;
 
-            float cooldown = ultimateData.GetCooldown();
+            // float cooldown = ultimateData.GetCooldown();
+            float cooldown = GetEffectiveCooldown(ultimateData);
             if (cooldown > 0f && !IsOffCooldown(ultimateId, cooldown)) return false;
 
             if (!player.CanAfford(ultimateData.manaCost)) return false;
@@ -374,6 +379,15 @@ namespace IdleDefenseSurvival.Ultimate
             _lastSpawnTimeMap[ultimateId] = Time.time;
             player.SpendMana(ultimateData.manaCost);
             return true;
+        }
+
+        private float GetEffectiveCooldown(UltimateData ultimateData)
+        {
+            float baseCooldown = ultimateData.GetCooldown();
+            if (baseCooldown <= 0f) return 0f;
+            float cdr = PlayerStatsManager.Instance.GetStat(SkillType.CooldownReduction);
+            float cooldownReduction = Mathf.Clamp(cdr, 0f, MAX_COOLDOWN_REDUCTION);
+            return baseCooldown * (1f - cooldownReduction);
         }
 
         /// <summary>

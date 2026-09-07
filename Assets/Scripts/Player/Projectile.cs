@@ -141,7 +141,7 @@ namespace IdleDefenseSurvival.Player
         /// Initialize the projectile with player stats.
         /// </summary>
         public void Initialize(Transform target, Player player, float damageMultiplier)
-        {    
+        {
             _owner = ProjectileOwner.Player;
             SetProjectileSprite(_playerBulletSprite);
 
@@ -154,7 +154,7 @@ namespace IdleDefenseSurvival.Player
             _basePerRange = PlayerStatsManager.Instance.GetStat(SkillType.DamagePerRange);
             _baseStuntDuration = PlayerStatsManager.Instance.GetStat(SkillType.StuntDuration);
             _bounceChance = PlayerStatsManager.Instance.GetStat(SkillType.BounceChance);
-            _bounceCount = PlayerStatsManager.Instance.GetStatInt(SkillType.BounceCount);
+            _bounceCount = 0; // Set when bounce is approved (see HitTarget)
             _bounceRadius = 4f;
             _knockbackChance = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackChance);
             _lifeSteal = PlayerStatsManager.Instance.GetStat(SkillType.LifeSteal);
@@ -371,7 +371,15 @@ namespace IdleDefenseSurvival.Player
                         // Bounce chance: roll sekali di hit pertama (_bounceIndex == 0),
                         // lalu gunakan hasilnya untuk semua bounce berikutnya
                         if (_bounceIndex == 0)
+                        {
                             _bounceApproved = Utilityku.Chance(_bounceChance);
+
+                            if (_bounceApproved)
+                            {
+                                float rawBounceCount = PlayerStatsManager.Instance.GetStat(SkillType.BounceCount);
+                                _bounceCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawBounceCount, AccumulatedCountType.Bounce);
+                            }
+                        }
 
                         // Build DamageData with critical tier
                         DamageData damageData = new(
