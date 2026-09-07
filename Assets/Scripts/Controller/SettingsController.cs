@@ -34,6 +34,9 @@ namespace IdleDefenseSurvival.Controller
         public event Action<bool> DamagePopupChanged;
         public event Action<bool> EnemyHealthBarChanged;
         public event Action<bool> AutoCastUltimateChanged;
+        public event Action<bool> AutoPotionChanged;
+        public event Action<float> HealthPotionThresholdChanged;
+        public event Action<float> ManaPotionThresholdChanged;
         public event Action<bool> CriticalTextChanged;
         public event Action<bool> HealPopupChanged;
         public event Action<bool> ShowFPSChanged;
@@ -116,6 +119,24 @@ namespace IdleDefenseSurvival.Controller
         {
             get => _settings.ShowFPS;
             set => SetProperty(ref _settings.ShowFPS, value, nameof(ShowFPS), ShowFPSChanged);
+        }
+
+        public bool AutoPotion
+        {
+            get => _settings.AutoPotion;
+            set => SetProperty(ref _settings.AutoPotion, value, nameof(AutoPotion), AutoPotionChanged);
+        }
+
+        public float HealthPotionThreshold
+        {
+            get => _settings.HealthPotionThreshold;
+            set => SetProperty(ref _settings.HealthPotionThreshold, Mathf.Clamp01(value), nameof(HealthPotionThreshold), HealthPotionThresholdChanged);
+        }
+
+        public float ManaPotionThreshold
+        {
+            get => _settings.ManaPotionThreshold;
+            set => SetProperty(ref _settings.ManaPotionThreshold, Mathf.Clamp01(value), nameof(ManaPotionThreshold), ManaPotionThresholdChanged);
         }
 
         public float PopupDuration
@@ -242,6 +263,9 @@ namespace IdleDefenseSurvival.Controller
             _settings.ShowDamagePopup = PlayerPrefs.GetInt(nameof(ShowDamagePopup), 1) == 1;
             _settings.ShowEnemyHealthBar = PlayerPrefs.GetInt(nameof(ShowEnemyHealthBar), 1) == 1;
             _settings.AutoCastUltimate = PlayerPrefs.GetInt(nameof(AutoCastUltimate), 1) == 1;
+            _settings.AutoPotion = PlayerPrefs.GetInt(nameof(AutoPotion), 1) == 1;
+            _settings.HealthPotionThreshold = PlayerPrefs.GetFloat(nameof(HealthPotionThreshold), 0.5f);
+            _settings.ManaPotionThreshold = PlayerPrefs.GetFloat(nameof(ManaPotionThreshold), 0.5f);
             _settings.ShowCriticalText = PlayerPrefs.GetInt(nameof(ShowCriticalText), 1) == 1;
             _settings.ShowHealPopup = PlayerPrefs.GetInt(nameof(ShowHealPopup), 1) == 1;
             _settings.ShowFPS = PlayerPrefs.GetInt(nameof(ShowFPS), 0) == 1;
@@ -326,6 +350,9 @@ namespace IdleDefenseSurvival.Controller
             DamagePopupChanged?.Invoke(_settings.ShowDamagePopup);
             EnemyHealthBarChanged?.Invoke(_settings.ShowEnemyHealthBar);
             AutoCastUltimateChanged?.Invoke(_settings.AutoCastUltimate);
+            AutoPotionChanged?.Invoke(_settings.AutoPotion);
+            HealthPotionThresholdChanged?.Invoke(_settings.HealthPotionThreshold);
+            ManaPotionThresholdChanged?.Invoke(_settings.ManaPotionThreshold);
             CriticalTextChanged?.Invoke(_settings.ShowCriticalText);
             HealPopupChanged?.Invoke(_settings.ShowHealPopup);
             ShowFPSChanged?.Invoke(_settings.ShowFPS);

@@ -8,6 +8,7 @@ using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Manager;
 using PlayerClass = IdleDefenseSurvival.Player.Player;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Controller;
 
 namespace IdleDefenseSurvival.UI.Game
 {
@@ -30,11 +31,65 @@ namespace IdleDefenseSurvival.UI.Game
         private readonly Dictionary<string, ItemConsumableUI> _slotByItemId = new();
         private readonly Dictionary<string, float> _remainingCooldown = new();
         private bool _isInitialized;
+        private PlayerClass _player;
+        private SettingsController _settings;
 
         private void Start()
         {
             Initialize();
             RefreshAll();
+            _player = PlayerClass.Instance;
+            _settings = SettingsController.Instance;
+            if (_player != null)
+            {
+                _player.OnHealthChanged += OnPlayerHealthChanged;
+                _player.OnManaChanged += OnPlayerManaChanged;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_player != null)
+            {
+                _player.OnHealthChanged -= OnPlayerHealthChanged;
+                _player.OnManaChanged -= OnPlayerManaChanged;
+            }
+        }
+
+        private void OnPlayerHealthChanged()
+        {
+            if (!_settings.AutoPotion) return;
+            if (_player == null) return;
+
+            float percent = _player.MaxHealth > 0f ? _player.CurrentHealth / _player.MaxHealth : 1f;
+            if (percent > _settings.HealthPotionThreshold) return;
+
+            foreach (var kvp in _slotByItemId)
+            {
+                var potion = GetPotion(kvp.Key);
+                if (potion == null) continue;
+                if (potion.PotionType != PotionType.Health) continue;
+                UsePotion(kvp.Key);
+                break;
+            }
+        }
+
+        private void OnPlayerManaChanged()
+        {
+            if (!_settings.AutoPotion) return;
+            if (_player == null) return;
+
+            float percent = _player.MaxMana > 0f ? _player.CurrentMana / _player.MaxMana : 1f;
+            if (percent > _settings.ManaPotionThreshold) return;
+
+            foreach (var kvp in _slotByItemId)
+            {
+                var potion = GetPotion(kvp.Key);
+                if (potion == null) continue;
+                if (potion.PotionType != PotionType.Mana) continue;
+                UsePotion(kvp.Key);
+                break;
+            }
         }
 
         /// <summary>Builds the visible potion slots for the items the player owns.</summary>

@@ -4,6 +4,7 @@ namespace IdleDefenseSurvival
     {
         public const int CURRENT_SAVE_VERSION = 3; // v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
         public const int MAX_WAVE_PER_TIER = 350;
+        public const int MAX_MISSION = 5;
         public const int BASE_LEVEL = 7903;
         public const int BASE_LEVEL_BLACKSMITH = 5;
         public const int BASE_LEVEL_ALCHEMIST = 7;

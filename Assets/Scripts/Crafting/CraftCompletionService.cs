@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Core.Interfaces;
 using UnityEngine;
 using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Crafting
 {
@@ -144,7 +145,25 @@ namespace IdleDefenseSurvival.Crafting
                     else
                     {
                         var account = AccountManager.Instance;
-                        if (account != null) account.AddExp((int)item.GetRarity(), LevelType.Blacksmith, $"Craft Equipment: {item.GetRarity()} {item.GetEquipmentType()}");
+                        if (account != null)
+                        {
+                            LevelType expType;
+                            string desc;
+
+                            if (item.GetItemCategory() == ItemCategory.Consumable)
+                            {
+                                expType = LevelType.Alchemist;
+                                desc = $"Craft Potion: {item.GetRarity()} {item.ItemId}";
+                            }
+                            else // Equipment, Material, dll
+                            {
+                                expType = LevelType.Blacksmith;
+                                desc = $"Craft Equipment: {item.GetRarity()} {item.GetEquipmentType()}";
+                            }
+
+                            account.AddExp((int)item.GetRarity(), expType, desc);
+                        }
+
                         appliedItems.Add(item);
                     }
                 }

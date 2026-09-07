@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Mission;
+using IdleDefenseSurvival.Economy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,8 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private Transform _slotContainer;
         [SerializeField] private GameObject _slotViewPrefab;
         [SerializeField] private Button _closeButton;
+        [SerializeField] private Button _upgradeMaxMissionButton;
+        [SerializeField] private TextMeshProUGUI _costUpgrade;
         [SerializeField, Tooltip("Soft cap on pool size; additional slots are instantiated as needed.")]
         private int _initialPoolSize = 1;
 
@@ -36,6 +39,8 @@ namespace IdleDefenseSurvival.UI
         {
             if (_closeButton != null)
                 _closeButton.onClick.AddListener(Close);
+            if (_upgradeMaxMissionButton != null)
+                _upgradeMaxMissionButton.onClick.AddListener(HandleUpgradeMaxMission);
         }
 
         private void OnEnable()
@@ -114,6 +119,25 @@ namespace IdleDefenseSurvival.UI
             RefreshUI();
         }
 
+        private void HandleUpgradeMaxMission()
+        {
+            var service = Service;
+            if (service == null) return;
+
+            int currentMax = service.GetMaxMission();
+            int maxLimit = GameConstants.MAX_MISSION;
+            if (currentMax >= maxLimit) return;
+
+            int cost = currentMax * 20;
+            var economy = EconomyManager.Instance;
+            if (economy == null || 
+                !economy.TrySpendCurrency(CurrencyType.Gem, cost, "Upgrade Mission Slot"))
+                return;
+
+            service.SetMaxMission(currentMax + 1);
+            RefreshUI();
+        }
+
         private System.Collections.IEnumerator CountdownUpdater()
         {
             var wait = new WaitForSeconds(1f);
@@ -135,9 +159,20 @@ namespace IdleDefenseSurvival.UI
 
             var utcNow = DateTime.UtcNow;
             var max = service.GetMaxMission();
+            
+            int cost = max * 20;
+            RefreshUpgradeButton(cost);
 
             RefreshHeader(service);
             RefreshSlots(service, max);
+        }
+
+        private void RefreshUpgradeButton(int cost)
+        {
+            bool hasGem = EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Gem, cost);
+            if (_costUpgrade != null) _costUpgrade.text = $"{cost}";
+            _upgradeMaxMissionButton.image.sprite = ButtonResources.GetColor(hasGem ? "Green" : "Grey");
+
         }
 
         private void RefreshHeader(MissionService service)

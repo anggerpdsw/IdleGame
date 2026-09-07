@@ -20,6 +20,7 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private Toggle _healPopupToggle;
         [SerializeField] private Toggle _enemyHealthBarToggle;
         [SerializeField] private Toggle _autoCastUltimate;
+        [SerializeField] private Toggle _autoPotion;
         [SerializeField] private Slider _popupDurationSlider;
 
         [Header("Audio Settings")]
@@ -40,6 +41,11 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private Button _resetButton;
         [SerializeField] private Button _surendButton;
 
+        [Header("Potions")]
+        [SerializeField] private GameObject _objPotion;
+        [SerializeField] private Slider _hpPotion;
+        [SerializeField] private Slider _mpPotion;
+        
         private SettingsController _settings;
 
         private void Awake()
@@ -70,6 +76,9 @@ namespace IdleDefenseSurvival.UI
             if (_damagePopupToggle != null) _damagePopupToggle.isOn = _settings.ShowDamagePopup;
             if (_enemyHealthBarToggle != null) _enemyHealthBarToggle.isOn = _settings.ShowEnemyHealthBar;
             if (_autoCastUltimate != null) _autoCastUltimate.isOn = _settings.AutoCastUltimate;
+            if (_autoPotion != null) _autoPotion.isOn = _settings.AutoPotion;
+            if (_hpPotion != null) _hpPotion.value = _settings.HealthPotionThreshold;
+            if (_mpPotion != null) _mpPotion.value = _settings.ManaPotionThreshold;
             if (_criticalTextToggle != null) _criticalTextToggle.isOn = _settings.ShowCriticalText;
             if (_healPopupToggle != null) _healPopupToggle.isOn = _settings.ShowHealPopup;
             if (_popupDurationSlider != null) _popupDurationSlider.value = _settings.PopupDuration;
@@ -87,6 +96,15 @@ namespace IdleDefenseSurvival.UI
             if (_cameraShakeToggle != null) _cameraShakeToggle.isOn = _settings.CameraShake;
             if (_vibrationToggle != null) _vibrationToggle.isOn = _settings.VibrationEnabled;
             if (_gameSpeedSlider != null) _gameSpeedSlider.value = _settings.GameSpeed;
+
+            // Update potion panel visibility
+            UpdatePotionPanelVisibility();
+        }
+
+        private void UpdatePotionPanelVisibility()
+        {
+            if (_objPotion != null && _autoPotion != null)
+                _objPotion.SetActive(_autoPotion.isOn);
         }
 
         /// <summary>
@@ -104,6 +122,16 @@ namespace IdleDefenseSurvival.UI
                 _settings.EnemyHealthBarChanged += v => _enemyHealthBarToggle.isOn = v;
             if (_autoCastUltimate != null)
                 _settings.AutoCastUltimateChanged += v => _autoCastUltimate.isOn = v;
+            if (_autoPotion != null)
+                _settings.AutoPotionChanged += v =>
+                {
+                    _autoPotion.isOn = v;
+                    UpdatePotionPanelVisibility();
+                };
+            if (_hpPotion != null)
+                _settings.HealthPotionThresholdChanged += v => _hpPotion.value = v;
+            if (_mpPotion != null)
+                _settings.ManaPotionThresholdChanged += v => _mpPotion.value = v;
             if (_criticalTextToggle != null)
                 _settings.CriticalTextChanged += v => _criticalTextToggle.isOn = v;
             if (_healPopupToggle != null)
@@ -149,6 +177,12 @@ namespace IdleDefenseSurvival.UI
                 _enemyHealthBarToggle.onValueChanged.AddListener(v => _settings.ShowEnemyHealthBar = v);
             if (_autoCastUltimate != null)
                 _autoCastUltimate.onValueChanged.AddListener(v => _settings.AutoCastUltimate = v);
+            if (_autoPotion != null)
+                _autoPotion.onValueChanged.AddListener(v => _settings.AutoPotion = v);
+            if (_hpPotion != null)
+                _hpPotion.onValueChanged.AddListener(v => _settings.HealthPotionThreshold = v);
+            if (_mpPotion != null)
+                _mpPotion.onValueChanged.AddListener(v => _settings.ManaPotionThreshold = v);
             if (_criticalTextToggle != null)
                 _criticalTextToggle.onValueChanged.AddListener(v => _settings.ShowCriticalText = v);
             if (_healPopupToggle != null)

@@ -27,7 +27,7 @@ namespace IdleDefenseSurvival.Player
 
         [Header("Bounce Settings")]
         [Tooltip("Radius untuk mencari enemy terdekat saat bounce")]
-        [SerializeField] private float _bounceRadius = 2f;
+        [SerializeField] private float _bounceRadius = 4f;
                 
         [Header("Visual")]
         [SerializeField] private SpriteRenderer _spriteRenderer;
@@ -64,6 +64,10 @@ namespace IdleDefenseSurvival.Player
         // Track enemies yang sudah terkena oleh projectile ini (untuk bounce chain)
         private readonly HashSet<Transform> _hitEnemies = new();
 
+        // Bounce approval: di-set true pada hit pertama jika bounce chance sukses,
+        // lalu dipakai untuk semua bounce berikutnya tanpa re-roll
+        private bool _bounceApproved = false;
+
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
 
@@ -75,6 +79,7 @@ namespace IdleDefenseSurvival.Player
         {
             _hasHit = false;
             _bounceIndex = 0;
+            _bounceApproved = false;
             _hitEnemies.Clear();
             _target = null;
             _owner = ProjectileOwner.Player;
@@ -150,7 +155,7 @@ namespace IdleDefenseSurvival.Player
             _baseStuntDuration = PlayerStatsManager.Instance.GetStat(SkillType.StuntDuration);
             _bounceChance = PlayerStatsManager.Instance.GetStat(SkillType.BounceChance);
             _bounceCount = PlayerStatsManager.Instance.GetStatInt(SkillType.BounceCount);
-            _bounceRadius = 8f;
+            _bounceRadius = 4f;
             _knockbackChance = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackChance);
             _lifeSteal = PlayerStatsManager.Instance.GetStat(SkillType.LifeSteal);
             _stuntChance = PlayerStatsManager.Instance.GetStat(SkillType.StuntChance);
@@ -362,7 +367,12 @@ namespace IdleDefenseSurvival.Player
                         }
 
                         currentDamage *= DamagePerRange(_player.transform.position);
-                        
+
+                        // Bounce chance: roll sekali di hit pertama (_bounceIndex == 0),
+                        // lalu gunakan hasilnya untuk semua bounce berikutnya
+                        if (_bounceIndex == 0)
+                            _bounceApproved = Utilityku.Chance(_bounceChance);
+
                         // Build DamageData with critical tier
                         DamageData damageData = new(
                             damage: currentDamage,
@@ -376,7 +386,7 @@ namespace IdleDefenseSurvival.Player
                             HasKnockback = Utilityku.Chance(_knockbackChance),
                             KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.35f, _bounceIndex),
                             HasStunt = Utilityku.Chance(_stuntChance),
-                            HasBounce = Utilityku.Chance(_bounceChance),
+                            HasBounce = _bounceApproved,
 
                             // Defense Break
                             DefenseBreakSource = _defenseBreakSource,

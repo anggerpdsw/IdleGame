@@ -22,6 +22,7 @@ namespace IdleDefenseSurvival.Items
         Skin = 12,
         Pet = 13,
         Artifact = 14,
+        Potion = 15,
     }
 
     /// <summary>
@@ -48,6 +49,7 @@ namespace IdleDefenseSurvival.Items
             ItemCategory.Skin => "Skin",
             ItemCategory.Pet => "Pet",
             ItemCategory.Artifact => "Artifact",
+            ItemCategory.Potion => "Potion",
             _ => "Unknown"
         };
 
@@ -70,6 +72,7 @@ namespace IdleDefenseSurvival.Items
             ItemCategory.Skin => false,
             ItemCategory.Pet => false,
             ItemCategory.Artifact => false,
+            ItemCategory.Potion => true,
             _ => false
         };
 
@@ -87,6 +90,7 @@ namespace IdleDefenseSurvival.Items
             ItemCategory.Chest => true,
             ItemCategory.SkillBook => true,
             ItemCategory.UpgradeStone => true,
+            ItemCategory.Potion => true,
             _ => false
         };
 
