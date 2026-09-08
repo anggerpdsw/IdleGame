@@ -394,7 +394,14 @@ namespace IdleDefenseSurvival.UI.Upgrade
         // Upgrade scene item-list callbacks
         private void OnItemListSingleClick(InventoryItem item, int inventoryIndex)
         {
-            OnMainSlotClicked(item, inventoryIndex);
+            if (_mainItem == null)
+            {
+                OnMainSlotClicked(item, inventoryIndex);
+            }
+            else
+            {
+                OnMaterialSlotClicked(item, inventoryIndex);
+            }
         }
 
         private void OnItemListDoubleClick(InventoryItem item, int inventoryIndex)
