@@ -58,6 +58,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         private void OnEnable()
         {
+            ClearMaterialSlots();
             RefreshItemList();
             SubscribeEvents();
         }
