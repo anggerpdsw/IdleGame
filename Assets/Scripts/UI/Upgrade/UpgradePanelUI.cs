@@ -234,10 +234,14 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 return;
             }
 
-            // Prevent selecting same material twice
-            if (_materialItems.Exists(m => m.InstanceId == item.InstanceId))
+            // Toggle: if already selected, unselect (remove) it
+            int existingIdx = _materialItems.FindIndex(m => m.InstanceId == item.InstanceId);
+            if (existingIdx != -1)
             {
-                _statusText.text = $"Material {item.ItemId} sudah dipilih.";
+                _materialSlots[existingIdx].Clear();
+                _materialInventoryIndices[existingIdx] = -1;
+                _materialItems.RemoveAt(existingIdx);
+                UpdatePreview();
                 return;
             }
 
