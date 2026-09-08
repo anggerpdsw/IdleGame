@@ -129,8 +129,31 @@ namespace IdleDefenseSurvival.UI.Upgrade
         private void OnEquipmentUpgraded(InventoryItem main, InventoryItem material, int oldLevel, int newLevel)
         {
             _statusText.text = $"Berhasil! Level {oldLevel} → {newLevel}";
-            ClearSelection();
+
+            // Keep upgraded main item visible in main slot
+            _mainItem = main;
+            _mainInventoryIndex = -1; // will be resolved in RefreshSlots()
+
+            // Clear only material slots
+            ClearMaterialSlots();
+
+            // Refresh UI: main slot (new level) + item list (materials consumed)
+            RefreshSlots();
             RefreshItemList();
+
+            _upgradeButton.interactable = false;
+            _goldCostText.text = "-";
+        }
+
+        // Helper – clear material UI but preserve main slot
+        private void ClearMaterialSlots()
+        {
+            _materialItems.Clear();
+            for (int i = 0; i < _materialSlots.Length; i++)
+            {
+                _materialSlots[i].Clear();
+                _materialInventoryIndices[i] = -1;
+            }
         }
 
         private void OnUpgradeFailed(InventoryItem main, InventoryItem material, string reason)
@@ -153,6 +176,27 @@ namespace IdleDefenseSurvival.UI.Upgrade
         public void OnMainSlotClicked(InventoryItem item, int inventoryIndex)
         {
             if (item == null || !item.IsEquippable()) return;
+
+            // Block max-level equipment from being selected as main
+            if (item.IsMaxLevel)
+            {
+                _statusText.text = $"Equipment {item.ItemId} sudah level maksimum.";
+                return;
+            }
+
+            // Click same main → clear selection (toggle)
+            if (_mainItem != null && item.InstanceId == _mainItem.InstanceId)
+            {
+                ClearSelection();
+                return;
+            }
+
+            // New main selected → clear materials (different type may have been added)
+            if (_mainItem != null)
+            {
+                ClearMaterialSlots();
+            }
+
             _mainItem = item;
             _mainInventoryIndex = inventoryIndex;
             _mainSlot.SetItem(item, inventoryIndex);
@@ -160,10 +204,34 @@ namespace IdleDefenseSurvival.UI.Upgrade
             _statusText.text = "Pilih equipment material";
         }
 
+        /// <summary>
+        /// Clears the main equipment selection (called when clicking main slot directly).
+        /// </summary>
+        public void ClearMainSlot()
+        {
+            if (_mainItem == null) return;
+
+            ClearMaterialSlots();
+            _mainItem = null;
+            _mainInventoryIndex = -1;
+            _mainSlot.Clear();
+            if (_previewSlot != null) _previewSlot.Clear();
+            _upgradeButton.interactable = false;
+            _goldCostText.text = "-";
+            _statusText.text = "Pilih equipment utama";
+        }
+
         public void OnMaterialSlotClicked(InventoryItem item, int inventoryIndex)
         {
             if (item == null || !item.IsEquippable()) return;
             if (item.InstanceId == _mainItem?.InstanceId) return;
+
+            // Material type must match main type
+            if (_mainItem != null && item.GetEquipmentType() != _mainItem.GetEquipmentType())
+            {
+                _statusText.text = $"Material tipe {item.GetEquipmentType()} tidak cocok dengan main {_mainItem.GetEquipmentType()}";
+                return;
+            }
 
             // Cek batas max level
             int maxMaterials = _mainItem != null ? Mathf.Max(0, _mainItem.MaxLevel - _mainItem.Level) : 0;
@@ -394,13 +462,27 @@ namespace IdleDefenseSurvival.UI.Upgrade
         // Upgrade scene item-list callbacks
         private void OnItemListSingleClick(InventoryItem item, int inventoryIndex)
         {
+            if (_mainItem != null && item.InstanceId == _mainItem.InstanceId)
+            {
+                // Click the currently-selected main again → clear it
+                ClearSelection();
+                return;
+            }
+
             if (_mainItem == null)
             {
                 OnMainSlotClicked(item, inventoryIndex);
             }
             else
             {
-                OnMaterialSlotClicked(item, inventoryIndex);
+                // Main already set → click another item replaces main (swap).
+                // Materials are cleared because they belong to the old main type.
+                ClearMaterialSlots();
+                _mainItem = item;
+                _mainInventoryIndex = inventoryIndex;
+                _mainSlot.SetItem(item, inventoryIndex);
+                UpdatePreview();
+                _statusText.text = "Pilih equipment material";
             }
         }
 

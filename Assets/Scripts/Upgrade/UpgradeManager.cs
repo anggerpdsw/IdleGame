@@ -275,7 +275,10 @@ namespace IdleDefenseSurvival.Upgrade
             int oldLevel = main.Level;
             int upgrades = 0;
 
-            foreach (var mat in materials)
+            // Copy list to avoid modification during enumeration (OnInventoryChanged may alter original list)
+            var materialCopy = new List<InventoryItem>(materials);
+
+            foreach (var mat in materialCopy)
             {
                 if (inventory.RemoveItem(mat.InstanceId, 1) <= 0) continue;
                 upgrades++;

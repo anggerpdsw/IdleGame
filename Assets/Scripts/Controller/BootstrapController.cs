@@ -22,7 +22,7 @@ namespace IdleDefenseSurvival.Core
     public class BootstrapController : MonoBehaviour
     {
         public static bool IsInitialized { get; private set; }
-        private const string MainMenuSceneName = "Upgrade"; // production = "MainMenu"
+        private const string MainMenuSceneName = "MainMenu"; // production = "MainMenu"
         private void Awake()
         {
             // Ensure this GameObject persists across scene loads.
