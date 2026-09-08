@@ -250,13 +250,19 @@ namespace IdleDefenseSurvival.UI.Inventory
             {
                 _activeDragItem = Instantiate(_dragItemPrefab, _dragCanvas.transform);
                 _activeDragItem.Initialize(item);
-                _activeDragItem.transform.position = screenPosition;
+                UpdateDragPosition(screenPosition);
             }
             else
             {
                 // No drag prefab wired yet; still allow drop via static DraggedItem.
                 InventoryDragItem.DraggedItem = item;
             }
+        }
+
+        public void UpdateDragPosition(Vector2 screenPosition)
+        {
+            if (_activeDragItem == null || _dragCanvas == null) return;
+            _activeDragItem.transform.position = screenPosition;
         }
 
         public void EndDrag(int targetSlotIndex)

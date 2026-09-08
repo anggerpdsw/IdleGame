@@ -182,6 +182,7 @@ namespace IdleDefenseSurvival.UI.Inventory
         public void OnDrag(PointerEventData eventData)
         {
             // Handled by InventoryUI Update
+            _parentUI.UpdateDragPosition(eventData.position);
         }
 
         public void OnEndDrag(PointerEventData eventData)

@@ -3,6 +3,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using UnityEngine;
 using UnityEngine.UI;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.UI.Inventory
 {
@@ -28,26 +29,19 @@ namespace IdleDefenseSurvival.UI.Inventory
             var itemData = ItemDatabase.Instance?.GetItem(item.ItemId);
             if (itemData == null) return;
 
-
-            if (_iconImage != null && itemData.Icon != null)
-            {
-                _iconImage.sprite = itemData.Icon;
+            if (_iconImage != null && itemData.IconKey != null) {
+                _iconImage.enabled = true;
+                _iconImage.sprite = ItemResources.GetItemSource($"{itemData.IconKey}");
             }
 
             if (_quantityText != null)
-            {
                 _quantityText.text = item.Quantity > 1 ? item.Quantity.ToString() : "";
-            }
 
             if (_rarityBorder != null && itemData.ItemRarity != Rarity.None)
-            {
                 _rarityBorder.color = itemData.ItemRarity.GetDefaultColor();
-            }
 
             if (_canvasGroup != null)
-            {
                 _canvasGroup.blocksRaycasts = false;
-            }
         }
 
         private void OnDestroy()
