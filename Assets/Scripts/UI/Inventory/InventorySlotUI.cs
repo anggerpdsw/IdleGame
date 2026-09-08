@@ -6,13 +6,14 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using IdleDefenseSurvival.UI.Tooltip;
 
 namespace IdleDefenseSurvival.UI.Inventory
 {
     /// <summary>
     /// Individual inventory slot UI.
     /// </summary>
-    public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+    public class InventorySlotUI : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Image _iconImage;
         [SerializeField] private TextMeshProUGUI _quantityText;
@@ -237,6 +238,20 @@ namespace IdleDefenseSurvival.UI.Inventory
         {
             if (_newIndicator != null)
                 _newIndicator.SetActive(isNew);
+        }
+        #endregion
+
+        #region Hover Tooltip
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            if (_currentItem == null) return;
+            if (_currentItem.IsEquippable())
+                TooltipUI.Instance?.ShowEquipment(_currentItem, eventData.position);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            TooltipUI.Instance?.Hide();
         }
         #endregion
     }

@@ -9,7 +9,6 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.UI.Inventory;
 using IdleDefenseSurvival.Equipment;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace IdleDefenseSurvival.UI.Upgrade
 {
@@ -58,7 +57,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         private void OnEnable()
         {
-            ClearMaterialSlots();
+            ClearSelection();
             RefreshItemList();
             SubscribeEvents();
         }
