@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Data;
 using System.Linq;
+using IdleDefenseSurvival.Upgrade;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -28,6 +29,7 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private Button _cardButton;
         [SerializeField] private Button _inventoryButton;
         [SerializeField] private Button _craftingButton;
+        [SerializeField] private Button _upgradeButton;
 
         [Header("Game Start")]
         [SerializeField] private Button _prevButton;
@@ -57,6 +59,7 @@ namespace IdleDefenseSurvival.Controller
             if (_cardButton != null) _cardButton.onClick.AddListener(OnLoadCard);
             if (_inventoryButton != null) _inventoryButton.onClick.AddListener(OnLoadInventory);
             if (_craftingButton != null) _craftingButton.onClick.AddListener(OnLoadCrafting);
+            if (_upgradeButton != null) _upgradeButton.onClick.AddListener(OnLoadUpgrade);
             if (_prevButton != null) _prevButton.onClick.AddListener(OnPrevClicked);
             if (_nextButton != null) _nextButton.onClick.AddListener(OnNextClicked);
             if (_startButton != null) _startButton.onClick.AddListener(OnStartGame);
@@ -76,6 +79,7 @@ namespace IdleDefenseSurvival.Controller
             if (_cardButton != null) _cardButton.onClick.RemoveListener(OnLoadCard);
             if (_inventoryButton != null) _inventoryButton.onClick.RemoveListener(OnLoadInventory);
             if (_craftingButton != null) _craftingButton.onClick.RemoveListener(OnLoadCrafting);
+            if (_upgradeButton != null) _upgradeButton.onClick.RemoveListener(OnLoadUpgrade);
             if (_prevButton != null) _prevButton.onClick.RemoveListener(OnPrevClicked);
             if (_nextButton != null) _nextButton.onClick.RemoveListener(OnNextClicked);
             if (_startButton != null) _startButton.onClick.RemoveListener(OnStartGame);
@@ -180,6 +184,7 @@ namespace IdleDefenseSurvival.Controller
         public void OnLoadCard() => CardManager.Instance.OpenCollection();
         public void OnLoadInventory() => InventoryManager.Instance.OpenInventory();
         public void OnLoadCrafting() => CraftingManager.Instance.OpenCrafting();
+        public void OnLoadUpgrade() => UpgradeManager.Instance.OpenUpgrade();
         
         private void OnShowDaily() => UIManager.Instance.ShowPopup(_dailyRewardPanelPrefab);
         private void OnShowMission() => UIManager.Instance.ShowPopup(_missionPanelPrefab);

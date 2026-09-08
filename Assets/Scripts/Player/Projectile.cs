@@ -414,8 +414,10 @@ namespace IdleDefenseSurvival.Player
                         // every hit an armed passive gets its chance to fire.
                         TriggerEquipmentHitEffects(enemy);
 
-                        float heal = actualDamage * _lifeSteal / 100f;
-                        _player.Heal(heal);
+                        if (_lifeSteal > 0f) {
+                            float heal = Mathf.Max(0.1f, actualDamage * _lifeSteal * 0.01f);
+                            _player.Heal(heal);
+                        }
 
                         // --- Implementasi Knockback ---
                         if (damageData.HasKnockback)

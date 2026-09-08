@@ -35,10 +35,10 @@ namespace IdleDefenseSurvival.UI.Inventory
         private InventoryItem _draggedItem;
         private int _draggedFromSlot = -1;
         private InventoryDragItem _activeDragItem;
-        private bool _isInitialized = false;
+        protected bool _isInitialized = false;
 
         #region Unity Lifecycle
-        private void Awake()
+        protected virtual void Awake()
         {
             Initialize();
         }
@@ -56,7 +56,7 @@ namespace IdleDefenseSurvival.UI.Inventory
         #endregion
 
         #region Initialization
-        public void Initialize()
+        public virtual void Initialize()
         {
             if (_isInitialized) return;
 
@@ -159,7 +159,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             UpdateCapacityDisplay();
         }
 
-        private List<(InventoryItem item, int inventoryIndex)> GetFilteredItems()
+        protected virtual List<(InventoryItem item, int inventoryIndex)> GetFilteredItems()
         {
             var inventory = InventoryService.Instance;
             if (inventory == null) return new List<(InventoryItem, int)>();

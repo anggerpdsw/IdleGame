@@ -124,6 +124,16 @@ namespace IdleDefenseSurvival.Equipment
 
         /// <summary>Gets the best item in inventory for a specific slot.</summary>
         InventoryItem GetBestItemForSlot(EquipmentType slot);
+
+        // ============ Level Up Equipment ============
+        /// <summary>Attempts to upgrade main equipment by consuming material equipment of same type.</summary>
+        bool UpgradeEquipment(InventoryItem main, InventoryItem material);
+
+        /// <summary>Gets the resulting level after upgrade (for preview).</summary>
+        int GetUpgradeResultLevel(InventoryItem main);
+
+        /// <summary>Checks if two equipment items are compatible for upgrade.</summary>
+        bool IsUpgradeCompatible(InventoryItem main, InventoryItem material);
     }
 
     /// <summary>

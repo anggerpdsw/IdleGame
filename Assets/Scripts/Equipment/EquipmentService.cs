@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Modifiers;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Upgrade;
 
 namespace IdleDefenseSurvival.Equipment
 {
@@ -169,9 +170,7 @@ namespace IdleDefenseSurvival.Equipment
         }
 
         public InventoryItem Unequip(EquipmentType slot)
-        {
-            return _equippedItems.TryGetValue(slot, out var item) ? UnequipInternal(slot, item) : null;
-        }
+            => _equippedItems.TryGetValue(slot, out var item) ? UnequipInternal(slot, item) : null;
 
         public InventoryItem UnequipByInstanceId(string instanceId)
         {
@@ -200,8 +199,8 @@ namespace IdleDefenseSurvival.Equipment
             return true;
         }
 
-        public int AutoEquipBest() => _autoEquipService.AutoEquipBest(
-            (item, slot) => CanEquip(item, slot, out _), Equip);
+        public int AutoEquipBest() 
+            => _autoEquipService.AutoEquipBest((item, slot) => CanEquip(item, slot, out _), Equip);
 
         public IReadOnlyList<InventoryItem> UnequipAll()
         {
@@ -210,6 +209,15 @@ namespace IdleDefenseSurvival.Equipment
                 UnequipInternal(slot, item);
             return items;
         }
+
+        public bool UpgradeEquipment(InventoryItem main, InventoryItem material)
+            => UpgradeManager.Instance?.UpgradeEquipment(main, material) ?? false;
+        /// <summary>Gets the resulting level after upgrade (for preview).</summary>
+        public int GetUpgradeResultLevel(InventoryItem main)
+            => UpgradeManager.Instance?.GetResultLevel(main) ?? 0;
+        /// <summary>Checks if two equipment items are compatible for upgrade.</summary>
+        public bool IsUpgradeCompatible(InventoryItem main, InventoryItem material)
+            => UpgradeManager.Instance?.IsCompatible(main, material) ?? false;
         #endregion
 
         #region Internal Equip/Unequip

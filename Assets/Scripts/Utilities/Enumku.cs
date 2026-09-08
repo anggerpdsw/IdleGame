@@ -2,7 +2,7 @@
 namespace IdleDefenseSurvival
 {
     public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
-    public enum SceneState { CardCollection, Crafting, Game, Inventory, MainMenu }
+    public enum SceneState { CardCollection, Crafting, Game, Inventory, MainMenu, Upgrade }
     public enum LevelType { Alchemist, Blacksmith, Level }
     public enum CraftType { Equipment, Potion }
     public enum CriticalType { None, Critical, SuperCritical, UltraCritical }

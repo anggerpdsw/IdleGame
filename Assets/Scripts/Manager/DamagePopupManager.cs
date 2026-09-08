@@ -88,12 +88,12 @@ namespace IdleDefenseSurvival.Manager
             // ============================================================
             if (data.Damage < 1f) return;
 
-            // 1. Filter Heal or Miss Popup
-            bool isHealOrMiss = data.Type == DamageType.Heal || data.Type == DamageType.Miss;
+            // 1. Filter Heal, Mana or Miss Popup
+            bool isHealOrMiss = data.Type == DamageType.Heal || data.Type == DamageType.Mana || data.Type == DamageType.Miss;
             if (isHealOrMiss && !_showHealPopup) return;
 
-            // 2. Filter Damage Popup (Normal damage, bukan Heal, bukan Miss)
-            bool isDamage = data.Type != DamageType.Heal && data.Type != DamageType.Miss;
+            // 2. Filter Damage Popup (Normal damage, bukan Heal, bukan Mana, bukan Miss)
+            bool isDamage = data.Type != DamageType.Heal && data.Type != DamageType.Mana && data.Type != DamageType.Miss;
             if (isDamage && !_showDamagePopup) return;
 
             // 3. Filter Critical Text (sub-filter dari damage popup)
