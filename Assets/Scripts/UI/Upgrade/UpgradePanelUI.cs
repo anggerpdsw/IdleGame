@@ -9,6 +9,7 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.UI.Inventory;
 using IdleDefenseSurvival.Equipment;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IdleDefenseSurvival.UI.Upgrade
 {
@@ -233,6 +234,13 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 return;
             }
 
+            // Prevent selecting same material twice
+            if (_materialItems.Exists(m => m.InstanceId == item.InstanceId))
+            {
+                _statusText.text = $"Material {item.ItemId} sudah dipilih.";
+                return;
+            }
+
             // Cek batas max level
             int maxMaterials = _mainItem != null ? Mathf.Max(0, _mainItem.MaxLevel - _mainItem.Level) : 0;
             if (_materialItems.Count >= maxMaterials && maxMaterials > 0)
@@ -383,7 +391,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 int needed = _filteredItems.Count;
                 if (_itemListSlots.Length < needed)
                 {
-                    System.Array.Resize(ref _itemListSlots, needed);
+                    Array.Resize(ref _itemListSlots, needed);
                     for (int i = 0; i < needed; i++)
                     {
                         if (_itemListSlots[i] == null)
@@ -429,9 +437,8 @@ namespace IdleDefenseSurvival.UI.Upgrade
         private long GetUpgradeGoldCost(InventoryItem item)
         {
             // Base cost scales with level and rarity
-            var itemData = ItemDatabase.Instance?.GetItem(item.ItemId);
             int rarityMultiplier = (int)item.GetRarity() + 1; // Common=1, Rare=2, etc.
-            return 100L * item.Level * rarityMultiplier;
+            return 10000L * item.Level * rarityMultiplier;
         }
 
         private InventoryItem CreatePreviewItem(InventoryItem source, int targetLevel)
@@ -462,28 +469,44 @@ namespace IdleDefenseSurvival.UI.Upgrade
         // Upgrade scene item-list callbacks
         private void OnItemListSingleClick(InventoryItem item, int inventoryIndex)
         {
-            if (_mainItem != null && item.InstanceId == _mainItem.InstanceId)
+            if (item == null || !item.IsEquippable()) return;
+
+            // =========================================================
+            // 1. Belum ada MAIN → klik pertama menjadi MAIN
+            // =========================================================
+            if (_mainItem == null)
             {
-                // Click the currently-selected main again → clear it
+                OnMainSlotClicked(item, inventoryIndex);
+                return;
+            }
+
+            // =========================================================
+            // 2. Klik MAIN yang sedang terpilih → clear semua selection
+            // =========================================================
+            if (item.InstanceId == _mainItem.InstanceId)
+            {
                 ClearSelection();
                 return;
             }
 
-            if (_mainItem == null)
+            // =========================================================
+            // 3. MAIN sudah ada dan sejenis → klik item menjadi MATERIAL
+            // =========================================================
+            if (item.GetEquipmentType() == _mainItem.GetEquipmentType())
             {
-                OnMainSlotClicked(item, inventoryIndex);
+                OnMaterialSlotClicked(item, inventoryIndex);
+                return;
             }
-            else
-            {
-                // Main already set → click another item replaces main (swap).
-                // Materials are cleared because they belong to the old main type.
-                ClearMaterialSlots();
-                _mainItem = item;
-                _mainInventoryIndex = inventoryIndex;
-                _mainSlot.SetItem(item, inventoryIndex);
-                UpdatePreview();
-                _statusText.text = "Pilih equipment material";
-            }
+
+            // =========================================================
+            // 4. MAIN sudah ada namun beda jenis → replace main (swap)
+            // =========================================================
+            ClearMaterialSlots();
+            _mainItem = item;
+            _mainInventoryIndex = inventoryIndex;
+            _mainSlot.SetItem(item, inventoryIndex);
+            UpdatePreview();
+            _statusText.text = "Pilih equipment material";
         }
 
         private void OnItemListDoubleClick(InventoryItem item, int inventoryIndex)

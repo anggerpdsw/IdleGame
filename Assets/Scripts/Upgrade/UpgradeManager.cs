@@ -6,6 +6,7 @@ using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Core;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Upgrade
 {
@@ -85,7 +86,6 @@ namespace IdleDefenseSurvival.Upgrade
              * 1. Upgrade main equipment
              * -------------------------------------------------------------
              */
-
             main.Level = newLevel;
 
             /*
@@ -93,7 +93,6 @@ namespace IdleDefenseSurvival.Upgrade
              * 2. Consume material
              * -------------------------------------------------------------
              */
-
             int removed = inventory.RemoveItem(material.InstanceId, 1);
             bool materialRemoved = removed > 0;
             if (!materialRemoved)
@@ -113,13 +112,13 @@ namespace IdleDefenseSurvival.Upgrade
              */
             inventory.MarkItemDirty(main.InstanceId, DirtyType.Item | DirtyType.Tooltip);
 
-            /*
-             * -------------------------------------------------------------
-             * 4. Refresh stats
-             * -------------------------------------------------------------
+             /*
+              * -------------------------------------------------------------
+              * 4. Refresh stats - pass oldLevel untuk delta scaling
+              * -------------------------------------------------------------
              */
-            RefreshEquipmentStats(main);
-
+            RefreshEquipmentStats(main, oldLevel);
+ 
             /*
              * -------------------------------------------------------------
              * 5. Notify listeners
@@ -287,7 +286,7 @@ namespace IdleDefenseSurvival.Upgrade
             }
 
             inventory.MarkItemDirty(main.InstanceId, DirtyType.Item | DirtyType.Tooltip);
-            RefreshEquipmentStats(main);
+            RefreshEquipmentStats(main, oldLevel);
 
             int newLevel = main.Level;
             OnEquipmentUpgraded?.Invoke(main, null, oldLevel, newLevel);
@@ -338,19 +337,33 @@ namespace IdleDefenseSurvival.Upgrade
         #endregion
 
         #region Stat Refresh
-        private void RefreshEquipmentStats(InventoryItem item)
+        private void RefreshEquipmentStats(InventoryItem item, int oldLevel)
         {
             if (item == null) return;
+ 
+            // -----------------------------------------------------------------
+            // 1. Recalculate secondary attribute values based on level delta.
+            //    Preserves generated BaseValue, adds (newLevel - oldLevel) * ValuePerLevel.
+            // -----------------------------------------------------------------
+            var loader = BaseStatLoader.Instance;
+            if (loader != null && item.AttributeData?.SecondAttribute != null)
+            {
+                foreach (var attr in item.AttributeData.SecondAttribute)
+                {
+                    var secStat = (SecondaryStat)attr.Attribute;
+                    float perLevel = loader.GetSecondaryValuePerLevel(secStat);
+                    if (perLevel > 0f)
+                    {
+                        // Preserve generated base, scale by equipment level delta
+                        attr.BaseValue += (item.Level - oldLevel) * perLevel;
+                    }
+                }
+            }
 
-            /*
-             * EquipmentStatCalculator reads the current item level
-             * when creating its stat modifiers.
-             *
-             * Therefore the old modifier must be refreshed.
-             */
-
+            // -----------------------------------------------------------------
+            // 2. Refresh modifier pipeline so equipment effects reflect new level.
+            // -----------------------------------------------------------------
             var equipmentService = Equipment.EquipmentService.Instance;
-
             if (equipmentService != null && item.IsEquipped)
             {
                 EquipmentType slot = item.EquippedSlot;
@@ -358,6 +371,9 @@ namespace IdleDefenseSurvival.Upgrade
                 equipmentService.ApplyItemStatModifiers(item, slot, true);
             }
 
+            // -----------------------------------------------------------------
+            // 3. Cleanup expired modifiers & refresh player stats.
+            // -----------------------------------------------------------------
             ModifierManager.Instance?.CleanupExpired();
             PlayerStatsManager.Instance?.RefreshStats();
         }
