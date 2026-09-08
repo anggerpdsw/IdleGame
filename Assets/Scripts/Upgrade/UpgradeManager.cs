@@ -3,10 +3,9 @@ using UnityEngine;
 
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Stats;
-using IdleDefenseSurvival.Modifiers;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Core;
+using System.Collections.Generic;
 
 namespace IdleDefenseSurvival.Upgrade
 {
@@ -259,6 +258,55 @@ namespace IdleDefenseSurvival.Upgrade
                 reason = "Material equipment is favorited.";
                 return false;
             }
+
+            return true;
+        }
+        
+        public bool UpgradeMultiple(InventoryItem main, List<InventoryItem> materials)
+        {
+            if (!CanUpgradeMultiple(main, materials, out string reason))
+            {
+                Debug.LogWarning($"[UpgradeManager] UpgradeMultiple failed: {reason}");
+                OnUpgradeFailed?.Invoke(main, null, reason);
+                return false;
+            }
+
+            var inventory = InventoryService.Instance;
+            int oldLevel = main.Level;
+            int upgrades = 0;
+
+            foreach (var mat in materials)
+            {
+                if (inventory.RemoveItem(mat.InstanceId, 1) <= 0) continue;
+                upgrades++;
+                main.Level = Mathf.Min(main.Level + 1, main.MaxLevel);
+                if (main.IsMaxLevel) break;
+            }
+
+            inventory.MarkItemDirty(main.InstanceId, DirtyType.Item | DirtyType.Tooltip);
+            RefreshEquipmentStats(main);
+
+            int newLevel = main.Level;
+            OnEquipmentUpgraded?.Invoke(main, null, oldLevel, newLevel);
+            Debug.Log($"[UpgradeManager] {upgrades} upgrades applied: Lv.{oldLevel}->{newLevel}");
+            return true;
+        }
+
+        public bool CanUpgradeMultiple(InventoryItem main, List<InventoryItem> materials, out string reason)
+        {
+            reason = string.Empty;
+            if (main == null) { reason = "Main equipment null."; return false; }
+            if (materials == null || materials.Count == 0) { reason = "No material selected."; return false; }
+
+            // Validasi tiap material
+            foreach (var mat in materials)
+            {
+                if (!CanUpgradeEquipment(main, mat, out reason)) return false;
+            }
+
+            // Cek max level
+            int possibleLevel = Mathf.Min(main.Level + materials.Count, main.MaxLevel);
+            if (possibleLevel == main.Level) { reason = "Equipment already at max level."; return false; }
 
             return true;
         }

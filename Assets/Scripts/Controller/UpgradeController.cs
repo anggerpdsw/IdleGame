@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.UI.Upgrade;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -10,16 +11,32 @@ namespace IdleDefenseSurvival.Controller
         [Header("References")]
         [SerializeField] private TextMeshProUGUI _title;
         [SerializeField] private Button _backButton;
+        [SerializeField] private UpgradePanelUI _upgradePanel;
 
         private void Start()
         {
-            if (_title != null) _title.SetText("UPGRADE EQUIPMENT & SKILLS");
+            if (_title != null)
+                _title.text = "UPGRADE EQUIPMENT";
+
+            if (_upgradePanel != null)
+                _upgradePanel.gameObject.SetActive(true);
         }
 
-        public void OnBack() => SceneLoader.Instance.ReturnToMainMenuFromUpgrade();
+        public void OnBack()
+        {
+            SceneLoader.Instance.ReturnToMainMenuFromUpgrade();
+        }
 
-        private void OnEnable() => _backButton?.onClick.AddListener(OnBack);
-        private void OnDisable() => _backButton?.onClick.RemoveListener(OnBack);
+        private void OnEnable()
+        {
+            if (_backButton != null)
+                _backButton.onClick.AddListener(OnBack);
+        }
 
+        private void OnDisable()
+        {
+            if (_backButton != null)
+                _backButton.onClick.RemoveListener(OnBack);
+        }
     }
 }

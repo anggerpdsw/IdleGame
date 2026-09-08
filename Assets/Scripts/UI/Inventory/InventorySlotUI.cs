@@ -30,8 +30,15 @@ namespace IdleDefenseSurvival.UI.Inventory
         private int _inventoryIndex;    // Physical slot index in InventoryService
         private InventoryItem _currentItem;
 
+        // Optional callbacks for non-InventoryUI contexts (e.g., Upgrade scene)
+        public System.Action<InventoryItem, int> OnSingleClickCallback;
+        public System.Action<InventoryItem, int> OnDoubleClickCallback;
+
         /// <summary>Physical index in InventoryService.Slots (-1 when empty).</summary>
         public int InventoryIndex => _inventoryIndex;
+
+        /// <summary>Current item shown in this slot (null when empty).</summary>
+        public InventoryItem CurrentItem => _currentItem;
 
         public void Initialize(int slotIndex, InventoryUI parentUI)
         {
@@ -151,7 +158,14 @@ namespace IdleDefenseSurvival.UI.Inventory
             else
             {
                 // Single click - show in info panel
-                _parentUI?.SelectItem(_currentItem, _slotIndex);
+                if (_parentUI != null)
+                {
+                    _parentUI.SelectItem(_currentItem, _slotIndex);
+                }
+                else
+                {
+                    OnSingleClickCallback?.Invoke(_currentItem, _slotIndex);
+                }
             }
         }
 
@@ -162,8 +176,15 @@ namespace IdleDefenseSurvival.UI.Inventory
             var itemData = ItemDatabase.Instance?.GetItem(_currentItem.ItemId);
             if (itemData != null && itemData.IsEquippable())
             {
-                // Quick equip
-                EquipmentService.Instance?.Equip(_currentItem);
+                // Quick equip - use callback if available (Upgrade scene), fallback to direct equip
+                if (OnDoubleClickCallback != null)
+                {
+                    OnDoubleClickCallback?.Invoke(_currentItem, _slotIndex);
+                }
+                else
+                {
+                    EquipmentService.Instance?.Equip(_currentItem);
+                }
             }
             else if (itemData != null && itemData.IsConsumable())
             {
@@ -181,8 +202,11 @@ namespace IdleDefenseSurvival.UI.Inventory
 
         public void OnDrag(PointerEventData eventData)
         {
-            // Handled by InventoryUI Update
-            _parentUI.UpdateDragPosition(eventData.position);
+            // Handled by InventoryUI Update; guard for contexts where _parentUI is null (e.g., Upgrade scene)
+            if (_parentUI != null)
+            {
+                _parentUI.UpdateDragPosition(eventData.position);
+            }
         }
 
         public void OnEndDrag(PointerEventData eventData)

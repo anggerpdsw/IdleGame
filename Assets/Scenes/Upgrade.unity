@@ -422,10 +422,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1817524303}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -76.26092}
-  m_SizeDelta: {x: 100, y: 27.478151}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &93535288
 MonoBehaviour:
@@ -592,10 +592,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 494574670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 209, y: -305}
-  m_SizeDelta: {x: 418, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &128071375
 GameObject:
@@ -825,10 +825,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1817524303}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -48.78277}
-  m_SizeDelta: {x: 100, y: 27.478151}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &148263890
 MonoBehaviour:
@@ -1204,6 +1204,143 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 175317271}
   m_CullTransparentMesh: 1
+--- !u!1 &183550940
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 183550941}
+  - component: {fileID: 183550942}
+  - component: {fileID: 183550943}
+  m_Layer: 5
+  m_Name: GoldCost
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &183550941
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183550940}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1822532936}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 293.5, y: 50}
+  m_Pivot: {x: 0, y: 0}
+--- !u!222 &183550942
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183550940}
+  m_CullTransparentMesh: 1
+--- !u!114 &183550943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183550940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: GoldCost
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 44.75
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 1
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &204564415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,10 +1448,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 592928652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 225, y: -55.005}
-  m_SizeDelta: {x: 418, y: 82.01}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &249287549
 MonoBehaviour:
@@ -1449,10 +1586,10 @@ RectTransform:
   - {fileID: 1754657986}
   m_Father: {fileID: 495044200}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 82.5, y: -37.5}
-  m_SizeDelta: {x: 165, y: 25}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &262239324
 GameObject:
@@ -1848,7 +1985,7 @@ GameObject:
   - component: {fileID: 345215660}
   - component: {fileID: 345215659}
   - component: {fileID: 345215658}
-  - component: {fileID: 345215657}
+  - component: {fileID: 345215661}
   m_Layer: 0
   m_Name: Armor
   m_TagString: Untagged
@@ -1877,22 +2014,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &345215657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 345215655}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 4
-  _toggle: {fileID: 345215658}
-  _label: {fileID: 933227828}
-  _activeIndicator: {fileID: 138954587}
 --- !u!114 &345215658
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1979,6 +2100,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 345215655}
   m_CullTransparentMesh: 1
+--- !u!114 &345215661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345215655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 4
+  _toggle: {fileID: 345215658}
+  _label: {fileID: 933227828}
+  _activeIndicator: {fileID: 138954587}
 --- !u!1 &354904313
 GameObject:
   m_ObjectHideFlags: 0
@@ -2305,7 +2442,7 @@ GameObject:
   - component: {fileID: 379363987}
   - component: {fileID: 379363986}
   - component: {fileID: 379363985}
-  - component: {fileID: 379363984}
+  - component: {fileID: 379363988}
   m_Layer: 0
   m_Name: Earring
   m_TagString: Untagged
@@ -2334,22 +2471,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &379363984
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 379363982}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 9
-  _toggle: {fileID: 379363985}
-  _label: {fileID: 1347132235}
-  _activeIndicator: {fileID: 1134785486}
 --- !u!114 &379363985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2436,6 +2557,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 379363982}
   m_CullTransparentMesh: 1
+--- !u!114 &379363988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379363982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 9
+  _toggle: {fileID: 379363985}
+  _label: {fileID: 1347132235}
+  _activeIndicator: {fileID: 1134785486}
 --- !u!1 &383888401
 GameObject:
   m_ObjectHideFlags: 0
@@ -3338,10 +3475,10 @@ RectTransform:
   - {fileID: 125400759}
   m_Father: {fileID: 592928652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 225, y: -279.51}
-  m_SizeDelta: {x: 418, y: 355}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &494574671
 MonoBehaviour:
@@ -3402,9 +3539,9 @@ RectTransform:
   - {fileID: 249687692}
   m_Father: {fileID: 605369243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 137.5, y: -25}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 165, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &495044201
@@ -3433,6 +3570,143 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
+--- !u!1 &516220596
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 516220599}
+  - component: {fileID: 516220598}
+  - component: {fileID: 516220597}
+  m_Layer: 5
+  m_Name: Status
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &516220597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516220596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Status
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 44.75
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 1
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &516220598
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516220596}
+  m_CullTransparentMesh: 1
+--- !u!224 &516220599
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516220596}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1822532936}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 100, y: 0}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &528555122
 GameObject:
   m_ObjectHideFlags: 0
@@ -3470,7 +3744,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -0.000061035, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &528555124
 MonoBehaviour:
@@ -3564,7 +3838,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 371.01}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &592928653
 MonoBehaviour:
@@ -3753,10 +4027,10 @@ RectTransform:
   - {fileID: 768032384}
   m_Father: {fileID: 494574670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 209, y: -25}
-  m_SizeDelta: {x: 418, y: 50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &605369244
 MonoBehaviour:
@@ -3816,9 +4090,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 605369243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 25, y: -25}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 50, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &620827657
@@ -4224,9 +4498,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 674883876}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
   _type: 1
   _toggle: {fileID: 674883882}
   _label: {fileID: 1011489183}
@@ -4400,10 +4674,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2119458815}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 40.370686, y: -50}
-  m_SizeDelta: {x: 80.74137, y: 30}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &764996722
 MonoBehaviour:
@@ -4641,9 +4915,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 767343933}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
   _type: 0
   _toggle: {fileID: 767343939}
   _label: {fileID: 623510017}
@@ -4680,9 +4954,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 605369243}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 321.5, y: -25}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 193, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &768032385
@@ -4873,7 +5147,7 @@ GameObject:
   - component: {fileID: 784951314}
   - component: {fileID: 784951316}
   m_Layer: 0
-  m_Name: UpgradeUI
+  m_Name: UpgradePanelUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4949,31 +5223,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 784951312}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 049a460057b875a4eb5cba04f7501776, type: 3}
+  m_Script: {fileID: 11500000, guid: e00acd41780d70340bb1aa96b662d2cd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.UpgradeUI
-  _capacityText: {fileID: 155371579}
-  _gridContainer: {fileID: 1082004585}
-  _slotPrefab: {fileID: 3372282772733966831, guid: 6531c5678c3f79744a93fc6ed58fa118, type: 3}
-  _tabs: []
-  _currentTab: 0
-  _infoPanel: {fileID: 1082815178}
-  _dragCanvas: {fileID: 479066632}
-  _dragItemPrefab: {fileID: 1001001004, guid: 9e6d1c2b3f4a5c6d7e8f9a0b1c2d3e4f, type: 3}
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.UpgradePanelUI
+  _mainSlot: {fileID: 1642887595}
+  _materialSlots:
+  - {fileID: 1454363707}
+  - {fileID: 1418509892}
+  - {fileID: 1019272055}
+  - {fileID: 1484228895}
+  _previewSlot: {fileID: 0}
+  _goldCostText: {fileID: 183550943}
+  _goldIcon: {fileID: 0}
+  _upgradeButton: {fileID: 2038518510}
+  _upgradeButtonText: {fileID: 1945484932}
+  _statusText: {fileID: 516220597}
   _equipmentTabs:
   - {fileID: 767343940}
   - {fileID: 674883883}
-  - {fileID: 1308562699}
-  - {fileID: 2035457721}
-  - {fileID: 345215657}
-  - {fileID: 2015551833}
-  - {fileID: 1014919570}
-  - {fileID: 1510022391}
-  - {fileID: 1334716900}
-  - {fileID: 379363984}
-  - {fileID: 1870418794}
-  - {fileID: 966841605}
-  _currentEquipmentTab: 0
+  - {fileID: 1308562703}
+  - {fileID: 2035457725}
+  - {fileID: 345215661}
+  - {fileID: 2015551837}
+  - {fileID: 1014919574}
+  - {fileID: 1510022395}
+  - {fileID: 1334716904}
+  - {fileID: 379363988}
+  - {fileID: 1870418798}
+  - {fileID: 966841609}
+  _currentTab: 0
+  _itemListContainer: {fileID: 1082004585}
+  _itemListSlotPrefab: {fileID: 3372282772733966831, guid: 6531c5678c3f79744a93fc6ed58fa118, type: 3}
+  _itemListScroll: {fileID: 1964188112}
 --- !u!1 &785592728
 GameObject:
   m_ObjectHideFlags: 0
@@ -4992,7 +5273,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &785592729
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5112,10 +5393,10 @@ RectTransform:
   - {fileID: 338898788}
   m_Father: {fileID: 1852297519}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 209, y: -32.5}
-  m_SizeDelta: {x: 418, y: 65}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &848347951
 MonoBehaviour:
@@ -5630,7 +5911,7 @@ GameObject:
   - component: {fileID: 966841608}
   - component: {fileID: 966841607}
   - component: {fileID: 966841606}
-  - component: {fileID: 966841605}
+  - component: {fileID: 966841609}
   m_Layer: 0
   m_Name: Shoes
   m_TagString: Untagged
@@ -5659,22 +5940,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &966841605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 966841603}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 11
-  _toggle: {fileID: 966841606}
-  _label: {fileID: 1631930881}
-  _activeIndicator: {fileID: 354904313}
 --- !u!114 &966841606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5761,6 +6026,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 966841603}
   m_CullTransparentMesh: 1
+--- !u!114 &966841609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966841603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 11
+  _toggle: {fileID: 966841606}
+  _label: {fileID: 1631930881}
+  _activeIndicator: {fileID: 354904313}
 --- !u!1 &1011489181
 GameObject:
   m_ObjectHideFlags: 0
@@ -6022,6 +6303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Controller.UpgradeController
   _title: {fileID: 383888403}
   _backButton: {fileID: 467059649}
+  _upgradePanel: {fileID: 784951316}
 --- !u!1 &1013669964
 GameObject:
   m_ObjectHideFlags: 0
@@ -6054,10 +6336,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1817524303}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -17.521847}
-  m_SizeDelta: {x: 100, y: 35.043694}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1013669966
 MonoBehaviour:
@@ -6171,7 +6453,7 @@ GameObject:
   - component: {fileID: 1014919573}
   - component: {fileID: 1014919572}
   - component: {fileID: 1014919571}
-  - component: {fileID: 1014919570}
+  - component: {fileID: 1014919574}
   m_Layer: 0
   m_Name: Pants
   m_TagString: Untagged
@@ -6200,22 +6482,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1014919570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1014919568}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 6
-  _toggle: {fileID: 1014919571}
-  _label: {fileID: 1694429040}
-  _activeIndicator: {fileID: 1942931132}
 --- !u!114 &1014919571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6302,6 +6568,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1014919568}
   m_CullTransparentMesh: 1
+--- !u!114 &1014919574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014919568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 6
+  _toggle: {fileID: 1014919571}
+  _label: {fileID: 1694429040}
+  _activeIndicator: {fileID: 1942931132}
 --- !u!1 &1019272051
 GameObject:
   m_ObjectHideFlags: 0
@@ -6313,6 +6595,7 @@ GameObject:
   - component: {fileID: 1019272052}
   - component: {fileID: 1019272054}
   - component: {fileID: 1019272053}
+  - component: {fileID: 1019272055}
   m_Layer: 5
   m_Name: SubEquipment3
   m_TagString: Untagged
@@ -6377,6 +6660,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1019272051}
   m_CullTransparentMesh: 1
+--- !u!114 &1019272055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019272051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66afa6da31f844d46be0d5a9faf9084b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.InventorySlotUI
+  _iconImage: {fileID: 1019272053}
+  _quantityText: {fileID: 0}
+  _rarityBorder: {fileID: 0}
+  _equippedIndicator: {fileID: 0}
+  _favoriteIndicator: {fileID: 0}
+  _lockedIndicator: {fileID: 0}
+  _newIndicator: {fileID: 0}
+  _durabilityBar: {fileID: 0}
+  _levelText: {fileID: 0}
+  _maxLevelIndicator: {fileID: 0}
 --- !u!1 &1022720591
 GameObject:
   m_ObjectHideFlags: 0
@@ -6957,10 +7262,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 495044200}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 82.5, y: -12.5}
-  m_SizeDelta: {x: 165, y: 25}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1153412410
 MonoBehaviour:
@@ -7095,7 +7400,7 @@ RectTransform:
   m_Father: {fileID: 1189187242}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -7278,10 +7583,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 494574670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 209, y: -245}
-  m_SizeDelta: {x: 418, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1197259086
 GameObject:
@@ -7473,7 +7778,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 209, y: -105}
-  m_SizeDelta: {x: 418, y: 90}
+  m_SizeDelta: {x: 418, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1246322300
 MonoBehaviour:
@@ -7562,7 +7867,7 @@ GameObject:
   - component: {fileID: 1308562702}
   - component: {fileID: 1308562701}
   - component: {fileID: 1308562700}
-  - component: {fileID: 1308562699}
+  - component: {fileID: 1308562703}
   m_Layer: 0
   m_Name: Gloves
   m_TagString: Untagged
@@ -7591,22 +7896,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1308562699
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308562697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 2
-  _toggle: {fileID: 1308562700}
-  _label: {fileID: 1910259090}
-  _activeIndicator: {fileID: 769509289}
 --- !u!114 &1308562700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7693,6 +7982,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1308562697}
   m_CullTransparentMesh: 1
+--- !u!114 &1308562703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308562697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 2
+  _toggle: {fileID: 1308562700}
+  _label: {fileID: 1910259090}
+  _activeIndicator: {fileID: 769509289}
 --- !u!1 &1334716898
 GameObject:
   m_ObjectHideFlags: 0
@@ -7705,7 +8010,7 @@ GameObject:
   - component: {fileID: 1334716903}
   - component: {fileID: 1334716902}
   - component: {fileID: 1334716901}
-  - component: {fileID: 1334716900}
+  - component: {fileID: 1334716904}
   m_Layer: 0
   m_Name: Ring
   m_TagString: Untagged
@@ -7734,22 +8039,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1334716900
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1334716898}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 8
-  _toggle: {fileID: 1334716901}
-  _label: {fileID: 469128232}
-  _activeIndicator: {fileID: 392889794}
 --- !u!114 &1334716901
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7836,6 +8125,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1334716898}
   m_CullTransparentMesh: 1
+--- !u!114 &1334716904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334716898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 8
+  _toggle: {fileID: 1334716901}
+  _label: {fileID: 469128232}
+  _activeIndicator: {fileID: 392889794}
 --- !u!1 &1347132233
 GameObject:
   m_ObjectHideFlags: 0
@@ -8136,6 +8441,7 @@ GameObject:
   - component: {fileID: 1418509889}
   - component: {fileID: 1418509891}
   - component: {fileID: 1418509890}
+  - component: {fileID: 1418509892}
   m_Layer: 5
   m_Name: SubEquipment2
   m_TagString: Untagged
@@ -8200,6 +8506,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1418509888}
   m_CullTransparentMesh: 1
+--- !u!114 &1418509892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418509888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66afa6da31f844d46be0d5a9faf9084b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.InventorySlotUI
+  _iconImage: {fileID: 1418509890}
+  _quantityText: {fileID: 0}
+  _rarityBorder: {fileID: 0}
+  _equippedIndicator: {fileID: 0}
+  _favoriteIndicator: {fileID: 0}
+  _lockedIndicator: {fileID: 0}
+  _newIndicator: {fileID: 0}
+  _durabilityBar: {fileID: 0}
+  _levelText: {fileID: 0}
+  _maxLevelIndicator: {fileID: 0}
 --- !u!1 &1451766422
 GameObject:
   m_ObjectHideFlags: 0
@@ -8348,6 +8676,7 @@ GameObject:
   - component: {fileID: 1454363704}
   - component: {fileID: 1454363706}
   - component: {fileID: 1454363705}
+  - component: {fileID: 1454363707}
   m_Layer: 5
   m_Name: SubEquipment1
   m_TagString: Untagged
@@ -8412,6 +8741,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1454363703}
   m_CullTransparentMesh: 1
+--- !u!114 &1454363707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454363703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66afa6da31f844d46be0d5a9faf9084b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.InventorySlotUI
+  _iconImage: {fileID: 1454363705}
+  _quantityText: {fileID: 0}
+  _rarityBorder: {fileID: 0}
+  _equippedIndicator: {fileID: 0}
+  _favoriteIndicator: {fileID: 0}
+  _lockedIndicator: {fileID: 0}
+  _newIndicator: {fileID: 0}
+  _durabilityBar: {fileID: 0}
+  _levelText: {fileID: 0}
+  _maxLevelIndicator: {fileID: 0}
 --- !u!1 &1462371159
 GameObject:
   m_ObjectHideFlags: 0
@@ -8560,6 +8911,7 @@ GameObject:
   - component: {fileID: 1484228892}
   - component: {fileID: 1484228894}
   - component: {fileID: 1484228893}
+  - component: {fileID: 1484228895}
   m_Layer: 5
   m_Name: SubEquipment4
   m_TagString: Untagged
@@ -8624,6 +8976,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484228891}
   m_CullTransparentMesh: 1
+--- !u!114 &1484228895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484228891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66afa6da31f844d46be0d5a9faf9084b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.InventorySlotUI
+  _iconImage: {fileID: 1484228893}
+  _quantityText: {fileID: 0}
+  _rarityBorder: {fileID: 0}
+  _equippedIndicator: {fileID: 0}
+  _favoriteIndicator: {fileID: 0}
+  _lockedIndicator: {fileID: 0}
+  _newIndicator: {fileID: 0}
+  _durabilityBar: {fileID: 0}
+  _levelText: {fileID: 0}
+  _maxLevelIndicator: {fileID: 0}
 --- !u!1 &1498977143
 GameObject:
   m_ObjectHideFlags: 0
@@ -8687,7 +9061,7 @@ GameObject:
   - component: {fileID: 1510022394}
   - component: {fileID: 1510022393}
   - component: {fileID: 1510022392}
-  - component: {fileID: 1510022391}
+  - component: {fileID: 1510022395}
   m_Layer: 0
   m_Name: Pendant
   m_TagString: Untagged
@@ -8716,22 +9090,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1510022391
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1510022389}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 7
-  _toggle: {fileID: 1510022392}
-  _label: {fileID: 1022720593}
-  _activeIndicator: {fileID: 361455251}
 --- !u!114 &1510022392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8818,6 +9176,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1510022389}
   m_CullTransparentMesh: 1
+--- !u!114 &1510022395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1510022389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 7
+  _toggle: {fileID: 1510022392}
+  _label: {fileID: 1022720593}
+  _activeIndicator: {fileID: 361455251}
 --- !u!1 &1566611358
 GameObject:
   m_ObjectHideFlags: 0
@@ -9320,10 +9694,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2119458815}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 40.370686, y: -15}
-  m_SizeDelta: {x: 80.74137, y: 30}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1637409717
 MonoBehaviour:
@@ -9436,6 +9810,7 @@ GameObject:
   - component: {fileID: 1642887592}
   - component: {fileID: 1642887594}
   - component: {fileID: 1642887593}
+  - component: {fileID: 1642887595}
   m_Layer: 5
   m_Name: Main
   m_TagString: Untagged
@@ -9500,6 +9875,28 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642887591}
   m_CullTransparentMesh: 1
+--- !u!114 &1642887595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642887591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66afa6da31f844d46be0d5a9faf9084b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.InventorySlotUI
+  _iconImage: {fileID: 1642887593}
+  _quantityText: {fileID: 0}
+  _rarityBorder: {fileID: 0}
+  _equippedIndicator: {fileID: 0}
+  _favoriteIndicator: {fileID: 0}
+  _lockedIndicator: {fileID: 0}
+  _newIndicator: {fileID: 0}
+  _durabilityBar: {fileID: 0}
+  _levelText: {fileID: 0}
+  _maxLevelIndicator: {fileID: 0}
 --- !u!1 &1650731688
 GameObject:
   m_ObjectHideFlags: 0
@@ -10495,6 +10892,9 @@ RectTransform:
   - {fileID: 1019272052}
   - {fileID: 1484228892}
   - {fileID: 1642887592}
+  - {fileID: 2038518509}
+  - {fileID: 516220599}
+  - {fileID: 183550941}
   m_Father: {fileID: 1012114272}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
@@ -10538,7 +10938,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 209, y: -192.5}
-  m_SizeDelta: {x: 418, y: 65}
+  m_SizeDelta: {x: 418, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1852297520
 MonoBehaviour:
@@ -10729,7 +11129,7 @@ GameObject:
   - component: {fileID: 1870418797}
   - component: {fileID: 1870418796}
   - component: {fileID: 1870418795}
-  - component: {fileID: 1870418794}
+  - component: {fileID: 1870418798}
   m_Layer: 0
   m_Name: Bracelet
   m_TagString: Untagged
@@ -10758,22 +11158,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &1870418794
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1870418792}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 10
-  _toggle: {fileID: 1870418795}
-  _label: {fileID: 175317273}
-  _activeIndicator: {fileID: 1093835543}
 --- !u!114 &1870418795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10860,6 +11244,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1870418792}
   m_CullTransparentMesh: 1
+--- !u!114 &1870418798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1870418792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 10
+  _toggle: {fileID: 1870418795}
+  _label: {fileID: 175317273}
+  _activeIndicator: {fileID: 1093835543}
 --- !u!1 &1882966910
 GameObject:
   m_ObjectHideFlags: 0
@@ -10892,9 +11292,9 @@ RectTransform:
   - {fileID: 1817524303}
   m_Father: {fileID: 1246322299}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -45}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1882966912
@@ -11124,6 +11524,143 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1942931132}
   m_CullTransparentMesh: 1
+--- !u!1 &1945484930
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1945484931}
+  - component: {fileID: 1945484933}
+  - component: {fileID: 1945484932}
+  m_Layer: 5
+  m_Name: Text (TMP)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1945484931
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945484930}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2038518509}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1945484932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945484930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Upgrade
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 24
+  m_fontSizeBase: 24
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 1
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1945484933
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1945484930}
+  m_CullTransparentMesh: 1
 --- !u!1 &1963069808
 GameObject:
   m_ObjectHideFlags: 0
@@ -11276,7 +11813,7 @@ RectTransform:
   m_GameObject: {fileID: 1964188110}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.99999, y: 0.99999, z: 0.99999}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 528555123}
@@ -11284,8 +11821,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0021972656, y: -5.002014}
-  m_SizeDelta: {x: -79.995, y: -250}
+  m_AnchoredPosition: {x: 0, y: -5}
+  m_SizeDelta: {x: -59.999992, y: -250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1964188112
 MonoBehaviour:
@@ -11541,7 +12078,7 @@ GameObject:
   - component: {fileID: 2015551836}
   - component: {fileID: 2015551835}
   - component: {fileID: 2015551834}
-  - component: {fileID: 2015551833}
+  - component: {fileID: 2015551837}
   m_Layer: 0
   m_Name: Belt
   m_TagString: Untagged
@@ -11570,22 +12107,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &2015551833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2015551831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 5
-  _toggle: {fileID: 2015551834}
-  _label: {fileID: 1858745440}
-  _activeIndicator: {fileID: 2111583094}
 --- !u!114 &2015551834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11672,6 +12193,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2015551831}
   m_CullTransparentMesh: 1
+--- !u!114 &2015551837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2015551831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 5
+  _toggle: {fileID: 2015551834}
+  _label: {fileID: 1858745440}
+  _activeIndicator: {fileID: 2111583094}
 --- !u!1 &2017516442
 GameObject:
   m_ObjectHideFlags: 0
@@ -11756,7 +12293,7 @@ GameObject:
   - component: {fileID: 2035457724}
   - component: {fileID: 2035457723}
   - component: {fileID: 2035457722}
-  - component: {fileID: 2035457721}
+  - component: {fileID: 2035457725}
   m_Layer: 0
   m_Name: Cape
   m_TagString: Untagged
@@ -11785,22 +12322,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 60, y: 60}
   m_Pivot: {x: 1, y: 1}
---- !u!114 &2035457721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2035457719}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25112f138215b7d4581f1015f836682f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Inventory.EquipmentTabButton
-  _type: 3
-  _toggle: {fileID: 2035457722}
-  _label: {fileID: 2077548861}
-  _activeIndicator: {fileID: 870999310}
 --- !u!114 &2035457722
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11886,6 +12407,143 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2035457719}
+  m_CullTransparentMesh: 1
+--- !u!114 &2035457725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035457719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbf10ce7c06134e45aeb27d7a0d8c1a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.Upgrade.EquipmentTabButton
+  _type: 3
+  _toggle: {fileID: 2035457722}
+  _label: {fileID: 2077548861}
+  _activeIndicator: {fileID: 870999310}
+--- !u!1 &2038518508
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2038518509}
+  - component: {fileID: 2038518512}
+  - component: {fileID: 2038518511}
+  - component: {fileID: 2038518510}
+  m_Layer: 5
+  m_Name: OKUpgrade
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &2038518509
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038518508}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1945484931}
+  m_Father: {fileID: 1822532936}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 120, y: 50}
+  m_Pivot: {x: 1, y: 0}
+--- !u!114 &2038518510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038518508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2038518511}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &2038518511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038518508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 173060327463990185, guid: bcd5b53da250a6343832d82be07c3881, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &2038518512
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2038518508}
   m_CullTransparentMesh: 1
 --- !u!1 &2039855305
 GameObject:
@@ -12343,10 +13001,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 338898788}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 158.6293, y: -32.5}
-  m_SizeDelta: {x: 317.2586, y: 65}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2116204477
 MonoBehaviour:
@@ -12481,10 +13139,10 @@ RectTransform:
   - {fileID: 764996721}
   m_Father: {fileID: 338898788}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 377.6293, y: -32.5}
-  m_SizeDelta: {x: 80.74137, y: 65}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2119458816
 MonoBehaviour:
