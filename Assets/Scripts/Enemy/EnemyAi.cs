@@ -18,6 +18,8 @@ using IdleDefenseSurvival.Stats;
 /// - Moves towards the player while outside the attack range.
 /// - Stops moving when within the attack range.
 /// - Can be knocked back by the player; movement resumes after the knockback duration.
+/// - Uses spatial grid for O(1) separation lookups.
+/// - Throttles updates for distant enemies (50Hz near, 10Hz far).
 /// </summary>
 namespace IdleDefenseSurvival.Enemy
 {
@@ -86,9 +88,20 @@ namespace IdleDefenseSurvival.Enemy
         private readonly Dictionary<SlowSource, SlowEffect> _slowEffects = new();
         private float _originalMoveSpeed;
 
-        // Optimasi: Buffer dan Contact Filter untuk menghindari GC Alloc setiap frame
-        private Collider2D[] _neighborBuffer = new Collider2D[16];
-        private ContactFilter2D _enemyContactFilter;
+        // Performance: spatial grid untuk separation O(1) lookup
+        private static readonly Dictionary<int, List<EnemyAi>> _spatialGrid = new();
+        private static readonly int GridCellSize = 2; // world units per cell
+        private Vector2Int _currentGridCell;
+        private bool _inGrid = false;
+
+        // Performance: update throttling untuk enemy jauh
+        private float _lastUpdateTime;
+        private const float UPDATE_INTERVAL_NEAR = 0.02f;  // 50Hz dekat player
+        private const float UPDATE_INTERVAL_FAR = 0.1f;    // 10Hz jauh
+        private const float FAR_DISTANCE_SQR = 400f;       // 20 units^2
+
+        // Performance: FixedUpdate throttling (separate timer so Update/FixedUpdate don't interfere)
+        private float _lastFixedUpdateTime;
 
         public float EnemyAttackDamage => _damage;
         public float Evasion => _evasion;
@@ -118,17 +131,23 @@ namespace IdleDefenseSurvival.Enemy
             // Freeze rotation Z agar enemy tidak berputar saat terkena force (separation/knockback)
             _rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-            // Setup ContactFilter2D untuk deteksi enemy saja
-            _enemyContactFilter = new ContactFilter2D();
-            _enemyContactFilter.SetLayerMask(LayerMask.GetMask("Enemy"));
-            _enemyContactFilter.useTriggers = false;
-            
             _saveManager = SaveManager.Instance;
             _waveManager = WaveManager.Instance;
             _economyManager = EconomyManager.Instance;
             _ultimateManager = UltimateManager.Instance;
             _damagePopUpManager = DamagePopupManager.Instance;
             _enemyHealthBarManager = EnemyHealthBarManager.Instance;
+        }
+
+        private void OnEnable()
+        {
+            RegisterWithGrid();
+        }
+
+        private void OnDisable()
+        {
+            UnregisterFromGrid();
+            ClearAllEffects();
         }
 
         private void Update()
@@ -146,6 +165,9 @@ namespace IdleDefenseSurvival.Enemy
                 return;
             }
             SetStunt(false);
+
+            // Throttle Update for distant enemies
+            if (!ShouldUpdateThisFrame()) return;
 
             // Attack logic: jika dalam attack range, mulai attack dengan cooldown
             if (IsInAttackRange())
@@ -171,8 +193,51 @@ namespace IdleDefenseSurvival.Enemy
             if (_player == null) return;
             if (Time.time < _stuntEndTime) return;
 
+            // Throttle FixedUpdate for distant enemies (same intervals as Update)
+            if (!ShouldFixedUpdate()) return;
+
+            // Update spatial grid cell
+            UpdateCell();
+
             ApplyMovement();
             UpdateFacing();
+        }
+
+        /// <summary>
+        /// Throttle FixedUpdate using same distance-based intervals as Update.
+        /// </summary>
+        private bool ShouldFixedUpdate()
+        {
+            float currentTime = Time.time;
+            float distSqr = (_player != null)
+                ? (transform.position - _player.position).sqrMagnitude
+                : FAR_DISTANCE_SQR;
+
+            float interval = distSqr <= FAR_DISTANCE_SQR ? UPDATE_INTERVAL_NEAR : UPDATE_INTERVAL_FAR;
+
+            if (currentTime - _lastFixedUpdateTime >= interval)
+            {
+                _lastFixedUpdateTime = currentTime;
+                return true;
+            }
+            return false;
+        }
+
+        private bool ShouldUpdateThisFrame()
+        {
+            float currentTime = Time.time;
+            float distSqr = (_player != null)
+                ? (transform.position - _player.position).sqrMagnitude
+                : FAR_DISTANCE_SQR;
+
+            float interval = distSqr <= FAR_DISTANCE_SQR ? UPDATE_INTERVAL_NEAR : UPDATE_INTERVAL_FAR;
+
+            if (currentTime - _lastUpdateTime >= interval)
+            {
+                _lastUpdateTime = currentTime;
+                return true;
+            }
+            return false;
         }
 
         private void ApplyMovement()
@@ -206,7 +271,7 @@ namespace IdleDefenseSurvival.Enemy
         private Vector2 CalculateSeek()
         {
             float distance = Vector2.Distance(transform.position, _player.position);
-            
+
             // Jika sudah dalam attack range, gaya seek menjadi 0 (berhenti mengejar)
             // Namun separation tetap aktif agar mereka tidak tumpuk saat menyerang
             if (distance <= _attackRange) return Vector2.zero;
@@ -215,37 +280,45 @@ namespace IdleDefenseSurvival.Enemy
         }
 
         /// <summary>
-        /// Menghasilkan gaya tolak dari enemy terdekat menggunakan linear falloff.
-        /// Recalculate setiap frame agar force selalu akurat (no caching).
+        /// Menghasilkan gaya tolak dari enemy terdekat menggunakan spatial grid O(1) lookup.
+        /// Hanya iterasi neighbor di cell saat ini dan 8 cell sekitarnya.
         /// </summary>
         private Vector2 CalculateSeparation()
         {
             // Safety: if move speed is 0 or negative, no separation needed
             if (_moveSpeed <= 0f) return Vector2.zero;
 
-            // Gunakan API baru Unity 6 untuk menghindari GC Allocation
-            int count = Physics2D.OverlapCircle(transform.position, _separationRadius, _enemyContactFilter, _neighborBuffer);
-
             Vector2 separationSum = Vector2.zero;
-            int neighborsFound = 0;
+            Vector2 myPos = transform.position;
 
-            for (int i = 0; i < count; i++)
+            // Cek 3x3 grid cells sekitar enemy
+            for (int dx = -1; dx <= 1; dx++)
             {
-                Collider2D col = _neighborBuffer[i];
-                if (col.gameObject == gameObject) continue;
-
-                Vector2 diff = (Vector2)transform.position - (Vector2)col.transform.position;
-                float distance = diff.magnitude;
-
-                if (distance > 0.01f && distance < _separationRadius)
+                for (int dy = -1; dy <= 1; dy++)
                 {
-                    // SIMPLE LINEAR FALLOFF (lebih stabil dari inverse square)
-                    // Strength = (1 - distance/radius) * weight
-                    // Ketika distance = 0 → strength = weight (max push)
-                    // Ketika distance = radius → strength = 0 (no push)
-                    float strength = (1f - distance / _separationRadius) * _separationWeight;
-                    separationSum += diff.normalized * strength;
-                    neighborsFound++;
+                    Vector2Int neighborCell = new(_currentGridCell.x + dx, _currentGridCell.y + dy);
+                    int hash = GetGridHash(neighborCell);
+
+                    if (!_spatialGrid.TryGetValue(hash, out var cellEnemies)) continue;
+
+                    foreach (var other in cellEnemies)
+                    {
+                        if (other == this || other == null) continue;
+
+                        Vector2 diff = myPos - (Vector2)other.transform.position;
+                        float distance = diff.magnitude;
+
+                        // Hanya apply separation jika dalam radius DAN di cell yang sama/berdekatan
+                        if (distance > 0.01f && distance < _separationRadius)
+                        {
+                            // SIMPLE LINEAR FALLOFF (lebih stabil dari inverse square)
+                            // Strength = (1 - distance/radius) * weight
+                            // Ketika distance = 0 → strength = weight (max push)
+                            // Ketika distance = radius → strength = 0 (no push)
+                            float strength = (1f - distance / _separationRadius) * _separationWeight;
+                            separationSum += diff.normalized * strength;
+                        }
+                    }
                 }
             }
 
@@ -255,6 +328,57 @@ namespace IdleDefenseSurvival.Enemy
                 separationSum = separationSum.normalized * _moveSpeed;
 
             return separationSum;
+        }
+
+        private void UpdateCell()
+        {
+            Vector2Int newCell = new(
+                Mathf.FloorToInt(transform.position.x / GridCellSize),
+                Mathf.FloorToInt(transform.position.y / GridCellSize)
+            );
+
+            if (newCell != _currentGridCell)
+            {
+                if (_inGrid) UnregisterFromGrid();
+                _currentGridCell = newCell;
+                RegisterWithGrid();
+            }
+        }
+
+        private void RegisterWithGrid()
+        {
+            int hash = GetGridHash(_currentGridCell);
+            if (!_spatialGrid.TryGetValue(hash, out var list))
+            {
+                list = new List<EnemyAi>();
+                _spatialGrid[hash] = list;
+            }
+            if (!list.Contains(this))
+            {
+                list.Add(this);
+                _inGrid = true;
+            }
+        }
+
+        private void UnregisterFromGrid()
+        {
+            int hash = GetGridHash(_currentGridCell);
+            if (_spatialGrid.TryGetValue(hash, out var list))
+            {
+                list.Remove(this);
+                if (list.Count == 0) _spatialGrid.Remove(hash);
+            }
+            _inGrid = false;
+        }
+
+        private static int GetGridHash(Vector2Int cell)
+        {
+            // Pairing function untuk hash unik dari 2D grid cell
+            // Cantor pairing: (x + y) * (x + y + 1) / 2 + y
+            // Diadaptasi untuk negative coords
+            int x = cell.x >= 0 ? cell.x * 2 : -cell.x * 2 - 1;
+            int y = cell.y >= 0 ? cell.y * 2 : -cell.y * 2 - 1;
+            return (x + y) * (x + y + 1) / 2 + y;
         }
 
         private Vector2 CalculateFinalVelocity(Vector2 seek, Vector2 separation)
@@ -723,7 +847,7 @@ namespace IdleDefenseSurvival.Enemy
 
             // Meat: Spawn physical pickup
             if (_meatReward > 0) SpawnItem(CurrencyType.Meat, _meatReward);
-            
+
         }
 
         /// <summary>
@@ -813,7 +937,6 @@ namespace IdleDefenseSurvival.Enemy
         /// Clear all aura effects when enemy is disabled (for object pooling).
         /// Ensures effects don't carry over to the next reuse.
         /// </summary>
-        private void OnDisable() => ClearAllEffects();
 
         /// <summary>
         /// Clears all slow and defense break effects from this enemy.

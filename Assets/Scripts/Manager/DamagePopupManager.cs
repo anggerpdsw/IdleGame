@@ -26,13 +26,22 @@ namespace IdleDefenseSurvival.Manager
         [Tooltip("Offset vertikal popup dari posisi enemy di layar (dalam piksel)")]
         private float _screenOffsetY = 30f;
 
-        // Melacak counter popup per target untuk menghindari penumpukan
-        private Dictionary<Transform, int> _targetPopupCounters = new();
+        // How many popups we allow to appear in a single frame.
+        // Tune this based on your typical burst size; 128 is a safe start.
+        private const int MAX_POPUPS_PER_FRAME = 128;
+        private int _popupsSpawnedThisFrame;
+
+        // Melacak counter popup per target untuk menghindari penumpukan.
+        // Use Transform instance ID (int) as key, avoids keeping dead Transform references.
+        private Dictionary<int, int> _targetPopupCounters = new();
 
         // Cache settings untuk menghindari akses terus-menerus ke SettingsController
         private bool _showDamagePopup = true;  // Master switch untuk damage (normal + critical)
         private bool _showCriticalText = true; // Filter khusus untuk critical damage
         private bool _showHealPopup = true;    // Filter khusus untuk heal popup
+
+        // Reusable struct to avoid allocations.
+        private DamagePopupData _popupDataReusable;
 
         private void Awake()
         {
@@ -42,6 +51,7 @@ namespace IdleDefenseSurvival.Manager
                 return;
             }
             _instance = this;
+            _popupDataReusable = new DamagePopupData(0f, DamageType.Miss, CriticalType.None, "");
         }
 
         private void Start()
@@ -74,6 +84,12 @@ namespace IdleDefenseSurvival.Manager
             }
         }
 
+        private void Update()
+        {
+            // Reset the per‑frame counter every frame.
+            _popupsSpawnedThisFrame = 0;
+        }
+
         private void OnDamagePopupChanged(bool enabled) => _showDamagePopup = enabled;
         private void OnCriticalTextChanged(bool enabled) => _showCriticalText = enabled;
         private void OnHealPopupChanged(bool enabled) => _showHealPopup = enabled;
@@ -86,13 +102,13 @@ namespace IdleDefenseSurvival.Manager
             // ============================================================
             // FILTER: Cek settings sebelum menampilkan popup
             // ============================================================
-            if (data.Damage < 1f) return;
+            if (Mathf.FloorToInt(data.Damage) < 1) return;
 
             // 1. Filter Heal, Mana or Miss Popup
             bool isHealOrMiss = data.Type == DamageType.Heal || data.Type == DamageType.Mana || data.Type == DamageType.Miss;
             if (isHealOrMiss && !_showHealPopup) return;
 
-            // 2. Filter Damage Popup (Normal damage, bukan Heal, bukan Mana, bukan Miss)
+            // 2. Filter Damage Popup (Normal damage, bukan Heal/Mana/Miss)
             bool isDamage = data.Type != DamageType.Heal && data.Type != DamageType.Mana && data.Type != DamageType.Miss;
             if (isDamage && !_showDamagePopup) return;
 
@@ -100,6 +116,15 @@ namespace IdleDefenseSurvival.Manager
             bool isCritical = data.Critical != CriticalType.None;
             if (isCritical && !_showCriticalText) return;
 
+            // ============================================================
+            // RATE LIMIT – prevent flooding the screen with popups
+            // ============================================================
+            if (_popupsSpawnedThisFrame >= MAX_POPUPS_PER_FRAME)
+                return; // skip this popup – still counted toward the limiter
+            _popupsSpawnedThisFrame++;
+
+            // ============================================================
+            // INITIALIZE POPUP
             // ============================================================
             InitializePoolIfNeeded();
 
@@ -130,14 +155,20 @@ namespace IdleDefenseSurvival.Manager
             Vector3 slotOffset = sequence switch
             {
                 0 => new Vector3(0f, 0f, 0f),   // Center, baseline
-                1 => new Vector3(10f, 3f, 0f),  // Right, slightly up
-                2 => new Vector3(-10f, 6f, 0f), // Left, more up
-                _ => new Vector3(20f, 9f, 0f),  // Far right, most up
+                1 => new Vector3(20f, 6f, 0f),  // Right, slightly up
+                2 => new Vector3(-20f, 12f, 0f), // Left, more up
+                _ => new Vector3(40f, 18f, 0f),  // Far right, most up
             };
 
             // Set posisi popup ke screen position + slot offset
             popup.transform.position = screenPos + new Vector3(slotOffset.x, _screenOffsetY + slotOffset.y, 0f);
             // ------------------------------------------------------
+
+            // Reuse the struct – copy the incoming data into our cached instance.
+            _popupDataReusable.Damage   = data.Damage;
+            _popupDataReusable.Type     = data.Type;
+            _popupDataReusable.Critical = data.Critical;
+            _popupDataReusable.Prefix   = data.Prefix; // usually empty
 
             // Initialize the popup (dengan sequence untuk animasi)
             // Gunakan referensi kamera utama untuk menjaga teks damage tetap terlihat baik
@@ -150,15 +181,13 @@ namespace IdleDefenseSurvival.Manager
         private int GetTargetSequence(Transform target)
         {
             if (target == null) return 0;
-
-            if (!_targetPopupCounters.ContainsKey(target))
-                _targetPopupCounters[target] = 0;
-
-            int sequence = _targetPopupCounters[target];
-
+            // Use Unity's InstanceID (int) as stable key; avoids holding Transform references.
+            int key = target.GetInstanceID();
+            if (!_targetPopupCounters.ContainsKey(key))
+                _targetPopupCounters[key] = 0;
+            int sequence = _targetPopupCounters[key];
             // Update counter: 0→1→2→3→0→1→2→3...
-            _targetPopupCounters[target] = (sequence + 1) % 4;
-
+            _targetPopupCounters[key] = (sequence + 1) % 4;
             return sequence;
         }
 

@@ -109,10 +109,10 @@ namespace IdleDefenseSurvival.UI.Inventory
             }
 
             // Level
-            if (_levelText != null)
+            if (_levelText != null && item.IsEquippable())
             {
-                _levelText.text = item.Level >= 1 ? $"Lv.{item.Level}" : "";
-                _levelText.enabled = item.Level >= 1;
+                _levelText.text = item.Level > 1 ? $"Lv.{item.Level}" : "";
+                _levelText.enabled = item.Level > 1;
             }
             
             gameObject.name = $"Slot_{_slotIndex}_{item.ItemId}";

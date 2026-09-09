@@ -17,6 +17,7 @@ namespace IdleDefenseSurvival.UI
         [Header("References")]
         [SerializeField] private GameObject _healthBarPrefab;
         [Tooltip("Offset vertikal health bar dari posisi enemy di layar (dalam piksel)")]
+        [SerializeField] private float _healthBarOffsetY = 0f;
 
         private static EnemyHealthBarManager _instance;
 
@@ -27,6 +28,7 @@ namespace IdleDefenseSurvival.UI
             public Image DefenseBreakImage;
             public Image HeartBreakImage;
             public GameObject RootObject; // Parent GameObject (PanelHealth)
+            public float LastHealth;    // last displayed value – avoids redundant slider updates
         }
 
         private readonly Dictionary<EnemyAi, HealthBarEntry> _activeHealthBars = new();
@@ -45,7 +47,6 @@ namespace IdleDefenseSurvival.UI
                 return;
             }
             _instance = this;
-
             PrePoolHealthBars();
         }
 
@@ -58,54 +59,72 @@ namespace IdleDefenseSurvival.UI
             }
         }
 
-        private void LateUpdate()
-        {
-            if (!_enemyHealthBarToggle) return; // Early return jika setting dimatikan
-
-            var keys = new List<EnemyAi>(_activeHealthBars.Keys);
-
-            foreach (var enemy in keys)
-            {
-                if (enemy == null)
-                {
-                    UnregisterEnemy(enemy);
-                    continue;
-                }
-
-                if (!_activeHealthBars.TryGetValue(enemy, out var entry)) continue;
-
-                Vector3 screenPos = Utilityku.WorldToScreen(enemy.HealthBarWorldPosition);
-                entry.RootObject.transform.position = screenPos;
-
-                // Update DefenseBreak visibility
-                bool hasDefenseBreak = enemy.HasActiveDefenseBreak();
-                entry.DefenseBreakImage.enabled = hasDefenseBreak && _enemyHealthBarToggle;
-
-                // Update HeartBreak visibility (enemy max health reduced)
-                bool hasHeartBreak = enemy.HasReducedMaxHealth();
-                entry.HeartBreakImage.enabled = hasHeartBreak && _enemyHealthBarToggle;
-            }
-        }
-
         private void OnDestroy()
         {
             if (SettingsController.Instance != null)
                 SettingsController.Instance.EnemyHealthBarChanged -= OnEnemyHealthBarChanged;
         }
 
+        private void LateUpdate()
+        {
+            if (!_enemyHealthBarToggle) return; // Early return jika setting dimatikan
+
+            foreach (var kvp in _activeHealthBars)
+            {
+                var enemy = kvp.Key;
+                var entry = kvp.Value;
+
+                if (enemy == null)
+                {
+                    UnregisterEnemy(enemy);
+                    continue;
+                }
+
+                // Convert world position to screen once.
+                Vector3 screenPos = Utilityku.WorldToScreen(enemy.HealthBarWorldPosition);
+
+                // Simple view‑cull: if behind camera (negative Z) or far outside screen, hide.
+                const float margin = 100f; // a few pixels outside the view is fine to hide.
+                if (screenPos.z < 0f ||
+                    screenPos.x < -margin || screenPos.x > Screen.width + margin ||
+                    screenPos.y < -margin || screenPos.y > Screen.height + margin)
+                {
+                    if (entry.RootObject.activeSelf)
+                        entry.RootObject.SetActive(false);
+                    continue;
+                }
+
+                // Show/update the health bar.
+                entry.RootObject.SetActive(true);
+                entry.RootObject.transform.position = screenPos + Vector3.up * _healthBarOffsetY;
+
+                // Only update the slider when health actually changed.
+                if (Mathf.Abs(entry.Slider.value - enemy.CurrentHealth) > 0.001f)
+                {
+                    entry.Slider.value = enemy.CurrentHealth;
+                    entry.LastHealth = enemy.CurrentHealth;
+                }
+
+                // Indicators – update only when the bar is visible.
+                bool hasDefenseBreak = enemy.HasActiveDefenseBreak();
+                bool hasHeartBreak   = enemy.HasReducedMaxHealth();
+
+                if (entry.DefenseBreakImage != null)
+                    entry.DefenseBreakImage.enabled = hasDefenseBreak;
+                if (entry.HeartBreakImage != null)
+                    entry.HeartBreakImage.enabled   = hasHeartBreak;
+            }
+        }
+
         private void OnEnemyHealthBarChanged(bool enabled)
         {
             _enemyHealthBarToggle = enabled;
 
-            // Sembunyikan/tampilkan semua health bar yang aktif
+            // Show/hide all active bars instantly.
             foreach (var kvp in _activeHealthBars)
             {
-                if (kvp.Value != null && kvp.Key != null && kvp.Value.RootObject != null)
-                {
-                    kvp.Value.RootObject.SetActive(enabled);
-                    kvp.Value.DefenseBreakImage.enabled = enabled && kvp.Key.HasActiveDefenseBreak();
-                    kvp.Value.HeartBreakImage.enabled = enabled && kvp.Key.HasReducedMaxHealth();
-                }
+                if (kvp.Value?.RootObject != null)
+                    kvp.Value.RootObject.SetActive(enabled && kvp.Key != null);
             }
         }
 
@@ -128,7 +147,8 @@ namespace IdleDefenseSurvival.UI
                     Slider = heartSlider,
                     DefenseBreakImage = defenseBreakImg,
                     HeartBreakImage = heartBreakImg,
-                    RootObject = bar
+                    RootObject = bar,
+                    LastHealth = -1f // force first update
                 };
 
                 bar.SetActive(false);
@@ -140,9 +160,10 @@ namespace IdleDefenseSurvival.UI
         {
             if (enemy == null || _activeHealthBars.ContainsKey(enemy)) return;
 
-            HealthBarEntry entry = GetHealthBarFromPool();
+            HealthBarEntry entry  = GetHealthBarFromPool();
             entry.Slider.maxValue = maxHealth;
-            entry.Slider.value = maxHealth;
+            entry.Slider.value    = maxHealth;
+            entry.LastHealth      = maxHealth;
 
             // Sembunyikan indikator di awal
             if (entry.DefenseBreakImage != null) entry.DefenseBreakImage.enabled = false;
@@ -187,8 +208,9 @@ namespace IdleDefenseSurvival.UI
             {
                 Slider = heartSlider,
                 DefenseBreakImage = defenseBreakImg,
-                HeartBreakImage = heartBreakImg,
-                RootObject = newBar
+                HeartBreakImage   = heartBreakImg,
+                RootObject        = newBar,
+                LastHealth        = -1f
             };
 
             return entry;
