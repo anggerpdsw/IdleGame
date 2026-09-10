@@ -704,7 +704,24 @@
     {
       "id": "Frost Guardian",
       "role": "Golem",
-      "effect": "Frost",
+      "effects": [{
+        "type": "Frost",
+        "onHit": [{
+          "effect": "Slow",
+          "value": 50,
+          "duration": 5
+        }],
+        "aura": [{
+          "effect": "Slow",
+          "value": 20,
+          "radius": 4
+        }],
+        "onTakeDamage": [{
+          "effect": "Slow",
+          "value": 10,
+          "duration": 3
+        }]
+      }],
       "prefabName": "Basic",
       "attackRange": 1.2,
       "attackSpeed": 1.16,

@@ -26,7 +26,7 @@ namespace IdleDefenseSurvival
     public enum DefenseBreakSource { None, Lightning, PlayerProjectile, TankProjectile }
     public enum DefenseBreakType { None, Aura, Permanent, Temporary}
 
-    public enum SlowSource { Card, Cloud, Void, Lightning }
+    public enum SlowSource { Card, Cloud, Enemy, Void, Lightning }
     public enum SlowType { Permanent, Temporary, Aura }
 
 

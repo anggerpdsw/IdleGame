@@ -59,7 +59,17 @@ namespace IdleDefenseSurvival.Data
         [Tooltip("Per-enemy drop entries (materials/items). Each entry rolls independently; Weight is a percent (0-100).")]
         public DropEntry[] dropItems;
 
-        public bool IsElite => role == Role.Agile ||  role == Role.Caster ||  role == Role.Ranger;
+        // ------------------------------------------------------------
+        // Enemy Effects
+        // ------------------------------------------------------------
+        [Tooltip("Special effects owned by this enemy.")]
+        public EnemyEffect[] effects;
+
+        // ------------------------------------------------------------
+        // Derived properties
+        // ------------------------------------------------------------
+        public bool IsElite => 
+            role == Role.Agile ||  role == Role.Caster ||  role == Role.Ranger;
         public bool IsBoss => role == Role.BOSS;
     }
 
@@ -73,21 +83,11 @@ namespace IdleDefenseSurvival.Data
     }
 
     [Serializable]
-    public class SlowEffect
+    public class ActiveSlowEffect
     {
         public SlowSource Source;
         public SlowType Type;
         public float Percent;
-        public float ExpireTime;
-    }
-
-    [Serializable]
-    public class DefenseBreakEffect
-    {
-        public DefenseBreakSource Source;
-        public DefenseBreakType Type;
-        public float Percent;
-        public int StackCount;
         public float ExpireTime;
     }
 }
