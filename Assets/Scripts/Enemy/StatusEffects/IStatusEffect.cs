@@ -108,6 +108,8 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         TauntImmune = 32,
         ControlImmune = 33,
         DamageOverTimeImmune = 34,
+        DefenseBreak = 35,
+        HeartBreak = 36,
     }
 
     /// <summary>

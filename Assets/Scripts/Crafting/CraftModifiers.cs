@@ -189,7 +189,7 @@ namespace IdleDefenseSurvival.Crafting
             else
             {
                 pipelineCtx.CraftTime = Mathf.Max(0f, pipelineCtx.CraftTime - FlatReduction);
-                pipelineCtx.CraftTime *= (1f - PercentReduction);
+                pipelineCtx.CraftTime *= 1f - PercentReduction;
             }
         }
     }

@@ -118,7 +118,7 @@ namespace IdleDefenseSurvival.Enemy
         {
             if (effect == null) return;
 
-            // Check for existing effect of same type
+            // Check active effects first
             for (int i = 0; i < _effects.Count; i++)
             {
                 var existing = _effects[i];
@@ -129,6 +129,17 @@ namespace IdleDefenseSurvival.Enemy
                 }
             }
 
+            // Check pending effects
+            for (int i = 0; i < _effectsToAdd.Count; i++)
+            {
+                var existing = _effectsToAdd[i];
+                if (existing.Type == effect.Type)
+                {
+                    HandleStacking(existing, effect);
+                    return;
+                }
+            }
+            
             // No existing effect, queue for addition
             _effectsToAdd.Add(effect);
         }
@@ -228,6 +239,23 @@ namespace IdleDefenseSurvival.Enemy
                     _effectsToRemove.Add(_effects[i]);
                     return true;
                 }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes a specific status effect by type, filtered by a predicate.
+        /// Use for source-specific removal (e.g., remove only Slow from Cloud source).
+        /// </summary>
+        public bool RemoveEffect(StatusEffectType type, System.Predicate<IStatusEffect> predicate)
+        {
+            for (int i = 0; i < _effects.Count; i++)
+            {
+                var e = _effects[i];
+                if (e.Type != type) continue;
+                if (predicate != null && !predicate(e)) continue;
+                _effectsToRemove.Add(e);
+                return true;
             }
             return false;
         }
@@ -343,11 +371,54 @@ namespace IdleDefenseSurvival.Enemy
             {
                 if (_effects[i] is SlowStatus slow)
                 {
-                    multiplier *= (1f - slow.GetCurrentValue());
+                    multiplier *= 1f - slow.GetCurrentValue();
                 }
             }
             return multiplier;
         }
+
+        /// <summary>
+        /// Gets the total defense break percentage from all DefenseBreak effects.
+        /// Returns value 0-1 where 1 = 100% defense reduction.
+        /// </summary>
+        public float GetTotalDefenseBreakPercent()
+        {
+            float total = 0f;
+            for (int i = 0; i < _effects.Count; i++)
+            {
+                if (_effects[i] is DefenseBreakStatus db)
+                {
+                    total += db.GetCurrentValue();
+                }
+            }
+            return Mathf.Clamp01(total);
+        }
+
+        /// <summary>
+        /// Gets the effective defense multiplier (1 - totalDefenseBreak).
+        /// </summary>
+        public float GetDefenseMultiplier() => 1f - GetTotalDefenseBreakPercent();
+
+        /// <summary>
+        /// Gets the total heart break (max health reduction) percentage.
+        /// </summary>
+        public float GetTotalHeartBreakPercent()
+        {
+            float total = 0f;
+            for (int i = 0; i < _effects.Count; i++)
+            {
+                if (_effects[i] is HeartBreakStatus hb)
+                {
+                    total += hb.GetCurrentValue();
+                }
+            }
+            return Mathf.Clamp01(total);
+        }
+
+        /// <summary>
+        /// Gets the effective max health multiplier (1 - totalHeartBreak).
+        /// </summary>
+        public float GetMaxHealthMultiplier() => 1f - GetTotalHeartBreakPercent();
 
         /// <summary>
         /// Checks if enemy is currently crowd controlled (stunned, frozen, rooted, feared, etc.).

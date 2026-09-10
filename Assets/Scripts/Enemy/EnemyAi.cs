@@ -9,9 +9,9 @@ using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using System.Collections.Generic;
-using UnityEngine.Pool;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Enemy.StatusEffects;
 
 /// <summary>
 /// Handles basic enemy AI for the auto‑shooter game.
@@ -20,6 +20,7 @@ using IdleDefenseSurvival.Stats;
 /// - Can be knocked back by the player; movement resumes after the knockback duration.
 /// - Uses spatial grid for O(1) separation lookups.
 /// - Throttles updates for distant enemies (50Hz near, 10Hz far).
+/// - Status effects (slow, defense break, heart break, stun, freeze, etc.) are delegated to EnemyStatusEffectController.
 /// </summary>
 namespace IdleDefenseSurvival.Enemy
 {
@@ -48,6 +49,9 @@ namespace IdleDefenseSurvival.Enemy
         [Header("UI & Effects")]
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private GameObject _dizzyEffect;
+
+        // Status effect controller reference
+        [SerializeField] private EnemyStatusEffectController _statusEffectController;
 
         private SaveManager _saveManager;
         private WaveManager _waveManager;
@@ -84,10 +88,6 @@ namespace IdleDefenseSurvival.Enemy
         private float _attackTimer = 0f;
         private string _lastDamageSource = UltimateDMG.Player.ToString();
 
-        // Slow effect tracking
-        private readonly Dictionary<SlowSource, SlowEffect> _slowEffects = new();
-        private float _originalMoveSpeed;
-
         // Performance: spatial grid untuk separation O(1) lookup
         private static readonly Dictionary<int, List<EnemyAi>> _spatialGrid = new();
         private static readonly int GridCellSize = 2; // world units per cell
@@ -111,7 +111,10 @@ namespace IdleDefenseSurvival.Enemy
             {
                 if (_spriteRenderer == null) return transform.position;
                 Bounds bounds = _spriteRenderer.bounds;
-                return new Vector3(bounds.center.x, bounds.max.y + 0.15f, transform.position.z);
+                float offset = _enemyHealthBarManager != null
+                    ? _enemyHealthBarManager.HealthBarOffsetY
+                    : 0.15f; // fallback
+                return new Vector3(bounds.center.x, bounds.max.y + offset, transform.position.z);
             }
         }
 
@@ -147,7 +150,7 @@ namespace IdleDefenseSurvival.Enemy
         private void OnDisable()
         {
             UnregisterFromGrid();
-            ClearAllEffects();
+            // Status effects are cleared by EnemyStatusEffectController.OnDisable
         }
 
         private void Update()
@@ -185,7 +188,7 @@ namespace IdleDefenseSurvival.Enemy
                 _attackTimer = 0f;
             }
 
-            UpdateDefenseBreaks();
+            // Defense breaks are now handled by EnemyStatusEffectController
         }
 
         private void FixedUpdate()
@@ -443,12 +446,9 @@ namespace IdleDefenseSurvival.Enemy
             _attackSpeed    = data.attackSpeed;
             _damage         = data.damage;
             _maxHealth      = data.health;
-            _originalMaxHealth = data.health; // Track original for HeartBreak detection
             _currentHealth  = _maxHealth;
             _defenseAmount  = Utilityku.FinalDefense(_role, _maxHealth);
-            _originalDefenseAmount = _defenseAmount;
             _moveSpeed      = data.moveSpeed;
-            _originalMoveSpeed = _moveSpeed;
             _knockbackDuration = data.knockback;
             _evasion  = data.evasion;
             _element        = data.element;
@@ -492,7 +492,11 @@ namespace IdleDefenseSurvival.Enemy
 
             float penetration = PlayerStatsManager.Instance.GetStat(SkillType.Penetration);
             float rawDamage = damageData.GetFinalDamage(elementMultiplier);
-            float damageAfterDefense = Utilityku.FinalDamage(rawDamage, _defenseAmount, penetration);
+
+            // Apply defense multiplier from status effects (DefenseBreak)
+            float effectiveDefense = _defenseAmount * (_statusEffectController != null ? _statusEffectController.GetDefenseMultiplier() : 1f);
+            float damageAfterDefense = Utilityku.FinalDamage(rawDamage, effectiveDefense, penetration);
+
             float damageBonus = EnemyData.IsBoss
                 ? PlayerStatsManager.Instance.GetStat(SkillType.BossDamage)
                 : EnemyData.IsElite
@@ -503,8 +507,12 @@ namespace IdleDefenseSurvival.Enemy
             _currentHealth -= finalDamage;
 
             // Apply Defense Break after hit enemy if damage data has it
-            if (damageData.DefenseBreak > 0f)
+            if (damageData.DefenseBreak > 0f && _statusEffectController != null)
                 ApplyDefenseBreak(damageData.DefenseBreakSource, damageData.DefenseBreakType, damageData.DefenseBreak, damageData.DefenseBreakDuration);
+
+            // Apply Health Break (HeartBreak) if present
+            if (damageData.HealthBreak > 0f && _statusEffectController != null)
+                ReduceMaxHealth(damageData.HealthBreak);
 
             // Record damage taken
             RecordDamage(_lastDamageSource, finalDamage);
@@ -512,8 +520,9 @@ namespace IdleDefenseSurvival.Enemy
             // Show damage popup
             ShowDamagePopup(finalDamage, damageData.Type, damageData.Critical);
 
-            // Update health bar melalui manager
-            _enemyHealthBarManager.UpdateEnemyHealth(this, _currentHealth);
+            // IMPORTANT:
+            // Status effect sudah ditambahkan sebelum UI refresh.
+            RefreshHealthBarStatus();
 
             // Mark statistics dirty
             EnemyStatisticsManager.Instance?.MarkDirty();
@@ -587,6 +596,10 @@ namespace IdleDefenseSurvival.Enemy
 
             _stuntEndTime = Time.time + duration;
             SetStunt(true);
+
+            // Also add to status effect controller for consistency
+            if (_statusEffectController != null)
+                _statusEffectController.AddEffect(new StunStatus(duration));
         }
 
         /// <summary>
@@ -595,44 +608,29 @@ namespace IdleDefenseSurvival.Enemy
         /// <param name="percent">Speed percent (e.g., 0.51 mean "slow sebesar 51%")</param>
         public void ApplySlow(SlowSource source, SlowType type, float percent)
         {
+            if (_statusEffectController == null) return;
             percent = Mathf.Clamp01(percent);
-            if (!_slowEffects.TryGetValue(source, out var effect))
+            _statusEffectController.AddEffect(new SlowStatus(percent, type == SlowType.Permanent ? float.MaxValue : 30f)
             {
-                effect = new SlowEffect { Source = source };
-                _slowEffects[source] = effect;
-            }
-            effect.Type = type;
-            effect.Percent = 1f - percent;
-            RecalculateMoveSpeed();
+                Source = source
+            });
         }
 
         /// <summary>
-        /// Removes the slow effect from the enemy.
+        /// Removes the slow effect from the enemy for a specific source.
         /// </summary>
         public void RemoveSlow(SlowSource source)
         {
-            _slowEffects.Remove(source);
-            RecalculateMoveSpeed();
+            if (_statusEffectController == null) return;
+            _statusEffectController.RemoveEffect(StatusEffectType.Slow, e => e is SlowStatus s && s.Source == source);
         }
 
-        private void RecalculateMoveSpeed()
+        /// <summary>
+        /// Applies a defense break effect to the enemy.
+        /// </summary>
+        public void ApplyDefenseBreak(DefenseBreakSource source, DefenseBreakType type, float percent, float duration = 0f)
         {
-            float multiplier = 1f;
-            foreach (var effect in _slowEffects.Values)
-                multiplier *= effect.Percent; // Perm/Aura/Temporary all multiply identically
-
-            _moveSpeed = _originalMoveSpeed * multiplier;
-            EnemyStatisticsManager.Instance?.MarkDirty();
-        }
-
-        // Defense Break effect tracking
-        private const int MAX_DEFENSE_BREAK_STACKS = 5;
-        private readonly Dictionary<DefenseBreakSource, DefenseBreakEffect> _defenseBreakEffects = new();
-        private float _originalDefenseAmount;
-
-        public void ApplyDefenseBreak(
-            DefenseBreakSource source, DefenseBreakType type, float percent, float duration = 0f)
-        {
+            if (_statusEffectController == null) return;
             percent = Mathf.Clamp01(percent);
             if (type == DefenseBreakType.Temporary && duration <= 0f)
             {
@@ -642,72 +640,28 @@ namespace IdleDefenseSurvival.Enemy
                 );
                 return;
             }
-            if (!_defenseBreakEffects.TryGetValue(source, out var effect))
+            _statusEffectController.AddEffectImmediate(new DefenseBreakStatus(
+                percent,
+                type == DefenseBreakType.Temporary ? duration : float.MaxValue,
+                type
+            )
             {
-                effect = new DefenseBreakEffect
-                {
-                    Source = source,
-                    Type = type,
-                    Percent = percent,
-                    StackCount = 1,
-                    ExpireTime = type == DefenseBreakType.Temporary ? Time.time + duration : 0f
-                };
-                _defenseBreakEffects[source] = effect;
-            }
-            else
-            {
-                if (effect.Type != type)
-                {
-                    Debug.LogWarning(
-                        $"[EnemyAi] Defense Break source {source} " +
-                        $"already has type {effect.Type}, cannot apply {type}."
-                    );
-                    return;
-                }
-                // Source sama → stack sampai maksimum 5.
-                effect.StackCount = Mathf.Min(effect.StackCount + 1, MAX_DEFENSE_BREAK_STACKS);
-                // Gunakan nilai effect pertama sebagai nilai per-stack.
-                effect.Percent = percent;
-                // Temporary → refresh duration setiap kali terkena lagi.
-                if (effect.Type == DefenseBreakType.Temporary)
-                    effect.ExpireTime = Time.time + duration;
-            }
-            RecalculateDefense();
+                Source = source
+            });
+
+            RefreshEnemyStatus();
         }
 
+        /// <summary>
+        /// Removes a defense break effect from the enemy.
+        /// </summary>
         public void RemoveDefenseBreak(DefenseBreakSource source, DefenseBreakType type)
         {
-            if (!_defenseBreakEffects.TryGetValue(source, out var effect)) return;
-            if (effect.Type != type) return;
-            _defenseBreakEffects.Remove(source);
-            RecalculateDefense();
-        }
-
-        private void RecalculateDefense()
-        {
-            float totalBreak = 0f;
-            foreach (var effect in _defenseBreakEffects.Values)
-                totalBreak += effect.Percent * effect.StackCount;
-            float calculatedDefense = _originalDefenseAmount * (1f - totalBreak);
-            _defenseAmount = Mathf.Max(-_originalDefenseAmount, calculatedDefense);
-            EnemyStatisticsManager.Instance?.MarkDirty();
-        }
-
-        private void UpdateDefenseBreaks()
-        {
-            if (_defenseBreakEffects.Count == 0) return;
-            var expiredSources = ListPool<DefenseBreakSource>.Get();
-            foreach (var pair in _defenseBreakEffects)
-            {
-                var effect = pair.Value;
-                if (effect.Type == DefenseBreakType.Temporary && Time.time >= effect.ExpireTime)
-                    expiredSources.Add(pair.Key);
-            }
-            bool changed = expiredSources.Count > 0;
-            foreach (var source in expiredSources)
-                _defenseBreakEffects.Remove(source);
-            ListPool<DefenseBreakSource>.Release(expiredSources);
-            if (changed) RecalculateDefense();
+            if (_statusEffectController == null) return;
+            _statusEffectController.RemoveEffect(StatusEffectType.DefenseBreak,
+                e => e is DefenseBreakStatus db && db.Source == source && db.BreakType == type);
+                
+            RefreshEnemyStatus();
         }
 
         /// <summary>
@@ -716,10 +670,34 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public void ReduceMaxHealth(float percent)
         {
+            if (_statusEffectController == null)
+            {
+                // Fallback to direct modification
+                percent = Mathf.Clamp01(percent * 0.01f);
+                _maxHealth *= 1f - percent;
+                if (_currentHealth > _maxHealth) _currentHealth = _maxHealth;
+                RefreshHealthBarStatus();
+                EnemyStatisticsManager.Instance?.MarkDirty();
+                return;
+            }
+
             percent = Mathf.Clamp01(percent * 0.01f);
-            _maxHealth *= 1f - percent;
+            _statusEffectController.AddEffect(new HeartBreakStatus(percent));
+
+            // Immediately apply the max health reduction
+            float newMaxHealth = _maxHealth * (1f - percent);
+            ReduceMaxHealthTo(newMaxHealth);
+        }
+
+        /// <summary>
+        /// Internal method to set max health to a specific value and clamp current health.
+        /// </summary>
+        public void ReduceMaxHealthTo(float newMaxHealth)
+        {
+            _maxHealth = Mathf.Max(1f, newMaxHealth);
             if (_currentHealth > _maxHealth) _currentHealth = _maxHealth;
-            _enemyHealthBarManager.UpdateEnemyHealth(this, _currentHealth);
+            RefreshHealthBarStatus();
+            RefreshEnemyStatus();
             EnemyStatisticsManager.Instance?.MarkDirty();
         }
 
@@ -729,7 +707,7 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public bool HasActiveDefenseBreak()
         {
-            return _defenseBreakEffects.Count > 0;
+            return _statusEffectController != null && _statusEffectController.HasEffect(StatusEffectType.DefenseBreak);
         }
 
         /// <summary>
@@ -738,15 +716,21 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public bool HasReducedMaxHealth()
         {
-            // We need to track original max health to compare
-            // Since we don't store original max health, we'll use a simple heuristic:
-            // if defense break effects include Permanent type, it likely reduced max health
-            // Actually, ReduceMaxHealth directly reduces _maxHealth, so we need to track original
-            return _maxHealth < _originalMaxHealth;
+            return _statusEffectController != null && _statusEffectController.HasEffect(StatusEffectType.HeartBreak);
         }
 
-        // Store original max health for HeartBreak detection
-        private float _originalMaxHealth;
+        /// <summary>
+        /// Forces the enemy health bar UI to refresh its status indicators.
+        /// Used after applying Defense Break / Heart Break.
+        /// </summary>
+        public void RefreshHealthBarStatus()
+            => _enemyHealthBarManager?.UpdateEnemyHealth(this, _currentHealth);
+        /// <summary>
+        /// Forces the enemy to refresh its status indicators.
+        /// Used after applying Defense Break / Heart Break.
+        /// </summary>
+        public void RefreshEnemyStatus()
+            => _enemyHealthBarManager?.UpdateEnemyStatus(this);
 
         /// <summary>
         /// Handle enemy death.
@@ -933,23 +917,6 @@ namespace IdleDefenseSurvival.Enemy
         // Private helpers
         // -------------------------------------------------------------------
 
-        /// <summary>
-        /// Clear all aura effects when enemy is disabled (for object pooling).
-        /// Ensures effects don't carry over to the next reuse.
-        /// </summary>
-
-        /// <summary>
-        /// Clears all slow and defense break effects from this enemy.
-        /// Called on disable to prevent pooling carry-over.
-        /// </summary>
-        public void ClearAllEffects()
-        {
-            _slowEffects.Clear();
-            RecalculateMoveSpeed();
-            _defenseBreakEffects.Clear();
-            RecalculateDefense();
-        }
-
         public void SetStunt(bool isStunt)
         {
             _isStunt = isStunt;
@@ -964,6 +931,11 @@ namespace IdleDefenseSurvival.Enemy
         public void SetMoveSpeed(float speed)
         {
             _moveSpeed = speed;
+        }
+
+        public void SetDefenseAmount(float amount)
+        {
+            _defenseAmount = amount;
         }
 
         public Transform PlayerTransform => _player;

@@ -220,6 +220,7 @@ GameObject:
   - component: {fileID: 8598307648548028344}
   - component: {fileID: 8956951214503799395}
   - component: {fileID: 2171929160586597651}
+  - component: {fileID: 6836594484995198180}
   - component: {fileID: 8760648504213372293}
   m_Layer: 6
   m_Name: Basic
@@ -312,6 +313,18 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.16
+--- !u!114 &6836594484995198180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4115171156768869594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e00d6e98983896441b6663beae26c95f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Enemy.EnemyStatusEffectController
 --- !u!114 &8760648504213372293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,4 +350,5 @@ MonoBehaviour:
   _velocityDamping: 0.15
   _spriteRenderer: {fileID: 2977224739219407189}
   _dizzyEffect: {fileID: 3520291935792346840}
+  _statusEffectController: {fileID: 6836594484995198180}
   _itemPrefab: {fileID: 7351252771090480809, guid: cc16b2faa5c81a341825e77a8f34f971, type: 3}

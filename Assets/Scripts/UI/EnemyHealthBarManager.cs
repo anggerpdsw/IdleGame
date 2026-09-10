@@ -17,7 +17,8 @@ namespace IdleDefenseSurvival.UI
         [Header("References")]
         [SerializeField] private GameObject _healthBarPrefab;
         [Tooltip("Offset vertikal health bar dari posisi enemy di layar (dalam piksel)")]
-        [SerializeField] private float _healthBarOffsetY = 0f;
+        [SerializeField] private float _healthBarOffsetY = 0.15f;
+        public float HealthBarOffsetY => _healthBarOffsetY;
 
         private static EnemyHealthBarManager _instance;
 
@@ -97,22 +98,36 @@ namespace IdleDefenseSurvival.UI
                 // Show/update the health bar.
                 entry.RootObject.SetActive(true);
                 entry.RootObject.transform.position = screenPos + Vector3.up * _healthBarOffsetY;
+            }
+        }
 
-                // Only update the slider when health actually changed.
-                if (Mathf.Abs(entry.Slider.value - enemy.CurrentHealth) > 0.001f)
-                {
-                    entry.Slider.value = enemy.CurrentHealth;
-                    entry.LastHealth = enemy.CurrentHealth;
-                }
+        public void UpdateEnemyStatus(EnemyAi enemy)
+        {
+            if (enemy == null) return;
+            if (!_activeHealthBars.TryGetValue(enemy, out var entry)) return;
+            if (entry.DefenseBreakImage != null)
+            {
+                bool showDefenseBreak = enemy.HasActiveDefenseBreak();
+                if (entry.DefenseBreakImage.enabled != showDefenseBreak)
+                    entry.DefenseBreakImage.enabled = showDefenseBreak;
+            }
+            if (entry.HeartBreakImage != null)
+            {
+                bool showHeartBreak = enemy.HasReducedMaxHealth();
+                if (entry.HeartBreakImage.enabled != showHeartBreak)
+                    entry.HeartBreakImage.enabled = showHeartBreak;
+            }
+        }
 
-                // Indicators – update only when the bar is visible.
-                bool hasDefenseBreak = enemy.HasActiveDefenseBreak();
-                bool hasHeartBreak   = enemy.HasReducedMaxHealth();
-
-                if (entry.DefenseBreakImage != null)
-                    entry.DefenseBreakImage.enabled = hasDefenseBreak;
-                if (entry.HeartBreakImage != null)
-                    entry.HeartBreakImage.enabled   = hasHeartBreak;
+        public void UpdateEnemyHealth(EnemyAi enemy, float currentHealth)
+        {
+            if (enemy == null) return;
+            if (!_activeHealthBars.TryGetValue(enemy, out var entry)) return;
+            if (entry.Slider != null &&
+                Mathf.Abs(entry.Slider.value - currentHealth) > 0.001f)
+            {
+                entry.Slider.value = currentHealth;
+                entry.LastHealth = currentHealth;
             }
         }
 
@@ -175,12 +190,6 @@ namespace IdleDefenseSurvival.UI
             _activeHealthBars[enemy] = entry;
         }
 
-        public void UpdateEnemyHealth(EnemyAi enemy, float currentHealth)
-        {
-            if (_activeHealthBars.TryGetValue(enemy, out var entry))
-                entry.Slider.value = currentHealth;
-        }
-
         public void UnregisterEnemy(EnemyAi enemy)
         {
             if (_activeHealthBars.TryGetValue(enemy, out var entry))
@@ -197,6 +206,7 @@ namespace IdleDefenseSurvival.UI
 
             // Expand pool bila habis
             GameObject newBar = Instantiate(_healthBarPrefab, this.transform);
+            newBar.SetActive(false);
             Transform defenseBreakTf = newBar.transform.Find("DefenseBreak");
             Transform heartBreakTf = newBar.transform.Find("HeartBreak");
             Transform healthBarTf = newBar.transform.Find("HealthBar");

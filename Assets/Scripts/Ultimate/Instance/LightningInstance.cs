@@ -92,15 +92,16 @@ namespace IdleDefenseSurvival.Ultimate
             _chainWait = new WaitForSeconds(_chainDelay);
 
             float ultimateAttack = PlayerStatsManager.Instance.GetStat(SkillType.UltimateAttack);
-            float baseDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * lightningData.GetDamageMultiplier() * ultimateAttack;
-            float stunMultiplier = lightningData.GetStuntMultiplier();
+            float lightningDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * lightningData.GetDamageMultiplier() * ultimateAttack;
             float defenseBreak = lightningData.GetDefenseBreak();
 
-            _baseDamageData = new DamageData(baseDamage, DamageType.Normal, CriticalType.None, UltimateID)
+            _baseDamageData = new DamageData(lightningDamage, DamageType.Normal, CriticalType.None, UltimateID)
             {
                 Element = lightningData.GetElement(),
-                StuntMultiplier = stunMultiplier,
-                DefenseBreak = defenseBreak,
+                StuntMultiplier = lightningData.GetStuntMultiplier(),
+                DefenseBreakSource  = DefenseBreakSource.Lightning,
+                DefenseBreakType    = DefenseBreakType.Permanent,
+                DefenseBreak = defenseBreak
             };
 
             // Start the chain lightning sequence
@@ -244,6 +245,8 @@ namespace IdleDefenseSurvival.Ultimate
             {
                 Element = _baseDamageData.Element,
                 StuntMultiplier = stunMultiplier,
+                DefenseBreakSource  = _baseDamageData.DefenseBreakSource,
+                DefenseBreakType    = _baseDamageData.DefenseBreakType,
                 DefenseBreak = defenseBreak,
             };
 

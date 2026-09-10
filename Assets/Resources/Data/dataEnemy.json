@@ -702,6 +702,22 @@
       ]
     },
     {
+      "id": "Frost Guardian",
+      "role": "Golem",
+      "effect": "Frost",
+      "prefabName": "Basic",
+      "attackRange": 1.2,
+      "attackSpeed": 1.16,
+      "damage": 9,
+      "health": 99.9,
+      "moveSpeed": 0.199,
+      "spawnWeight": 1.5,
+      "evasion": 3.6,
+      "element": "Water",
+      "exp": 26,
+      "dropItems": []
+    },
+    {
       "id": "Log Mimic",
       "role": "Tank",
       "prefabName": "Basic",

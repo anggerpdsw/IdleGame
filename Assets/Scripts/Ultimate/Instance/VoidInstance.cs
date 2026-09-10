@@ -165,7 +165,7 @@ namespace IdleDefenseSurvival.Ultimate
             {
                 if (!col.TryGetComponent(out EnemyAi enemy)) continue;
 
-                // First time enemy enters void: apply permanent slow + stunt + reduce max health by 10%
+                // First time enemy enters void: apply permanent slow + stunt + reduce max health by damageData.HealthBreak %
                 if (!_tetheredEnemies.Contains(enemy))
                 {
                     enemy.ApplyStunt(damageData.StuntMultiplier);

@@ -6849,6 +6849,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.UI.EnemyHealthBarManager
   _healthBarPrefab: {fileID: 5319573227512290303, guid: d250593e9a7bbfa44b26dc04291bca93, type: 3}
+  _healthBarOffsetY: 0.15
 --- !u!1 &604881968
 GameObject:
   m_ObjectHideFlags: 0

@@ -63,9 +63,11 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new BurnStatus(_damagePerSecond, Duration, _isPercentBased);
-            clone.StackCount = StackCount;
-            clone.MaxStacks = MaxStacks;
+            var clone = new BurnStatus(_damagePerSecond, Duration, _isPercentBased)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }
@@ -142,9 +144,11 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new PoisonStatus(_damagePerSecond, Duration, _spreadRadius, _spreadChance);
-            clone.StackCount = StackCount;
-            clone.MaxStacks = MaxStacks;
+            var clone = new PoisonStatus(_damagePerSecond, Duration, _spreadRadius, _spreadChance)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }
@@ -195,8 +199,10 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new FreezeStatus(Duration);
-            clone.StackCount = StackCount;
+            var clone = new FreezeStatus(Duration)
+            {
+                StackCount = StackCount
+            };
             return clone;
         }
     }
@@ -247,9 +253,11 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new BleedStatus(_baseDamagePerSecond, Duration, _missingHealthMultiplier);
-            clone.StackCount = StackCount;
-            clone.MaxStacks = MaxStacks;
+            var clone = new BleedStatus(_baseDamagePerSecond, Duration, _missingHealthMultiplier)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }
@@ -326,9 +334,11 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new ShockStatus(_damagePerSecond, Duration, _chainRadius, _maxChains);
-            clone.StackCount = StackCount;
-            clone.MaxStacks = MaxStacks;
+            var clone = new ShockStatus(_damagePerSecond, Duration, _chainRadius, _maxChains)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }
@@ -348,8 +358,9 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         private float _originalMoveSpeed;
         private float _originalAttackSpeed;
 
-        public SlowStatus(float slowPercent, float duration)
-            : base(duration)
+        public SlowSource Source { get; set; } = SlowSource.Card;
+
+        public SlowStatus(float slowPercent, float duration) : base(duration)
         {
             _slowPercent = Mathf.Clamp01(slowPercent);
         }
@@ -399,9 +410,11 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new SlowStatus(_slowPercent, Duration);
-            clone.StackCount = StackCount;
-            clone.MaxStacks = MaxStacks;
+            var clone = new SlowStatus(_slowPercent, Duration)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }
@@ -446,9 +459,11 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new CurseStatus(_damageTakenIncrease, _healingReduction, Duration);
-            clone.StackCount = StackCount;
-            clone.MaxStacks = MaxStacks;
+            var clone = new CurseStatus(_damageTakenIncrease, _healingReduction, Duration)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }
@@ -504,8 +519,10 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new FearStatus(Duration);
-            clone.StackCount = StackCount;
+            var clone = new FearStatus(Duration)
+            {
+                StackCount = StackCount
+            };
             return clone;
         }
     }
@@ -536,8 +553,10 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new StunStatus(Duration);
-            clone.StackCount = StackCount;
+            var clone = new StunStatus(Duration)
+            {
+                StackCount = StackCount
+            };
             return clone;
         }
     }
@@ -578,8 +597,143 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override IStatusEffect Clone()
         {
-            var clone = new RootStatus(Duration);
-            clone.StackCount = StackCount;
+            var clone = new RootStatus(Duration)
+            {
+                StackCount = StackCount
+            };
+            return clone;
+        }
+    }
+
+    /// <summary>
+    /// Defense Break - reduces enemy defense amount by a percentage.
+    /// Stacks additively per source (up to max stacks per source).
+    /// </summary>
+    [Serializable]
+    public sealed class DefenseBreakStatus : BaseStatusEffect
+    {
+        public override StatusEffectType Type => StatusEffectType.DefenseBreak;
+        public override int MaxStacks => 5;
+        public override StackPolicy StackPolicy => StackPolicy.Additive;
+
+        private readonly float _percentPerStack; // 0.1 = 10% defense reduction per stack
+        private float _originalDefense;
+
+        public DefenseBreakSource Source { get; set; }
+        public DefenseBreakType BreakType { get; set; }
+
+        public DefenseBreakStatus(float percentPerStack, float duration, DefenseBreakType breakType = DefenseBreakType.Temporary)
+            : base(duration)
+        {
+            _percentPerStack = Mathf.Clamp01(percentPerStack);
+            BreakType = breakType;
+        }
+
+        public override float GetCurrentValue() => _percentPerStack * StackCount;
+
+        public override void OnApply(EnemyAi enemy)
+        {
+            base.OnApply(enemy);
+            _originalDefense = enemy.DefenseAmount;
+            ApplyDefenseBreak(enemy);
+        }
+
+        public override void Tick(EnemyAi enemy, float deltaTime)
+        {
+            base.Tick(enemy, deltaTime);
+            // Reapply in case defense changed from other sources
+            ApplyDefenseBreak(enemy);
+        }
+
+        private void ApplyDefenseBreak(EnemyAi enemy)
+        {
+            float totalBreak = GetCurrentValue();
+            float newDefense = _originalDefense * (1f - totalBreak);
+            // Defense can go negative (amplifies damage) but clamp to -originalDefense as floor
+            enemy.SetDefenseAmount(Mathf.Max(-_originalDefense, newDefense));
+        }
+
+        public override void OnExpire(EnemyAi enemy)
+        {
+            enemy.SetDefenseAmount(_originalDefense);
+            base.OnExpire(enemy);
+        }
+
+        public override void OnStackAdded(EnemyAi enemy, int newStackCount)
+        {
+            base.OnStackAdded(enemy, newStackCount);
+            ApplyDefenseBreak(enemy);
+        }
+
+        public override IStatusEffect Clone()
+        {
+            var clone = new DefenseBreakStatus(_percentPerStack, Duration, BreakType)
+            {
+                Source = Source,
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
+            return clone;
+        }
+    }
+
+    /// <summary>
+    /// Heart Break - permanently reduces enemy max health by a percentage.
+    /// Does not stack; each application reduces current max health further.
+    /// </summary>
+    [Serializable]
+    public sealed class HeartBreakStatus : BaseStatusEffect
+    {
+        public override StatusEffectType Type => StatusEffectType.HeartBreak;
+        public override int MaxStacks => 1;
+        public override StackPolicy StackPolicy => StackPolicy.Replace;
+
+        private readonly float _percentReduction; // 0.1 = 10% max health reduction
+        private float _originalMaxHealth;
+
+        public HeartBreakStatus(float percentReduction, float duration = 0f)
+            : base(duration)
+        {
+            _percentReduction = Mathf.Clamp01(percentReduction);
+        }
+
+        public override float GetCurrentValue() => _percentReduction;
+
+        public override void OnApply(EnemyAi enemy)
+        {
+            base.OnApply(enemy);
+            _originalMaxHealth = enemy.MaxHealth;
+            ApplyHeartBreak(enemy);
+        }
+
+        public override void Tick(EnemyAi enemy, float deltaTime)
+        {
+            base.Tick(enemy, deltaTime);
+            // HeartBreak is permanent - no per-frame logic needed
+            // But we reapply in case max health was changed externally
+            ApplyHeartBreak(enemy);
+        }
+
+        private void ApplyHeartBreak(EnemyAi enemy)
+        {
+            float newMaxHealth = _originalMaxHealth * (1f - _percentReduction);
+            enemy.ReduceMaxHealthTo(newMaxHealth);
+        }
+
+        public override void OnExpire(EnemyAi enemy)
+        {
+            // HeartBreak is permanent - don't restore on expire
+            // If it has a duration, it's a temporary debuff (should use DefenseBreak instead)
+            base.OnExpire(enemy);
+        }
+
+        public override IStatusEffect Clone()
+        {
+            var clone = new HeartBreakStatus(_percentReduction, Duration)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
             return clone;
         }
     }

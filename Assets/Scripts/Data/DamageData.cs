@@ -64,5 +64,5 @@ namespace IdleDefenseSurvival.Data
             return Damage * DamageMultiplier * elementMultiplier;
         }
 
-        }
+    }
 }
