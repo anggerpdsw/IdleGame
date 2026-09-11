@@ -90,8 +90,7 @@ namespace IdleDefenseSurvival.UI
             if (_slotPrefab != null)
             {
                 var go = Instantiate(_slotPrefab, _content);
-                var comp = go.GetComponent<DropBagEntryUI>();
-                if (comp != null) return comp;
+                if (go.TryGetComponent<DropBagEntryUI>(out var comp)) return comp;
                 Destroy(go);
             }
 

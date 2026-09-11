@@ -20,7 +20,7 @@ namespace IdleDefenseSurvival.Enemy
 
         [Header("TEST")]
         [SerializeField] private bool _testMode = false;
-        [SerializeField] private string _testSpecificID = "Frost Guardian";
+        [SerializeField] private string _testSpecificID = "Iron Guardian";
         [SerializeField] private Role _testRole = Role.Fighter;
 
         private EnemyDatabase EnemyDatabase => DatabaseJSONCache.DatabaseEnemy;

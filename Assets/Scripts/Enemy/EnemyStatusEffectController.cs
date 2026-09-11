@@ -274,6 +274,29 @@ namespace IdleDefenseSurvival.Enemy
         }
 
         /// <summary>
+        /// Removes effects of a given type instantly (bypasses the queued removal).
+        /// Useful for UI‑driven immediate updates such as aura expiration.
+        /// </summary>
+        public void RemoveEffectImmediate(StatusEffectType type, System.Predicate<IStatusEffect> predicate = null)
+        {
+            var toRemove = new List<IStatusEffect>();
+            for (int i = 0; i < _effects.Count; i++)
+            {
+                var e = _effects[i];
+                if (e.Type != type) continue;
+                if (predicate != null && !predicate(e)) continue;
+                toRemove.Add(e);
+            }
+
+            foreach (var e in toRemove)
+            {
+                RemoveEffectInternal(e);
+            }
+
+            if (toRemove.Count > 0) OnEffectsChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Removes all effects of a specific category.
         /// </summary>
         public void RemoveEffectsByCategory(StatusEffectCategory category)
@@ -419,6 +442,29 @@ namespace IdleDefenseSurvival.Enemy
         /// Gets the effective max health multiplier (1 - totalHeartBreak).
         /// </summary>
         public float GetMaxHealthMultiplier() => 1f - GetTotalHeartBreakPercent();
+
+        /// <summary>
+        /// Gets the total damage reduction percentage from all DamageReduction effects.
+        /// Returns value 0-1 where 1 = 100% damage reduction.
+        /// Uses MaximumValue stacking (only highest reduction applies).
+        /// </summary>
+        public float GetTotalDamageReductionPercent()
+        {
+            float total = 0f;
+            for (int i = 0; i < _effects.Count; i++)
+            {
+                if (_effects[i] is DamageReductionStatus dr)
+                {
+                    total = Mathf.Max(total, dr.GetCurrentValue());
+                }
+            }
+            return Mathf.Clamp01(total);
+        }
+
+        /// <summary>
+        /// Gets the effective damage multiplier (1 - totalDamageReduction).
+        /// </summary>
+        public float GetDamageReductionMultiplier() => 1f - GetTotalDamageReductionPercent();
 
         /// <summary>
         /// Checks if enemy is currently crowd controlled (stunned, frozen, rooted, feared, etc.).

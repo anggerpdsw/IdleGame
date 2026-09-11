@@ -26,8 +26,9 @@ namespace IdleDefenseSurvival.UI
         private class HealthBarEntry
         {
             public Slider Slider;
-            public Image DefenseBreakImage;
+            public Image DamageReductionImage;
             public Image HeartBreakImage;
+            public Image DefenseBreakImage;
             public GameObject RootObject; // Parent GameObject (PanelHealth)
             public float LastHealth;    // last displayed value – avoids redundant slider updates
         }
@@ -105,17 +106,23 @@ namespace IdleDefenseSurvival.UI
         {
             if (enemy == null) return;
             if (!_activeHealthBars.TryGetValue(enemy, out var entry)) return;
-            if (entry.DefenseBreakImage != null)
+            if (entry.DamageReductionImage != null)
             {
-                bool showDefenseBreak = enemy.HasActiveDefenseBreak();
-                if (entry.DefenseBreakImage.enabled != showDefenseBreak)
-                    entry.DefenseBreakImage.enabled = showDefenseBreak;
+                bool showDamageReduction = enemy.HasActiveDamageReduction();
+                if (entry.DamageReductionImage.enabled != showDamageReduction)
+                    entry.DamageReductionImage.enabled = showDamageReduction;
             }
             if (entry.HeartBreakImage != null)
             {
                 bool showHeartBreak = enemy.HasReducedMaxHealth();
                 if (entry.HeartBreakImage.enabled != showHeartBreak)
                     entry.HeartBreakImage.enabled = showHeartBreak;
+            }
+            if (entry.DefenseBreakImage != null)
+            {
+                bool showDefenseBreak = enemy.HasActiveDefenseBreak();
+                if (entry.DefenseBreakImage.enabled != showDefenseBreak)
+                    entry.DefenseBreakImage.enabled = showDefenseBreak;
             }
         }
 
@@ -150,18 +157,21 @@ namespace IdleDefenseSurvival.UI
                 GameObject bar = Instantiate(_healthBarPrefab, this.transform);
 
                 // Find DefenseBreak and HeartBreak images in the prefab hierarchy
-                Transform defenseBreakTf = bar.transform.Find("DefenseBreak");
+                Transform damageReductionTf = bar.transform.Find("DamageReduction");
                 Transform heartBreakTf = bar.transform.Find("HeartBreak");
+                Transform defenseBreakTf = bar.transform.Find("DefenseBreak");
                 Transform healthBarTf = bar.transform.Find("HealthBar");
-                var defenseBreakImg = defenseBreakTf ? defenseBreakTf.GetComponent<Image>() : null;
+                var damageReductionImg = damageReductionTf ? damageReductionTf.GetComponent<Image>() : null;
                 var heartBreakImg = heartBreakTf ? heartBreakTf.GetComponent<Image>() : null;
+                var defenseBreakImg = defenseBreakTf ? defenseBreakTf.GetComponent<Image>() : null;
                 var heartSlider = healthBarTf ? healthBarTf.GetComponent<Slider>() : null;
 
                 var entry = new HealthBarEntry
                 {
                     Slider = heartSlider,
-                    DefenseBreakImage = defenseBreakImg,
+                    DamageReductionImage = damageReductionImg,
                     HeartBreakImage = heartBreakImg,
+                    DefenseBreakImage = defenseBreakImg,
                     RootObject = bar,
                     LastHealth = -1f // force first update
                 };
@@ -181,8 +191,9 @@ namespace IdleDefenseSurvival.UI
             entry.LastHealth      = maxHealth;
 
             // Sembunyikan indikator di awal
-            if (entry.DefenseBreakImage != null) entry.DefenseBreakImage.enabled = false;
+            if (entry.DamageReductionImage != null) entry.DamageReductionImage.enabled = false;
             if (entry.HeartBreakImage != null) entry.HeartBreakImage.enabled = false;
+            if (entry.DefenseBreakImage != null) entry.DefenseBreakImage.enabled = false;
 
             // Tampilkan hanya jika setting aktif
             entry.RootObject.SetActive(_enemyHealthBarToggle);
@@ -207,18 +218,21 @@ namespace IdleDefenseSurvival.UI
             // Expand pool bila habis
             GameObject newBar = Instantiate(_healthBarPrefab, this.transform);
             newBar.SetActive(false);
-            Transform defenseBreakTf = newBar.transform.Find("DefenseBreak");
+            Transform damageReductionTf = newBar.transform.Find("DamageReduction");
             Transform heartBreakTf = newBar.transform.Find("HeartBreak");
+            Transform defenseBreakTf = newBar.transform.Find("DefenseBreak");
             Transform healthBarTf = newBar.transform.Find("HealthBar");
-            var defenseBreakImg = defenseBreakTf ? defenseBreakTf.GetComponent<Image>() : null;
+            var damageReductionImg = damageReductionTf ? damageReductionTf.GetComponent<Image>() : null;
             var heartBreakImg = heartBreakTf ? heartBreakTf.GetComponent<Image>() : null;
+            var defenseBreakImg = defenseBreakTf ? defenseBreakTf.GetComponent<Image>() : null;
             var heartSlider = healthBarTf ? healthBarTf.GetComponent<Slider>() : null;
 
             var entry = new HealthBarEntry
             {
                 Slider = heartSlider,
-                DefenseBreakImage = defenseBreakImg,
+                DamageReductionImage = damageReductionImg,
                 HeartBreakImage   = heartBreakImg,
+                DefenseBreakImage = defenseBreakImg,
                 RootObject        = newBar,
                 LastHealth        = -1f
             };
@@ -231,8 +245,9 @@ namespace IdleDefenseSurvival.UI
             if (entry == null || entry.Slider == null || entry.RootObject == null) return;
             entry.RootObject.SetActive(false);
             entry.RootObject.transform.SetParent(this.transform);
-            if (entry.DefenseBreakImage != null) entry.DefenseBreakImage.enabled = false;
+            if (entry.DamageReductionImage != null) entry.DamageReductionImage.enabled = false;
             if (entry.HeartBreakImage != null) entry.HeartBreakImage.enabled = false;
+            if (entry.DefenseBreakImage != null) entry.DefenseBreakImage.enabled = false;
             _healthBarPool.Enqueue(entry);
         }
     }

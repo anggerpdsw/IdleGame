@@ -175,6 +175,8 @@ namespace IdleDefenseSurvival.Enemy
         {
             UnregisterFromGrid();
             // Status effects are cleared by EnemyStatusEffectController.OnDisable
+            // Unregister from enemy-to-enemy aura manager
+            EnemyAuraManager.Instance?.UnregisterEnemyAuraSource(this);
         }
 
         private void Update()
@@ -493,6 +495,9 @@ namespace IdleDefenseSurvival.Enemy
             _enemyHealthBarManager.RegisterEnemy(this, _maxHealth);
 
             RefreshAuraVisual();
+
+            // Register as aura source for enemy-to-enemy auras (e.g., Iron Guardian Damage Reduction)
+            EnemyAuraManager.Instance?.RegisterEnemyAuraSource(this);
         }
 
         /// <summary>
@@ -626,6 +631,12 @@ namespace IdleDefenseSurvival.Enemy
                     ? PlayerStatsManager.Instance.GetStat(SkillType.EliteDamage)
                     : 0f;
             damageAfterDefense *= 1f + damageBonus * 0.01f;
+
+            // Apply Damage Reduction aura (from Iron Guardian etc.) AFTER defense
+            // This is a final damage multiplier: damage * (1 - reductionPercent)
+            float damageReductionMultiplier = _statusEffectController != null ? _statusEffectController.GetDamageReductionMultiplier() : 1f;
+            damageAfterDefense *= damageReductionMultiplier;
+
             float finalDamage = Mathf.Min(_currentHealth, damageAfterDefense);
             _currentHealth -= finalDamage;
 
@@ -843,6 +854,16 @@ namespace IdleDefenseSurvival.Enemy
         public bool HasReducedMaxHealth()
         {
             return _statusEffectController != null && _statusEffectController.HasEffect(StatusEffectType.HeartBreak);
+        }
+
+        /// <summary>
+        /// Check if enemy currently has an active DamageReduction aura effect.
+        /// Used by health bar UI to show DamageReduction indicator icon.
+        /// </summary>
+        public bool HasActiveDamageReduction()
+        {
+            return _statusEffectController != null
+                && _statusEffectController.GetTotalDamageReductionPercent() > 0f;
         }
 
         /// <summary>

@@ -737,4 +737,55 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
             return clone;
         }
     }
+
+    /// <summary>
+    /// Damage Reduction - reduces damage taken by a percentage.
+    /// Uses MaximumValue stacking: only the highest reduction applies (prevents stacking abuse).
+    /// Applied after defense calculation, as a final damage multiplier.
+    /// </summary>
+    [Serializable]
+    public sealed class DamageReductionStatus : BaseStatusEffect
+    {
+        public override StatusEffectType Type => StatusEffectType.DamageReduction;
+        public override int MaxStacks => 1;
+        public override StackPolicy StackPolicy => StackPolicy.MaximumValue;
+
+        private readonly float _reductionPercent; // 0.3 = 30% damage reduction
+
+        public DamageReductionStatus(float reductionPercent, float duration = float.MaxValue)
+            : base(duration)
+        {
+            _reductionPercent = Mathf.Clamp01(reductionPercent);
+        }
+
+        public override float GetCurrentValue() => _reductionPercent;
+
+        public override void OnApply(EnemyAi enemy)
+        {
+            base.OnApply(enemy);
+            // Visual indicator could be added here (e.g., shield effect)
+        }
+
+        public override void Tick(EnemyAi enemy, float deltaTime)
+        {
+            base.Tick(enemy, deltaTime);
+            // No per-frame logic needed; reduction is read during TakeDamage
+        }
+
+        public override void OnExpire(EnemyAi enemy)
+        {
+            base.OnExpire(enemy);
+            // Cleanup visual if any
+        }
+
+        public override IStatusEffect Clone()
+        {
+            var clone = new DamageReductionStatus(_reductionPercent, Duration)
+            {
+                StackCount = StackCount,
+                MaxStacks = MaxStacks
+            };
+            return clone;
+        }
+    }
 }
