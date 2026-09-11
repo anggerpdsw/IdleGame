@@ -709,17 +709,17 @@
         "onHit": [{
           "effect": "Slow",
           "value": 50,
-          "duration": 5.5
+          "duration": 66
         }],
         "aura": [{
           "effect": "Slow",
           "value": 20,
-          "radius": 4.31
+          "radius": 5.31
         }],
         "onTakeDamage": [{
           "effect": "Slow",
           "value": 10,
-          "duration": 3.3
+          "duration": 6.6
         }]
       }],
       "prefabName": "Basic",
@@ -727,7 +727,7 @@
       "attackSpeed": 1.26,
       "damage": 9,
       "health": 99.9,
-      "moveSpeed": 0.119,
+      "moveSpeed": 0.099,
       "spawnWeight": 1.5,
       "evasion": 5.6,
       "element": "Water",

@@ -56,9 +56,7 @@ namespace IdleDefenseSurvival.Mission
             _instanceId = mission.instanceId;
 
             if (_label != null)
-                _label.text = !string.IsNullOrEmpty(template?.name)
-                    ? template.name
-                    : mission.missionId;
+                _label.text = GetMissionLabel(mission, template);
 
             if (_progressLabel != null)
                 _progressLabel.text = $"{Utilityku.FormatNumber(mission.currentCount)} / {Utilityku.FormatNumber(mission.targetCount)}";
@@ -130,6 +128,19 @@ namespace IdleDefenseSurvival.Mission
                     return m.status == MissionStatus.Claimed ? "Claimed" : "Cancelled";
                 default: return string.Empty;
             }
+        }
+
+        private static string GetMissionLabel(MissionInstance mission, MissionTemplate template)
+        {
+            if (template == null) return mission?.missionId ?? string.Empty;
+
+            // Specific enemy: display actual enemy ID (targetId) if available
+            if (template.type == MissionEventType.SpecificEnemyKilled &&
+                !string.IsNullOrEmpty(mission?.targetId))
+                return mission.targetId;
+
+            // Fallback: template name, then mission ID
+            return !string.IsNullOrEmpty(template.name) ? template.name : mission.missionId;
         }
     }
 }
