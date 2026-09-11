@@ -713,12 +713,12 @@
         }],
         "aura": [{
           "effect": "Slow",
-          "value": 20,
+          "value": 30,
           "radius": 5.31
         }],
         "onTakeDamage": [{
           "effect": "Slow",
-          "value": 10,
+          "value": 20,
           "duration": 6.6
         }]
       }],
@@ -732,6 +732,35 @@
       "evasion": 5.6,
       "element": "Water",
       "exp": 26,
+      "dropItems": [{
+        "ItemId": "decomposed_common",
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Weight": 0.0015,
+        "MinTier": 2
+      }]
+    },
+    {
+      "id": "Iron Guardian",
+      "role": "Golem",
+      "effects": [{
+        "type": "Defense",
+        "aura": [{
+          "effect": "DamageReduction",
+          "value": 30,
+          "radius": 6.5
+        }]
+      }],
+      "prefabName": "Basic",
+      "attackRange": 1.62,
+      "attackSpeed": 1.53,
+      "damage": 12,
+      "health": 199.9,
+      "moveSpeed": 0.089,
+      "spawnWeight": 0.97,
+      "evasion": 4.4,
+      "element": "Earth",
+      "exp": 32,
       "dropItems": [{
         "ItemId": "decomposed_common",
         "MinCount": 1,

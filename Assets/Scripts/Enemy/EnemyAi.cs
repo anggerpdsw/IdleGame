@@ -512,8 +512,12 @@ namespace IdleDefenseSurvival.Enemy
                         if (act == null) continue;
                         _auraRadius = Mathf.Max(_auraRadius, act.radius);
 
-                        _auraPulseColor = act.effect != StatusEffectType.Slow 
-                            ? GameColors.red : GameColors.rareBlue;
+                        _auraPulseColor = act.effect switch
+                        {
+                            StatusEffectType.Slow => GameColors.rareBlue,
+                            StatusEffectType.DamageReduction => GameColors.gemRuby,
+                            _ => GameColors.empty,
+                        };
                     }
                 }
             }
