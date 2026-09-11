@@ -39,6 +39,7 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private SpriteRenderer _attackRangeRenderer;
         // Barrier visual – child GameObject with SpriteRenderer
         [SerializeField] private SpriteRenderer _barrierRenderer;
+        [SerializeField] private SpriteRenderer _iceRenderer;
         // Shield visual - separate from barrier
         [SerializeField] private SpriteRenderer _shieldRenderer;
         [SerializeField] private Image _shieldCooldownImage; // Radial fill image for cooldown UI
@@ -96,9 +97,9 @@ namespace IdleDefenseSurvival.Player
             _enemyLayerMask = LayerMask.GetMask("Enemy");
             _activeTanks = new List<TankInstance>();
 
-            // Ensure barrier renderer starts disabled
-            if (_barrierRenderer != null)
-                _barrierRenderer.enabled = false;
+            // Ensure effect renderer starts disabled
+            SetBarrierEffect(false);
+            SetIceEffect(false);
         }
 
         /// <summary>
@@ -775,10 +776,10 @@ namespace IdleDefenseSurvival.Player
                 float heal = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint) * 0.1f;
                 Heal(heal);
 
-                // Start immunity coroutine (5 seconds) and enable barrier visual.
+                // Start immunity coroutine (15 seconds) and enable barrier visual.
                 // ensure we can start coroutine
                 if (gameObject.activeInHierarchy)
-                    StartCoroutine(ImmunityRoutine(5f));
+                    StartCoroutine(ImmunityRoutine(15f));
                 return;
             }
 
@@ -790,14 +791,19 @@ namespace IdleDefenseSurvival.Player
         private IEnumerator ImmunityRoutine(float duration)
         {
             _isImmune = true;
-            if (_barrierRenderer != null)
-                _barrierRenderer.enabled = true;
-
+            SetBarrierEffect(_isImmune);
             yield return new WaitForSeconds(duration);
-
             _isImmune = false;
-            if (_barrierRenderer != null)
-                _barrierRenderer.enabled = false;
+            SetBarrierEffect(_isImmune);
+        }
+                
+        public void SetBarrierEffect(bool enabled)
+        {
+            if (_barrierRenderer != null) _barrierRenderer.enabled = enabled;
+        }
+        public void SetIceEffect(bool enabled)
+        {
+            if (_iceRenderer != null) _iceRenderer.enabled = enabled;
         }
 
         private void DrawAttackRange()

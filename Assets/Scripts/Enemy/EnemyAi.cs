@@ -53,6 +53,30 @@ namespace IdleDefenseSurvival.Enemy
         // Status effect controller reference
         [SerializeField] private EnemyStatusEffectController _statusEffectController;
 
+        [Header("Aura Visualization")]
+        [Tooltip("SpriteRenderer for drawing enemy aura range (dashed circle).")]
+        [SerializeField] private SpriteRenderer _auraRangeRenderer;
+        [Tooltip("Rotation speed of aura range visual.")]
+        [SerializeField] private float _auraRotationSpeed = 2f;
+        [Tooltip("Scale multiplier for aura sprite size.")]
+        [SerializeField] private float _auraScaleRange = 1f;
+
+        [Header("Aura Pulse")]
+        [Tooltip("Renderer untuk gelombang aura yang melebar dari pusat enemy.")]
+        [SerializeField] private SpriteRenderer _auraPulseRenderer;
+        [Tooltip("Durasi satu gelombang dari pusat sampai batas aura.")]
+        [SerializeField] private float _auraPulseDuration = 1.2f;
+        [Tooltip("Jeda antar gelombang.")]
+        [SerializeField] private float _auraPulseInterval = 0.35f;
+        [Tooltip("Alpha maksimum gelombang.")]
+        [SerializeField, Range(0f, 1f)] private float _auraPulseMaxAlpha = 0.45f;
+        [Tooltip("Warna gelombang aura Slow.")]
+        [SerializeField] private Color _auraPulseColor = new(0.1f, 0.55f, 1f, 1f);
+
+        private float _auraPulseTimer;
+        private float _auraRadius;
+        private bool _hasAura;
+
         private SaveManager _saveManager;
         private WaveManager _waveManager;
         private EconomyManager _economyManager;
@@ -155,6 +179,9 @@ namespace IdleDefenseSurvival.Enemy
 
         private void Update()
         {
+            // Slow aura pulse tetap berjalan saat Time.timeScale = 0
+            UpdateAuraPulse();
+
             // Skip movement if still in stun
             if (Time.time < _stuntEndTime)
             {
@@ -189,6 +216,10 @@ namespace IdleDefenseSurvival.Enemy
             }
 
             // Defense breaks are now handled by EnemyStatusEffectController
+
+            // Rotate aura range visual
+            if (_auraRangeRenderer != null && _auraRangeRenderer.enabled)
+                _auraRangeRenderer.transform.Rotate(0, 0, _auraRotationSpeed * Time.deltaTime);
         }
 
         private void FixedUpdate()
@@ -460,6 +491,94 @@ namespace IdleDefenseSurvival.Enemy
 
             // Register dengan global health bar manager
             _enemyHealthBarManager.RegisterEnemy(this, _maxHealth);
+
+            RefreshAuraVisual();
+        }
+
+        /// <summary>
+        /// Updates the aura range visual based on EnemyData aura effects.
+        /// </summary>
+        private void RefreshAuraVisual()
+        {
+            if (_auraRangeRenderer == null) return;
+            _auraRadius = 0f;
+            if (EnemyData?.effects != null)
+            {
+                foreach (var ef in EnemyData.effects)
+                {
+                    if (ef?.aura == null) continue;
+                    foreach (var act in ef.aura)
+                    {
+                        if (act == null) continue;
+                        _auraRadius = Mathf.Max(_auraRadius, act.radius);
+
+                        _auraPulseColor = act.effect != StatusEffectType.Slow 
+                            ? GameColors.red : GameColors.rareBlue;
+                    }
+                }
+            }
+
+            _hasAura = _auraRadius > 0f;
+
+            // --------------------------------------------------
+            // Aura boundary
+            // --------------------------------------------------
+            _auraRangeRenderer.enabled = _hasAura;
+            if (_hasAura)
+            {
+                float diameter = _auraRadius * 2f;
+                float scale = diameter * _auraScaleRange;
+                _auraRangeRenderer.transform.localScale = new Vector3(scale, scale, 1f);
+                _auraRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
+            }
+            
+            if (_auraPulseRenderer != null)
+            {
+                _auraPulseRenderer.enabled = false;
+                _auraPulseTimer = 0f;
+            }
+        }
+
+        private void UpdateAuraPulse()
+        {
+            if (!_hasAura || _auraPulseRenderer == null) return;
+            float deltaTime = Time.unscaledDeltaTime;
+            _auraPulseTimer += deltaTime;
+
+            float cycleDuration = _auraPulseDuration + _auraPulseInterval;
+            float cycleTime = _auraPulseTimer % cycleDuration;
+
+            // --------------------------------------------------
+            // Jeda sebelum pulse berikutnya
+            // --------------------------------------------------
+            if (cycleTime >= _auraPulseDuration)
+            {
+                _auraPulseRenderer.enabled = false;
+                return;
+            }
+
+            _auraPulseRenderer.enabled = true;
+
+            // 0 → 1
+            float t = cycleTime / _auraPulseDuration;
+
+            // Smooth easing: mulai pelan, lalu melebar
+            float easedT = Mathf.SmoothStep(0f, 1f, t);
+
+            // --------------------------------------------------
+            // Scale dari pusat menuju batas aura
+            // --------------------------------------------------
+            float diameter = _auraRadius * 2f;
+            float scale = diameter * easedT;
+            _auraPulseRenderer.transform.localScale = new Vector3(scale, scale, 1f);
+
+            // --------------------------------------------------
+            // Alpha: muncul → menghilang
+            // --------------------------------------------------
+            float alpha = Mathf.Sin(t * Mathf.PI) * _auraPulseMaxAlpha;
+            Color color = _auraPulseColor;
+            color.a = alpha;
+            _auraPulseRenderer.color = color;
         }
 
         public float TakeDamage(DamageData damageData, bool canEvade = true)
@@ -526,6 +645,9 @@ namespace IdleDefenseSurvival.Enemy
 
             // Mark statistics dirty
             EnemyStatisticsManager.Instance?.MarkDirty();
+
+            // Process OnTakeDamage effects after damage is applied
+            EnemyEffectProcessor.ProcessOnTakeDamage(this, damageData);
 
             // Check if dead
             if (_currentHealth <= 0) Die();
@@ -766,6 +888,9 @@ namespace IdleDefenseSurvival.Enemy
             // Unregister from statistics service
             EnemyStatisticsManager.Instance?.Unregister(this);
 
+            // Notify aura manager to clean up any active auras from this enemy
+            EnemyAuraManager.Instance?.OnEnemyDeath(this);
+
             DropRewards();
             DropItemDrops();
 
@@ -968,6 +1093,9 @@ namespace IdleDefenseSurvival.Enemy
                 projectile.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
                 projectile.InitializeFromEnemy(_player.transform, this);
             }
+
+            // Process OnHit effects after successful attack
+            EnemyEffectProcessor.ProcessOnHit(this, _playerComponent);
         }
 
 #if UNITY_EDITOR

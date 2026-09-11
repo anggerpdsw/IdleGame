@@ -16,17 +16,49 @@
             "cancelCooldownMinutes": 15
         },
         {
-            "id": "kill_specific_monster",
-            "name": "Specialist",
+            "id": "kill_specific_monster_v1",
+            "name": "Specialist v1",
             "description": "Hunt specific monster types",
             "type": 1,
             "targetId": "Crystal Cluster",
-            "minCount": 500,
-            "maxCount": 2500,
+            "minCount": 600,
+            "maxCount": 3000,
             "reward": {
                 "gold": 15000,
                 "gem": 7,
                 "meat": 25
+            },
+            "claimCooldownMinutes": 2,
+            "cancelCooldownMinutes": 20
+        },
+        {
+            "id": "kill_specific_monster_v2",
+            "name": "Specialist v2",
+            "description": "Hunt special monster types",
+            "type": 1,
+            "targetId": "Frost Guardian",
+            "minCount": 200,
+            "maxCount": 1000,
+            "reward": {
+                "gold": 45000,
+                "gem": 21,
+                "meat": 75
+            },
+            "claimCooldownMinutes": 2,
+            "cancelCooldownMinutes": 20
+        },
+        {
+            "id": "kill_specific_monster_v3",
+            "name": "Sniper",
+            "description": "Hunt elite monster types",
+            "type": 1,
+            "targetId": "Forest Archer",
+            "minCount": 400,
+            "maxCount": 1200,
+            "reward": {
+                "gold": 30000,
+                "gem": 14,
+                "meat": 50
             },
             "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 20
@@ -54,7 +86,7 @@
             "type": 2,
             "targetId": "Gold",
             "minCount": 50000,
-            "maxCount": 100000,
+            "maxCount": 150000,
             "reward": {
                 "gold": 10000,
                 "gem": 1,
@@ -70,7 +102,7 @@
             "type": 2,
             "targetId": "Gem",
             "minCount": 10,
-            "maxCount": 25,
+            "maxCount": 35,
             "reward": {
                 "gold": 50000,
                 "gem": 3,

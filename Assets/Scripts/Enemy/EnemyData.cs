@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Data
     /// <summary>
     /// Data definition for a single enemy type.
     /// Loaded from dataEnemy.json.
+    /// Jika menambahkan field baru, tambahkan juga pada EnemySpawner ketika SpawnEnemy
     /// </summary>
     [Serializable]
     public class EnemyData
@@ -71,6 +72,7 @@ namespace IdleDefenseSurvival.Data
         public bool IsElite => 
             role == Role.Agile ||  role == Role.Caster ||  role == Role.Ranger;
         public bool IsBoss => role == Role.BOSS;
+        public bool IsSpecial => effects != null;
     }
 
     /// <summary>
@@ -83,7 +85,7 @@ namespace IdleDefenseSurvival.Data
     }
 
     [Serializable]
-    public class ActiveSlowEffect
+    public class SlowEffect
     {
         public SlowSource Source;
         public SlowType Type;

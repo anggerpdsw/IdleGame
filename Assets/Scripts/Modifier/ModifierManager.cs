@@ -288,13 +288,22 @@ namespace IdleDefenseSurvival.Manager
         {
             if (_modifierLookup.Count == 0) return;
             _removeBuffer.Clear();
-
-            DateTime now = DateTime.UtcNow;
+            
+            float now = Time.time;              // Unity time (primary)
+            DateTime utcNow = DateTime.UtcNow;
             foreach (var pair in _modifierLookup)
             {
                 var modifier = pair.Value;
-                if (modifier.Permanent || modifier.ExpireUtc is null) continue;
-                if (modifier.ExpireUtc.Value <= now) _removeBuffer.Add(pair.Key);
+                if (modifier.Permanent) continue;
+                // NEW: Unity-time path
+                if (modifier.ExpireTime.HasValue && modifier.ExpireTime.Value <= now)
+                {
+                    _removeBuffer.Add(pair.Key);
+                    continue;
+                }
+                // LEGACY: UTC path
+                if (modifier.ExpireUtc.HasValue && modifier.ExpireUtc.Value <= utcNow)
+                    _removeBuffer.Add(pair.Key);
             }
 
             if (_removeBuffer.Count == 0) return;

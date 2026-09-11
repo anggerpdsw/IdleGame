@@ -1,4 +1,5 @@
 using System;
+using IdleDefenseSurvival.Enemy.StatusEffects;
 
 namespace IdleDefenseSurvival.Data
 {
@@ -30,7 +31,7 @@ namespace IdleDefenseSurvival.Data
     [Serializable]
     public class EnemyEffectAction
     {
-        public string effect;
+        public StatusEffectType effect = StatusEffectType.None;
         public float value;
         public float duration;
         public float radius;

@@ -1,4 +1,5 @@
 using System;
+using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Stats;
 using UnityEngine;
@@ -69,9 +70,9 @@ namespace IdleDefenseSurvival.Manager
             float fraction = rawCount - wholeCount;
             return type switch
             {
-                AccumulatedCountType.Bounce => 
+                AccumulatedCountType.Bounce =>
                     AccumulateFraction(wholeCount, fraction, ref _bounceFractionAccumulator),
-                AccumulatedCountType.Multi => 
+                AccumulatedCountType.Multi =>
                     AccumulateFraction(wholeCount, fraction, ref _multiShootFractionAccumulator),
                 _ => wholeCount,
             };
@@ -89,6 +90,36 @@ namespace IdleDefenseSurvival.Manager
             return wholeCount;
         }
 
+        /// <summary>
+        /// Applies a temporary percent modifier to a stat.
+        /// Used for effects like enemy slow that temporarily modify move speed.
+        /// </summary>
+        public void ApplyTemporaryModifier(SkillType stat, float multiplierPercent, string sourceId, float durationSec = 1f)
+        {
+            if (multiplierPercent <= 0f) return;
+
+            // multiplierPercent = current speed percent (e.g., 90 = 90% speed)
+            // Percent modifier needed = multiplierPercent - 100  → 90 → -10
+            // ModifierCalculator expects raw percent value (-10), not fraction (-0.1)
+            float percentValue = multiplierPercent - 100f;
+
+            var modifier = new StatModifier
+            {
+                Id = $"Temp_{sourceId}_{stat}",
+                Source = ModifierSource.Buff,
+                Stat = stat,
+                Mode = ModifierMode.Percent,
+                Value = percentValue,
+                Permanent = false,
+                ExpireTime = Time.time + durationSec   // Unity time
+            };
+
+            ModifierManager.Instance.AddModifier(modifier);
+        }
+
+        // Overload preserving original 1s default
+        public void ApplyTemporaryModifier(SkillType stat, float multiplierPercent, string sourceId)
+            => ApplyTemporaryModifier(stat, multiplierPercent, sourceId, 1f);
     }
 
     public enum AccumulatedCountType { Bounce, Multi }

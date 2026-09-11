@@ -709,30 +709,36 @@
         "onHit": [{
           "effect": "Slow",
           "value": 50,
-          "duration": 5
+          "duration": 5.5
         }],
         "aura": [{
           "effect": "Slow",
           "value": 20,
-          "radius": 4
+          "radius": 4.31
         }],
         "onTakeDamage": [{
           "effect": "Slow",
           "value": 10,
-          "duration": 3
+          "duration": 3.3
         }]
       }],
       "prefabName": "Basic",
-      "attackRange": 1.2,
-      "attackSpeed": 1.16,
+      "attackRange": 1.52,
+      "attackSpeed": 1.26,
       "damage": 9,
       "health": 99.9,
-      "moveSpeed": 0.199,
+      "moveSpeed": 0.119,
       "spawnWeight": 1.5,
-      "evasion": 3.6,
+      "evasion": 5.6,
       "element": "Water",
       "exp": 26,
-      "dropItems": []
+      "dropItems": [{
+        "ItemId": "decomposed_common",
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Weight": 0.0015,
+        "MinTier": 2
+      }]
     },
     {
       "id": "Log Mimic",

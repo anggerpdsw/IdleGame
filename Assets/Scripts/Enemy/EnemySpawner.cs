@@ -20,6 +20,7 @@ namespace IdleDefenseSurvival.Enemy
 
         [Header("TEST")]
         [SerializeField] private bool _testMode = false;
+        [SerializeField] private string _testSpecificID = "Frost Guardian";
         [SerializeField] private Role _testRole = Role.Fighter;
 
         private EnemyDatabase EnemyDatabase => DatabaseJSONCache.DatabaseEnemy;
@@ -82,7 +83,8 @@ namespace IdleDefenseSurvival.Enemy
                 evasion     = rawData.evasion,
                 element     = rawData.element,
                 exp         = rawData.exp,
-                dropItems   = rawData.dropItems
+                dropItems   = rawData.dropItems,
+                effects     = rawData.effects
             };
 
             // Calculate rewards based on enemy stats and wave
@@ -167,8 +169,11 @@ namespace IdleDefenseSurvival.Enemy
         private EnemyData GetRandomEnemy()
         {
             if (EnemyDatabase == null || EnemyDatabase.enemies.Length == 0) return null;
-            if (_testMode)
+            if (_testMode) {
+                if (_testSpecificID != string.Empty)
+                    return GetEnemyById(_testSpecificID);
                 return GetRandomEnemyByRole(_testRole);
+            }
             return GetRandomEnemyByWeight();
         }
                 
@@ -227,6 +232,19 @@ namespace IdleDefenseSurvival.Enemy
                     enemy.role == Role.BOSS)) continue;
                 cumulativeWeight += enemy.spawnWeight;
                 if (randomValue <= cumulativeWeight) return enemy;
+            }
+            return null;
+        }
+
+        private EnemyData GetEnemyById(string enemyId)
+        {
+            if (EnemyDatabase?.enemies == null) return null;
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (enemy == null) continue;
+                if (string.Equals(enemy.id, enemyId, 
+                    System.StringComparison.OrdinalIgnoreCase))
+                    return enemy;
             }
             return null;
         }

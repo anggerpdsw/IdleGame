@@ -157,9 +157,7 @@ namespace IdleDefenseSurvival.UI
             var service = Service;
             if (service == null) return;
 
-            var utcNow = DateTime.UtcNow;
             var max = service.GetMaxMission();
-            
             int cost = max * 20;
             RefreshUpgradeButton(cost);
 
@@ -169,10 +167,19 @@ namespace IdleDefenseSurvival.UI
 
         private void RefreshUpgradeButton(int cost)
         {
+            var service = Service;
+            if (service == null) return;
+
+            int currentMax = service.GetMaxMission();
+            bool isMaxed = currentMax >= GameConstants.MAX_MISSION;
+
+            _upgradeMaxMissionButton.gameObject.SetActive(!isMaxed);
+            if (_costUpgrade != null) _costUpgrade.gameObject.SetActive(!isMaxed);
+            if (isMaxed) return;
+
             bool hasGem = EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Gem, cost);
             if (_costUpgrade != null) _costUpgrade.text = $"{cost}";
             _upgradeMaxMissionButton.image.sprite = ButtonResources.GetColor(hasGem ? "Green" : "Grey");
-
         }
 
         private void RefreshHeader(MissionService service)

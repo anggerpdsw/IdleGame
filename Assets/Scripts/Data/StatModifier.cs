@@ -14,6 +14,7 @@ namespace IdleDefenseSurvival.Data
         public float Value;
         public bool Permanent;
         public DateTime? ExpireUtc;
+        public float? ExpireTime; // Unity Time.time at expiry
 
         // Helper to check which stat system is being used
         public bool UsesSecondaryStat => SecondaryStat != SecondaryStat.None;

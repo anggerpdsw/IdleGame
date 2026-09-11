@@ -148,6 +148,14 @@ namespace IdleDefenseSurvival.Mission
         private MissionInstance CreateMissionInstance(MissionTemplate tmpl, int slot, DateTime now)
         {
             int targetCount = UnityEngine.Random.Range(tmpl.minCount, tmpl.maxCount + 1);
+
+            // Scale rewards proportionally to the random targetCount.
+            // Base reward corresponds to the minimum count (tmpl.minCount).
+            // Use round division to avoid fractional rewards.
+            int scaledGold = Mathf.RoundToInt((float)tmpl.reward.gold * targetCount / tmpl.minCount);
+            int scaledGem  = Mathf.RoundToInt((float)tmpl.reward.gem  * targetCount / tmpl.minCount);
+            int scaledMeat = Mathf.RoundToInt((float)tmpl.reward.meat * targetCount / tmpl.minCount);
+
             var mission = new MissionInstance
             {
                 instanceId = GenerateInstanceId(),
@@ -156,21 +164,50 @@ namespace IdleDefenseSurvival.Mission
                 currentCount = 0,
                 status = MissionStatus.Active,
                 createdAt = now.ToString("o"),
-                reward = new MissionReward { gold = tmpl.reward.gold, gem = tmpl.reward.gem, meat = tmpl.reward.meat },
+                reward = new MissionReward { gold = scaledGold, gem = scaledGem, meat = scaledMeat },
                 slotIndex = slot
             };
 
-            // Specific enemy: pick random non‑BOSS enemy from JSON cache
+            // Specific enemy: pick random non-BOSS enemy from JSON cache
+            // Specialist v1 -> enemy without effects; v2 -> enemy with effects
             if (tmpl.type == MissionEventType.SpecificEnemyKilled)
             {
                 var db = DatabaseJSONCache.DatabaseEnemy;
                 if (db?.enemies != null && db.enemies.Length > 0)
                 {
-                    var candidates = db.enemies
-                        .Where(e => e.role != Role.BOSS)
-                        .Select(e => e.id).ToArray();
-                    if (candidates.Length > 0)
-                        mission.targetId = candidates[UnityEngine.Random.Range(0, candidates.Length)];
+                    var baseCandidates = db.enemies
+                        .Where(e => !e.IsBoss)
+                        .ToArray();
+
+                    EnemyData[] filtered;
+                    if (tmpl.id.EndsWith("_v1", StringComparison.OrdinalIgnoreCase))
+                    {
+                        filtered = baseCandidates
+                            .Where(e => !e.IsSpecial && !e.IsElite)
+                            .ToArray();
+                    }
+                    else if (tmpl.id.EndsWith("_v2", StringComparison.OrdinalIgnoreCase))
+                    {
+                        filtered = baseCandidates
+                            .Where(e => e.IsSpecial)
+                            .ToArray();
+                    }
+                    else if (tmpl.id.EndsWith("_v3", StringComparison.OrdinalIgnoreCase))
+                    {
+                        filtered = baseCandidates
+                            .Where(e => e.IsElite)
+                            .ToArray();
+                    }
+                    else
+                    {
+                        filtered = baseCandidates;
+                    }
+
+                    if (filtered.Length == 0) filtered = baseCandidates;
+
+                    var ids = filtered.Select(e => e.id).ToArray();
+                    if (ids.Length > 0)
+                        mission.targetId = ids[UnityEngine.Random.Range(0, ids.Length)];
                 }
             }
             else if (tmpl.type == MissionEventType.Blacksmithing)
