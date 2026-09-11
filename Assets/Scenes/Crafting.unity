@@ -8949,7 +8949,7 @@ MonoBehaviour:
   _minusButton: {fileID: 2005927888}
   _craftButton: {fileID: 1302717445}
   _jobList: {fileID: 272725790}
-  _jobEntryPrefab: {fileID: 329149208362478867, guid: 7788ddbb47426eb428deb6addd12685f, type: 3}
+  _jobEntryPrefab: {fileID: 4386140516594279290, guid: 7788ddbb47426eb428deb6addd12685f, type: 3}
 --- !u!1 &1538214899
 GameObject:
   m_ObjectHideFlags: 0

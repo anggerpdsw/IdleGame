@@ -114,26 +114,47 @@ namespace IdleDefenseSurvival.Crafting
                 var context = _contextBuilder.Build();
                 Debug.Log($"[CraftCompletionService] Context built: craftingLevel={context.PlayerStats?.CraftingLevel ?? 0} blacksmith={context.PlayerStats?.BlacksmithLevel ?? 0}");
                 
-                var rollResult = _rollService.RollCraftSeeded(job.RecipeId, context, (int)completionSeed);
-                Debug.Log($"[CraftCompletionService] RollCraft: success={rollResult.Success} entries={rollResult.Entries?.Count ?? 0} reason={rollResult.FailureReason}");
+                // ----------- Quantity-aware crafting: loop job.Count times with deterministic seed offsets -----------
+                int jobCount = Math.Max(1, job.Count);
+                var allItems = new List<InventoryItem>();
+                bool anyFailure = false;
 
-                if (!rollResult.Success || rollResult.Entries.Count == 0)
+                for (int qty = 0; qty < jobCount; qty++)
                 {
-                    Failed?.Invoke(jobId, rollResult.FailureReason ?? "Craft failed");
+                    int seedForThis = (int)(completionSeed + qty);
+                    var rollResult = _rollService.RollCraftSeeded(job.RecipeId, context, seedForThis);
+                    Debug.Log($"[CraftCompletion] RollCraft qty={qty + 1}/{jobCount} success={rollResult.Success} entries={rollResult.Entries?.Count ?? 0}");
+
+                    if (!rollResult.Success || rollResult.Entries.Count == 0)
+                    {
+                        anyFailure = true;
+                        Debug.LogWarning($"[CraftCompletion] Roll failed for qty {qty + 1}: {rollResult.FailureReason}");
+                        break;
+                    }
+
+                    var qtyItems = _rewardService.GenerateRewards(rollResult, recipe, context, seedForThis);
+                    Debug.Log($"[CraftCompletion] GenerateRewards qty={qty + 1} returned items={qtyItems?.Length ?? 0}");
+
+                    if (qtyItems != null && qtyItems.Length > 0)
+                        allItems.AddRange(qtyItems);
+                }
+
+                if (anyFailure)
+                {
+                    Failed?.Invoke(jobId, "Crafting failed for one or more quantities");
                     Claimed?.Invoke(jobId, false);
                     return;
                 }
 
-                var items = _rewardService.GenerateRewards(rollResult, recipe, context, completionSeed);
-                Debug.Log($"[CraftCompletionService] GenerateRewards returned items={items?.Length ?? 0}");
+                Debug.Log($"[CraftCompletionService] Total generated items={allItems.Count} (job.Count={jobCount})");
 
                 // Apply each reward with idempotency guard
                 bool allApplied = true;
                 var appliedItems = new List<InventoryItem>();
 
-                for (int i = 0; i < items.Length; i++)
+                for (int i = 0; i < allItems.Count; i++)
                 {
-                    var item = items[i];
+                    var item = allItems[i];
                     string rewardOperationId = $"{jobId}#{i}";
 
                     var applyResult = _inventory.ApplyReward(item, rewardOperationId);

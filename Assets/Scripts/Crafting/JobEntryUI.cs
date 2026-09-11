@@ -14,20 +14,28 @@ namespace IdleDefenseSurvival.Crafting
         [SerializeField] private Slider _progressSlider;
         [SerializeField] private Button _claimButton;
         [SerializeField] private TextMeshProUGUI _statusText;
+        [SerializeField] private TextMeshProUGUI _countText;
 
         public string JobId { get; private set; }
         private Action<string> _onClaim;
 
-        public void Initialize(string jobId, Sprite icon, Rarity rarity, string name, float progress, CraftJobStatus status, Action<string> onClaim)
+        public void Initialize(string jobId, Sprite icon, Rarity rarity, string name, int count, float progress, CraftJobStatus status, Action<string> onClaim)
         {
             JobId = jobId;
             _onClaim = onClaim;
             SetRarity(rarity);
             SetIcon(icon);
             SetRecipeName(name);
+            SetCount(count);
             SetProgress(progress);
             SetStatus(status);
             BindClaimButton();
+        }
+
+        public void SetCount(int count)
+        {
+            if (_countText != null)
+                _countText.text = count > 1 ? $"×{count}" : "";
         }
 
         private void BindClaimButton()

@@ -689,7 +689,8 @@ namespace IdleDefenseSurvival.Controller
                     recipeRarity = (Rarity)recipe.Rarity;
                 }
 
-                entry.Initialize(job.JobId, icon, recipeRarity, recipeName, job.Progress, job.Status, OnClaimJob);
+                // Pass job.Count to UI for quantity display
+                entry.Initialize(job.JobId, icon, recipeRarity, recipeName, job.Count, job.Progress, job.Status, OnClaimJob);
                 _jobEntries.Add(entry);
             }
         }
