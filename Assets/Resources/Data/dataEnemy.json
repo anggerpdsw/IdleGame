@@ -749,6 +749,11 @@
           "effect": "DamageReduction",
           "value": 30,
           "radius": 6.5
+        }],
+        "onTakeDamage": [{
+          "effect": "Burn",
+          "value": 10,
+          "duration": 30
         }]
       }],
       "prefabName": "Basic",

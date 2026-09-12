@@ -367,7 +367,7 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override float GetCurrentValue()
         {
-            // Multiplicative stacking: 0.3 slow + 0.3 slow = 1 - (0.7 * 0.7) = 0.51 effective slow
+            // Multiplicative stacking: 0.3 slow + 0.3 slow = 1 - (0.7 * 0.7) = 0.49 effective slow
             float effectiveSlow = 1f - Mathf.Pow(1f - _slowPercent, StackCount);
             return effectiveSlow;
         }

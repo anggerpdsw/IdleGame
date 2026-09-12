@@ -61,6 +61,9 @@ namespace IdleDefenseSurvival.Enemy
                 case StatusEffectType.Stun:
                     ApplyStunToPlayer(action, sourceEnemy, player);
                     break;
+                case StatusEffectType.Burn:
+                    ApplyBurnToPlayer(action, sourceEnemy, player);
+                    break;
                 default:
                     Debug.LogWarning(
                         $"[EnemyEffectProcessor] Unknown effect type: " +
@@ -87,6 +90,9 @@ namespace IdleDefenseSurvival.Enemy
                     break;
                 case StatusEffectType.Stun:
                     ApplyStunToPlayer(action, sourceEnemy, player);
+                    break;
+                case StatusEffectType.Burn:
+                    ApplyBurnToPlayer(action, sourceEnemy, player);
                     break;
                 default:
                     Debug.LogWarning(
@@ -128,6 +134,25 @@ namespace IdleDefenseSurvival.Enemy
 
             // Apply through PlayerStunManager (source-based tracking, like slow)
             PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Stun, 0f, action.duration);
+        }
+
+        /// <summary>
+        /// Applies burn effect to player.
+        /// </summary>
+        private static void ApplyBurnToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player)
+        {
+            if (action.value <= 0f) return;
+            // value stored as percent of max health (e.g., 10 = 10%)
+            float percent = Mathf.Clamp01(action.value * 0.01f);
+            float duration = Mathf.Max(0.1f, action.duration);
+
+            // Unique source ID for source-based tracking (non-stacking)
+            string sourceId =
+                $"EnemyEffect_{sourceEnemy?.EnemyData?.id}_" +
+                $"{sourceEnemy.GetInstanceID()}_{action.effect}";
+
+            // Apply via the new Burn handling in PlayerStatusEffectManager
+            PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Burn, percent, duration);
         }
 
         /// <summary>
