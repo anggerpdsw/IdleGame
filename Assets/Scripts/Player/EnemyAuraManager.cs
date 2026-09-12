@@ -150,7 +150,7 @@ namespace IdleDefenseSurvival.Player
             switch (action.effect)
             {
                 case StatusEffectType.Slow:
-                    PlayerSlowManager.Instance.ApplyAuraSlow(sourceId, Mathf.Clamp01(action.value * 0.01f), action.radius, enemy.transform.position);
+                    PlayerStatusEffectManager.Instance.ApplyAuraEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Slow, Mathf.Clamp01(action.value * 0.01f), action.radius, enemy.transform.position);
                     break;
                 case StatusEffectType.DamageReduction: break;
                 default:
@@ -170,7 +170,7 @@ namespace IdleDefenseSurvival.Player
                     switch (effectType)
                     {
                         case "Slow":
-                            PlayerSlowManager.Instance.RemoveAuraSlow(sourceId);
+                            PlayerStatusEffectManager.Instance.RemoveAuraEffect(sourceId);
                             break;
                     }
                 }

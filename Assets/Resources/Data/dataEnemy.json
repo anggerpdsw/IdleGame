@@ -714,17 +714,17 @@
         "aura": [{
           "effect": "Slow",
           "value": 30,
-          "radius": 5.31
+          "radius": 5.55
         }],
         "onTakeDamage": [{
           "effect": "Slow",
           "value": 20,
-          "duration": 6.6
+          "duration": 33
         }]
       }],
       "prefabName": "Basic",
-      "attackRange": 1.52,
-      "attackSpeed": 1.26,
+      "attackRange": 1.82,
+      "attackSpeed": 1.36,
       "damage": 9,
       "health": 99.9,
       "moveSpeed": 0.099,
@@ -752,7 +752,7 @@
         }]
       }],
       "prefabName": "Basic",
-      "attackRange": 1.62,
+      "attackRange": 1.72,
       "attackSpeed": 1.53,
       "damage": 12,
       "health": 199.9,

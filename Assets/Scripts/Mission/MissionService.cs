@@ -147,14 +147,23 @@ namespace IdleDefenseSurvival.Mission
 
         private MissionInstance CreateMissionInstance(MissionTemplate tmpl, int slot, DateTime now)
         {
-            int targetCount = UnityEngine.Random.Range(tmpl.minCount, tmpl.maxCount + 1);
+            var saveManager = SaveManager.Instance;
+            if (saveManager == null) return null;
+            int highestTier = Mathf.Max(1, saveManager.GetHighestUnlockedTier());
+            float tierMultiplier = highestTier * 0.75f;
 
-            // Scale rewards proportionally to the random targetCount.
-            // Base reward corresponds to the minimum count (tmpl.minCount).
-            // Use round division to avoid fractional rewards.
-            int scaledGold = Mathf.RoundToInt((float)tmpl.reward.gold * targetCount / tmpl.minCount);
-            int scaledGem  = Mathf.RoundToInt((float)tmpl.reward.gem  * targetCount / tmpl.minCount);
-            int scaledMeat = Mathf.RoundToInt((float)tmpl.reward.meat * targetCount / tmpl.minCount);
+            // 1. Random target dasar dari template.
+            int baseTargetCount = UnityEngine.Random.Range(tmpl.minCount, tmpl.maxCount + 1);
+            // 2. Tier hanya menaikkan target.
+            int targetCount = Mathf.Max(1, Mathf.RoundToInt(baseTargetCount * tierMultiplier));
+            // 3. Reward tetap dihitung dari baseTargetCount.
+            //    Tidak menggunakan targetCount yang sudah di-scale tier.
+            int scaledGold = Mathf.RoundToInt(
+                (float)tmpl.reward.gold * baseTargetCount / tmpl.minCount);
+            int scaledGem = Mathf.RoundToInt(
+                (float)tmpl.reward.gem * baseTargetCount / tmpl.minCount);
+            int scaledMeat = Mathf.RoundToInt(
+                (float)tmpl.reward.meat * baseTargetCount / tmpl.minCount);
 
             var mission = new MissionInstance
             {

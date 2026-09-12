@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Stats;
@@ -120,6 +121,46 @@ namespace IdleDefenseSurvival.Manager
         // Overload preserving original 1s default
         public void ApplyTemporaryModifier(SkillType stat, float multiplierPercent, string sourceId)
             => ApplyTemporaryModifier(stat, multiplierPercent, sourceId, 1f);
+
+        /// <summary>
+        /// Applies a temporary percent modifier to multiple stats simultaneously.
+        /// Used for effects like enemy slow that affect both move speed and attack speed.
+        /// </summary>
+        public void ApplyTemporaryModifier(IEnumerable<SkillType> stats, float multiplierPercent, string sourceId, float durationSec = 1f)
+        {
+            if (multiplierPercent <= 0f) return;
+            if (stats == null) return;
+
+            float percentValue = multiplierPercent - 100f;
+
+            foreach (var stat in stats)
+            {
+                var modifier = new StatModifier
+                {
+                    Id = $"Temp_{sourceId}_{stat}",
+                    Source = ModifierSource.Buff,
+                    Stat = stat,
+                    Mode = ModifierMode.Percent,
+                    Value = percentValue,
+                    Permanent = false,
+                    ExpireTime = Time.time + durationSec
+                };
+
+                ModifierManager.Instance.AddModifier(modifier);
+            }
+        }
+
+        /// <summary>
+        /// Applies a temporary percent modifier to multiple stats (params overload for convenience).
+        /// </summary>
+        public void ApplyTemporaryModifier(float multiplierPercent, string sourceId, float durationSec, params SkillType[] stats)
+            => ApplyTemporaryModifier(stats, multiplierPercent, sourceId, durationSec);
+
+        /// <summary>
+        /// Applies a temporary percent modifier to multiple stats (1s default duration).
+        /// </summary>
+        public void ApplyTemporaryModifier(float multiplierPercent, string sourceId, params SkillType[] stats)
+            => ApplyTemporaryModifier(stats, multiplierPercent, sourceId, 1f);
     }
 
     public enum AccumulatedCountType { Bounce, Multi }

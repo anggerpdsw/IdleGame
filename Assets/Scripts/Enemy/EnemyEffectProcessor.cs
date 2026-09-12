@@ -110,7 +110,7 @@ namespace IdleDefenseSurvival.Enemy
                 $"EnemyEffect_{sourceEnemy?.EnemyData?.id}_" +
                 $"{sourceEnemy.GetInstanceID()}_{action.effect}";
             // Apply through PlayerSlowManager (will create if needed)
-            PlayerSlowManager.Instance.ApplySlow(sourceId, percent, duration);
+            PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Slow, percent, duration);
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace IdleDefenseSurvival.Enemy
                 $"{sourceEnemy.GetInstanceID()}_{action.effect}";
 
             // Apply through PlayerStunManager (source-based tracking, like slow)
-            PlayerStunManager.Instance.ApplyStun(sourceId, action.duration);
+            PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Stun, 0f, action.duration);
         }
 
         /// <summary>
