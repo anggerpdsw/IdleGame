@@ -57,6 +57,7 @@ namespace IdleDefenseSurvival.Controller
         [Header("Controls & Economy")]
         [SerializeField] private TextMeshProUGUI _goldCostText;
         [SerializeField] private TextMeshProUGUI _gemCostText;
+        [SerializeField] private TextMeshProUGUI _levelNeed;
         [SerializeField] private TextMeshProUGUI _quantityText;
         [SerializeField] private Button _plusButton;
         [SerializeField] private Button _minusButton;
@@ -299,6 +300,7 @@ namespace IdleDefenseSurvival.Controller
             if (_materialRowTemplate == null) Debug.LogError("[CraftingUIController] Missing required reference: _materialRowTemplate");
             if (_goldCostText == null) Debug.LogError("[CraftingUIController] Missing required reference: _goldCostText");
             if (_gemCostText == null) Debug.LogError("[CraftingUIController] Missing required reference: _gemCostText");
+            if (_levelNeed == null) Debug.LogError("[CraftingUIController] Missing required reference: _levelNeed");
             if (_quantityText == null) Debug.LogError("[CraftingUIController] Missing required reference: _quantityText");
             if (_plusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _plusButton");
             if (_minusButton == null) Debug.LogError("[CraftingUIController] Missing required reference: _minusButton");
@@ -456,6 +458,22 @@ namespace IdleDefenseSurvival.Controller
             var icon = ResolveRecipeIcon(recipe);
             if (_resultIcon != null) _resultIcon.sprite = icon;
 
+            // Update level requirement display
+            if (_levelNeed != null)
+            {
+                var account = SaveManager.Instance?.GetAccountData();
+                int bsLevel = account?.blacksmithLevel ?? 1;
+                int alchLevel = account?.alchemistLevel ?? 1;
+                if (recipe.PotionType != PotionType.None)
+                {
+                    _levelNeed.text = $"Alch Lv.{alchLevel}/{recipe.RequiredAlchemistLevel}";
+                }
+                else
+                {
+                    _levelNeed.text = $"Smith Lv.{bsLevel}/{recipe.RequiredBlacksmithLevel}";
+                }
+            }
+
             RebuildMaterials();
             RefreshCost();
             RefreshControls();
@@ -469,6 +487,7 @@ namespace IdleDefenseSurvival.Controller
             if (_rarityText != null) _rarityText.text = "";
             if (_goldCostText != null) _goldCostText.text = "0";
             if (_gemCostText != null) _gemCostText.text = "0";
+            if (_levelNeed != null) _levelNeed.text = $"Lv.1/25";
             ClearMaterialRows();
         }
 
@@ -535,18 +554,22 @@ namespace IdleDefenseSurvival.Controller
                 return;
             }
 
-            long gold = EconomyManager.Instance != null ? EconomyManager.Instance.GetCurrency(CurrencyType.Gold) : 0;
-            long gem = EconomyManager.Instance != null ? EconomyManager.Instance.GetCurrency(CurrencyType.Gem) : 0;
-            var cost = svc.GetRecipeCostPreview(_selectedRecipeId, _quantity);
-            var reqs = svc.GetRecipeMaterialPreview(_selectedRecipeId, _quantity);
-            static int owned(string id) => InventoryService.Instance != null ? InventoryService.Instance.GetTotalQuantity(id) : 0;
+            // Determine craft type from recipe
+            if (!svc.TryGetRecipe(_selectedRecipeId, out var recipe))
+            {
+                _craftButton.interactable = false;
+                return;
+            }
+            CraftType craftType = recipe.PotionType != PotionType.None ? CraftType.Potion : CraftType.Equipment;
 
-            bool canAfford = CanAffordCurrency(cost, gold, gem) && CanAffordMaterials(reqs, owned);
+            // Validate via CraftValidator (includes level requirement, materials, currency, inventory space, conditions)
+            var validation = svc.CanCraft(craftType, _selectedRecipeId, _quantity);
+            bool canCraft = validation.IsSuccess;
 
             // Check concurrent slot availability
             bool hasConcurrentSlot = svc.GetQueueService() != null && svc.GetQueueService().HasAvailableSlot;
 
-            _craftButton.interactable = canAfford && hasConcurrentSlot;
+            _craftButton.interactable = canCraft && hasConcurrentSlot;
         }
 
         #endregion
