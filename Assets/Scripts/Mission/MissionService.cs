@@ -150,20 +150,29 @@ namespace IdleDefenseSurvival.Mission
             var saveManager = SaveManager.Instance;
             if (saveManager == null) return null;
             int highestTier = Mathf.Max(1, saveManager.GetHighestUnlockedTier());
-            float tierMultiplier = highestTier * 0.75f;
+            float tierMultiplier = 1f + (highestTier - 1) * 0.75f;
 
             // 1. Random target dasar dari template.
             int baseTargetCount = UnityEngine.Random.Range(tmpl.minCount, tmpl.maxCount + 1);
             // 2. Tier hanya menaikkan target.
             int targetCount = Mathf.Max(1, Mathf.RoundToInt(baseTargetCount * tierMultiplier));
-            // 3. Reward tetap dihitung dari baseTargetCount.
-            //    Tidak menggunakan targetCount yang sudah di-scale tier.
-            int scaledGold = Mathf.RoundToInt(
-                (float)tmpl.reward.gold * baseTargetCount / tmpl.minCount);
-            int scaledGem = Mathf.RoundToInt(
-                (float)tmpl.reward.gem * baseTargetCount / tmpl.minCount);
-            int scaledMeat = Mathf.RoundToInt(
-                (float)tmpl.reward.meat * baseTargetCount / tmpl.minCount);
+            // 3. Hitung progress target dasar
+            float normalizedProgress = 0f;
+            if (tmpl.maxCount > tmpl.minCount)
+            {
+                normalizedProgress = 
+                    (float)(baseTargetCount - tmpl.minCount)
+                    / (tmpl.maxCount - tmpl.minCount);
+            }
+            normalizedProgress = Mathf.Clamp01(normalizedProgress);
+            // 4. Reward minimum = 20% dari reward maksimal
+            const float minRewardMultiplier = 0.2f;
+            float rewardMultiplier = Mathf.Lerp(minRewardMultiplier, 1f, normalizedProgress);
+            // 5. Reward dihitung dari baseTargetCount
+            //    BUKAN targetCount yang sudah di-scale tier
+            int scaledGold = Mathf.RoundToInt(tmpl.reward.gold * rewardMultiplier);
+            int scaledGem = Mathf.RoundToInt(tmpl.reward.gem * rewardMultiplier);
+            int scaledMeat = Mathf.RoundToInt(tmpl.reward.meat * rewardMultiplier);
 
             var mission = new MissionInstance
             {

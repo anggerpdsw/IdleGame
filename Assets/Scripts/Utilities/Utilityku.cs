@@ -8,6 +8,12 @@ using UnityEngine;
 public static class Utilityku
 {
     public static bool Chance(float chancePercent) => Random.Range(0f, 100f) < chancePercent;
+    public static bool Chance01(float chance) => Random.value > chance;
+    public static float DropRateIncrease(float value)
+    {
+        float dropRate = PlayerStatsManager.Instance.GetStat(SkillType.DropRate);
+        return value * (1f + dropRate * 0.01f);
+    }
     public static float FinalDamage(float damage, float defense, float armorPenetration = 0f)
     {
         float effectiveDefense = defense - armorPenetration;

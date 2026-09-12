@@ -54,8 +54,15 @@ namespace IdleDefenseSurvival
         public const int REWARD_COUNT = 7;
         public const int COOLDOWN_MINUTES = 5;
         public const int DAILY_GOLD_REWARD = 10000;
+        public const int DAILY_GEM_REWARD = 11;
+        public const int DAILY_GEM_MAX_REWARD = 180;
         public const int DAILY_MEAT_REWARD = 500;
         public const int DAILY_EXP_REWARD = 2500;
+
+        // Drop Chance
+        public const float DROP_CHANCE_GOLD = 0.125f;
+        public const float DROP_CHANCE_GEM = 0.0047f; // 0.47% drop chance
+        public const float DROP_CHANCE_MEAT = 0.01f;
 
     }
 

@@ -1007,8 +1007,7 @@ namespace IdleDefenseSurvival.Enemy
                 if (entry.MinTier > currentTier) continue;
 
                 // DropRate increases drop chance directly.
-                float dropRate = PlayerStatsManager.Instance.GetStat(SkillType.DropRate);
-                float finalWeight = entry.Weight * (1f + dropRate * 0.01f);
+                float finalWeight = Utilityku.DropRateIncrease(entry.Weight);
                 if (!Utilityku.Chance(finalWeight)) continue;
 
                 int min = Mathf.Max(1, entry.MinCount);

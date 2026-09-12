@@ -142,7 +142,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
         public void Apply(ItemGenerationContext context, ref CraftRollResult result)
         {
-            if (UnityEngine.Random.value > Chance) return;
+            if (Utilityku.Chance01(Chance)) return;
 
             var originalEntries = result.Entries.ToArray();
             foreach (var entry in originalEntries)
@@ -213,7 +213,7 @@ namespace IdleDefenseSurvival.Items.Generation
 
         public void Apply(ItemGenerationContext context, ref CraftRollResult result)
         {
-            if (UnityEngine.Random.value > Chance) return;
+            if (Utilityku.Chance01(Chance)) return;
 
             foreach (var entry in result.Entries)
             {

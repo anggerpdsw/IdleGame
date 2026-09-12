@@ -24,7 +24,7 @@ namespace IdleDefenseSurvival.Data
             return rewardIndex switch
             {
                 0 => new DailyRewardData(RewardType.Gold, GetGoldReward()),
-                1 => new DailyRewardData(RewardType.Gem, 11),
+                1 => new DailyRewardData(RewardType.Gem, GetGemReward()),
                 2 => new DailyRewardData(RewardType.Meat, GetMeatReward()),
                 3 => new DailyRewardData(RewardType.Item, 1, "CardRoll"),
                 4 => new DailyRewardData(RewardType.Exp, GetExpReward()),
@@ -38,6 +38,12 @@ namespace IdleDefenseSurvival.Data
         {
             var highestGold = SaveManager.Instance?.GetHighestGoldEarned() ?? 0L;
             return Math.Max(GameConstants.DAILY_GOLD_REWARD, highestGold);
+        }
+
+        private long GetGemReward()
+        {
+            var highestTier = SaveManager.Instance?.GetHighestUnlockedTier() ?? 1;
+            return Math.Min(GameConstants.DAILY_GEM_REWARD * highestTier, GameConstants.DAILY_GEM_MAX_REWARD);
         }
 
         private long GetMeatReward()

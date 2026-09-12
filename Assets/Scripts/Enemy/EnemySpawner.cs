@@ -275,7 +275,7 @@ namespace IdleDefenseSurvival.Enemy
             float equipGoldGain = PlayerStatsManager.Instance.GetStat(SkillType.GoldGain);
             rawGold *= 1f + equipGoldGain / 100f;
 
-            rawGold *= 0.25f;
+            rawGold *= Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_GOLD);
             return (long)System.Math.Max(1, Mathf.Floor(rawGold));
         }
 
@@ -293,7 +293,8 @@ namespace IdleDefenseSurvival.Enemy
 
         private long CalculateGemReward()
         {
-            if (Random.value > 0.0051f) return 0; // 0.51% drop chance
+            float dropChance = Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_GEM);
+            if (Utilityku.Chance01(dropChance)) return 0;
             if (!CanEarnGem()) return 0;
             return 1; // allocate 1 gem
         }
@@ -305,8 +306,8 @@ namespace IdleDefenseSurvival.Enemy
         private long CalculateMeatReward(float enemyHealth)
         {
             // Bonus kartu juga meningkatkan peluang drop.
-            float dropChance = 0.02f;
-            if (Random.value > dropChance) return 0;
+            float dropChance = Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_MEAT);
+            if (Utilityku.Chance01(dropChance)) return 0;
             int tier = WaveManager.Instance.CurrentTier;
             float hpBonus = Mathf.Pow(enemyHealth, 0.25f) * 0.08f;
             float rawMeat = 1f + tier * 0.35f + hpBonus;

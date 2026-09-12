@@ -8,9 +8,9 @@
             "minCount": 5000,
             "maxCount": 100000,
             "reward": {
-                "gold": 500,
+                "gold": 5000,
                 "gem": 3,
-                "meat": 10
+                "meat": 20
             },
             "claimCooldownMinutes": 1,
             "cancelCooldownMinutes": 15
@@ -24,9 +24,9 @@
             "minCount": 600,
             "maxCount": 3000,
             "reward": {
-                "gold": 15000,
-                "gem": 7,
-                "meat": 25
+                "gold": 3000,
+                "gem": 8,
+                "meat": 50
             },
             "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 20
@@ -40,9 +40,9 @@
             "minCount": 200,
             "maxCount": 1000,
             "reward": {
-                "gold": 45000,
-                "gem": 21,
-                "meat": 75
+                "gold": 5000,
+                "gem": 12,
+                "meat": 100
             },
             "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 20
@@ -56,9 +56,9 @@
             "minCount": 400,
             "maxCount": 1200,
             "reward": {
-                "gold": 30000,
-                "gem": 14,
-                "meat": 50
+                "gold": 4000,
+                "gem": 8,
+                "meat": 80
             },
             "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 20
@@ -72,9 +72,9 @@
             "minCount": 300,
             "maxCount": 1000,
             "reward": {
-                "gold": 20000,
-                "gem": 9,
-                "meat": 50
+                "gold": 7500,
+                "gem": 15,
+                "meat": 150
             },
             "claimCooldownMinutes": 3,
             "cancelCooldownMinutes": 30
@@ -88,9 +88,9 @@
             "minCount": 50000,
             "maxCount": 150000,
             "reward": {
-                "gold": 10000,
-                "gem": 1,
-                "meat": 20
+                "gold": 3000,
+                "gem": 3,
+                "meat": 40
             },
             "claimCooldownMinutes": 4,
             "cancelCooldownMinutes": 20
@@ -104,9 +104,9 @@
             "minCount": 10,
             "maxCount": 35,
             "reward": {
-                "gold": 50000,
-                "gem": 3,
-                "meat": 300
+                "gold": 7500,
+                "gem": 5,
+                "meat": 200
             },
             "claimCooldownMinutes": 5,
             "cancelCooldownMinutes": 30
@@ -120,9 +120,9 @@
             "minCount": 1250,
             "maxCount": 5000,
             "reward": {
-                "gold": 50000,
-                "gem": 2,
-                "meat": 10
+                "gold": 4000,
+                "gem": 3,
+                "meat": 100
             },
             "claimCooldownMinutes": 1,
             "cancelCooldownMinutes": 15
@@ -136,9 +136,9 @@
             "minCount": 250,
             "maxCount": 600,
             "reward": {
-                "gold": 3000,
-                "gem": 6,
-                "meat": 30
+                "gold": 5000,
+                "gem": 8,
+                "meat": 100
             },
             "claimCooldownMinutes": 2,
             "cancelCooldownMinutes": 25
@@ -152,8 +152,8 @@
             "minCount": 1,
             "maxCount": 5,
             "reward": {
-                "gold": 3000,
-                "gem": 4,
+                "gold": 2500,
+                "gem": 8,
                 "meat": 300
             },
             "claimCooldownMinutes": 3,
