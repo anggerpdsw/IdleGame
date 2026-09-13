@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
@@ -40,21 +41,19 @@ namespace IdleDefenseSurvival.Player
             if (_instance == this) _instance = null;
         }
 
-        private void OnApplicationQuit()
-        {
-            _isQuitting = true;
-        }
+        private void OnApplicationQuit() => _isQuitting = true;
 
         // ===== Player-targeted auras =====
-        private readonly HashSet<string> _activePlayerAuraSources = new();
+        // sourceId -> EffectType (replaces HashSet, avoids string.Split on removal)
+        private readonly Dictionary<StatusSourceId, StatusEffectType> _activePlayerAuraSources = new();
         private Transform _playerTransform;
         private Player _player;
 
         // ===== Enemy-targeted auras =====
         // sourceId -> AuraSource
-        private readonly Dictionary<string, AuraSource> _enemyAuraSources = new();
+        private readonly Dictionary<StatusSourceId, AuraSource> _enemyAuraSources = new();
         // targetEnemy -> HashSet<sourceId>
-        private readonly Dictionary<EnemyAi, HashSet<string>> _enemyAffectedBy = new();
+        private readonly Dictionary<EnemyAi, HashSet<StatusSourceId>> _enemyAffectedBy = new();
 
         // Shared
         private int _enemyLayerMask;
@@ -62,6 +61,18 @@ namespace IdleDefenseSurvival.Player
         // Performance: update interval for enemy-to-enemy auras (5Hz)
         private float _enemyAuraUpdateTimer;
         private const float ENEMY_AURA_UPDATE_INTERVAL = 0.2f;
+
+        // Performance: update interval for player-targeted auras (10Hz)
+        private float _playerAuraUpdateTimer;
+        private const float PLAYER_AURA_UPDATE_INTERVAL = 0.1f;
+
+        // ===== Allocation-free physics buffers & cached collections =====
+        private readonly Collider2D[] _overlapBuffer = new Collider2D[1024];
+        private readonly List<EnemyAi> _enemyCleanupList = new();
+        private readonly List<StatusSourceId> _sourceCleanupList = new();
+        private readonly List<StatusSourceId> _removeFromTargetList = new();
+        private readonly List<StatusSourceId> _sourcesToRemove = new();
+        private readonly List<EnemyAi> _affectedEnemiesCleanup = new();
 
         private void Awake()
         {
@@ -78,6 +89,7 @@ namespace IdleDefenseSurvival.Player
 
         private void Update()
         {
+            // ---- player auras -------------------------------------------------
             if (_playerTransform == null)
             {
                 _player = Player.Instance;
@@ -85,23 +97,40 @@ namespace IdleDefenseSurvival.Player
             }
             if (_playerTransform == null) return;
 
-            UpdatePlayerAuras();
-            UpdateEnemyAuras();
+            _playerAuraUpdateTimer += Time.deltaTime;
+            if (_playerAuraUpdateTimer >= PLAYER_AURA_UPDATE_INTERVAL)
+            {
+                _playerAuraUpdateTimer = 0f;
+                UpdatePlayerAuras();
+            }
+
+            // ---- enemy-to-enemy auras (cleanup + apply at same 5Hz interval) ---
+            _enemyAuraUpdateTimer += Time.deltaTime;
+            if (_enemyAuraUpdateTimer < ENEMY_AURA_UPDATE_INTERVAL) return;
+            _enemyAuraUpdateTimer = 0f;
+
+            CleanupOutOfRangeAuras();
+            ApplyAurasToNearbyEnemies();
         }
 
-        // ===================================================================
-        // Player-targeted auras (existing logic)
-        // ===================================================================
+        // -----------------------------------------------------------------------
+        // Player-targeted auras
+        // -----------------------------------------------------------------------
         private void UpdatePlayerAuras()
         {
             const float maxAuraCheckRadius = 10f;
+            int count = Physics2D.OverlapCircle(
+                _playerTransform.position,
+                maxAuraCheckRadius,
+                new ContactFilter2D { useLayerMask = true, layerMask = _enemyLayerMask },
+                _overlapBuffer);
 
-            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(_playerTransform.position, maxAuraCheckRadius, _enemyLayerMask);
+            _sourceCleanupList.Clear();
+            _sourceCleanupList.AddRange(_activePlayerAuraSources.Keys);
 
-            var currentlyInRange = new HashSet<string>();
-
-            foreach (var col in nearbyEnemies)
+            for (int i = 0; i < count; i++)
             {
+                var col = _overlapBuffer[i];
                 if (!col.TryGetComponent<EnemyAi>(out var enemy)) continue;
                 if (enemy.EnemyData?.effects == null) continue;
 
@@ -114,89 +143,61 @@ namespace IdleDefenseSurvival.Player
                         if (action.radius <= 0f) continue;
                         if (action.value <= 0f) continue;
 
-                        float distance = Vector2.Distance(_playerTransform.position, enemy.transform.position);
-                        if (distance <= action.radius)
-                        {
-                            string sourceId = $"Aura_{enemy.EnemyData.id}_{enemy.GetInstanceID()}_{action.effect}";
-                            currentlyInRange.Add(sourceId);
-                            ApplyAuraEffectToPlayer(sourceId, action, enemy);
-                        }
+                        float distSq = (enemy.transform.position - _playerTransform.position).sqrMagnitude;
+                        if (distSq > action.radius * action.radius) continue;
+
+                        var sourceId = new StatusSourceId(enemy.GetInstanceID(), (int)action.effect);
+                        _sourceCleanupList.Remove(sourceId);
+                        _activePlayerAuraSources[sourceId] = action.effect;
+                        ApplyAuraEffectToPlayer(sourceId, action, enemy);
                     }
                 }
             }
 
-            var sourcesToRemove = new List<string>();
-            foreach (var sourceId in _activePlayerAuraSources)
+            foreach (var sourceId in _sourceCleanupList)
             {
-                if (!currentlyInRange.Contains(sourceId))
-                    sourcesToRemove.Add(sourceId);
-            }
-
-            foreach (var sourceId in sourcesToRemove)
-            {
-                RemoveAuraEffectFromPlayer(sourceId);
-                _activePlayerAuraSources.Remove(sourceId);
-            }
-
-            _activePlayerAuraSources.Clear();
-            foreach (var sourceId in currentlyInRange)
-            {
-                _activePlayerAuraSources.Add(sourceId);
+                if (_activePlayerAuraSources.TryGetValue(sourceId, out var effectType))
+                {
+                    RemoveAuraEffectFromPlayer(sourceId, effectType);
+                    _activePlayerAuraSources.Remove(sourceId);
+                }
             }
         }
 
-        private void ApplyAuraEffectToPlayer(string sourceId, EnemyEffectAction action, EnemyAi enemy)
+        private void ApplyAuraEffectToPlayer(StatusSourceId sourceId, EnemyEffectAction action, EnemyAi enemy)
         {
             switch (action.effect)
             {
                 case StatusEffectType.Slow:
-                    PlayerStatusEffectManager.Instance.ApplyAuraEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Slow, Mathf.Clamp01(action.value * 0.01f), action.radius, enemy.transform.position);
+                    PlayerStatusEffectManager.Instance.ApplyAuraEffect(sourceId,
+                        PlayerStatusEffectManager.PlayerEffectType.Slow,
+                        Mathf.Clamp01(action.value * 0.01f),
+                        action.radius,
+                        enemy.transform.position);
                     break;
-                case StatusEffectType.DamageReduction: break;
+                case StatusEffectType.DamageReduction:
+                    break;
                 default:
-                    Debug.LogWarning($"[EnemyAuraManager] Unknown player aura effect type: {action.effect} on enemy {enemy.EnemyData.id}");
+                    Debug.LogWarning($"[EnemyAuraManager] Unknown player aura: {action.effect}");
                     break;
             }
         }
 
-        private void RemoveAuraEffectFromPlayer(string sourceId)
+        private void RemoveAuraEffectFromPlayer(StatusSourceId sourceId, StatusEffectType effectType)
         {
-            if (sourceId.StartsWith("Aura_"))
-            {
-                var parts = sourceId.Split('_');
-                if (parts.Length >= 4)
-                {
-                    string effectType = parts[3];
-                    switch (effectType)
-                    {
-                        case "Slow":
-                            PlayerStatusEffectManager.Instance.RemoveAuraEffect(sourceId);
-                            break;
-                    }
-                }
-            }
+            if (effectType == StatusEffectType.Slow)
+                PlayerStatusEffectManager.Instance.RemoveAuraEffect(sourceId);
         }
 
-        // ===================================================================
-        // Enemy-targeted auras (merged from EnemyDamageReductionAuraManager)
-        // ===================================================================
-        private void UpdateEnemyAuras()
-        {
-            // Cleanup phase: run EVERY frame for instant UI update when enemies leave range
-            CleanupOutOfRangeAuras();
-
-            // Apply phase: run at 5Hz to save physics queries
-            _enemyAuraUpdateTimer += Time.deltaTime;
-            if (_enemyAuraUpdateTimer < ENEMY_AURA_UPDATE_INTERVAL) return;
-            _enemyAuraUpdateTimer = 0f;
-
-            ApplyAurasToNearbyEnemies();
-        }
-
+        // -----------------------------------------------------------------------
+        // Enemy-targeted auras
+        // -----------------------------------------------------------------------
         private void CleanupOutOfRangeAuras()
         {
-            var enemiesToCheck = new List<EnemyAi>(_enemyAffectedBy.Keys);
-            foreach (var targetEnemy in enemiesToCheck)
+            _enemyCleanupList.Clear();
+            _enemyCleanupList.AddRange(_enemyAffectedBy.Keys);
+
+            foreach (var targetEnemy in _enemyCleanupList)
             {
                 if (targetEnemy == null || !targetEnemy.gameObject.activeInHierarchy)
                 {
@@ -204,40 +205,27 @@ namespace IdleDefenseSurvival.Player
                     continue;
                 }
 
-                var activeSourcesForTarget = _enemyAffectedBy[targetEnemy];
-                var sourcesToRemoveFromTarget = new List<string>();
+                var activeSources = _enemyAffectedBy[targetEnemy];
+                _removeFromTargetList.Clear();
 
-                foreach (var sourceId in activeSourcesForTarget)
+                foreach (var sourceId in activeSources)
                 {
-                    if (!_enemyAuraSources.TryGetValue(sourceId, out var source))
+                    if (!_enemyAuraSources.TryGetValue(sourceId, out var src) ||
+                        src.SourceEnemy == null ||
+                        (targetEnemy.transform.position - src.SourceEnemy.transform.position).sqrMagnitude
+                            > src.Action.radius * src.Action.radius)
                     {
-                        sourcesToRemoveFromTarget.Add(sourceId);
-                        continue;
-                    }
-
-                    if (source.SourceEnemy == null)
-                    {
-                        sourcesToRemoveFromTarget.Add(sourceId);
-                        continue;
-                    }
-
-                    float distance = Vector2.Distance(targetEnemy.transform.position, source.SourceEnemy.transform.position);
-                    if (distance > source.Action.radius)
-                    {
-                        sourcesToRemoveFromTarget.Add(sourceId);
+                        _removeFromTargetList.Add(sourceId);
                     }
                 }
 
-                foreach (var sourceId in sourcesToRemoveFromTarget)
+                foreach (var srcId in _removeFromTargetList)
                 {
-                    RemoveAuraEffectFromEnemy(sourceId, targetEnemy);
-                    activeSourcesForTarget.Remove(sourceId);
+                    RemoveAuraEffectFromEnemy(srcId, targetEnemy);
+                    activeSources.Remove(srcId);
                 }
 
-                if (activeSourcesForTarget.Count == 0)
-                {
-                    _enemyAffectedBy.Remove(targetEnemy);
-                }
+                if (activeSources.Count == 0) _enemyAffectedBy.Remove(targetEnemy);
             }
         }
 
@@ -245,21 +233,21 @@ namespace IdleDefenseSurvival.Player
         {
             foreach (var kvp in _enemyAuraSources)
             {
-                string sourceId = kvp.Key;
                 var source = kvp.Value;
-
                 if (source.SourceEnemy == null) continue;
 
-                Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(
+                int count = Physics2D.OverlapCircle(
                     source.SourceEnemy.transform.position,
                     source.Action.radius,
-                    _enemyLayerMask);
+                    new ContactFilter2D { useLayerMask = true, layerMask = _enemyLayerMask },
+                    _overlapBuffer);
 
-                foreach (var col in nearbyEnemies)
+                for (int i = 0; i < count; i++)
                 {
+                    var col = _overlapBuffer[i];
                     if (!col.TryGetComponent<EnemyAi>(out var targetEnemy)) continue;
                     if (targetEnemy == source.SourceEnemy) continue;
-                    ApplyAuraEffectToEnemy(sourceId, source, targetEnemy);
+                    ApplyAuraEffectToEnemy(kvp.Key, source, targetEnemy);
                 }
             }
         }
@@ -270,7 +258,7 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public void RegisterEnemyAuraSource(EnemyAi sourceEnemy)
         {
-            if (sourceEnemy == null || sourceEnemy.EnemyData == null || sourceEnemy.EnemyData.effects == null) return;
+            if (sourceEnemy?.EnemyData?.effects == null) return;
 
             foreach (var effect in sourceEnemy.EnemyData.effects)
             {
@@ -278,10 +266,9 @@ namespace IdleDefenseSurvival.Player
                 foreach (var action in effect.aura)
                 {
                     if (action == null || action.effect == StatusEffectType.None) continue;
-                    if (action.radius <= 0f) continue;
-                    if (action.value <= 0f) continue;
+                    if (action.radius <= 0f || action.value <= 0f) continue;
 
-                    string sourceId = $"EnemyAura_{sourceEnemy.EnemyData.id}_{sourceEnemy.GetInstanceID()}_{action.effect}";
+                    var sourceId = new StatusSourceId(sourceEnemy.GetInstanceID(), (int)action.effect);
                     _enemyAuraSources[sourceId] = new AuraSource
                     {
                         SourceEnemy = sourceEnemy,
@@ -300,108 +287,73 @@ namespace IdleDefenseSurvival.Player
         {
             if (sourceEnemy == null) return;
 
-            var sourcesToRemove = new List<string>();
+            _sourcesToRemove.Clear();
             foreach (var kvp in _enemyAuraSources)
-            {
-                if (kvp.Value.SourceEnemy == sourceEnemy)
-                {
-                    sourcesToRemove.Add(kvp.Key);
-                }
-            }
+                if (kvp.Value.SourceEnemy == sourceEnemy) _sourcesToRemove.Add(kvp.Key);
 
-            foreach (var sourceId in sourcesToRemove)
+            foreach (var srcId in _sourcesToRemove)
             {
-                // Remove aura effect from all enemies currently affected by this source
-                var affectedEnemies = new List<EnemyAi>(_enemyAffectedBy.Keys);
-                foreach (var targetEnemy in affectedEnemies)
+                _affectedEnemiesCleanup.Clear();
+                _affectedEnemiesCleanup.AddRange(_enemyAffectedBy.Keys);
+                foreach (var target in _affectedEnemiesCleanup)
                 {
-                    // Skip destroyed enemies
-                    if (targetEnemy == null) continue;
-                    if (_enemyAffectedBy.TryGetValue(targetEnemy, out var sources))
+                    if (_enemyAffectedBy.TryGetValue(target, out var set) && set.Contains(srcId))
                     {
-                        if (sources.Contains(sourceId))
-                        {
-                            RemoveAuraEffectFromEnemy(sourceId, targetEnemy);
-                            sources.Remove(sourceId);
-                        }
-
-                        if (sources.Count == 0)
-                        {
-                            _enemyAffectedBy.Remove(targetEnemy);
-                        }
+                        RemoveAuraEffectFromEnemy(srcId, target);
+                        set.Remove(srcId);
+                        if (set.Count == 0) _enemyAffectedBy.Remove(target);
                     }
                 }
-
-                _enemyAuraSources.Remove(sourceId);
+                _enemyAuraSources.Remove(srcId);
             }
         }
 
-        private void ApplyAuraEffectToEnemy(string sourceId, AuraSource source, EnemyAi targetEnemy)
+        private void ApplyAuraEffectToEnemy(StatusSourceId sourceId, AuraSource source, EnemyAi targetEnemy)
         {
-            if (!_enemyAffectedBy.TryGetValue(targetEnemy, out var sources))
+            if (!_enemyAffectedBy.TryGetValue(targetEnemy, out var set))
             {
-                sources = new HashSet<string>();
-                _enemyAffectedBy[targetEnemy] = sources;
+                set = new HashSet<StatusSourceId>();
+                _enemyAffectedBy[targetEnemy] = set;
             }
-            sources.Add(sourceId);
+            set.Add(sourceId);
 
             if (!targetEnemy.TryGetComponent<EnemyStatusEffectController>(out var controller)) return;
 
             switch (source.EffectType)
             {
-                case StatusEffectType.Slow: break;
                 case StatusEffectType.DamageReduction:
-                {
-                    // Iron Guardian (or any enemy with DamageReduction aura) should not receive
-                    // DamageReduction from other sources — they already have thick HP.
                     if (targetEnemy.EnemyData?.effects != null)
                     {
-                        foreach (var effect in targetEnemy.EnemyData.effects)
+                        foreach (var eff in targetEnemy.EnemyData.effects)
                         {
-                            if (effect?.aura != null)
-                            {
-                                foreach (var action in effect.aura)
-                                {
-                                    if (action?.effect == StatusEffectType.DamageReduction)
-                                    {
-                                        // Target is itself a DamageReduction aura source — skip
-                                        return;
-                                    }
-                                }
-                            }
+                            if (eff?.aura == null) continue;
+                            foreach (var act in eff.aura)
+                                if (act?.effect == StatusEffectType.DamageReduction) return;
                         }
                     }
-
-                    float reductionPercent = Mathf.Clamp01(source.Action.value * 0.01f);
-                    var status = new DamageReductionStatus(reductionPercent, float.MaxValue);
-                    controller.AddEffect(status);
+                    var reduction = Mathf.Clamp01(source.Action.value * 0.01f);
+                    controller.AddEffect(new DamageReductionStatus(reduction, float.MaxValue, sourceId.EnemyInstanceId, sourceId.EffectCode));
                     break;
-                }
-                // Add other aura effect types here as needed
+                case StatusEffectType.Slow:
+                    break;
                 default:
-                    Debug.LogWarning($"[EnemyAuraManager] Unknown enemy aura effect type: {source.EffectType} on enemy {source.SourceEnemy.EnemyData.id}");
+                    Debug.LogWarning($"[EnemyAuraManager] Unknown enemy aura: {source.EffectType}");
                     break;
             }
 
             targetEnemy.RefreshEnemyStatus();
         }
 
-        private void RemoveAuraEffectFromEnemy(string sourceId, EnemyAi targetEnemy)
+        private void RemoveAuraEffectFromEnemy(StatusSourceId sourceId, EnemyAi targetEnemy)
         {
             if (targetEnemy == null) return;
             if (!targetEnemy.TryGetComponent<EnemyStatusEffectController>(out var controller)) return;
 
-            var parts = sourceId.Split('_');
-            if (parts.Length >= 4)
-            {
-                string effectTypeStr = parts[3];
-                if (System.Enum.TryParse<StatusEffectType>(effectTypeStr, out var effectType))
-                {
-                    controller.RemoveEffectImmediate(effectType, e => true);
-                }
-            }
+            if (_enemyAuraSources.TryGetValue(sourceId, out var src))
+                controller.RemoveEffectImmediate(src.EffectType, sourceId.EnemyInstanceId, sourceId.EffectCode);
+            else
+                Debug.LogWarning($"[EnemyAuraManager] Missing source entry for removal: {sourceId}");
 
-            // Immediately refresh enemy status UI (health bar icons)
             targetEnemy.RefreshEnemyStatus();
         }
 
@@ -413,11 +365,48 @@ namespace IdleDefenseSurvival.Player
         }
 
         /// <summary>
+        /// Effect trigger discriminator for StatusSourceId.
+        /// </summary>
+        public enum EffectTrigger
+        {
+            Aura = 0,
+            OnHit = 1,
+            OnTakeDamage = 2
+        }
+
+        /// <summary>
+        /// Compact key – combines enemy instance ID, effect enum value, and trigger type.
+        /// </summary>
+        public readonly struct StatusSourceId : IEquatable<StatusSourceId>
+        {
+            public readonly int EnemyInstanceId;
+            public readonly int EffectCode; // (int)StatusEffectType
+            public readonly EffectTrigger Trigger;
+
+            public StatusSourceId(int enemyInstanceId, int effectCode, EffectTrigger trigger = EffectTrigger.Aura)
+            {
+                EnemyInstanceId = enemyInstanceId;
+                EffectCode = effectCode;
+                Trigger = trigger;
+            }
+
+            public bool Equals(StatusSourceId other) =>
+                EnemyInstanceId == other.EnemyInstanceId && EffectCode == other.EffectCode && Trigger == other.Trigger;
+
+            public override bool Equals(object obj) => obj is StatusSourceId other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(EnemyInstanceId, EffectCode, Trigger);
+
+            public override string ToString() => $"Src_{EnemyInstanceId}_{EffectCode}_{Trigger}";
+        }
+
+        /// <summary>
         /// Called when an enemy dies to immediately remove its auras (both player-targeted and enemy-targeted).
+        /// Does NOT remove timed effects (OnHit/OnTakeDamage) - those persist until their duration expires.
         /// </summary>
         public void OnEnemyDeath(EnemyAi enemy)
         {
-            // Clean up player-targeted auras
+            // Clean up player-targeted auras only (not timed effects)
             if (enemy?.EnemyData?.effects != null)
             {
                 foreach (var effect in enemy.EnemyData.effects)
@@ -425,12 +414,11 @@ namespace IdleDefenseSurvival.Player
                     if (effect?.aura == null) continue;
                     foreach (var action in effect.aura)
                     {
-                        if (action == null || action.effect == StatusEffectType.None) continue;
-                        string sourceId = $"Aura_{enemy.EnemyData.id}_{enemy.GetInstanceID()}_{action.effect}";
-                        if (_activePlayerAuraSources.Contains(sourceId))
+                        var srcId = new StatusSourceId(enemy.GetInstanceID(), (int)action.effect, EffectTrigger.Aura);
+                        if (_activePlayerAuraSources.TryGetValue(srcId, out var et))
                         {
-                            RemoveAuraEffectFromPlayer(sourceId);
-                            _activePlayerAuraSources.Remove(sourceId);
+                            RemoveAuraEffectFromPlayer(srcId, et);
+                            _activePlayerAuraSources.Remove(srcId);
                         }
                     }
                 }
@@ -445,17 +433,14 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public void LogActiveAuras()
         {
-            Debug.Log($"[EnemyAuraManager] Active Player Auras: {_activePlayerAuraSources.Count}");
-            foreach (var sourceId in _activePlayerAuraSources)
-            {
-                Debug.Log($"  - {sourceId}");
-            }
-            Debug.Log($"[EnemyAuraManager] Active Enemy Aura Sources: {_enemyAuraSources.Count}");
+            Debug.Log($"[EnemyAuraManager] Player auras: {_activePlayerAuraSources.Count}");
+            foreach (var kvp in _activePlayerAuraSources) Debug.Log($"  - {kvp.Key}: {kvp.Value}");
+
+            Debug.Log($"[EnemyAuraManager] Enemy sources: {_enemyAuraSources.Count}");
             foreach (var kvp in _enemyAuraSources)
-            {
-                Debug.Log($"  - {kvp.Key}: {kvp.Value.EffectType} radius={kvp.Value.Action.radius}");
-            }
-            Debug.Log($"[EnemyAuraManager] Affected Enemies: {_enemyAffectedBy.Count}");
+                Debug.Log($"  - {kvp.Key}: {kvp.Value.EffectType} r={kvp.Value.Action.radius}");
+
+            Debug.Log($"[EnemyAuraManager] Affected enemies: {_enemyAffectedBy.Count}");
         }
     }
 }

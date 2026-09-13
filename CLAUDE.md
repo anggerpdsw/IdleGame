@@ -14,6 +14,7 @@ This file provides guidance to Claude Code (claude.ai/code) and other coding age
 
 The project is designed around:
 
+- target enemy > 5000
 - automatic combat;
 - long-term progression;
 - wave/tier progression;

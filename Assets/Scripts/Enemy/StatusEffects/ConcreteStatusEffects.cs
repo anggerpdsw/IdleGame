@@ -758,6 +758,17 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
             _reductionPercent = Mathf.Clamp01(reductionPercent);
         }
 
+        /// <summary>
+        /// Constructor with source tracking for aura-based effects.
+        /// </summary>
+        public DamageReductionStatus(float reductionPercent, float duration, int sourceEnemyInstanceId, int sourceEffectCode)
+            : base(duration)
+        {
+            _reductionPercent = Mathf.Clamp01(reductionPercent);
+            SourceEnemyInstanceId = sourceEnemyInstanceId;
+            SourceEffectCode = sourceEffectCode;
+        }
+
         public override float GetCurrentValue() => _reductionPercent;
 
         public override void OnApply(EnemyAi enemy)

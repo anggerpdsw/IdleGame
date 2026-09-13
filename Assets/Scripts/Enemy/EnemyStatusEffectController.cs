@@ -277,7 +277,7 @@ namespace IdleDefenseSurvival.Enemy
         /// Removes effects of a given type instantly (bypasses the queued removal).
         /// Useful for UI‑driven immediate updates such as aura expiration.
         /// </summary>
-        public void RemoveEffectImmediate(StatusEffectType type, System.Predicate<IStatusEffect> predicate = null)
+        public void RemoveEffectImmediate(StatusEffectType type, Predicate<IStatusEffect> predicate = null)
         {
             var toRemove = new List<IStatusEffect>();
             for (int i = 0; i < _effects.Count; i++)
@@ -294,6 +294,30 @@ namespace IdleDefenseSurvival.Enemy
             }
 
             if (toRemove.Count > 0) OnEffectsChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Removes a specific status effect by type and source tracking (for aura source-based removal).
+        /// </summary>
+        public void RemoveEffectImmediate(StatusEffectType type, int sourceEnemyInstanceId, int sourceEffectCode)
+        {
+            for (int i = _effects.Count - 1; i >= 0; i--)
+            {
+                var effect = _effects[i];
+                if (effect.Type != type) continue;
+
+                // Check if effect has source tracking (BaseStatusEffect or derived)
+                if (effect is BaseStatusEffect baseEffect)
+                {
+                    if (baseEffect.SourceEnemyInstanceId == sourceEnemyInstanceId &&
+                        baseEffect.SourceEffectCode == sourceEffectCode)
+                    {
+                        RemoveEffectInternal(effect);
+                        OnEffectsChanged?.Invoke();
+                        return; // Only remove one matching source
+                    }
+                }
+            }
         }
 
         /// <summary>

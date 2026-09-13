@@ -39,10 +39,14 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private SpriteRenderer _attackRangeRenderer;
         // Barrier visual – child GameObject with SpriteRenderer
         [SerializeField] private SpriteRenderer _barrierRenderer;
-        [SerializeField] private SpriteRenderer _iceRenderer;
-        // Shield visual - separate from barrier
         [SerializeField] private SpriteRenderer _shieldRenderer;
-        [SerializeField] private Image _shieldCooldownImage; // Radial fill image for cooldown UI
+        [SerializeField] private SpriteRenderer _iceRenderer;
+        [SerializeField] private SpriteRenderer _burnRenderer;
+        // Shield visual - separate from barrier
+        // Radial fill image for cooldown effecy UI
+        [SerializeField] private Image _shieldCooldownImage;
+        [SerializeField] private Image _iceCooldownImage;
+        [SerializeField] private Image _burnCooldownImage;
         private float _attackRangeSpeedRotate = 2f;
         // Immunity flag for DeathDefy
         private bool _isImmune;
@@ -100,6 +104,7 @@ namespace IdleDefenseSurvival.Player
             // Ensure effect renderer starts disabled
             SetBarrierEffect(false);
             SetIceEffect(false);
+            SetBurnEffect(false);
         }
 
         /// <summary>
@@ -162,6 +167,8 @@ namespace IdleDefenseSurvival.Player
             TryTriggerUltimateWithCooldown();
             TryRegeneration();
             UpdateShield(); // Shield system update
+            UpdateIceCooldownUI();
+            UpdateBurnCooldownUI();
             // Aura effects now handled by AuraCollider trigger system
 
             _attackRangeRenderer.transform.Rotate(0, 0, _attackRangeSpeedRotate * Time.deltaTime);
@@ -455,6 +462,43 @@ namespace IdleDefenseSurvival.Player
                 _shieldCooldownImage.enabled = false;
                 _shieldCooldownImage.fillAmount = 0f;
             }
+        }
+
+        private void UpdateIceCooldownUI()
+        {
+            if (_iceCooldownImage == null) return;
+
+            float fillAmount = PlayerStatusEffectManager.Instance?.GetIceCooldownFill() ?? 0f;
+            if (fillAmount > 0f)
+            {
+                _iceCooldownImage.fillAmount = fillAmount;
+                _iceCooldownImage.enabled = true;
+            }
+            else
+            {
+                _iceCooldownImage.enabled = false;
+                _iceCooldownImage.fillAmount = 0f;
+            }
+        }
+
+        private void UpdateBurnCooldownUI()
+        {
+            if (_burnCooldownImage == null) return;
+
+            float fillAmount = PlayerStatusEffectManager.Instance?.GetBurnCooldownFill() ?? 0f;
+            bool active = false;
+            if (fillAmount > 0f)
+            {
+                active = true;
+                _burnCooldownImage.fillAmount = fillAmount;
+                _burnCooldownImage.enabled = active;
+            }
+            else
+            {
+                _burnCooldownImage.enabled = active;
+                _burnCooldownImage.fillAmount = 0f;
+            }
+            SetBurnEffect(active);
         }
 
         /// <summary>
@@ -804,6 +848,10 @@ namespace IdleDefenseSurvival.Player
         public void SetIceEffect(bool enabled)
         {
             if (_iceRenderer != null) _iceRenderer.enabled = enabled;
+        }
+        public void SetBurnEffect(bool enabled)
+        {
+            if (_burnRenderer != null) _burnRenderer.enabled = enabled;
         }
 
         private void DrawAttackRange()

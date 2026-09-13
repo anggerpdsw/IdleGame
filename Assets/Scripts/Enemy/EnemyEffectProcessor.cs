@@ -56,13 +56,13 @@ namespace IdleDefenseSurvival.Enemy
             switch (action.effect)
             {
                 case StatusEffectType.Slow:
-                    ApplySlowToPlayer(action, sourceEnemy, player);
+                    ApplySlowToPlayer(action, sourceEnemy, player, trigger);
                     break;
                 case StatusEffectType.Stun:
-                    ApplyStunToPlayer(action, sourceEnemy, player);
+                    ApplyStunToPlayer(action, sourceEnemy, player, trigger);
                     break;
                 case StatusEffectType.Burn:
-                    ApplyBurnToPlayer(action, sourceEnemy, player);
+                    ApplyBurnToPlayer(action, sourceEnemy, player, trigger);
                     break;
                 default:
                     Debug.LogWarning(
@@ -86,13 +86,13 @@ namespace IdleDefenseSurvival.Enemy
             switch (action.effect)
             {
                 case StatusEffectType.Slow:
-                    ApplySlowToPlayer(action, sourceEnemy, player);
+                    ApplySlowToPlayer(action, sourceEnemy, player, trigger);
                     break;
                 case StatusEffectType.Stun:
-                    ApplyStunToPlayer(action, sourceEnemy, player);
+                    ApplyStunToPlayer(action, sourceEnemy, player, trigger);
                     break;
                 case StatusEffectType.Burn:
-                    ApplyBurnToPlayer(action, sourceEnemy, player);
+                    ApplyBurnToPlayer(action, sourceEnemy, player, trigger);
                     break;
                 default:
                     Debug.LogWarning(
@@ -106,53 +106,68 @@ namespace IdleDefenseSurvival.Enemy
         /// <summary>
         /// Applies slow effect to player.
         /// </summary>
-        private static void ApplySlowToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player)
+        private static void ApplySlowToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player, EffectTriggerType trigger)
         {
             if (action.value <= 0f) return;
             float percent = Mathf.Clamp01(action.value * 0.01f); // Convert 50 to 0.5
             float duration = action.duration > 0f ? action.duration : 1f;
-            // Use a unique source ID based on enemy instance and effect type
-            string sourceId =
-                $"EnemyEffect_{sourceEnemy?.EnemyData?.id}_" +
-                $"{sourceEnemy.GetInstanceID()}_{action.effect}";
-            // Apply through PlayerSlowManager (will create if needed)
-            PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Slow, percent, duration);
+            var sourceId = BuildSourceId(sourceEnemy, action.effect, trigger);
+            PlayerStatusEffectManager.Instance.ApplyEffect(
+                sourceId,
+                PlayerStatusEffectManager.PlayerEffectType.Slow,
+                percent,
+                duration);
         }
 
         /// <summary>
         /// Applies stun effect to player using source-based manager.
         /// </summary>
-        private static void ApplyStunToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player)
+        private static void ApplyStunToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player, EffectTriggerType trigger)
         {
             if (action.duration <= 0f) return;
             if (sourceEnemy == null) return;
 
-            // Generate unique source ID based on enemy definition + instance + effect type
-            string sourceId =
-                $"EnemyEffect_{sourceEnemy.EnemyData.id}_" +
-                $"{sourceEnemy.GetInstanceID()}_{action.effect}";
-
-            // Apply through PlayerStunManager (source-based tracking, like slow)
-            PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Stun, 0f, action.duration);
+            var sourceId = BuildSourceId(sourceEnemy, action.effect, trigger);
+            PlayerStatusEffectManager.Instance.ApplyEffect(
+                sourceId,
+                PlayerStatusEffectManager.PlayerEffectType.Stun,
+                0f,
+                action.duration);
         }
 
         /// <summary>
         /// Applies burn effect to player.
         /// </summary>
-        private static void ApplyBurnToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player)
+        private static void ApplyBurnToPlayer(EnemyEffectAction action, EnemyAi sourceEnemy, Player.Player player, EffectTriggerType trigger)
         {
             if (action.value <= 0f) return;
             // value stored as percent of max health (e.g., 10 = 10%)
             float percent = Mathf.Clamp01(action.value * 0.01f);
             float duration = Mathf.Max(0.1f, action.duration);
 
-            // Unique source ID for source-based tracking (non-stacking)
-            string sourceId =
-                $"EnemyEffect_{sourceEnemy?.EnemyData?.id}_" +
-                $"{sourceEnemy.GetInstanceID()}_{action.effect}";
+            var sourceId = BuildSourceId(sourceEnemy, action.effect, trigger);
+            PlayerStatusEffectManager.Instance.ApplyEffect(
+                sourceId,
+                PlayerStatusEffectManager.PlayerEffectType.Burn,
+                percent,
+                duration);
+        }
 
-            // Apply via the new Burn handling in PlayerStatusEffectManager
-            PlayerStatusEffectManager.Instance.ApplyEffect(sourceId, PlayerStatusEffectManager.PlayerEffectType.Burn, percent, duration);
+        private static EnemyAuraManager.StatusSourceId BuildSourceId(
+            EnemyAi sourceEnemy, StatusEffectType effect, EffectTriggerType trigger)
+        {
+            var auraType = trigger switch
+            {
+                EffectTriggerType.OnHit => EnemyAuraManager.EffectTrigger.OnHit,
+                EffectTriggerType.OnTakeDamage => EnemyAuraManager.EffectTrigger.OnTakeDamage,
+                EffectTriggerType.Aura => EnemyAuraManager.EffectTrigger.Aura,
+                _ => EnemyAuraManager.EffectTrigger.Aura
+            };
+
+            return new EnemyAuraManager.StatusSourceId(
+                sourceEnemy?.GetInstanceID() ?? 0,
+                (int)effect,
+                auraType);
         }
 
         /// <summary>

@@ -26,6 +26,16 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
             ElapsedTime = 0f;
         }
 
+        /// <summary>
+        /// Instance ID of the enemy that applied this effect (for source-based removal).
+        /// </summary>
+        public int SourceEnemyInstanceId { get; set; }
+
+        /// <summary>
+        /// Effect code (int)StatusEffectType of the source aura/effect (for source-based removal).
+        /// </summary>
+        public int SourceEffectCode { get; set; }
+
         public virtual void OnApply(EnemyAi enemy)
         {
             _enemy = enemy;
