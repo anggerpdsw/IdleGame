@@ -16,11 +16,11 @@ namespace IdleDefenseSurvival.Player
     {
         [Header("Movement")]
         [Tooltip("Speed of the projectile in units per second.")]
-        [SerializeField] private float _speed = 20f;
+        [SerializeField] private float _speed = 23f;
 
         [Header("Lifetime")]
         [Tooltip("Maximum distance the projectile can travel before self-destructing.")]
-        [SerializeField] private float _maxDistance = 20f;
+        [SerializeField] private float _maxDistance = 25f;
 
         [Tooltip("Radius to detect hit on target using distance check (fallback).")]
         [SerializeField] private float _hitRadius = 0.5f;
@@ -35,7 +35,7 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Sprite _tankBulletSprite;
         [SerializeField] private Sprite _enemyBulletSprite;
         [Tooltip("Target visual diameter in world units.")]
-        [SerializeField] private float _visualSize = 0.53f;
+        [SerializeField] private float _visualSize = 0.67f;
 
         private Transform _target;
         private ProjectileOwner _owner;
@@ -201,9 +201,15 @@ namespace IdleDefenseSurvival.Player
                 return;
             }
 
+            // Kompensasi Time.timeScale: bagi speed dengan timeScale supaya
+            // kecepatan visual tetap konsisten di semua game speed (0.5x-7.5x).
+            // Physics engine sudah mengalikan timeScale, jadi kita perlu membagi.
+            float timeScaleCompensation = Mathf.Max(0.1f, Time.timeScale);
+            float effectiveSpeed = _speed / timeScaleCompensation;
+
             // Move towards target
             Vector2 direction = ((Vector2)_target.position - _rb.position).normalized;
-            _rb.linearVelocity = direction * _speed;
+            _rb.linearVelocity = direction * effectiveSpeed;
 
             // Rotate to face direction of movement
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;

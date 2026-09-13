@@ -37,6 +37,12 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Slider manaBar;
         [SerializeField] private Image fillMana;
         [SerializeField] private SpriteRenderer _attackRangeRenderer;
+
+        [Header("Projectile Spacing")]
+        [Tooltip("Radius offset untuk spawn projectile agar tidak menumpuk")]
+        [SerializeField] private float _projectileSpacingRadius = 0.25f;
+        [Tooltip("Sudut spread antar projectile dalam derajat")]
+        [SerializeField] private float _projectileSpreadAngle = 15f;
         // Barrier visual – child GameObject with SpriteRenderer
         [SerializeField] private SpriteRenderer _barrierRenderer;
         [SerializeField] private SpriteRenderer _shieldRenderer;
@@ -60,6 +66,7 @@ namespace IdleDefenseSurvival.Player
         private int _enemyLayerMask;
         private Transform _currentTarget;
         private UltimateManager _ultimateManager;
+        private int _shotIndex = 0; // Counter untuk radial offset pattern
 
         public float CurrentHealth => _currentHealth;
         public float MaxHealth => PlayerStatsManager.Instance != null
@@ -269,13 +276,35 @@ namespace IdleDefenseSurvival.Player
                 Projectile projectile = ProjectilePool.Instance.Get();
                 if (projectile != null)
                 {
-                    projectile.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
+                    // Spawn dengan radial offset untuk spacing visual
+                    Vector3 spawnPos = GetSpawnPositionWithOffset(i);
+                    projectile.transform.SetPositionAndRotation(spawnPos, Quaternion.identity);
 
                     // Projectile pertama = damage penuh
                     float damageMultiplier = (i == 0) ? 1f : 0.75f;
                     projectile.Initialize(target, this, damageMultiplier);
                 }
             }
+        }
+
+        /// <summary>
+        /// Hitung posisi spawn projectile dengan radial offset untuk mencegah overlapping.
+        /// Menggunakan pattern circular distribution berdasarkan shot index.
+        /// </summary>
+        private Vector3 GetSpawnPositionWithOffset(int shotIndex)
+        {
+            // Kombinasi shot index dengan counter global untuk variasi pattern
+            float totalAngle = (shotIndex * _projectileSpreadAngle) + (_shotIndex * 7f);
+            float angleRad = totalAngle * Mathf.Deg2Rad;
+
+            Vector3 offset = new(
+                Mathf.Cos(angleRad) * _projectileSpacingRadius,
+                Mathf.Sin(angleRad) * _projectileSpacingRadius,
+                0f
+            );
+
+            _shotIndex++; // Increment untuk variasi pattern shot berikutnya
+            return transform.position + offset;
         }
 
         /// <summary>
