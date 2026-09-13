@@ -8,9 +8,9 @@
             "minCount": 5000,
             "maxCount": 100000,
             "reward": {
-                "gold": 5000,
-                "gem": 3,
-                "meat": 20
+                "gold": 2500,
+                "gem": 2,
+                "meat": 35
             },
             "claimCooldownMinutes": 1,
             "cancelCooldownMinutes": 15
@@ -41,7 +41,7 @@
             "maxCount": 1000,
             "reward": {
                 "gold": 5000,
-                "gem": 12,
+                "gem": 10,
                 "meat": 100
             },
             "claimCooldownMinutes": 2,
@@ -53,11 +53,11 @@
             "description": "Hunt elite monster types",
             "type": 1,
             "targetId": "Forest Archer",
-            "minCount": 400,
+            "minCount": 300,
             "maxCount": 1200,
             "reward": {
-                "gold": 4000,
-                "gem": 8,
+                "gold": 5000,
+                "gem": 9,
                 "meat": 80
             },
             "claimCooldownMinutes": 2,
@@ -86,7 +86,7 @@
             "type": 2,
             "targetId": "Gold",
             "minCount": 50000,
-            "maxCount": 150000,
+            "maxCount": 250000,
             "reward": {
                 "gold": 3000,
                 "gem": 3,
@@ -102,11 +102,12 @@
             "type": 2,
             "targetId": "Gem",
             "minCount": 10,
-            "maxCount": 35,
+            "maxCount": 100,
+            "scaleOnTier": false,
             "reward": {
-                "gold": 7500,
-                "gem": 5,
-                "meat": 200
+                "gold": 750,
+                "gem": 2,
+                "meat": 20
             },
             "claimCooldownMinutes": 5,
             "cancelCooldownMinutes": 30
@@ -121,7 +122,7 @@
             "maxCount": 5000,
             "reward": {
                 "gold": 4000,
-                "gem": 3,
+                "gem": 7,
                 "meat": 100
             },
             "claimCooldownMinutes": 1,
@@ -133,11 +134,11 @@
             "description": "Complete waves of enemies",
             "type": 3,
             "targetId": "",
-            "minCount": 250,
+            "minCount": 150,
             "maxCount": 600,
             "reward": {
                 "gold": 5000,
-                "gem": 8,
+                "gem": 7,
                 "meat": 100
             },
             "claimCooldownMinutes": 2,
@@ -151,6 +152,7 @@
             "targetId": "Common Tertentu",
             "minCount": 1,
             "maxCount": 5,
+            "scaleOnTier": false,
             "reward": {
                 "gold": 2500,
                 "gem": 8,

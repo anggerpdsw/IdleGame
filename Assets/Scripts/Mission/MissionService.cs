@@ -155,7 +155,8 @@ namespace IdleDefenseSurvival.Mission
             // 1. Random target dasar dari template.
             int baseTargetCount = UnityEngine.Random.Range(tmpl.minCount, tmpl.maxCount + 1);
             // 2. Tier hanya menaikkan target.
-            int targetCount = Mathf.Max(1, Mathf.RoundToInt(baseTargetCount * tierMultiplier));
+            int targetUpCount = Mathf.Max(1, Mathf.RoundToInt(baseTargetCount * tierMultiplier));
+            int targetCount = tmpl.scaleOnTier ? targetUpCount : baseTargetCount;
             // 3. Hitung progress target dasar
             float normalizedProgress = 0f;
             if (tmpl.maxCount > tmpl.minCount)
@@ -165,9 +166,10 @@ namespace IdleDefenseSurvival.Mission
                     / (tmpl.maxCount - tmpl.minCount);
             }
             normalizedProgress = Mathf.Clamp01(normalizedProgress);
-            // 4. Reward minimum = 20% dari reward maksimal
-            const float minRewardMultiplier = 0.2f;
-            float rewardMultiplier = Mathf.Lerp(minRewardMultiplier, 1f, normalizedProgress);
+            // 4. Reward template = reward minimum.
+            //    Reward maksimum = 10x reward minimum.
+            const float maxRewardMultiplier = 10f;
+            float rewardMultiplier = Mathf.Lerp(1f, maxRewardMultiplier, normalizedProgress);
             // 5. Reward dihitung dari baseTargetCount
             //    BUKAN targetCount yang sudah di-scale tier
             int scaledGold = Mathf.RoundToInt(tmpl.reward.gold * rewardMultiplier);

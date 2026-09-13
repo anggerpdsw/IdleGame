@@ -1,16 +1,19 @@
 fileFormatVersion: 2
-guid: 516c3d4b245443f41ac47e1bf871333e
+guid: 2ba77282bcb4c824f8a85bd609ee12ba
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5530328233454342813
-    second: potion_r6_0
+      213: -1836448825861540991
+    second: potion_r2_0
   - first:
-      213: 6475786007247545235
-    second: potion_r6_1
+      213: 1102250783842699998
+    second: potion_r2_1
   - first:
-      213: 3976282121376021061
-    second: potion_r6_2
+      213: -4273006150192193084
+    second: potion_r2_2
+  - first:
+      213: 1702259075420243818
+    second: potion_r2_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -122,10 +125,10 @@ TextureImporter:
       name: hp
       rect:
         serializedVersion: 2
-        x: 114
-        y: 651
-        width: 422
-        height: 596
+        x: 132
+        y: 664
+        width: 420
+        height: 551
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,8 +137,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d921c563a3cafbc40800000000000000
-      internalID: 5530328233454342813
+      spriteID: 183f656d58f9386e0800000000000000
+      internalID: -1836448825861540991
       vertices: []
       indices: 
       edges: []
@@ -144,10 +147,10 @@ TextureImporter:
       name: sp
       rect:
         serializedVersion: 2
-        x: 720
-        y: 651
-        width: 420
-        height: 595
+        x: 706
+        y: 658
+        width: 417
+        height: 544
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,30 +159,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3936f6b301d9ed950800000000000000
-      internalID: 6475786007247545235
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: potion_r6_2
-      rect:
-        serializedVersion: 2
-        x: 114
-        y: 651
-        width: 422
-        height: 596
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 54aba5ba5879e2730800000000000000
-      internalID: 3976282121376021061
+      spriteID: eda07587f3bfb4f00800000000000000
+      internalID: 1102250783842699998
       vertices: []
       indices: 
       edges: []
@@ -188,20 +169,20 @@ TextureImporter:
       name: mp
       rect:
         serializedVersion: 2
-        x: 113
-        y: 17
-        width: 428
-        height: 614
+        x: 120
+        y: 49
+        width: 438
+        height: 553
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: c2bbc126f4ba09d4c8c54cd34d52a2a3
-      internalID: -1300994997
+      spriteID: 4c12cb6bb8b33b4c0800000000000000
+      internalID: -4273006150192193084
       vertices: []
       indices: 
       edges: []
@@ -210,20 +191,20 @@ TextureImporter:
       name: ap
       rect:
         serializedVersion: 2
-        x: 720
-        y: 17
-        width: 428
-        height: 615
+        x: 702
+        y: 48
+        width: 425
+        height: 555
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: d1d750094a85eb94c8b712efa23971ae
-      internalID: -1922387557
+      spriteID: a67cb123c93af9710800000000000000
+      internalID: 1702259075420243818
       vertices: []
       indices: 
       edges: []
@@ -232,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 27cda6b68b71920429b7fe9792a7e6b7
+    spriteID: 090cf9dcb803c9343a9871f4b4214f84
     internalID: 0
     vertices: []
     indices: 
@@ -242,11 +223,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ap: -1922387557
-      hp: 5530328233454342813
-      mp: -1300994997
-      potion_r6_2: 3976282121376021061
-      sp: 6475786007247545235
+      ap: 1702259075420243818
+      hp: -1836448825861540991
+      mp: -4273006150192193084
+      sp: 1102250783842699998
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

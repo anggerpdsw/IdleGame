@@ -16,6 +16,7 @@ namespace IdleDefenseSurvival.Data
         public string targetId; // Specific enemy ID or currency type, empty for generic
         public int minCount;
         public int maxCount;
+        public bool scaleOnTier = true;
         public MissionReward reward;
         public int claimCooldownMinutes;
         public int cancelCooldownMinutes;
