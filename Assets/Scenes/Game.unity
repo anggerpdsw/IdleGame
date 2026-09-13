@@ -3742,6 +3742,8 @@ MonoBehaviour:
   manaBar: {fileID: 1373347276}
   fillMana: {fileID: 1989693410}
   _attackRangeRenderer: {fileID: 937093094}
+  _projectileSpacingRadius: 0.25
+  _projectileSpreadAngle: 15
   _barrierRenderer: {fileID: 434727783}
   _shieldRenderer: {fileID: 92404209}
   _iceRenderer: {fileID: 1993558567}

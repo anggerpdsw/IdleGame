@@ -1998,7 +1998,7 @@
       "id": "Fire Wisp",
       "role": "Beast",
       "prefabName": "Basic",
-      "attackRange": 2.1,
+      "attackRange": 2.3,
       "attackSpeed": 1.12,
       "damage": 4,
       "health": 18.7,
@@ -2429,6 +2429,39 @@
           "MinTier": 1
         }
       ]
+    },
+    {
+      "id": "Vampire",
+      "role": "Beast",
+      "effects": [{
+        "type": "Vampiric",
+        "onHit": [{
+          "effect": "LifeSteal",
+          "value": 40
+        }],
+        "aura": [{
+          "effect": "Regeneration",
+          "value": 1,
+          "radius": 3.1
+        }]
+      }],
+      "prefabName": "Basic",
+      "attackRange": 4.23,
+      "attackSpeed": 1.01,
+      "damage": 14,
+      "health": 66.6,
+      "moveSpeed": 0.101,
+      "spawnWeight": 0.88,
+      "evasion": 37.3,
+      "element": "Wood",
+      "exp": 38,
+      "dropItems": [{
+        "ItemId": "decomposed_common",
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Weight": 0.0015,
+        "MinTier": 2
+      }]
     },
     {
       "id": "Ice Sprite",
