@@ -111,6 +111,7 @@ namespace IdleDefenseSurvival.Player
 
             CleanupOutOfRangeAuras();
             ApplyAurasToNearbyEnemies();
+            ProcessRegenerationAuras();
         }
 
         // -----------------------------------------------------------------------
@@ -176,6 +177,9 @@ namespace IdleDefenseSurvival.Player
                         enemy.transform.position);
                     break;
                 case StatusEffectType.DamageReduction:
+                    break;
+                case StatusEffectType.Regeneration:
+                    // Regeneration is enemy-to-enemy only, does not affect player
                     break;
                 default:
                     Debug.LogWarning($"[EnemyAuraManager] Unknown player aura: {action.effect}");
@@ -248,6 +252,40 @@ namespace IdleDefenseSurvival.Player
                     if (!col.TryGetComponent<EnemyAi>(out var targetEnemy)) continue;
                     if (targetEnemy == source.SourceEnemy) continue;
                     ApplyAuraEffectToEnemy(kvp.Key, source, targetEnemy);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Process Regeneration aura heal for all registered Vampire sources.
+        /// Called at ENEMY_AURA_UPDATE_INTERVAL (5Hz).
+        /// </summary>
+        private void ProcessRegenerationAuras()
+        {
+            foreach (var kvp in _enemyAuraSources)
+            {
+                var source = kvp.Value;
+                if (source.SourceEnemy == null) continue;
+                if (source.EffectType != StatusEffectType.Regeneration) continue;
+
+                // Heal per tick = source MaxHealth * (value / 100) * interval
+                float healPerSecond = source.SourceEnemy.MaxHealth * (source.Action.value * 0.01f);
+                float healThisTick = healPerSecond * ENEMY_AURA_UPDATE_INTERVAL;
+
+                int count = Physics2D.OverlapCircle(
+                    source.SourceEnemy.transform.position,
+                    source.Action.radius,
+                    new ContactFilter2D { useLayerMask = true, layerMask = _enemyLayerMask },
+                    _overlapBuffer);
+
+                for (int i = 0; i < count; i++)
+                {
+                    var col = _overlapBuffer[i];
+                    if (!col.TryGetComponent<EnemyAi>(out var targetEnemy)) continue;
+                    if (targetEnemy.CurrentHealth >= targetEnemy.MaxHealth) continue;
+                    if (!targetEnemy.gameObject.activeInHierarchy) continue;
+
+                    targetEnemy.Heal(healThisTick);
                 }
             }
         }
@@ -333,6 +371,10 @@ namespace IdleDefenseSurvival.Player
                     }
                     var reduction = Mathf.Clamp01(source.Action.value * 0.01f);
                     controller.AddEffect(new DamageReductionStatus(reduction, float.MaxValue, sourceId.EnemyInstanceId, sourceId.EffectCode));
+                    break;
+                case StatusEffectType.Regeneration:
+                    // Regeneration is processed centrally in ProcessRegenerationAuras()
+                    // No status effect needs to be added to target
                     break;
                 case StatusEffectType.Slow:
                     break;

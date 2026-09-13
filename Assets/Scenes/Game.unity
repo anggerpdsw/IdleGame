@@ -9023,7 +9023,7 @@ MonoBehaviour:
   _player: {fileID: 296059131}
   _spawnMode: 0
   _testMode: 0
-  _testSpecificID: Frost Guardian
+  _testSpecificID: Vampire
   _testRole: 0
 --- !u!4 &890400225
 Transform:

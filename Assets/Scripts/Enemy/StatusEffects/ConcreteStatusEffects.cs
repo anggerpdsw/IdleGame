@@ -799,4 +799,23 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
             return clone;
         }
     }
+
+    /// <summary>
+    /// Regeneration - passive heal per second based on source MaxHealth.
+    /// Used by Vampire aura. Not a real status effect on targets - marker only.
+    /// </summary>
+    [Serializable]
+    public sealed class RegenerationStatus : BaseStatusEffect
+    {
+        public override StatusEffectType Type => StatusEffectType.Regeneration;
+        public override int MaxStacks => 1;
+        public override StackPolicy StackPolicy => StackPolicy.Replace;
+
+        public RegenerationStatus(float duration = float.MaxValue) : base(duration) { }
+
+        public override IStatusEffect Clone()
+        {
+            return new RegenerationStatus(Duration) { StackCount = StackCount };
+        }
+    }
 }

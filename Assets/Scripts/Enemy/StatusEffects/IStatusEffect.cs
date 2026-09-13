@@ -110,6 +110,8 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         DamageOverTimeImmune = 34,
         DefenseBreak = 35,
         HeartBreak = 36,
+        LifeSteal = 37,
+        Regeneration = 38,
     }
 
     /// <summary>

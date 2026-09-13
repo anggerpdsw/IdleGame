@@ -521,6 +521,7 @@ namespace IdleDefenseSurvival.Enemy
                         {
                             StatusEffectType.Slow => GameColors.rareBlue,
                             StatusEffectType.DamageReduction => GameColors.gemRuby,
+                            StatusEffectType.Regeneration => GameColors.green,
                             _ => GameColors.empty,
                         };
                     }
@@ -836,6 +837,22 @@ namespace IdleDefenseSurvival.Enemy
             RefreshHealthBarStatus();
             RefreshEnemyStatus();
             EnemyStatisticsManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>
+        /// Heal enemy by amount. Clamps to MaxHealth. Used by Vampiric LifeSteal and Regeneration aura.
+        /// </summary>
+        public void Heal(float amount)
+        {
+            if (amount <= 0f) return;
+            if (_currentHealth >= _maxHealth) return;
+
+            _currentHealth = Mathf.Min(_currentHealth + amount, _maxHealth);
+            RefreshHealthBarStatus();
+            EnemyStatisticsManager.Instance?.MarkDirty();
+
+            // Show heal popup
+            if (amount >= 1f) ShowDamagePopup(amount, DamageType.Heal, CriticalType.None, "+");
         }
 
         /// <summary>

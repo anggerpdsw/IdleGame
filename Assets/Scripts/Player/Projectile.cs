@@ -293,7 +293,14 @@ namespace IdleDefenseSurvival.Player
                 source: ProjectileOwner.Enemy.ToString()
             );
 
-            player.TakeDamage(damageData);
+            float actualDamageDealt = player.TakeDamage(damageData);
+
+            // Process Vampiric LifeSteal after actual damage is known
+            if (_target != null && _target.TryGetComponent<EnemyAi>(out var enemy))
+            {
+                EnemyEffectProcessor.ProcessVampiricLifeSteal(enemy, actualDamageDealt);
+            }
+
             ReturnToPool();
         }
 

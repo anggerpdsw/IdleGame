@@ -29,6 +29,66 @@ namespace IdleDefenseSurvival.Enemy
         }
 
         /// <summary>
+        /// Processes Vampiric LifeSteal after enemy successfully damages player.
+        /// Called from Projectile.HitPlayer after actualDamageDealt is known.
+        /// </summary>
+        public static void ProcessVampiricLifeSteal(EnemyAi enemy, float actualDamageDealt)
+        {
+            if (enemy?.EnemyData?.effects == null) return;
+            if (actualDamageDealt <= 0f) return;
+
+            foreach (var effect in enemy.EnemyData.effects)
+            {
+                if (effect?.type != "Vampiric") continue;
+                if (effect?.onHit == null) continue;
+
+                foreach (var action in effect.onHit)
+                {
+                    if (action == null || action.effect != StatusEffectType.LifeSteal) continue;
+                    if (action.value <= 0f) continue;
+
+                    float lifeStealPercent = action.value * 0.01f; // 40 → 0.40
+                    float healthThreshold = enemy.MaxHealth * 0.80f;
+
+                    if (enemy.CurrentHealth <= healthThreshold)
+                    {
+                        // Self-heal: 40%
+                        float selfHeal = actualDamageDealt * lifeStealPercent;
+                        enemy.Heal(selfHeal);
+                    }
+                    else
+                    {
+                        // Aura heal: 20% distributed to nearby enemies
+                        float auraHealTotal = actualDamageDealt * (lifeStealPercent * 0.5f);
+                        DistributeAuraHeal(enemy, auraHealTotal, action.radius);
+                    }
+                }
+            }
+        }
+
+        private static void DistributeAuraHeal(EnemyAi source, float healAmount, float radius)
+        {
+            if (healAmount <= 0f || radius <= 0f) return;
+
+            var buffer = new Collider2D[64];
+            int count = Physics2D.OverlapCircle(
+                source.transform.position,
+                radius,
+                new ContactFilter2D { useLayerMask = true, layerMask = LayerMask.GetMask("Enemy") },
+                buffer);
+
+            for (int i = 0; i < count; i++)
+            {
+                if (!buffer[i].TryGetComponent<EnemyAi>(out var target)) continue;
+                if (target == source) continue;
+                if (target.CurrentHealth >= target.MaxHealth) continue;
+                if (!target.gameObject.activeInHierarchy) continue;
+
+                target.Heal(healAmount);
+            }
+        }
+
+        /// <summary>
         /// Processes OnTakeDamage effects when enemy receives damage.
         /// </summary>
         public static void ProcessOnTakeDamage(EnemyAi enemy, DamageData damageData)
@@ -63,6 +123,10 @@ namespace IdleDefenseSurvival.Enemy
                     break;
                 case StatusEffectType.Burn:
                     ApplyBurnToPlayer(action, sourceEnemy, player, trigger);
+                    break;
+                case StatusEffectType.LifeSteal:
+                    // LifeSteal is processed separately in ProcessVampiricLifeSteal()
+                    // after actualDamageDealt is known (called from Projectile.HitPlayer)
                     break;
                 default:
                     Debug.LogWarning(
