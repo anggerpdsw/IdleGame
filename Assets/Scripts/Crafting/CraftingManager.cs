@@ -121,7 +121,11 @@ namespace IdleDefenseSurvival.Manager
         public string StartCraft(CraftType type, string recipeId, int count = 1)
         {
             var validation = _validator.CanCraft(type, recipeId, count);
-            if (!validation.IsSuccess) return null;
+            if (!validation.IsSuccess)
+            {
+                Debug.LogWarning($"[CraftingManager] Cannot craft '{recipeId}' x{count}: {validation.Reason}");
+                return null;
+            }
             if (!_repository.TryGetRecipe(recipeId, out var recipe)) return null;
 
             long completionSeed = _rollService.RngProvider.NextInt(1, int.MaxValue);
@@ -133,7 +137,11 @@ namespace IdleDefenseSurvival.Manager
             var transaction = new CraftTransactionService(
                 InventoryService.Instance, EconomyManager.Instance, _saveManager);
             var trxResult = transaction.BeginTransaction(recipe, count);
-            if (!trxResult.IsSuccess) return null;
+            if (!trxResult.IsSuccess)
+            {
+                Debug.LogWarning($"[CraftingManager] Transaction failed for '{recipeId}' x{count}: {trxResult.Reason}");
+                return null;
+            }
 
             if (!_queueService.EnqueueJob(job))
             {
@@ -238,7 +246,10 @@ namespace IdleDefenseSurvival.Manager
             if (_repository == null || _saveManager == null) return;
             var account = _saveManager.GetAccountData();
             if (account == null) return;
-            _repository.UnlockRecipesByCraftingLevel(account.blacksmithLevel);
+            _repository.UnlockRecipesByCraftingLevel(
+                account.blacksmithLevel, 
+                account.alchemistLevel
+            );
         }
 
         // ---------- Misc ----------

@@ -63,23 +63,9 @@ namespace IdleDefenseSurvival.Items
                 }
             }
 
-            // Reserve decomposed requirements (always, independent of regular ingredients)
-            var decomposedReqsReserve = DecomposedRequirementResolver.Compute(recipe.Rarity);
-            if (decomposedReqsReserve.Count > 0)
-            {
-                var decomposedScaledReserve = DecomposedRequirementAggregator.SumPerJob(decomposedReqsReserve, count);
-                for (int dr = 0; dr < decomposedScaledReserve.Count; dr++)
-                {
-                    var entry = decomposedScaledReserve[dr];
-                    int have = _inventory.GetTotalQuantity(entry.ItemId);
-                    if (have < entry.Count)
-                    {
-                        Rollback();
-                        return TransactionResult.Fail($"Failed to reserve {entry.ItemId}: need {entry.Count}, have {have}");
-                    }
-                    _reservedMaterials.Add(new ReservedMaterial { ItemId = entry.ItemId, Count = entry.Count, MinQuality = 0, MinLevel = 0 });
-                }
-            }
+            // ponytail: decomposed requirements removed — already injected into recipe.Ingredients by CraftRecipeRepository.cs:111-158
+            // Potion recipes get potion_hp_1/potion_mp_1; equipment recipes get decomposed_* materials.
+            // Double-injection caused validation failure when player had hidden ingredient but not decomposed material.
 
             // Reserve currency
             if (recipe.GoldCost > 0)
@@ -189,19 +175,7 @@ namespace IdleDefenseSurvival.Items
                 }
             }
 
-            // Validate decomposed requirements (R2-R6 only) - ALWAYS, independent of regular ingredients
-            var decomposedReqsValidate = DecomposedRequirementResolver.Compute(recipe.Rarity);
-            if (decomposedReqsValidate.Count > 0)
-            {
-                var decomposedScaledValidate = DecomposedRequirementAggregator.SumPerJob(decomposedReqsValidate, count);
-                for (int dv = 0; dv < decomposedScaledValidate.Count; dv++)
-                {
-                    int need = decomposedScaledValidate[dv].Count;
-                    int have = _inventory.GetTotalQuantity(decomposedScaledValidate[dv].ItemId);
-                    if (have < need)
-                        return ValidationResult.Fail($"Not enough {decomposedScaledValidate[dv].ItemId}: need {need}, have {have}");
-                }
-            }
+            // ponytail: decomposed validation removed — recipe.Ingredients already complete after repository injection
 
             // Check currency
             if (recipe.GoldCost > 0)

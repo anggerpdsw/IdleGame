@@ -231,7 +231,7 @@
             "EffectType": "",
             "SkillType": "HealthRegen",
             "Mode": "Flat",
-            "BaseValue": 71,
+            "BaseValue": 17,
             "ValuePerLevel": 23,
             "CardRarity": "Common"
         }, {

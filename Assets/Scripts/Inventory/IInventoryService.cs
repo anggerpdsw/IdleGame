@@ -360,6 +360,7 @@ public class InventoryItemData
     // ---- Equipment-only (unique instances) ----
     public int? Level;
     public int? MaxLevel;
+    public Rarity? Rarity; // Persisted rarity for crafted equipment
     public int? MaxDurability; // Rolled from rarity config (not base template)
     public int? CurrentDurability;
     public int? DurabilityLossPerUse; // From rarity config

@@ -1,3 +1,5 @@
+using System;
+
 namespace IdleDefenseSurvival
 {
     public static class GameConstants
@@ -63,6 +65,9 @@ namespace IdleDefenseSurvival
         public const float DROP_CHANCE_GOLD = 0.125f;
         public const float DROP_CHANCE_GEM = 0.0047f; // 0.47% drop chance
         public const float DROP_CHANCE_MEAT = 0.01f;
+
+        // Upgrade cost equipment
+        public const int BASE_UPGRADE_COST = 100000;
 
     }
 

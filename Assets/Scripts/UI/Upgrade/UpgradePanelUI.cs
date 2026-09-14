@@ -9,6 +9,7 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.UI.Inventory;
 using IdleDefenseSurvival.Equipment;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Items.Decomposition;
 
 namespace IdleDefenseSurvival.UI.Upgrade
 {
@@ -31,6 +32,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
         [Header("Action")]
         [SerializeField] private Button _upgradeButton;
         [SerializeField] private TextMeshProUGUI _upgradeButtonText;
+        [SerializeField] private Button _decomposeButton;
         [SerializeField] private TextMeshProUGUI _statusText;
 
         [Header("Filters")]
@@ -71,6 +73,8 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             if (_upgradeButton != null)
                 _upgradeButton.onClick.AddListener(OnUpgradeClicked);
+            if (_decomposeButton != null)
+                _decomposeButton.onClick.AddListener(OnDecomposeClicked);
 
             foreach (var tab in _equipmentTabs)
             {
@@ -178,13 +182,6 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             if (item == null || !item.IsEquippable()) return;
 
-            // Block max-level equipment from being selected as main
-            if (item.IsMaxLevel)
-            {
-                _statusText.text = $"Equipment {item.ItemId} sudah level maksimum.";
-                return;
-            }
-
             // Click same main → clear selection (toggle)
             if (_mainItem != null && item.InstanceId == _mainItem.InstanceId)
             {
@@ -202,7 +199,11 @@ namespace IdleDefenseSurvival.UI.Upgrade
             _mainInventoryIndex = inventoryIndex;
             _mainSlot.SetItem(item, inventoryIndex);
             UpdatePreview();
-            _statusText.text = "Pilih equipment material";
+
+            if (item.IsMaxLevel)
+                _statusText.text = "Equipment max level - siap decompose";
+            else
+                _statusText.text = "Pilih equipment material";
         }
 
         /// <summary>
@@ -270,7 +271,14 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         private void UpdatePreview()
         {
-            if (_mainItem != null && _materialItems.Count > 0)
+            // Decompose button state
+            if (_decomposeButton != null)
+            {
+                bool isDivine = _mainItem != null && _mainItem.GetRarity() == Rarity.Divine;
+                _decomposeButton.interactable = _mainItem != null && _mainItem.IsMaxLevel && !isDivine;
+            }
+
+            if (_mainItem != null && _materialItems.Count > 0 && !_mainItem.IsMaxLevel)
             {
                 bool canUpgrade = UpgradeManager.Instance.CanUpgradeMultiple(_mainItem, _materialItems, out string reason);
                 int resultLevel = Mathf.Min(_mainItem.Level + _materialItems.Count, _mainItem.MaxLevel);
@@ -288,6 +296,13 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 _statusText.text = canUpgrade
                     ? $"Level {_mainItem.Level} → {resultLevel} (Biaya: {goldCost:N0} Gold)"
                     : $"Tidak cocok: {reason}";
+            }
+            else if (_mainItem != null && _mainItem.IsMaxLevel)
+            {
+                _upgradeButton.interactable = false;
+                _goldCostText.text = "-";
+                _previewSlot?.Clear();
+                _statusText.text = "Equipment max level - siap decompose";
             }
             else if (_mainItem != null)
             {
@@ -309,6 +324,55 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             if (_mainItem == null || _materialItems.Count == 0) return;
             UpgradeManager.Instance.UpgradeMultiple(_mainItem, _materialItems);
+        }
+
+        private void OnDecomposeClicked()
+        {
+            if (_mainItem == null)
+            {
+                _statusText.text = "Pilih equipment untuk decompose or upgrade";
+                return;
+            }
+
+            if (!_mainItem.IsMaxLevel)
+            {
+                _statusText.text = $"Equipment harus level maksimal ({_mainItem.Level}/{_mainItem.MaxLevel})";
+                return;
+            }
+
+            if (_mainItem.GetRarity() == Rarity.Divine)
+            {
+                _statusText.text = "Divine equipment tidak dapat di-decompose";
+                return;
+            }
+
+            // Collect all selected items (main + materials yang juga max level)
+            var items = new List<InventoryItem> { _mainItem };
+            foreach (var mat in _materialItems)
+            {
+                if (mat.IsMaxLevel)
+                    items.Add(mat);
+            }
+
+            if (EquipmentDecompositionService.DecomposeMultiple(items, out var rewards, out string reason))
+            {
+                string rewardText = "";
+                foreach (var kvp in rewards)
+                {
+                    rewardText += $"{kvp.Key} x{kvp.Value}, ";
+                }
+                _statusText.text = $"Decompose berhasil! Dapat: {rewardText.TrimEnd(',', ' ')}";
+
+                // Force inventory refresh
+                InventoryService.Instance?.FlushDirtySlots();
+
+                ClearSelection();
+                RefreshItemList();
+            }
+            else
+            {
+                _statusText.text = $"Decompose gagal: {reason}";
+            }
         }
 
         private void ClearSelection()
@@ -442,7 +506,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             // Base cost scales with level and rarity
             int rarityMultiplier = (int)item.GetRarity() + 1; // Common=1, Rare=2, etc.
-            return 10000L * item.Level * rarityMultiplier;
+            return GameConstants.BASE_UPGRADE_COST * item.Level * rarityMultiplier;
         }
 
         private InventoryItem CreatePreviewItem(InventoryItem source, int targetLevel)

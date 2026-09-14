@@ -185,9 +185,11 @@ namespace IdleDefenseSurvival.Crafting
 
         private bool HasInventorySpaceForResults(CraftRecipeData recipe, int count)
         {
-            // Deterministic: 1 equipment item per craft (plus possible mastery/critical extras)
-            // Estimate: 1 base + 1 mastery + up to 2 critical = max 4 per craft
-            int maxItems = count * 4;
+            // Equipment: 1 item per craft
+            // Potion/consumable: conservatively estimate 2 per craft (future-proof for multi-output recipes)
+            // ponytail: old 4x too high, caused false-negative; add recipe type check when non-equipment multi-output exists
+            int itemsPerCraft = recipe.IsEquipment ? 1 : 2;
+            int maxItems = count * itemsPerCraft;
             return _inventory.FreeSlots >= maxItems || _inventory.HasSpaceFor("", maxItems);
         }
 

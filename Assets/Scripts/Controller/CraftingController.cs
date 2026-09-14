@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Controller
 {
@@ -13,6 +14,11 @@ namespace IdleDefenseSurvival.Controller
         [Header("References")]
         [SerializeField] private Button _backButton;
 
+        void Start()
+        {
+            CraftingManager.Instance?.CheckAutoUnlocks();
+        }
+
         public void OnBack() => SceneLoader.Instance.ReturnToMainMenuFromCrafting();
 
         private void OnEnable() {
@@ -21,6 +27,7 @@ namespace IdleDefenseSurvival.Controller
         private void OnDisable() {
             if (_backButton != null) _backButton.onClick.RemoveListener(OnBack);
         }
+
 
     }
 }

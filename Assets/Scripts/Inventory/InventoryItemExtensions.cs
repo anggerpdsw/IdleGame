@@ -105,6 +105,11 @@ namespace IdleDefenseSurvival.Inventory
         /// </summary>
         public static Rarity GetRarity(this InventoryItem item)
         {
+            // Crafted equipment: use persisted Rarity field
+            if (item.IsEquippable() && item.Rarity != Rarity.None)
+                return item.Rarity;
+
+            // Database lookup fallback
             var itemData = item.GetEquipmentData();
             return itemData?.ItemRarity ?? Rarity.Common;
         }

@@ -77,6 +77,11 @@ namespace IdleDefenseSurvival.Enemy
         private float _auraRadius;
         private bool _hasAura;
 
+        // Regeneration aura stop-move behavior
+        private bool _hasRegenerationAura;
+        private bool _isRegenerating;
+        private const float REGEN_HP_THRESHOLD = 0.90f;
+
         private SaveManager _saveManager;
         private WaveManager _waveManager;
         private EconomyManager _economyManager;
@@ -184,6 +189,13 @@ namespace IdleDefenseSurvival.Enemy
             // Slow aura pulse tetap berjalan saat Time.timeScale = 0
             UpdateAuraPulse();
 
+            // Update regeneration state
+            if (_hasRegenerationAura)
+            {
+                float hpPercent = _currentHealth / Mathf.Max(1f, _maxHealth);
+                _isRegenerating = hpPercent < REGEN_HP_THRESHOLD;
+            }
+
             // Skip movement if still in stun
             if (Time.time < _stuntEndTime)
             {
@@ -235,7 +247,18 @@ namespace IdleDefenseSurvival.Enemy
             // Update spatial grid cell
             UpdateCell();
 
-            ApplyMovement();
+            // Stop movement when regenerating (HP < 90%) but still allow attacking
+            if (!_isRegenerating)
+            {
+                ApplyMovement();
+            }
+            else
+            {
+                // Zero velocity saat regen
+                if (_rb.linearVelocity != Vector2.zero)
+                    _rb.linearVelocity = Vector2.zero;
+            }
+
             UpdateFacing();
         }
 
@@ -493,6 +516,25 @@ namespace IdleDefenseSurvival.Enemy
 
             // Register dengan global health bar manager
             _enemyHealthBarManager.RegisterEnemy(this, _maxHealth);
+
+            // Check if has Regeneration aura
+            _hasRegenerationAura = false;
+            if (data.effects != null)
+            {
+                foreach (var eff in data.effects)
+                {
+                    if (eff?.aura == null) continue;
+                    foreach (var act in eff.aura)
+                    {
+                        if (act?.effect == StatusEffectType.Regeneration)
+                        {
+                            _hasRegenerationAura = true;
+                            break;
+                        }
+                    }
+                    if (_hasRegenerationAura) break;
+                }
+            }
 
             RefreshAuraVisual();
 

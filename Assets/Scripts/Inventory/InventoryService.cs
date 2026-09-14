@@ -776,6 +776,7 @@ namespace IdleDefenseSurvival.Inventory
                 data.InstanceId = item.InstanceId;
                 data.Level = item.Level;
                 data.MaxLevel = item.MaxLevel;
+                data.Rarity = item.Rarity; // Persist rarity for crafted equipment
                 data.MaxDurability = item.MaxDurability;
                 data.CurrentDurability = item.CurrentDurability;
                 data.DurabilityLossPerUse = item.DurabilityLossPerUse;
@@ -876,6 +877,7 @@ namespace IdleDefenseSurvival.Inventory
                 item.InstanceId = data.InstanceId;
                 item.Level = data.Level ?? 1;
                 item.MaxLevel = data.MaxLevel ?? 20;
+                item.Rarity = data.Rarity ?? Rarity.Common; // Restore persisted rarity
 
                 // ponytail: use persisted durability instead of DB template (crafted items lack DB entry)
                 item.MaxDurability = data.MaxDurability ?? 100;

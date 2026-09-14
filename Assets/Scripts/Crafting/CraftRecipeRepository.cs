@@ -79,6 +79,7 @@ namespace IdleDefenseSurvival.Crafting
                 "Data/Crafting/Equipment/dataRecipeEarring",
                 "Data/Crafting/Equipment/dataRecipeBracelet",
                 "Data/Crafting/Equipment/dataRecipeShoes",
+
                 "Data/Crafting/Potion/dataRecipeHealthPotion",
                 "Data/Crafting/Potion/dataRecipeManaPotion"
             };
@@ -139,7 +140,7 @@ namespace IdleDefenseSurvival.Crafting
                         // Equipment: use decomposed material requirements
                         else
                         {
-                            var decomposed = DecomposedRequirementResolver.Compute(recipe.Rarity);
+                            var decomposed = DecomposedRequirementResolver.ComputeCraftRequirements(recipe.Rarity);
                             foreach (var d in decomposed)
                             {
                                 extraIngredients.Add(new CraftIngredient
@@ -251,19 +252,25 @@ namespace IdleDefenseSurvival.Crafting
             return true;
         }
 
-        public void UnlockRecipesByCraftingLevel(int craftingLevel)
+        public void UnlockRecipesByCraftingLevel(int blacksmithLevel, int alchemistLevel)
         {
             foreach (var recipe in _allRecipes.Values)
             {
                 if (recipe.UnlockSource == UnlockSource.BlacksmithLevel
-                    && recipe.RequiredBlacksmithLevel <= craftingLevel
+                    && recipe.RequiredBlacksmithLevel <= blacksmithLevel
+                    && !_unlockedRecipeIds.Contains(recipe.RecipeId))
+                {
+                    UnlockRecipe(recipe.RecipeId, notify: true);
+                }
+                
+                if (recipe.UnlockSource == UnlockSource.AlchemistLevel
+                    && recipe.RequiredAlchemistLevel <= alchemistLevel
                     && !_unlockedRecipeIds.Contains(recipe.RecipeId))
                 {
                     UnlockRecipe(recipe.RecipeId, notify: true);
                 }
             }
         }
-
         // ponytail: Tier-based unlock removed — RequiredTier no longer exists on CraftRecipeData
         // public void UnlockRecipesByTier(int tier) { ... }
 

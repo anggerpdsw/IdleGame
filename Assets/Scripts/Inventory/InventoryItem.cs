@@ -31,6 +31,7 @@ namespace IdleDefenseSurvival.Inventory
         public int Quantity = 1; // For stackable items
         public int Level = 1; // Current level
         public int MaxLevel = 20; // Maximum level this equipment can reach (from rarity config)
+        public Rarity Rarity = Rarity.Common; // Rarity tier (persisted for crafted equipment)
 
         // ============ Durability ============
         public int MaxDurability = 100;
