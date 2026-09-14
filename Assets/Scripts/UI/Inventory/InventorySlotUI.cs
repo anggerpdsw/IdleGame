@@ -111,7 +111,7 @@ namespace IdleDefenseSurvival.UI.Inventory
             // Level
             if (_levelText != null && item.IsEquippable())
             {
-                _levelText.text = item.Level > 1 ? $"Lv.{item.Level}" : "";
+                _levelText.text = $"Lv.{item.Level}/{item.MaxLevel}";
                 _levelText.enabled = item.Level > 1;
             }
             
@@ -197,7 +197,10 @@ namespace IdleDefenseSurvival.UI.Inventory
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (_currentItem == null || _currentItem.IsLocked) return;
-            // Drag uses the PHYSICAL inventory index, not the UI grid position
+            // Jangan mulai drag kalau gerakan masih kecil (user lagi scroll)
+            const float MIN_DRAG_DISTANCE = 10f;
+            if (eventData.delta.sqrMagnitude < MIN_DRAG_DISTANCE * MIN_DRAG_DISTANCE) 
+                return;
             _parentUI?.BeginDrag(_currentItem, _inventoryIndex, eventData.position);
         }
 

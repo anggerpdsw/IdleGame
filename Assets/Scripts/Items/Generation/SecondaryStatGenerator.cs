@@ -83,20 +83,13 @@ namespace IdleDefenseSurvival.Items.Generation
             int index = 0;
             foreach (var kvp in aggregated)
             {
-                var meta = SecondaryStatRegistry.Get(kvp.Key);
                 var progression = AttributeStatLoader.Instance?.GetSecondaryProgression(kvp.Key);
-
-                float templateBaseValue = meta.BaseValue;
                 float valuePerLevel = progression?.ValuePerLevel ?? 0f;
-
-                // BaseValue stores the value at level 1: templateBaseValue + ValuePerLevel
-                // GetValue(level) = BaseValue + ValuePerLevel * (level - 1) = templateBaseValue + Level * ValuePerLevel
-                float baseValue = templateBaseValue + valuePerLevel;
 
                 results[index++] = new CombatStatEntry
                 {
                     Stat = kvp.Key,
-                    BaseValue = baseValue,
+                    BaseValue = kvp.Value,  // pakai hasil roll, bukan template
                     ValuePerLevel = valuePerLevel,
                 };
             }

@@ -9,7 +9,6 @@ using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.UI.Inventory;
 using IdleDefenseSurvival.Equipment;
 using System.Collections.Generic;
-using IdleDefenseSurvival.Items.Decomposition;
 
 namespace IdleDefenseSurvival.UI.Upgrade
 {
@@ -27,7 +26,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         [Header("Cost")]
         [SerializeField] private TextMeshProUGUI _goldCostText;
-        [SerializeField] private Image _goldIcon;
+        [SerializeField] private TextMeshProUGUI _meatCostText;
 
         [Header("Action")]
         [SerializeField] private Button _upgradeButton;
@@ -82,7 +81,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             }
             SetTab(_currentTab);
 
-            if (_statusText != null) _statusText.text = "Pilih equipment utama";
+            if (_statusText != null) _statusText.text = "Choose main equipment";
         }
 
         private void SubscribeEvents()
@@ -133,7 +132,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         private void OnEquipmentUpgraded(InventoryItem main, InventoryItem material, int oldLevel, int newLevel)
         {
-            _statusText.text = $"Berhasil! Level {oldLevel} → {newLevel}";
+            _statusText.text = $"Success! Level {oldLevel} → {newLevel}";
 
             // Keep upgraded main item visible in main slot
             _mainItem = main;
@@ -147,7 +146,8 @@ namespace IdleDefenseSurvival.UI.Upgrade
             RefreshItemList();
 
             _upgradeButton.interactable = false;
-            _goldCostText.text = "-";
+            if (_goldCostText != null) _goldCostText.text = "-";
+            if (_meatCostText != null) _meatCostText.text = "-";
         }
 
         // Helper – clear material UI but preserve main slot
@@ -163,7 +163,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
 
         private void OnUpgradeFailed(InventoryItem main, InventoryItem material, string reason)
         {
-            _statusText.text = $"Gagal: {reason}";
+            _statusText.text = $"Failed: {reason}";
         }
 
         // Tab filtering by EquipmentType
@@ -201,9 +201,9 @@ namespace IdleDefenseSurvival.UI.Upgrade
             UpdatePreview();
 
             if (item.IsMaxLevel)
-                _statusText.text = "Equipment max level - siap decompose";
+                _statusText.text = "Equipment max level - can decompose";
             else
-                _statusText.text = "Pilih equipment material";
+                _statusText.text = "Choose material equipment";
         }
 
         /// <summary>
@@ -219,8 +219,9 @@ namespace IdleDefenseSurvival.UI.Upgrade
             _mainSlot.Clear();
             if (_previewSlot != null) _previewSlot.Clear();
             _upgradeButton.interactable = false;
-            _goldCostText.text = "-";
-            _statusText.text = "Pilih equipment utama";
+            if (_goldCostText != null) _goldCostText.text = "-";
+            if (_meatCostText != null) _meatCostText.text = "-";
+            _statusText.text = "Choose main equipment or equipment max level";
         }
 
         public void OnMaterialSlotClicked(InventoryItem item, int inventoryIndex)
@@ -231,7 +232,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             // Material type must match main type
             if (_mainItem != null && item.GetEquipmentType() != _mainItem.GetEquipmentType())
             {
-                _statusText.text = $"Material tipe {item.GetEquipmentType()} tidak cocok dengan main {_mainItem.GetEquipmentType()}";
+                _statusText.text = $"Material type {item.GetEquipmentType()} doesn't match with main {_mainItem.GetEquipmentType()}";
                 return;
             }
 
@@ -250,7 +251,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             int maxMaterials = _mainItem != null ? Mathf.Max(0, _mainItem.MaxLevel - _mainItem.Level) : 0;
             if (_materialItems.Count >= maxMaterials && maxMaterials > 0)
             {
-                _statusText.text = $"Maksimal {maxMaterials} material (level {_mainItem.Level}/{_mainItem.MaxLevel})";
+                _statusText.text = $"Maximum {maxMaterials} material (level {_mainItem.Level}/{_mainItem.MaxLevel})";
                 return;
             }
 
@@ -282,10 +283,15 @@ namespace IdleDefenseSurvival.UI.Upgrade
             {
                 bool canUpgrade = UpgradeManager.Instance.CanUpgradeMultiple(_mainItem, _materialItems, out string reason);
                 int resultLevel = Mathf.Min(_mainItem.Level + _materialItems.Count, _mainItem.MaxLevel);
-                long goldCost = GetUpgradeGoldCost(_mainItem) * _materialItems.Count;
+                long meatCost = UpgradeManager.Instance.ComputeMeatCost(_mainItem) * _materialItems.Count;
+                long goldCost = UpgradeManager.Instance.ComputeGoldCost(_mainItem) * _materialItems.Count;
 
-                _upgradeButton.interactable = canUpgrade && EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Gold, goldCost);
-                _goldCostText.text = goldCost.ToString("N0");
+                bool hasMeat = EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Meat, meatCost);
+                bool hasGold = EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Gold, goldCost);
+                _upgradeButton.interactable = canUpgrade && (hasMeat || hasGold);
+
+                if (_meatCostText != null) _meatCostText.text = meatCost.ToString("N0");
+                if (_goldCostText != null) _goldCostText.text = goldCost.ToString("N0");
 
                 if (_previewSlot != null)
                 {
@@ -293,30 +299,34 @@ namespace IdleDefenseSurvival.UI.Upgrade
                     _previewSlot.SetItem(preview, -1);
                 }
 
+                string costDisplay = $"{meatCost:N0} Meat + {goldCost:N0} Gold";
                 _statusText.text = canUpgrade
-                    ? $"Level {_mainItem.Level} → {resultLevel} (Biaya: {goldCost:N0} Gold)"
-                    : $"Tidak cocok: {reason}";
+                    ? $"Level {_mainItem.Level} → {resultLevel} (Cost: {costDisplay})"
+                    : $"Not suitable: {reason}";
             }
             else if (_mainItem != null && _mainItem.IsMaxLevel)
             {
                 _upgradeButton.interactable = false;
-                _goldCostText.text = "-";
+                if (_goldCostText != null) _goldCostText.text = "-";
+                if (_meatCostText != null) _meatCostText.text = "-";
                 _previewSlot?.Clear();
-                _statusText.text = "Equipment max level - siap decompose";
+                _statusText.text = "Equipment max level - can decompose";
             }
             else if (_mainItem != null)
             {
                 _upgradeButton.interactable = false;
-                _goldCostText.text = "-";
+                if (_goldCostText != null) _goldCostText.text = "-";
+                if (_meatCostText != null) _meatCostText.text = "-";
                 _previewSlot?.Clear();
-                _statusText.text = "Pilih equipment material";
+                _statusText.text = "Choose material equipment";
             }
             else
             {
                 _upgradeButton.interactable = false;
-                _goldCostText.text = "-";
+                if (_goldCostText != null) _goldCostText.text = "-";
+                if (_meatCostText != null) _meatCostText.text = "-";
                 _previewSlot?.Clear();
-                _statusText.text = "Pilih equipment utama";
+                _statusText.text = "Choose main equipment";
             }
         }
 
@@ -330,19 +340,19 @@ namespace IdleDefenseSurvival.UI.Upgrade
         {
             if (_mainItem == null)
             {
-                _statusText.text = "Pilih equipment untuk decompose or upgrade";
+                _statusText.text = "Choose equipment to decompose or upgrade";
                 return;
             }
 
             if (!_mainItem.IsMaxLevel)
             {
-                _statusText.text = $"Equipment harus level maksimal ({_mainItem.Level}/{_mainItem.MaxLevel})";
+                _statusText.text = $"Equipment must at max level ({_mainItem.Level}/{_mainItem.MaxLevel})";
                 return;
             }
 
             if (_mainItem.GetRarity() == Rarity.Divine)
             {
-                _statusText.text = "Divine equipment tidak dapat di-decompose";
+                _statusText.text = "Divine equipment can't be decomposed";
                 return;
             }
 
@@ -361,7 +371,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
                 {
                     rewardText += $"{kvp.Key} x{kvp.Value}, ";
                 }
-                _statusText.text = $"Decompose berhasil! Dapat: {rewardText.TrimEnd(',', ' ')}";
+                _statusText.text = $"Success decompose! Get: {rewardText.TrimEnd(',', ' ')}";
 
                 // Force inventory refresh
                 InventoryService.Instance?.FlushDirtySlots();
@@ -371,7 +381,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             }
             else
             {
-                _statusText.text = $"Decompose gagal: {reason}";
+                _statusText.text = $"Failed decomposed: {reason}";
             }
         }
 
@@ -388,8 +398,9 @@ namespace IdleDefenseSurvival.UI.Upgrade
             _mainSlot.Clear();
             if (_previewSlot != null) _previewSlot.Clear();
             _upgradeButton.interactable = false;
-            _goldCostText.text = "-";
-            _statusText.text = "Pilih equipment utama";
+            if (_goldCostText != null) _goldCostText.text = "-";
+            if (_meatCostText != null) _meatCostText.text = "-";
+            _statusText.text = "Choose main equipment";
         }
 
         private void RefreshSlots()
@@ -502,13 +513,6 @@ namespace IdleDefenseSurvival.UI.Upgrade
             }
         }
 
-        private long GetUpgradeGoldCost(InventoryItem item)
-        {
-            // Base cost scales with level and rarity
-            int rarityMultiplier = (int)item.GetRarity() + 1; // Common=1, Rare=2, etc.
-            return GameConstants.BASE_UPGRADE_COST * item.Level * rarityMultiplier;
-        }
-
         private InventoryItem CreatePreviewItem(InventoryItem source, int targetLevel)
         {
             var preview = new InventoryItem
@@ -574,7 +578,7 @@ namespace IdleDefenseSurvival.UI.Upgrade
             _mainInventoryIndex = inventoryIndex;
             _mainSlot.SetItem(item, inventoryIndex);
             UpdatePreview();
-            _statusText.text = "Pilih equipment material";
+            _statusText.text = "Choose material equipment";
         }
 
         private void OnItemListDoubleClick(InventoryItem item, int inventoryIndex)

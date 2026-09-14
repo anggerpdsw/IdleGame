@@ -5,6 +5,7 @@ using IdleDefenseSurvival.Inventory;
 using IdleDefenseSurvival.Items;
 using IdleDefenseSurvival.Items.Generation;
 using IdleDefenseSurvival.Items.Data;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Crafting
 {
@@ -134,19 +135,29 @@ namespace IdleDefenseSurvival.Crafting
             // Rarity source of truth: recipe.Rarity (1=Common..6=Divine).
             // EquipmentGenerator expects 0-based quality tier: 0=Common, 1=Rare, ..., 5=Divine.
             int qualityTier = Mathf.Max(0, recipe.Rarity - 1);
-            int level = Mathf.Max(1, recipe.RequiredBlacksmithLevel);
+            // ---- FIX: random level 1–BlacksmithLevel ----
+            int maxPossible = Mathf.Max(1, context.BlacksmithLevel);
+            UnityEngine.Random.InitState((int)seed);
+            int level = UnityEngine.Random.Range(1, maxPossible + 1);
+            int maxLevel = UnityEngine.Random.Range(level, maxPossible + 1); // MaxLevel = level to BlacksmithLevel
+            baseEquip.MaxLevel = maxLevel;
 
             // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.
             var eventModifiers = new List<EventCraftModifier>();
             foreach (var mod in context.ActiveEventModifiers)
                 if (mod is EventCraftModifier ev) eventModifiers.Add(ev);
 
+            // Use player's highest unlocked tier to influence stat rolls (tierBonus/tierMult in SecondaryStatGenerator).
+            // Falls back to recipe.RequiredBlacksmithLevel if higher.
+            int playerHighestTier = SaveManager.Instance?.GetHighestUnlockedTier() ?? 0;
+            int effectiveTier = Math.Max(recipe.RequiredBlacksmithLevel, playerHighestTier);
+
             // Build generation context – sets Source, EquipmentType, Category, ForcedQuality, FixedLevel, etc.
             var genContext = ItemGenerationContext.Equipment(
                                  equipmentType: slot,
                                  rarity: (Rarity)recipe.Rarity,
                                  level: level,
-                                 tier: recipe.RequiredBlacksmithLevel)
+                                 tier: effectiveTier)
                              .With(
                                  seed: (int)seed,
                                  forcedQuality: qualityTier,

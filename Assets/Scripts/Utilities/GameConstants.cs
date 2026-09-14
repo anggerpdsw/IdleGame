@@ -67,7 +67,8 @@ namespace IdleDefenseSurvival
         public const float DROP_CHANCE_MEAT = 0.01f;
 
         // Upgrade cost equipment
-        public const int BASE_UPGRADE_COST = 100000;
+        public const int BASE_UPGRADE_GOLD_COST = 100000;
+        public const int BASE_UPGRADE_MEAT_COST = 925;
 
     }
 

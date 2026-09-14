@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Core;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Economy;
 
 namespace IdleDefenseSurvival.Upgrade
 {
@@ -80,6 +81,18 @@ namespace IdleDefenseSurvival.Upgrade
 
             int oldLevel = main.Level;
             int newLevel = oldLevel + 1;
+
+            /*
+             * -------------------------------------------------------------
+             * 0. Deduct upgrade cost (Meat preferred, Gold fallback)
+             * -------------------------------------------------------------
+             */
+            if (!TrySpendUpgradeCost(main, out long cost, out CurrencyType currency))
+            {
+                Debug.LogWarning($"[UpgradeManager] Insufficient currency: need {cost}");
+                OnUpgradeFailed?.Invoke(main, material, $"Insufficient {currency}");
+                return false;
+            }
 
             /*
              * -------------------------------------------------------------
@@ -274,6 +287,23 @@ namespace IdleDefenseSurvival.Upgrade
             int oldLevel = main.Level;
             int upgrades = 0;
 
+            /*
+             * -------------------------------------------------------------
+             * 0. Deduct total upgrade cost (Meat preferred, Gold fallback)
+             * -------------------------------------------------------------
+             */
+            long meatTotal = ComputeMeatCost(main) * materials.Count;
+            long goldTotal = ComputeGoldCost(main) * materials.Count;
+
+            if (!EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Meat, meatTotal) || 
+                !EconomyManager.Instance.HasEnoughCurrency(CurrencyType.Gold, goldTotal))
+                return false;
+
+            EconomyManager.Instance.TrySpendCurrency(CurrencyType.Meat, meatTotal,
+                $"UpgradeMultiple {main.ItemId} Lv.{oldLevel} +{materials.Count}");
+            EconomyManager.Instance.TrySpendCurrency(CurrencyType.Gold, goldTotal,
+                $"UpgradeMultiple {main.ItemId} Lv.{oldLevel} +{materials.Count}");
+
             // Copy list to avoid modification during enumeration (OnInventoryChanged may alter original list)
             var materialCopy = new List<InventoryItem>(materials);
 
@@ -333,6 +363,52 @@ namespace IdleDefenseSurvival.Upgrade
             if (main == null || material == null) return false;
             if (!main.IsEquippable() || !material.IsEquippable()) return false;
             return main.GetEquipmentType() == material.GetEquipmentType();
+        }
+        #endregion
+
+        #region Cost Calculation
+        /// <summary>
+        /// Compute gold cost for upgrading one level.
+        /// </summary>
+        public long ComputeGoldCost(InventoryItem item)
+        {
+            int rarityMultiplier = (int)item.GetRarity() + 1;
+            return GameConstants.BASE_UPGRADE_GOLD_COST * item.Level * rarityMultiplier;
+        }
+
+        /// <summary>
+        /// Compute meat cost for upgrading one level.
+        /// Same formula as gold, uses BASE_UPGRADE_MEAT_COST.
+        /// </summary>
+        public long ComputeMeatCost(InventoryItem item)
+        {
+            int rarityMultiplier = (int)item.GetRarity() + 1;
+            return GameConstants.BASE_UPGRADE_MEAT_COST * item.Level * rarityMultiplier;
+        }
+
+        /// <summary>
+        /// Try spend upgrade cost - prefer Meat if affordable, fallback to Gold.
+        /// </summary>
+        private bool TrySpendUpgradeCost(InventoryItem item, out long cost, out CurrencyType currency)
+        {
+            cost = ComputeMeatCost(item);
+            if (EconomyManager.Instance.TrySpendCurrency(CurrencyType.Meat, cost,
+                $"Upgrade {item.ItemId} Lv.{item.Level}->{item.Level+1}"))
+            {
+                currency = CurrencyType.Meat;
+                return true;
+            }
+
+            cost = ComputeGoldCost(item);
+            if (EconomyManager.Instance.TrySpendCurrency(CurrencyType.Gold, cost,
+                $"Upgrade {item.ItemId} Lv.{item.Level}->{item.Level+1}"))
+            {
+                currency = CurrencyType.Gold;
+                return true;
+            }
+
+            currency = CurrencyType.Gold;
+            return false;
         }
         #endregion
 
