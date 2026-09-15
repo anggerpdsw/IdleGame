@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) and other coding agents when working with this repository.
 
-**Last Synchronized:** 2026-09-01 — Comprehensive audit completed. All major systems verified against source code. Documentation is current and accurate.
+**Last Synchronized:** 2026-09-15 — EnemyAi refactor completed. God class decomposed into orchestrator + 5 specialized services. All major systems verified against source code. Documentation is current and accurate.
 
 ---
 
@@ -1609,7 +1609,7 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 |---|---|
 | Player | `Scripts/Player/Player.cs`, `Scripts/Player/PlayerStats.cs`, `Scripts/Player/AuraCollider.cs`, `Scripts/Player/AttributeService.cs`; managers: `Scripts/Manager/PlayerStatsManager.cs`, `Scripts/Manager/BaseStatLoader.cs`, `Scripts/Manager/AttributeStatLoader.cs` |
 | Attributes | `Assets/Resources/Data/Player/dataMainAttribute.json` + `dataAttributeMainValuePerLevel.json` + `dataSOTValuePerLevel.json`; pipeline = `Scripts/Manager/AttributeModifierManager.cs` → `Scripts/Modifier/ModifierCalculator.cs` |
-| Enemy | `Scripts/Enemy/EnemyAi.cs`, `Scripts/Enemy/EnemySpawner.cs`, `Scripts/Enemy/EnemyData.cs`; stats aggregation: `Scripts/Manager/EnemyStatisticsManager.cs` |
+| Enemy | `Scripts/Enemy/EnemyAi.cs` (orchestrator, 827 lines, 67+ public API), `EnemySpawner.cs`, `EnemyData.cs`; services: `EnemySpatialGrid.cs` (O(1) neighbor lookup, Cantor hash), `EnemyMovementCalculator.cs` (pure math: seek/flee/separation), `EnemyAuraVisualController.cs` (MonoBehaviour, pulse animation), `EnemyDeathHandler.cs` (10-step death sequence), `EnemyRewardDistributor.cs` (currency/material drops); stats: `Scripts/Manager/EnemyStatisticsManager.cs`; doc: `REFACTOR_SUMMARY.md` |
 | Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/IStatusEffect.cs`, `BaseStatusEffect.cs`, `ConcreteStatusEffects.cs` |
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
 | Wave | `Scripts/Manager/WaveManager.cs`, `Assets/Resources/Data/dataWave.json` |

@@ -53,29 +53,9 @@ namespace IdleDefenseSurvival.Enemy
         // Status effect controller reference
         [SerializeField] private EnemyStatusEffectController _statusEffectController;
 
-        [Header("Aura Visualization")]
-        [Tooltip("SpriteRenderer for drawing enemy aura range (dashed circle).")]
-        [SerializeField] private SpriteRenderer _auraRangeRenderer;
-        [Tooltip("Rotation speed of aura range visual.")]
-        [SerializeField] private float _auraRotationSpeed = 2f;
-        [Tooltip("Scale multiplier for aura sprite size.")]
-        [SerializeField] private float _auraScaleRange = 1f;
-
-        [Header("Aura Pulse")]
-        [Tooltip("Renderer untuk gelombang aura yang melebar dari pusat enemy.")]
-        [SerializeField] private SpriteRenderer _auraPulseRenderer;
-        [Tooltip("Durasi satu gelombang dari pusat sampai batas aura.")]
-        [SerializeField] private float _auraPulseDuration = 1.2f;
-        [Tooltip("Jeda antar gelombang.")]
-        [SerializeField] private float _auraPulseInterval = 0.35f;
-        [Tooltip("Alpha maksimum gelombang.")]
-        [SerializeField, Range(0f, 1f)] private float _auraPulseMaxAlpha = 0.45f;
-        [Tooltip("Warna gelombang aura Slow.")]
-        [SerializeField] private Color _auraPulseColor = new(0.1f, 0.55f, 1f, 1f);
-
-        private float _auraPulseTimer;
-        private float _auraRadius;
-        private bool _hasAura;
+        [Header("Pickup Prefab")]
+        [Tooltip("Single pickup prefab for all currency types (Gem, Meat)")]
+        [SerializeField] private GameObject _itemPrefab;
 
         // Regeneration aura stop-move behavior
         private bool _hasRegenerationAura;
@@ -97,10 +77,6 @@ namespace IdleDefenseSurvival.Enemy
 
         public EnemyData EnemyData { get; private set; }
 
-        [Header("Pickup Prefab")]
-        [Tooltip("Single pickup prefab for all currency types (Gem, Meat)")]
-        [SerializeField] private GameObject _itemPrefab;
-
         // -------------------------------------------------------------------
         // Runtime references
         // -------------------------------------------------------------------
@@ -117,9 +93,7 @@ namespace IdleDefenseSurvival.Enemy
         private float _attackTimer = 0f;
         private string _lastDamageSource = UltimateDMG.Player.ToString();
 
-        // Performance: spatial grid untuk separation O(1) lookup
-        private static readonly Dictionary<int, List<EnemyAi>> _spatialGrid = new();
-        private static readonly int GridCellSize = 2; // world units per cell
+        // Spatial grid state
         private Vector2Int _currentGridCell;
         private bool _inGrid = false;
 
@@ -186,9 +160,6 @@ namespace IdleDefenseSurvival.Enemy
 
         private void Update()
         {
-            // Slow aura pulse tetap berjalan saat Time.timeScale = 0
-            UpdateAuraPulse();
-
             // Update regeneration state
             if (_hasRegenerationAura)
             {
@@ -228,12 +199,6 @@ namespace IdleDefenseSurvival.Enemy
                 // Reset timer ketika keluar dari attack range
                 _attackTimer = 0f;
             }
-
-            // Defense breaks are now handled by EnemyStatusEffectController
-
-            // Rotate aura range visual
-            if (_auraRangeRenderer != null && _auraRangeRenderer.enabled)
-                _auraRangeRenderer.transform.Rotate(0, 0, _auraRotationSpeed * Time.deltaTime);
         }
 
         private void FixedUpdate()
@@ -314,9 +279,12 @@ namespace IdleDefenseSurvival.Enemy
 
         private void ApplyMovement()
         {
-            Vector2 seekForce = CalculateSeek();
-            Vector2 separationForce = CalculateSeparation();
-            Vector2 finalVelocity = CalculateFinalVelocity(seekForce, separationForce);
+            Vector2 seekForce = EnemyMovementCalculator.CalculateSeek(
+                transform.position, _player.position, _attackRange, _moveSpeed);
+            Vector2 separationForce = EnemyMovementCalculator.CalculateSeparation(
+                this, transform.position, _currentGridCell, _separationRadius, _separationWeight, _moveSpeed);
+            Vector2 finalVelocity = EnemyMovementCalculator.CalculateFinalVelocity(
+                seekForce, separationForce, _moveSpeed);
 
             // Apply damping untuk smooth transition, hindari "snap" ke velocity baru
             _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, finalVelocity, _velocityDamping);
@@ -328,13 +296,12 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         private void ApplyFleeMovement()
         {
-            // Arah menjauhi player, scaled by move speed
-            Vector2 fleeForce = (_player != null)
-                ? ((Vector2)transform.position - (Vector2)_player.position).normalized * _moveSpeed
-                : Vector2.zero;
-
-            Vector2 separationForce = CalculateSeparation();
-            Vector2 finalVelocity = CalculateFinalVelocity(fleeForce, separationForce);
+            Vector2 fleeForce = EnemyMovementCalculator.CalculateFlee(
+                transform.position, _player.position, _moveSpeed);
+            Vector2 separationForce = EnemyMovementCalculator.CalculateSeparation(
+                this, transform.position, _currentGridCell, _separationRadius, _separationWeight, _moveSpeed);
+            Vector2 finalVelocity = EnemyMovementCalculator.CalculateFinalVelocity(
+                fleeForce, separationForce, _moveSpeed);
 
             _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, finalVelocity, _velocityDamping);
         }
@@ -345,85 +312,17 @@ namespace IdleDefenseSurvival.Enemy
         private void UpdateFacing()
         {
             if (_spriteRenderer == null || _player == null) return;
-            // Enemy di kiri player (dx < 0) → menghadap kanan (flipX = false)
-            // Enemy di kanan player (dx > 0) → menghadap kiri (flipX = true)
-            const float epsilon = 0.01f;
-            bool shouldFaceLeft = transform.position.x > _player.position.x + epsilon;
+            bool shouldFaceLeft = EnemyMovementCalculator.ShouldFaceLeft(transform.position, _player.position);
             // Hanya flip kalau benar-benar berubah (hindari call berulang)
             if (_spriteRenderer.flipX != shouldFaceLeft)
                 SetFacing(shouldFaceLeft);
         }
 
-        /// <summary>
-        /// Menghasilkan gaya tarik menuju player.
-        /// </summary>
-        private Vector2 CalculateSeek()
-        {
-            float distance = Vector2.Distance(transform.position, _player.position);
-
-            // Jika sudah dalam attack range, gaya seek menjadi 0 (berhenti mengejar)
-            // Namun separation tetap aktif agar mereka tidak tumpuk saat menyerang
-            if (distance <= _attackRange) return Vector2.zero;
-
-            return (_player.position - transform.position).normalized * _moveSpeed;
-        }
-
-        /// <summary>
-        /// Menghasilkan gaya tolak dari enemy terdekat menggunakan spatial grid O(1) lookup.
-        /// Hanya iterasi neighbor di cell saat ini dan 8 cell sekitarnya.
-        /// </summary>
-        private Vector2 CalculateSeparation()
-        {
-            // Safety: if move speed is 0 or negative, no separation needed
-            if (_moveSpeed <= 0f) return Vector2.zero;
-
-            Vector2 separationSum = Vector2.zero;
-            Vector2 myPos = transform.position;
-
-            // Cek 3x3 grid cells sekitar enemy
-            for (int dx = -1; dx <= 1; dx++)
-            {
-                for (int dy = -1; dy <= 1; dy++)
-                {
-                    Vector2Int neighborCell = new(_currentGridCell.x + dx, _currentGridCell.y + dy);
-                    int hash = GetGridHash(neighborCell);
-
-                    if (!_spatialGrid.TryGetValue(hash, out var cellEnemies)) continue;
-
-                    foreach (var other in cellEnemies)
-                    {
-                        if (other == this || other == null) continue;
-
-                        Vector2 diff = myPos - (Vector2)other.transform.position;
-                        float distance = diff.magnitude;
-
-                        // Hanya apply separation jika dalam radius DAN di cell yang sama/berdekatan
-                        if (distance > 0.01f && distance < _separationRadius)
-                        {
-                            // SIMPLE LINEAR FALLOFF (lebih stabil dari inverse square)
-                            // Strength = (1 - distance/radius) * weight
-                            // Ketika distance = 0 → strength = weight (max push)
-                            // Ketika distance = radius → strength = 0 (no push)
-                            float strength = (1f - distance / _separationRadius) * _separationWeight;
-                            separationSum += diff.normalized * strength;
-                        }
-                    }
-                }
-            }
-
-            // Tidak perlu normalize, biarkan magnitude alami dari sum
-            // Cukup clamp agar tidak lebih besar dari move speed
-            if (separationSum.magnitude > _moveSpeed)
-                separationSum = separationSum.normalized * _moveSpeed;
-
-            return separationSum;
-        }
-
         private void UpdateCell()
         {
             Vector2Int newCell = new(
-                Mathf.FloorToInt(transform.position.x / GridCellSize),
-                Mathf.FloorToInt(transform.position.y / GridCellSize)
+                Mathf.FloorToInt(transform.position.x / EnemySpatialGrid.CellSize),
+                Mathf.FloorToInt(transform.position.y / EnemySpatialGrid.CellSize)
             );
 
             if (newCell != _currentGridCell)
@@ -436,63 +335,14 @@ namespace IdleDefenseSurvival.Enemy
 
         private void RegisterWithGrid()
         {
-            int hash = GetGridHash(_currentGridCell);
-            if (!_spatialGrid.TryGetValue(hash, out var list))
-            {
-                list = new List<EnemyAi>();
-                _spatialGrid[hash] = list;
-            }
-            if (!list.Contains(this))
-            {
-                list.Add(this);
-                _inGrid = true;
-            }
+            EnemySpatialGrid.Register(this, _currentGridCell);
+            _inGrid = true;
         }
 
         private void UnregisterFromGrid()
         {
-            int hash = GetGridHash(_currentGridCell);
-            if (_spatialGrid.TryGetValue(hash, out var list))
-            {
-                list.Remove(this);
-                if (list.Count == 0) _spatialGrid.Remove(hash);
-            }
+            EnemySpatialGrid.Unregister(this, _currentGridCell);
             _inGrid = false;
-        }
-
-        private static int GetGridHash(Vector2Int cell)
-        {
-            // Pairing function untuk hash unik dari 2D grid cell
-            // Cantor pairing: (x + y) * (x + y + 1) / 2 + y
-            // Diadaptasi untuk negative coords
-            int x = cell.x >= 0 ? cell.x * 2 : -cell.x * 2 - 1;
-            int y = cell.y >= 0 ? cell.y * 2 : -cell.y * 2 - 1;
-            return (x + y) * (x + y + 1) / 2 + y;
-        }
-
-        private Vector2 CalculateFinalVelocity(Vector2 seek, Vector2 separation)
-        {
-            // Safety: if move speed is 0 or negative, return zero velocity
-            if (_moveSpeed <= 0f) return Vector2.zero;
-
-            // STRATEGI: Prioritaskan separation saat ada tabrakan
-            // - Jika separation kuat (ada neighbor dekat), kurangi influence seek
-            // - Jika tidak ada tabrakan, seek dominan
-
-            float separationStrength = separation.magnitude / _moveSpeed; // 0-1 range
-            separationStrength = Mathf.Clamp01(separationStrength);
-
-            // Ketika separationStrength tinggi (neighbor dekat), seek dikurangi drastis
-            // Gunakan exponential falloff: seek * (1 - strength²)
-            Vector2 adjustedSeek = seek * (1f - separationStrength * separationStrength);
-
-            Vector2 combined = adjustedSeek + separation;
-
-            // Limit kecepatan maksimal
-            if (combined.magnitude > _moveSpeed)
-                combined = combined.normalized * _moveSpeed;
-
-            return combined;
         }
 
         // -------------------------------------------------------------------
@@ -566,102 +416,14 @@ namespace IdleDefenseSurvival.Enemy
                 }
             }
 
-            RefreshAuraVisual();
+            // Refresh aura visuals via component if exists
+            if (TryGetComponent<EnemyAuraVisualController>(out var auraVisual))
+                auraVisual.RefreshAuraVisual(data);
 
             // Register as aura source for enemy-to-enemy auras (e.g., Iron Guardian Damage Reduction)
             EnemyAuraManager.Instance?.RegisterEnemyAuraSource(this);
         }
 
-        /// <summary>
-        /// Updates the aura range visual based on EnemyData aura effects.
-        /// </summary>
-        private void RefreshAuraVisual()
-        {
-            if (_auraRangeRenderer == null) return;
-            _auraRadius = 0f;
-            if (EnemyData?.effects != null)
-            {
-                foreach (var ef in EnemyData.effects)
-                {
-                    if (ef?.aura == null) continue;
-                    foreach (var act in ef.aura)
-                    {
-                        if (act == null) continue;
-                        _auraRadius = Mathf.Max(_auraRadius, act.radius);
-
-                        _auraPulseColor = act.effect switch
-                        {
-                            StatusEffectType.Slow => GameColors.rareBlue,
-                            StatusEffectType.DamageReduction => GameColors.gemRuby,
-                            StatusEffectType.Regeneration => GameColors.green,
-                            _ => GameColors.empty,
-                        };
-                    }
-                }
-            }
-
-            _hasAura = _auraRadius > 0f;
-
-            // --------------------------------------------------
-            // Aura boundary
-            // --------------------------------------------------
-            _auraRangeRenderer.enabled = _hasAura;
-            if (_hasAura)
-            {
-                float diameter = _auraRadius * 2f;
-                float scale = diameter * _auraScaleRange;
-                _auraRangeRenderer.transform.localScale = new Vector3(scale, scale, 1f);
-                _auraRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
-            }
-            
-            if (_auraPulseRenderer != null)
-            {
-                _auraPulseRenderer.enabled = false;
-                _auraPulseTimer = 0f;
-            }
-        }
-
-        private void UpdateAuraPulse()
-        {
-            if (!_hasAura || _auraPulseRenderer == null) return;
-            float deltaTime = Time.unscaledDeltaTime;
-            _auraPulseTimer += deltaTime;
-
-            float cycleDuration = _auraPulseDuration + _auraPulseInterval;
-            float cycleTime = _auraPulseTimer % cycleDuration;
-
-            // --------------------------------------------------
-            // Jeda sebelum pulse berikutnya
-            // --------------------------------------------------
-            if (cycleTime >= _auraPulseDuration)
-            {
-                _auraPulseRenderer.enabled = false;
-                return;
-            }
-
-            _auraPulseRenderer.enabled = true;
-
-            // 0 → 1
-            float t = cycleTime / _auraPulseDuration;
-
-            // Smooth easing: mulai pelan, lalu melebar
-            float easedT = Mathf.SmoothStep(0f, 1f, t);
-
-            // --------------------------------------------------
-            // Scale dari pusat menuju batas aura
-            // --------------------------------------------------
-            float diameter = _auraRadius * 2f;
-            float scale = diameter * easedT;
-            _auraPulseRenderer.transform.localScale = new Vector3(scale, scale, 1f);
-
-            // --------------------------------------------------
-            // Alpha: muncul → menghilang
-            // --------------------------------------------------
-            float alpha = Mathf.Sin(t * Mathf.PI) * _auraPulseMaxAlpha;
-            Color color = _auraPulseColor;
-            color.a = alpha;
-            _auraPulseRenderer.color = color;
-        }
 
         public float TakeDamage(DamageData damageData, bool canEvade = true)
         {
@@ -973,183 +735,22 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         private void Die()
         {
-            // Record kill in save system with damage source
-            RecordEnemyKill(_lastDamageSource);
-
-            string player = UltimateDMG.Player.ToString();
-            string lightning = UltimateDMG.Lightning.ToString();
-            string cloud = UltimateDMG.Cloud.ToString();
-
-            // Register kill for Lightning ultimate trigger (if killed by player or lightning)
-            if (_lastDamageSource == player || _lastDamageSource == lightning)
-            {
-                if (LightningHandler.RegisterKill())
-                {
-                    // Lightning ready to trigger - spawn it at player position
-                    _ultimateManager.TrySpawn(lightning, _playerComponent.transform.position, _playerComponent);
-                }
-            }
-
-            // Try to spawn toxic death cloud at death position (if killed by player or cloud)
-            if (_lastDamageSource == player || _lastDamageSource == cloud)
-            {
-                _ultimateManager.TryGenerateStack(cloud, _playerComponent, transform.position);
-            }
-
-            // Unregister dari manager
-            _enemyHealthBarManager.UnregisterEnemy(this);
-
-            // Unregister from statistics service
-            EnemyStatisticsManager.Instance?.Unregister(this);
-
-            // Notify aura manager to clean up any active auras from this enemy
-            EnemyAuraManager.Instance?.OnEnemyDeath(this);
-
-            DropRewards();
-            DropItemDrops();
-
-            EnemyKillMission();
-
-            // TODO: Add death animation, particle effects, etc.
-            Destroy(gameObject);
-        }
-
-        private void EnemyKillMission()
-        {
-            if (EnemyData == null) return;
-
-            var missionService = MissionService.Instance;
-            if (missionService == null) return;
-
-            // Any enemy whose Role == BOSS
-            // counts toward BossKilled missions.
-            if (EnemyData.IsBoss)
-            {
-                missionService.UpdateProgress(MissionEventType.BossKilled, EnemyData.id, 1);
-                return;
-            }
-
-            // Generic kill mission:
-            // Any non-boss enemy counts toward generic EnemyKilled missions.
-            missionService.UpdateProgress(MissionEventType.EnemyKilled, EnemyData.id, 1);
-
-            // Specific enemy mission:
-            // "Kill X Goblins", "Kill X Slimes", etc.
-            missionService.UpdateProgress(MissionEventType.SpecificEnemyKilled, EnemyData.id, 1);
+            // Delegate to static death handler
+            EnemyDeathHandler.ProcessDeath(this, _lastDamageSource);
         }
 
         /// <summary>
-        /// Record this enemy kill in the save system, grouped by role.
+        /// Internal accessor for item prefab (used by EnemyRewardDistributor).
         /// </summary>
-        /// <param name="damageSource">The source of damage that killed the enemy (e.g., UltimateDMG.Player.ToString(), "bomb", "tank").</param>
-        private void RecordEnemyKill(string damageSource)
-        {
-            if (string.IsNullOrEmpty(_enemyId)) return;
-            _saveManager.RecordEnemyKill(_enemyId, damageSource, _role.ToString());
-            _saveManager.AddKills(_waveManager.CurrentTier, 1);
-        }
-
-        private void DropRewards()
-        {
-            if (_economyManager == null) return;
-
-            // Gold & Exp: Instant add (no pickup)
-            RewardManager.Instance.GiveEnemyReward(_goldReward, _expReward, gameObject.name);
-
-            // Gem: Spawn physical pickup with re-check of daily limit
-            if (_gemReward > 0)
-            {
-                // Re-check if daily limit reached at death time
-                if (!_saveManager.HasReachedDailyGemLimit())
-                {
-                    // Record gem drop and spawn (re-enforce limit)
-                    int actualGems = _saveManager.RecordGemDrop(1);
-                    if (actualGems > 0) SpawnItem(CurrencyType.Gem, actualGems);
-                }
-            }
-
-            // Meat: Spawn physical pickup
-            if (_meatReward > 0) SpawnItem(CurrencyType.Meat, _meatReward);
-
-        }
+        internal GameObject ItemPrefab => _itemPrefab;
 
         /// <summary>
-        /// Roll material drops defined in dataEnemy.json (dropItems) and grant them to inventory.
-        /// Each entry rolls independently; Weight is a percent (0-100), consistent with
-        /// Utilityku.Chance and DropEntry.Weight semantics elsewhere. Uses InventoryService.AddItem
-        /// so stacking, capacity, events, and save-dirty flow stay centralized.
-        /// Normal (non-boss) enemies are capped at 2 successful item drops to prevent inventory flooding.
+        /// Internal accessor for managers (used by death/reward handlers).
         /// </summary>
-        private void DropItemDrops()
-        {
-            if (EnemyData?.dropItems == null || EnemyData.dropItems.Length == 0) return;
-            var inventory = InventoryService.Instance;
-            if (inventory == null) return;
-
-            int currentTier = WaveManager.Instance?.CurrentTier ?? 1;
-            int droppedCount = 0;
-
-            foreach (var entry in EnemyData.dropItems)
-            {
-                if (entry == null || string.IsNullOrEmpty(entry.ItemId)) continue;
-                // Tier gate: material rarity tier must already be reachable (T1=rare1, T2=rare2, ...)
-                if (entry.MinTier > currentTier) continue;
-
-                // DropRate increases drop chance directly.
-                float finalWeight = Utilityku.DropRateIncrease(entry.Weight);
-                if (!Utilityku.Chance(finalWeight)) continue;
-
-                int min = Mathf.Max(1, entry.MinCount);
-                int max = Mathf.Max(min, entry.MaxCount);
-                int quantity = Random.Range(min, max + 1);
-
-                if (ItemDatabase.Instance != null && ItemDatabase.Instance.GetItem(entry.ItemId) == null)
-                {
-                    Debug.LogWarning($"[EnemyAi] Drop item not found in dataItems.json: {entry.ItemId}");
-                    continue;
-                }
-
-                inventory.AddItem(entry.ItemId, quantity);
-                droppedCount++;
-
-                // Drop Bag: record ONLY after the drop truly succeeded (Chance + MinTier passed,
-                // AddItem executed). Single authoritative point — no duplicate events.
-                if (DropBagManager.Instance != null)
-                    DropBagManager.Instance.AddDrop(entry.ItemId, quantity);
-
-                // Cap normal enemies at 2 item drops; bosses keep full drop potential.
-                if (!EnemyData.IsBoss && droppedCount >= 2) break;
-            }
-        }
-
-        /// <summary>
-        /// Spawn item(s) at enemy death position with spread animation.
-        /// Spawns 1 parent item that handles spreading additional items.
-        /// Items.cs handles the spread animation and magnetic collection.
-        /// </summary>
-        private void SpawnItem(CurrencyType currencyType, long amount)
-        {
-            if (_economyManager == null) return;
-            if (_itemPrefab == null)
-            {
-                Debug.LogWarning($"[EnemyAi] Currency item prefab not assigned! Adding {currencyType} directly.");
-                _economyManager.AddCurrency(currencyType, amount, $"Kill {gameObject.name}");
-                return;
-            }
-
-            // Spawn 1 item at enemy death position (center)
-            // Items.cs will handle spawning additional items with spread effect
-            GameObject itemObj = Instantiate(_itemPrefab, transform.position, Quaternion.identity, UIManager.Instance.DropRoot);
-            if (itemObj.TryGetComponent<CurrencyPickup>(out var item))
-            {
-                item.Initialize(currencyType, amount);
-            }
-            else
-            {
-                Debug.LogError($"[EnemyAi] Item prefab missing CurrencyPickup component!");
-                Destroy(itemObj);
-            }
-        }
+        internal SaveManager SaveMgr => _saveManager;
+        internal WaveManager WaveMgr => _waveManager;
+        internal EconomyManager EconomyMgr => _economyManager;
+        internal UltimateManager UltimateMgr => _ultimateManager;
 
         // -------------------------------------------------------------------
         // Private helpers

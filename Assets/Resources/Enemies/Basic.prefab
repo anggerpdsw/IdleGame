@@ -313,6 +313,7 @@ GameObject:
   - component: {fileID: 2171929160586597651}
   - component: {fileID: 6836594484995198180}
   - component: {fileID: 8760648504213372293}
+  - component: {fileID: -3365906772020504700}
   m_Layer: 6
   m_Name: Basic
   m_TagString: Enemy
@@ -444,6 +445,19 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 2977224739219407189}
   _dizzyEffect: {fileID: 3520291935792346840}
   _statusEffectController: {fileID: 6836594484995198180}
+  _itemPrefab: {fileID: 7351252771090480809, guid: cc16b2faa5c81a341825e77a8f34f971, type: 3}
+--- !u!114 &-3365906772020504700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4115171156768869594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef84acb43cad4a2499c70f504c4e7aaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Enemy.EnemyAuraVisualController
   _auraRangeRenderer: {fileID: 5943116777313866150}
   _auraRotationSpeed: 2
   _auraScaleRange: 1
@@ -452,7 +466,6 @@ MonoBehaviour:
   _auraPulseInterval: 0.35
   _auraPulseMaxAlpha: 0.45
   _auraPulseColor: {r: 0.1, g: 0.55, b: 1, a: 1}
-  _itemPrefab: {fileID: 7351252771090480809, guid: cc16b2faa5c81a341825e77a8f34f971, type: 3}
 --- !u!1 &8371961166102414644
 GameObject:
   m_ObjectHideFlags: 0
