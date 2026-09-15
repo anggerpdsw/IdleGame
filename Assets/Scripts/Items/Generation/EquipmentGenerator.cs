@@ -185,7 +185,8 @@ namespace IdleDefenseSurvival.Items.Generation
                 DurabilityLossPerUse = rarityConfig.DurabilityLossPerUse,
                 RepairCostPerDurability = rarityConfig.RepairCostPerDurability,
                 MaxSockets = rarityConfig.Sockets,
-                AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                AcquiredTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                Rarity = rarity  // Persist crafted rarity for upgrade validation
             };
 
             return item;

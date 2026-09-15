@@ -2,14 +2,9 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.UI;
 using IdleDefenseSurvival.Economy;
-using IdleDefenseSurvival.Item;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Player;
-using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Items;
-using System.Collections.Generic;
-using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy.StatusEffects;
 

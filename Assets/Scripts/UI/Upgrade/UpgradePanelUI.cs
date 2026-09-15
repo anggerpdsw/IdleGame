@@ -229,10 +229,11 @@ namespace IdleDefenseSurvival.UI.Upgrade
             if (item == null || !item.IsEquippable()) return;
             if (item.InstanceId == _mainItem?.InstanceId) return;
 
-            // Material type must match main type
-            if (_mainItem != null && item.GetEquipmentType() != _mainItem.GetEquipmentType())
+            // Validate via UpgradeManager (covers type, rarity, equipped/locked/favorite)
+            if (_mainItem != null &&
+                !UpgradeManager.Instance.CanUpgradeEquipment(_mainItem, item, out string reason))
             {
-                _statusText.text = $"Material type {item.GetEquipmentType()} doesn't match with main {_mainItem.GetEquipmentType()}";
+                _statusText.text = reason;
                 return;
             }
 

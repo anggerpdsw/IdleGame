@@ -133,8 +133,6 @@ namespace IdleDefenseSurvival.Crafting
             };
 
             // Rarity source of truth: recipe.Rarity (1=Common..6=Divine).
-            // EquipmentGenerator expects 0-based quality tier: 0=Common, 1=Rare, ..., 5=Divine.
-            int qualityTier = Mathf.Max(0, recipe.Rarity - 1);
             // ---- FIX: random level 1–BlacksmithLevel ----
             int maxPossible = Mathf.Max(1, context.BlacksmithLevel);
             UnityEngine.Random.InitState((int)seed);
@@ -161,7 +159,7 @@ namespace IdleDefenseSurvival.Crafting
                                  tier: effectiveTier)
                              .With(
                                  seed: (int)seed,
-                                 forcedQuality: qualityTier,
+                                 forcedQuality: recipe.Rarity,  // FIX: pass direct rarity (1=Common..6=Divine)
                                  fixedLevel: level,
                                  eventModifiers: eventModifiers);
 

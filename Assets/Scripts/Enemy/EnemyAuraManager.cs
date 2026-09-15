@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Enemy;
+using PlayerClass = IdleDefenseSurvival.Player.Player;
 using IdleDefenseSurvival.Enemy.StatusEffects;
+using IdleDefenseSurvival.Player;
 
-namespace IdleDefenseSurvival.Player
+namespace IdleDefenseSurvival.Enemy
 {
     /// <summary>
     /// Manages enemy aura effects:
@@ -47,7 +48,7 @@ namespace IdleDefenseSurvival.Player
         // sourceId -> EffectType (replaces HashSet, avoids string.Split on removal)
         private readonly Dictionary<StatusSourceId, StatusEffectType> _activePlayerAuraSources = new();
         private Transform _playerTransform;
-        private Player _player;
+        private PlayerClass _player;
 
         // ===== Enemy-targeted auras =====
         // sourceId -> AuraSource
@@ -92,7 +93,7 @@ namespace IdleDefenseSurvival.Player
             // ---- player auras -------------------------------------------------
             if (_playerTransform == null)
             {
-                _player = Player.Instance;
+                _player = PlayerClass.Instance;
                 if (_player != null) _playerTransform = _player.transform;
             }
             if (_playerTransform == null) return;

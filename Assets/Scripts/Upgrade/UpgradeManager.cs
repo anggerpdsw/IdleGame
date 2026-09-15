@@ -210,6 +210,20 @@ namespace IdleDefenseSurvival.Upgrade
 
             /*
              * -------------------------------------------------------------
+             * Rarity validation
+             * -------------------------------------------------------------
+             */
+            Rarity mainRarity = main.GetRarity();
+            Rarity materialRarity = material.GetRarity();
+
+            if (mainRarity != materialRarity)
+            {
+                reason = $"Rarity differs: {mainRarity} vs {materialRarity}.";
+                return false;
+            }
+
+            /*
+             * -------------------------------------------------------------
              * Inventory validation
              * -------------------------------------------------------------
              */
@@ -357,12 +371,16 @@ namespace IdleDefenseSurvival.Upgrade
 
         /// <summary>
         /// Checks whether main and material are compatible.
+        /// Requires same EquipmentType AND same Rarity.
         /// </summary>
         public bool IsCompatible(InventoryItem main, InventoryItem material)
         {
             if (main == null || material == null) return false;
             if (!main.IsEquippable() || !material.IsEquippable()) return false;
-            return main.GetEquipmentType() == material.GetEquipmentType();
+            if (main.GetEquipmentType() != material.GetEquipmentType()) return false;
+            // Rarity must match — prevent cross-rarity upgrades
+            if (main.GetRarity() != material.GetRarity()) return false;
+            return true;
         }
         #endregion
 
