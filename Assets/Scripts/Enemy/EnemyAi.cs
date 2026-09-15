@@ -159,7 +159,11 @@ namespace IdleDefenseSurvival.Enemy
             if (_hasRegenerationAura)
             {
                 float hpPercent = _currentHealth / Mathf.Max(1f, _maxHealth);
+                bool wasRegenerating = _isRegenerating;
                 _isRegenerating = hpPercent < REGEN_HP_THRESHOLD;
+
+                // Refresh icon saat status berubah
+                if (_isRegenerating != wasRegenerating) RefreshEnemyStatus();
             }
 
             // Skip movement if still in stun
@@ -465,6 +469,9 @@ namespace IdleDefenseSurvival.Enemy
             // Apply Damage Reduction aura (from Iron Guardian etc.) AFTER defense
             // This is a final damage multiplier: damage * (1 - reductionPercent)
             float damageReductionMultiplier = _statusEffectController != null ? _statusEffectController.GetDamageReductionMultiplier() : 1f;
+            // Additional 50% reduction when regeneration aura active
+            if (_hasRegenerationAura && _isRegenerating)
+                damageReductionMultiplier *= 0.5f;
             damageAfterDefense *= damageReductionMultiplier;
 
             float finalDamage = Mathf.Min(_currentHealth, damageAfterDefense);
@@ -708,19 +715,20 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public bool HasActiveDamageReduction()
         {
-            return _statusEffectController != null
+            bool hasEffectReduction = _statusEffectController != null
                 && _statusEffectController.GetTotalDamageReductionPercent() > 0f;
+            bool hasRegenReduction = _hasRegenerationAura && _isRegenerating;
+            return hasEffectReduction || hasRegenReduction;
         }
 
         /// <summary>
         /// Forces the enemy health bar UI to refresh its status indicators.
-        /// Used after applying Defense Break / Heart Break.
         /// </summary>
         public void RefreshHealthBarStatus()
             => _enemyHealthBarManager?.UpdateEnemyHealth(this, _currentHealth);
         /// <summary>
         /// Forces the enemy to refresh its status indicators.
-        /// Used after applying Defense Break / Heart Break.
+        /// Used after applying effect to enemy.
         /// </summary>
         public void RefreshEnemyStatus()
             => _enemyHealthBarManager?.UpdateEnemyStatus(this);
