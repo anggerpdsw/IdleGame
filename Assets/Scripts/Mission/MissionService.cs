@@ -237,6 +237,13 @@ namespace IdleDefenseSurvival.Mission
                 if (eqTypes.Length > 0)
                     mission.targetId = eqTypes[UnityEngine.Random.Range(0, eqTypes.Length)].ToString();
             }
+            else if (tmpl.type == MissionEventType.Alchemist)
+            {
+                var eqTypes = Enum.GetValues(typeof(PotionType)).Cast<PotionType>()
+                    .Where(e => e != PotionType.None).ToArray();
+                if (eqTypes.Length > 0)
+                    mission.targetId = eqTypes[UnityEngine.Random.Range(0, eqTypes.Length)].ToString();
+            }
             else mission.targetId = tmpl.targetId;
 
             return mission;
@@ -332,11 +339,11 @@ namespace IdleDefenseSurvival.Mission
             if (ev != t.type) return false;
             return t.type switch
             {
-                MissionEventType.SpecificEnemyKilled or MissionEventType.Blacksmithing 
+                MissionEventType.SpecificEnemyKilled or MissionEventType.Blacksmithing or MissionEventType.Alchemist
                     => IsTargetMatch(m.targetId, tId),
-                MissionEventType.CurrencyEarned 
+                MissionEventType.CurrencyEarned
                     => IsTargetMatch(t.targetId, tId),
-                MissionEventType.EnemyKilled or MissionEventType.BossKilled or MissionEventType.WaveCompleted 
+                MissionEventType.EnemyKilled or MissionEventType.BossKilled or MissionEventType.WaveCompleted
                     => true,
                 _ => false,
             };

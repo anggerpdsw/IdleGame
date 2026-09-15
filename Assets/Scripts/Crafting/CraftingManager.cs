@@ -175,6 +175,13 @@ namespace IdleDefenseSurvival.Manager
                     MissionEventType.Blacksmithing, recipe.EquipmentType.ToString(), count);
             }
 
+            // Alchemist mission progress: potion recipe (any rarity)
+            if (!recipe.IsEquipment && recipe.PotionType != PotionType.None)
+            {
+                MissionService.Instance?.UpdateProgress(
+                    MissionEventType.Alchemist, recipe.PotionType.ToString(), count);
+            }
+
             return job.JobId;
         }
 

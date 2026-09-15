@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 41357bccffbf8204db9da52e9266e7dc
+guid: 65b00ef13fef3754ca6ae7e5564cf0b3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8698163947868029849
-    second: ginger_0
+      213: 731806605160617493
+    second: potion_0
+  - first:
+      213: 8840016672301374354
+    second: potion_1
+  - first:
+      213: -8805645451618135844
+    second: potion_2
+  - first:
+      213: 6239067095133181186
+    second: potion_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +55,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,23 +122,89 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ginger_0
+      name: DebuffCleanse
       rect:
         serializedVersion: 2
-        x: 19
-        y: 28
-        width: 351
-        height: 319
+        x: 131
+        y: 591
+        width: 286
+        height: 359
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 99388c6960616b870800000000000000
-      internalID: 8698163947868029849
+      spriteID: 51612e8ea36e72a00800000000000000
+      internalID: 731806605160617493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stamina
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 592
+        width: 295
+        height: 361
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29bdd09b35c0eaa70800000000000000
+      internalID: 8840016672301374354
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Health
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 101
+        width: 291
+        height: 364
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cd05446bd101cc580800000000000000
+      internalID: -8805645451618135844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Mana
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 101
+        width: 297
+        height: 364
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 205dd3f877e959650800000000000000
+      internalID: 6239067095133181186
       vertices: []
       indices: 
       edges: []
@@ -138,7 +213,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 2ec8995d55558a340915cbfa6b2fd689
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +223,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ginger_0: 8698163947868029849
+      DebuffCleanse: 731806605160617493
+      Health: -8805645451618135844
+      Mana: 6239067095133181186
+      Stamina: 8840016672301374354
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

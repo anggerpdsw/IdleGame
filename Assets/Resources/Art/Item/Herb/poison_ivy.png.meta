@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 41357bccffbf8204db9da52e9266e7dc
+guid: 38adff416f3942245a730bb23a6ee5a9
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8698163947868029849
-    second: ginger_0
+      213: -4203664807064136581
+    second: poison_ivy_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ginger_0
+      name: poison_ivy_0
       rect:
         serializedVersion: 2
-        x: 19
-        y: 28
-        width: 351
-        height: 319
+        x: 33
+        y: 17
+        width: 296
+        height: 328
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 99388c6960616b870800000000000000
-      internalID: 8698163947868029849
+      spriteID: b749124412599a5c0800000000000000
+      internalID: -4203664807064136581
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ginger_0: 8698163947868029849
+      poison_ivy_0: -4203664807064136581
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

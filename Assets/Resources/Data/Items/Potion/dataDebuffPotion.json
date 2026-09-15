@@ -1,0 +1,73 @@
+[{
+    "Id": "potion_ap_1",
+    "Name": "Small Debuff Potion",
+    "Description": "Immune to Debuff over 10s when used. Cooldown in 5s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion_r1/ap",
+    "SellPrice": 10,
+    "StackSize": 999,
+    "PotionType": 4,
+    "EffectDuration": 10,
+    "Cooldown": 5
+}, {
+    "Id": "potion_ap_2",
+    "Name": "Debuff Potion",
+    "Description": "Immune to Debuff over 25s when used. Cooldown in 13s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion_r2/ap",
+    "SellPrice": 20,
+    "StackSize": 999,
+    "PotionType": 4,
+    "EffectDuration": 25,
+    "Cooldown": 13
+}, {
+    "Id": "potion_ap_3",
+    "Name": "Greater Debuff Potion",
+    "Description": "Immune to Debuff over 40s when used. Cooldown in 20s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion_r3/ap",
+    "SellPrice": 50,
+    "StackSize": 999,
+    "PotionType": 4,
+    "EffectDuration": 40,
+    "Cooldown": 20
+}, {
+    "Id": "potion_ap_4",
+    "Name": "Superior Debuff Potion",
+    "Description": "Immune to Debuff over 55s when used. Cooldown in 28s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion_r4/ap",
+    "SellPrice": 100,
+    "StackSize": 999,
+    "PotionType": 4,
+    "EffectDuration": 55,
+    "Cooldown": 28
+}, {
+    "Id": "potion_ap_5",
+    "Name": "Mythic Debuff Potion",
+    "Description": "Immune to Debuff over 70s when used. Cooldown in 35s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion_r5/ap",
+    "SellPrice": 300,
+    "StackSize": 999,
+    "PotionType": 4,
+    "EffectDuration": 70,
+    "Cooldown": 35
+}, {
+    "Id": "potion_ap_6",
+    "Name": "Divine Debuff Elixir",
+    "Description": "Immune to Debuff over 85s when used. Cooldown in 43s.",
+    "Category": 2,
+    "ItemRarity": 1,
+    "IconKey": "Potion/potion_r6/ap",
+    "SellPrice": 1000,
+    "StackSize": 999,
+    "PotionType": 4,
+    "EffectDuration": 85,
+    "Cooldown": 43
+}]

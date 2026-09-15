@@ -1,0 +1,94 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_ap_potion_r1",
+      "DisplayName": "Small Debuff Potion",
+      "Description": "Immune to Debuff over 10s when used. Cooldown in 5s.",
+      "PotionType": 4,
+      "Rarity": 1,
+      "RequiredAlchemistLevel": 1,
+      "Ingredients": [
+        { "ItemId": "nightshade", "Count": 2 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 5.0,
+      "TimePerAdditionalUnit": 5.0
+    },
+    {
+      "RecipeId": "craft_ap_potion_r2",
+      "DisplayName": "Debuff Potion",
+      "Description": "Immune to Debuff over 25s when used. Cooldown in 13s.",
+      "PotionType": 4,
+      "Rarity": 2,
+      "RequiredAlchemistLevel": 5,
+      "Ingredients": [
+        { "ItemId": "black_henbane", "Count": 3 },
+        { "ItemId": "nightshade", "Count": 1 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 8.0,
+      "TimePerAdditionalUnit": 8.0
+    },
+    {
+      "RecipeId": "craft_ap_potion_r3",
+      "DisplayName": "Greater Debuff Potion",
+      "Description": "Immune to Debuff over 40s when used. Cooldown in 20s.",
+      "PotionType": 4,
+      "Rarity": 3,
+      "RequiredAlchemistLevel": 10,
+      "Ingredients": [
+        { "ItemId": "poison_ivy", "Count": 4 },
+        { "ItemId": "black_henbane", "Count": 2 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 12.0,
+      "TimePerAdditionalUnit": 12.0
+    },
+    {
+      "RecipeId": "craft_ap_potion_r4",
+      "DisplayName": "Superior Debuff Potion",
+      "Description": "Immune to Debuff over 55s when used. Cooldown in 28s.",
+      "PotionType": 4,
+      "Rarity": 4,
+      "RequiredAlchemistLevel": 15,
+      "Ingredients": [
+        { "ItemId": "mandrake_root", "Count": 5 },
+        { "ItemId": "poison_ivy", "Count": 3 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 18.0,
+      "TimePerAdditionalUnit": 18.0
+    },
+    {
+      "RecipeId": "craft_ap_potion_r5",
+      "DisplayName": "Mythic Debuff Potion",
+      "Description": "Immune to Debuff over 70s when used. Cooldown in 35s.",
+      "PotionType": 4,
+      "Rarity": 5,
+      "RequiredAlchemistLevel": 20,
+      "Ingredients": [
+        { "ItemId": "wolfsbane", "Count": 6 },
+        { "ItemId": "mandrake_root", "Count": 4 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_ap_potion_r6",
+      "DisplayName": "Divine Debuff Elixir",
+      "Description": "Immune to Debuff over 85s when used. Cooldown in 43s.",
+      "PotionType": 4,
+      "Rarity": 6,
+      "RequiredAlchemistLevel": 25,
+      "Ingredients": [
+        { "ItemId": "perfumedew_herb", "Count": 8 },
+        { "ItemId": "wolfsbane", "Count": 5 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 35.0,
+      "TimePerAdditionalUnit": 35.0
+    }
+  ]
+}

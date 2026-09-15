@@ -81,7 +81,9 @@ namespace IdleDefenseSurvival.Crafting
                 "Data/Crafting/Equipment/dataRecipeShoes",
 
                 "Data/Crafting/Potion/dataRecipeHealthPotion",
-                "Data/Crafting/Potion/dataRecipeManaPotion"
+                "Data/Crafting/Potion/dataRecipeManaPotion",
+                "Data/Crafting/Potion/dataRecipeStaminaPotion",
+                "Data/Crafting/Potion/dataRecipeDebuffPotion"
             };
 
             int totalLoaded = 0;

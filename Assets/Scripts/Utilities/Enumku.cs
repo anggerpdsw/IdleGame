@@ -44,7 +44,8 @@ namespace IdleDefenseSurvival
         CurrencyEarned = 2,
         WaveCompleted = 3,
         BossKilled = 4,
-        Blacksmithing = 5
+        Blacksmithing = 5,
+        Alchemist = 6
     }
 
     /// <summary>

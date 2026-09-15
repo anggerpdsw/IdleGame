@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 41357bccffbf8204db9da52e9266e7dc
+guid: 69f0685ec2b37c449bf29ab8ed340245
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8698163947868029849
-    second: ginger_0
+      213: 8424244193161340190
+    second: thick_thread_cape_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ginger_0
+      name: thick_thread_cape_0
       rect:
         serializedVersion: 2
-        x: 19
-        y: 28
-        width: 351
-        height: 319
+        x: 11
+        y: 11
+        width: 566
+        height: 402
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 99388c6960616b870800000000000000
-      internalID: 8698163947868029849
+      spriteID: e15678ac57de8e470800000000000000
+      internalID: 8424244193161340190
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ginger_0: 8698163947868029849
+      thick_thread_cape_0: 8424244193161340190
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

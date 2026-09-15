@@ -247,16 +247,29 @@ namespace IdleDefenseSurvival.Enemy
             // Update spatial grid cell
             UpdateCell();
 
-            // Stop movement when regenerating (HP < 90%) but still allow attacking
-            if (!_isRegenerating)
+            // Regeneration behavior:
+            // - HP < 90% + player in range → flee (move away)
+            // - HP < 90% + player out of range → stop
+            // - HP ≥ 90% → normal (seek player)
+            if (_hasRegenerationAura && _isRegenerating)
             {
-                ApplyMovement();
+                bool playerInRange = IsInAttackRange();
+                if (playerInRange)
+                {
+                    // Flee from player while regenerating
+                    ApplyFleeMovement();
+                }
+                else
+                {
+                    // Stop movement when player is far
+                    if (_rb.linearVelocity != Vector2.zero)
+                        _rb.linearVelocity = Vector2.zero;
+                }
             }
             else
             {
-                // Zero velocity saat regen
-                if (_rb.linearVelocity != Vector2.zero)
-                    _rb.linearVelocity = Vector2.zero;
+                // Normal movement (seek player)
+                ApplyMovement();
             }
 
             UpdateFacing();
@@ -306,6 +319,23 @@ namespace IdleDefenseSurvival.Enemy
             Vector2 finalVelocity = CalculateFinalVelocity(seekForce, separationForce);
 
             // Apply damping untuk smooth transition, hindari "snap" ke velocity baru
+            _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, finalVelocity, _velocityDamping);
+        }
+
+        /// <summary>
+        /// Flee movement - mundur menjauhi player sambil tetap menjaga separation.
+        /// Dipakai saat enemy regenerasi dan player dalam attack range.
+        /// </summary>
+        private void ApplyFleeMovement()
+        {
+            // Arah menjauhi player, scaled by move speed
+            Vector2 fleeForce = (_player != null)
+                ? ((Vector2)transform.position - (Vector2)_player.position).normalized * _moveSpeed
+                : Vector2.zero;
+
+            Vector2 separationForce = CalculateSeparation();
+            Vector2 finalVelocity = CalculateFinalVelocity(fleeForce, separationForce);
+
             _rb.linearVelocity = Vector2.Lerp(_rb.linearVelocity, finalVelocity, _velocityDamping);
         }
 

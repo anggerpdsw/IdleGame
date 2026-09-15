@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 41357bccffbf8204db9da52e9266e7dc
+guid: 433598b9bcc08fc4e8ea602a67333f2b
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -116,10 +116,10 @@ TextureImporter:
       name: ginger_0
       rect:
         serializedVersion: 2
-        x: 19
-        y: 28
-        width: 351
-        height: 319
+        x: 69
+        y: 16
+        width: 212
+        height: 327
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

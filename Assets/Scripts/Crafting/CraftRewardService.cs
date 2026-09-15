@@ -139,7 +139,8 @@ namespace IdleDefenseSurvival.Crafting
             int maxPossible = Mathf.Max(1, context.BlacksmithLevel);
             UnityEngine.Random.InitState((int)seed);
             int level = UnityEngine.Random.Range(1, maxPossible + 1);
-            int maxLevel = UnityEngine.Random.Range(level, maxPossible + 1); // MaxLevel = level to BlacksmithLevel
+            // MaxLevel = level to BlacksmithLevel
+            int maxLevel = UnityEngine.Random.Range(level, maxPossible + 1);
             baseEquip.MaxLevel = maxLevel;
 
             // Convert active modifiers (ICraftModifier) to the expected EventCraftModifier list.

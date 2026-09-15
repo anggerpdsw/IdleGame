@@ -37,12 +37,17 @@ namespace IdleDefenseSurvival.UI.Game
         private readonly Dictionary<string, PotionData> _potionByItemId = new();
         // Cached sorted IDs by potion type.
         private readonly Dictionary<PotionType, List<string>> _sortedPotionIds = new();
+        // Reusable list to avoid ToList() allocation in Update().
+        private readonly List<string> _cooldownKeys = new();
+        // Separate list for RefreshAll iteration to avoid conflict with _cooldownKeys.
+        private readonly List<string> _refreshKeys = new();
         // ─────────────────────────────────────────────────────────────
         // State
         // ─────────────────────────────────────────────────────────────
         private bool _isInitialized;
         private bool _isSubscribed;
         private PlayerClass _player;
+        private PlayerStatsManager _stats;
         private SettingsController _settings;
         private InventoryService _inventory;
         private ItemDatabase _database;
@@ -52,6 +57,7 @@ namespace IdleDefenseSurvival.UI.Game
             Initialize();
             _player = PlayerClass.Instance;
             _settings = SettingsController.Instance;
+            _stats = PlayerStatsManager.Instance;
             if (_player != null)
             {
                 _player.OnHealthChanged += OnPlayerHealthChanged;
@@ -246,13 +252,27 @@ namespace IdleDefenseSurvival.UI.Game
                     _slots.RemoveAt(i);
                     continue;
                 }
-                // Reverse lookup is avoided by refreshing through dictionary.
+
+                // Slot ID tidak disimpan di UI, jadi refresh dilakukan
+                // melalui dictionary di bawah.
             }
+
+            _refreshKeys.Clear();
             foreach (var pair in _slotByItemId)
+                _refreshKeys.Add(pair.Key);
+            for (int i = 0; i < _refreshKeys.Count; i++)
             {
-                int quantity = _inventory.GetTotalQuantity(pair.Key);
-                pair.Value.SetQuantity(quantity);
+                string itemId = _refreshKeys[i];
+                int quantity = _inventory.GetTotalQuantity(itemId);
+                if (quantity <= 0)
+                {
+                    RemovePotionSlot(itemId);
+                    continue;
+                }
+                if (_slotByItemId.TryGetValue(itemId, out var slot))
+                    slot.SetQuantity(quantity);
             }
+            
             UpdateCooldownVisuals();
         }
 
@@ -261,116 +281,90 @@ namespace IdleDefenseSurvival.UI.Game
         // ─────────────────────────────────────────────────────────────
         private void OnPlayerHealthChanged()
         {
-            if (!_settings.AutoPotion) return;
-            if (_player == null) return;
-
-            float percent = _player.MaxHealth > 0f ? _player.CurrentHealth / _player.MaxHealth : 1f;
+            if (!CanAutoPotion()) return;
+            float maxHealth = _player.MaxHealth;
+            if (maxHealth <= 0f) return;
+            float percent = _player.CurrentHealth / maxHealth;
             if (percent > _settings.HealthPotionThreshold) return;
-
-            foreach (var id in GetSortedPotionIds(PotionType.Health))
-            {
-                if (_remainingCooldown.TryGetValue(id, out var cd) && cd > 0f) continue;
-                if (InventoryService.Instance.GetTotalQuantity(id) <= 0) continue;
-                UsePotion(id);
-                break;
-            }
+            TryUseFirstAvailablePotion(PotionType.Health);
         }
 
         private void OnPlayerManaChanged()
         {
-            if (!_settings.AutoPotion) return;
-            if (_player == null) return;
-
-            float percent = _player.MaxMana > 0f ? _player.CurrentMana / _player.MaxMana : 1f;
+            if (!CanAutoPotion()) return;
+            float maxMana = _player.MaxMana;
+            if (maxMana <= 0f) return;
+            float percent = _player.CurrentMana / maxMana;
             if (percent > _settings.ManaPotionThreshold) return;
-
-            foreach (var id in GetSortedPotionIds(PotionType.Mana))
-            {
-                if (_remainingCooldown.TryGetValue(id, out var cd) && cd > 0f) continue;
-                if (InventoryService.Instance.GetTotalQuantity(id) <= 0) continue;
-                UsePotion(id);
-                break;
-            }
+            TryUseFirstAvailablePotion(PotionType.Mana);
         }
-
         private bool CanAutoPotion()
             =>  _settings != null && _settings.AutoPotion &&
                 _player != null && _inventory != null;
+        private void TryUseFirstAvailablePotion(PotionType type)
+        {
+            if (!_sortedPotionIds.TryGetValue(type, out var ids)) return;
+            for (int i = 0; i < ids.Count; i++)
+            {
+                string itemId = ids[i];
+                if (IsOnCooldown(itemId)) continue;
+                if (_inventory.GetTotalQuantity(itemId) <= 0) continue;
+                UsePotion(itemId);
+                return;
+            }
+        }
 
+        // ─────────────────────────────────────────────────────────────
+        // Potion usage
+        // ─────────────────────────────────────────────────────────────
         /// <summary>Uses one copy of the potion + starts its cooldown timer.</summary>
         private void UsePotion(string itemId)
         {
-            var inv = InventoryService.Instance;
-            if (inv == null) return;
-            if (inv.GetTotalQuantity(itemId) <= 0) return;
-            if (_remainingCooldown.TryGetValue(itemId, out var remaining) && remaining > 0f)
-                return;
+            if (string.IsNullOrEmpty(itemId)) return;
+            if (_inventory == null) return;
+            if (_inventory.GetTotalQuantity(itemId) <= 0) return;
+            if (IsOnCooldown(itemId)) return;
             if (!ApplyEffect(itemId)) return;
-            if (inv.RemoveItemById(itemId, 1) <= 0) return;
+            if (_inventory.RemoveItemById(itemId, 1) <= 0) return;
             var potion = GetPotion(itemId);
             float cd = GetCooldown(potion);
             if (cd > 0f) _remainingCooldown[itemId] = cd;
             UpdateCooldownVisuals();
         }
+        private bool IsOnCooldown(string itemId)
+        {
+            return _remainingCooldown.TryGetValue(itemId, out float remaining)
+                   && remaining > 0f;
+        }
 
+        // ─────────────────────────────────────────────────────────────
+        // Cooldown
+        // ─────────────────────────────────────────────────────────────
         /// <summary>Applies visual cooldown state (radial fill + block click) for all tracked potions.</summary>
         private void UpdateCooldownVisuals()
         {
-            foreach (var (itemId, remaining) in _remainingCooldown)
+            foreach (var pair in _remainingCooldown)
             {
-                if (_slotByItemId.TryGetValue(itemId, out var slot))
-                {
-                    var potion = GetPotion(itemId);
-                    float cd = GetCooldown(potion);
-                    float fill = cd > 0f ? remaining / cd : 0f;
-                    slot.SetCooldown(fill);
-                }
+                if (!_slotByItemId.TryGetValue(pair.Key, out var slot)) continue;
+                float cooldown = GetCooldown(pair.Key);
+                slot.SetCooldown(GetCooldownFill(pair.Value, cooldown));
             }
-        }
-
-        private List<string> GetSortedPotionIds(PotionType type)
-        {
-            var db = ItemDatabase.Instance;
-            if (db == null) return new List<string>();
-
-            var ids = db.GetItemsByCategory(ItemCategory.Consumable)
-                        .Where(d => db.IsPotion(d.Id))
-                        .Select(d => d.Id)
-                        .Where(id => db.GetPotion(id)?.PotionType == type)
-                        .ToList();
-
-            ids.Sort((a, b) =>
-            {
-                static int GetNum(string s)
-                {
-                    var parts = s.Split('_');
-                    return int.TryParse(parts.Last(), out var n) ? n : 0;
-                }
-                return GetNum(a).CompareTo(GetNum(b));
-            });
-
-            return ids;
         }
 
         private static PotionData GetPotion(string itemId)
             => ItemDatabase.Instance?.GetPotion(itemId);
-        private static float GetCooldown(PotionData potion)
-            => Mathf.Max(0f, potion?.Cooldown ?? 0f);
         private static float GetCooldownFill(float remaining, float cooldown)
             => cooldown > 0f ? Mathf.Clamp01(remaining / cooldown) : 0f;
+        private float GetCooldown(string itemId)
+            => _potionByItemId.TryGetValue(itemId, out var potion) ? GetCooldown(potion) : 0f;
+        private static float GetCooldown(PotionData potion)
+            => Mathf.Max(0f, potion?.Cooldown ?? 0f);
 
-        /// <summary>
-        /// Runs the potion effect described by its item ID.
-        /// Returns false when the item cannot be used.
-        /// </summary>
+        // ─────────────────────────────────────────────────────────────
+        // Effect application
+        // ─────────────────────────────────────────────────────────────
         private bool ApplyEffect(string itemId)
-        {
-            if (string.IsNullOrEmpty(itemId)) return false;
-            var potion = GetPotion(itemId);
-            if (potion == null) return false;
-            return ApplyPotion(potion);
-        }
-
+            => _potionByItemId.TryGetValue(itemId, out var potion) && ApplyPotion(potion);
         private bool ApplyPotion(PotionData potion)
         {
             if (potion == null) return false;
@@ -386,28 +380,31 @@ namespace IdleDefenseSurvival.UI.Game
 
         private bool ApplyHealthPotion(PotionData potion)
         {
-            float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
+            if (_player == null || _stats == null) return false;
+            float maxHealth = _stats.GetStat(SkillType.HealthPoint);
             float amount = potion.CalculateAmount(maxHealth);
-            PlayerClass.Instance.StartHealOverTime(amount, potion.EffectDuration);
-            return true;
-        }
-        private bool ApplyManaPotion(PotionData potion)
-        {
-            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
-            float amount = potion.CalculateAmount(maxMana);
-            PlayerClass.Instance.StartManaOverTime(amount,potion.EffectDuration);
+            _player.StartHealOverTime(amount, potion.EffectDuration);
             return true;
         }
 
-        private bool CleanDebuff()
+        private bool ApplyManaPotion(PotionData potion)
         {
-            // Player doesn't have a debuff system yet. Don't consume item.
+            if (_player == null || _stats == null) return false;
+            float maxMana = _stats.GetStat(SkillType.ManaPoint);
+            float amount = potion.CalculateAmount(maxMana);
+            _player.StartManaOverTime(amount, potion.EffectDuration);
+            return true;
+        }
+
+        private static bool CleanDebuff()
+        {
+            // Player doesn't have a debuff system yet.
             return false;
         }
 
         private static bool RestoreStamina()
         {
-            // Player doesn't have a stamina system yet. Don't consume item.
+            // Player doesn't have a stamina system yet.
             return false;
         }
 
@@ -415,26 +412,28 @@ namespace IdleDefenseSurvival.UI.Game
         private void Update()
         {
             if (_remainingCooldown.Count == 0) return;
-            foreach (var itemId in _remainingCooldown.Keys.ToList())
+            _cooldownKeys.Clear();
+            foreach (var pair in _remainingCooldown)
+                _cooldownKeys.Add(pair.Key);
+            float deltaTime = Time.deltaTime;
+            for (int i = 0; i < _cooldownKeys.Count; i++)
             {
-                float remaining = _remainingCooldown[itemId] - Time.deltaTime;
+                string itemId = _cooldownKeys[i];
+                if (!_remainingCooldown.TryGetValue(itemId, out float remaining))
+                    continue;
+                remaining -= deltaTime;
                 if (remaining <= 0f)
                 {
                     _remainingCooldown.Remove(itemId);
-                    if (_slotByItemId.TryGetValue(itemId, out var slot)) slot.SetCooldown(0f);
+                    if (_slotByItemId.TryGetValue(itemId, out var slot))
+                        slot.SetCooldown(0f);
                     continue;
                 }
                 _remainingCooldown[itemId] = remaining;
-                if (!_slotByItemId.TryGetValue(itemId, out var activeSlot)) continue;
-                var potion = GetPotion(itemId);
-                if (potion == null)
-                {
-                    activeSlot.SetCooldown(0f);
+                if (!_slotByItemId.TryGetValue(itemId, out var activeSlot))
                     continue;
-                }
-                float cooldown = GetCooldown(potion);
-                float fill = cooldown > 0f ? Mathf.Clamp01(remaining / cooldown) : 0f;
-                activeSlot.SetCooldown(fill);
+                float cooldown = GetCooldown(itemId);
+                activeSlot.SetCooldown(GetCooldownFill(remaining, cooldown));
             }
         }
     }

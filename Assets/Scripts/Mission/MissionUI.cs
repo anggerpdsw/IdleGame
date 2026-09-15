@@ -239,6 +239,10 @@ namespace IdleDefenseSurvival.UI
                     string eqId = !string.IsNullOrEmpty(m.targetId) ? m.targetId : null;
                     return string.IsNullOrEmpty(eqId) ? null : ItemResources.GetItemSource($"Equipment/{eqId}");
 
+                case MissionEventType.Alchemist:
+                    string potionId = !string.IsNullOrEmpty(m.targetId) ? m.targetId : null;
+                    return string.IsNullOrEmpty(potionId) ? null : ItemResources.GetItemSource($"Potion/mission/{potionId}");
+
                 case MissionEventType.WaveCompleted:
                     return null;
 

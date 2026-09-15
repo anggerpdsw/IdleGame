@@ -37,8 +37,9 @@
             "description": "Hunt special monster types",
             "type": 1,
             "targetId": "Frost Guardian",
-            "minCount": 200,
-            "maxCount": 1000,
+            "minCount": 300,
+            "maxCount": 1500,
+            "scaleOnTier": false,
             "reward": {
                 "gold": 5000,
                 "gem": 10,
@@ -160,6 +161,23 @@
             },
             "claimCooldownMinutes": 3,
             "cancelCooldownMinutes": 10
+        },
+        {
+            "id": "alchemist",
+            "name": "Be A Legendary Alchemist",
+            "description": "Make some awesome potion!",
+            "type": 6,
+            "targetId": "",
+            "minCount": 1,
+            "maxCount": 5,
+            "scaleOnTier": false,
+            "reward": {
+                "gold": 1250,
+                "gem": 4,
+                "meat": 150
+            },
+            "claimCooldownMinutes": 2,
+            "cancelCooldownMinutes": 12
         }
     ]
 }

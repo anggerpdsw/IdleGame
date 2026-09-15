@@ -128,6 +128,8 @@ namespace IdleDefenseSurvival.Items
         {
             LoadJsonList<PotionData>("Data/Items/Potion/dataHealthPotion", RegisterPotion);
             LoadJsonList<PotionData>("Data/Items/Potion/dataManaPotion", RegisterPotion);
+            LoadJsonList<PotionData>("Data/Items/Potion/dataStaminaPotion", RegisterPotion);
+            LoadJsonList<PotionData>("Data/Items/Potion/dataDebuffPotion", RegisterPotion);
         }
         private void LoadGems()
         {

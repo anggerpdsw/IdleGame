@@ -1,0 +1,94 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_sp_potion_r1",
+      "DisplayName": "Small Stamina Potion",
+      "Description": "A basic stamina brew that restores a small amount of stamina over a short duration.",
+      "PotionType": 3,
+      "Rarity": 1,
+      "RequiredAlchemistLevel": 1,
+      "Ingredients": [
+        { "ItemId": "turmeric_root", "Count": 2 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 5.0,
+      "TimePerAdditionalUnit": 5.0
+    },
+    {
+      "RecipeId": "craft_sp_potion_r2",
+      "DisplayName": "Stamina Potion",
+      "Description": "A stronger stamina brew that restores a moderate amount of stamina.",
+      "PotionType": 3,
+      "Rarity": 2,
+      "RequiredAlchemistLevel": 5,
+      "Ingredients": [
+        { "ItemId": "ginger", "Count": 3 },
+        { "ItemId": "turmeric_root", "Count": 1 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 8.0,
+      "TimePerAdditionalUnit": 8.0
+    },
+    {
+      "RecipeId": "craft_sp_potion_r3",
+      "DisplayName": "Greater Stamina Potion",
+      "Description": "An advanced stamina brew that restores a larger portion of stamina.",
+      "PotionType": 3,
+      "Rarity": 3,
+      "RequiredAlchemistLevel": 10,
+      "Ingredients": [
+        { "ItemId": "ginseng", "Count": 4 },
+        { "ItemId": "ginger", "Count": 2 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 12.0,
+      "TimePerAdditionalUnit": 12.0
+    },
+    {
+      "RecipeId": "craft_sp_potion_r4",
+      "DisplayName": "Superior Stamina Potion",
+      "Description": "A potent stamina brew that significantly boosts stamina for a longer period.",
+      "PotionType": 3,
+      "Rarity": 4,
+      "RequiredAlchemistLevel": 15,
+      "Ingredients": [
+        { "ItemId": "black_henbane", "Count": 5 },
+        { "ItemId": "ginseng", "Count": 3 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 18.0,
+      "TimePerAdditionalUnit": 18.0
+    },
+    {
+      "RecipeId": "craft_sp_potion_r5",
+      "DisplayName": "Mythic Stamina Potion",
+      "Description": "A rare stamina brew that restores a massive amount of stamina, reserved for elite alchemists.",
+      "PotionType": 3,
+      "Rarity": 5,
+      "RequiredAlchemistLevel": 20,
+      "Ingredients": [
+        { "ItemId": "golden_herb", "Count": 6 },
+        { "ItemId": "black_henbane", "Count": 4 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_sp_potion_r6",
+      "DisplayName": "Divine Stamina Elixir",
+      "Description": "A legendary stamina brew that restores an overwhelming amount of stamina, cherished by the gods.",
+      "PotionType": 3,
+      "Rarity": 6,
+      "RequiredAlchemistLevel": 25,
+      "Ingredients": [
+        { "ItemId": "perfumedew_herb", "Count": 8 },
+        { "ItemId": "golden_herb", "Count": 5 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 35.0,
+      "TimePerAdditionalUnit": 35.0
+    }
+  ]
+}

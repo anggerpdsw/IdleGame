@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 41357bccffbf8204db9da52e9266e7dc
+guid: 28e71c2e542bf7a4182bb8525d40c31d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8698163947868029849
-    second: ginger_0
+      213: -2163330338579785107
+    second: reinforced_leather_pants_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ginger_0
+      name: reinforced_leather_pants_0
       rect:
         serializedVersion: 2
-        x: 19
-        y: 28
-        width: 351
-        height: 319
+        x: 311
+        y: 7
+        width: 603
+        height: 1241
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 99388c6960616b870800000000000000
-      internalID: 8698163947868029849
+      spriteID: d6a5025d48e4af1e0800000000000000
+      internalID: -2163330338579785107
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ginger_0: 8698163947868029849
+      reinforced_leather_pants_0: -2163330338579785107
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
