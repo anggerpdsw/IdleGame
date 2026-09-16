@@ -319,974 +319,16 @@ unless the project explicitly defines that structure.
 
 ---
 
-# 8. SAVE SYSTEM
-
-## 8.1 SaveData
-
-Persistent data is stored in:
-
-`SaveData.json`
-
-at:
-
-`Application.persistentDataPath`
-
-The save system is centralized in:
-
-`Scripts/Manager/SaveManager.cs`
-
-Current persistent domains include:
-
-- account data;
-- VIP data;
-- game state;
-- wave progress;
-- idle rewards;
-- daily rewards;
-- card inventory;
-- inventory;
-- equipment;
-- crafting queue;
-- other persistent progression data.
-
-## 8.2 Save ownership
-
-Gameplay systems should not independently write arbitrary JSON files unless explicitly designed to do so.
-
-Prefer:
-
-`System Service -> SaveManager -> SaveData`
-
-rather than:
-
-`UI -> JSON`
-
-or:
-
-`Gameplay object -> JSON`
-
-## 8.3 Save compatibility
-
-Before changing a persistent data structure:
-
-1. identify existing fields;
-2. identify old saves that may exist;
-3. determine whether the change is backward compatible;
-4. add migration/default handling when necessary;
-5. test loading an old save;
-6. test loading a new save;
-7. test missing/null collections.
-
-Never assume a fresh save is the only save that matters.
-
-## 8.4 Dirty-state saving
-
-When a system changes persistent state, it should correctly mark that state dirty or notify the persistence layer.
-
-Do not add save calls everywhere.
-
-The save architecture should remain centralized and predictable.
-
----
-
-# 9. INVENTORY ARCHITECTURE
-
-Inventory is a persistent domain, not a UI feature.
-
-Primary systems:
-
-`Scripts/Inventory/`
-
-and:
-
-`Scripts/Items/`
-
-Responsibilities include:
-
-- item ownership;
-- slot/capacity management;
-- item quantities;
-- instance identity;
-- consumables;
-- materials;
-- equipment;
-- gems;
-- item state;
-- inventory persistence.
-
-## 9.1 Inventory events
-
-The inventory has multiple kinds of changes, for example:
-
-- structural inventory changes;
-- quantity changes;
-- item addition/removal.
-
-Do not blindly trigger every event for every mutation.
-
-A single operation such as consuming one potion must not accidentally cause duplicate UI refreshes or duplicate gameplay effects because multiple overlapping events fire.
-
-When changing inventory events:
-
-1. identify which event represents the semantic change;
-2. identify which consumers subscribe to it;
-3. ensure one logical mutation produces one logical reaction.
-
-## 9.2 Consumables
-
-Consumable use should:
-
-1. validate the item;
-2. validate the quantity;
-3. apply the gameplay effect;
-4. remove the consumed quantity;
-5. trigger the correct inventory/save events;
-6. update UI through existing event flow.
-
-Do not put the entire consumable system inside a UI click handler.
-
----
-
-# 10. EQUIPMENT SYSTEM
-
-Equipment is a major progression system.
-
-Primary location:
-
-`Scripts/Equipment/`
-
-Equipment supports:
-
-- equipment slots (11 fixed slots);
-- level;
-- durability;
-- sockets;
-- gems;
-- set bonuses;
-- special effects (active/passive);
-- comparison;
-- auto-equip;
-- persistence;
-- visual representation.
-
-## 10.1 Current equipment slots (11 fixed)
-
-The equipment model uses these slot identities (verified from `EquipmentTypeExtensions.GetDisplayName`):
-
-| Index | Slot | Type enum value |
-|---|---|---|
-| 0 | Hat | `EquipmentType.Hat` |
-| 1 | Gloves | `EquipmentType.Gloves` |
-| 2 | Cape | `EquipmentType.Cape` |
-| 3 | Armor | `EquipmentType.Armor` |
-| 4 | Belt | `EquipmentType.Belt` |
-| 5 | Pants | `EquipmentType.Pants` |
-| 6 | Pendant | `EquipmentType.Pendant` |
-| 7 | Ring | `EquipmentType.Ring` |
-| 8 | Earring | `EquipmentType.Earring` |
-| 9 | Bracelet | `EquipmentType.Bracelet` |
-| 10 | Shoes | `EquipmentType.Shoes` |
-
-Total: **11 slots**. `GetIndex()` returns `(int)type - 1` (zero-based array access).
-
-Do not introduce alternate slot names such as:
-
-- Boots vs Shoes
-- Necklace vs Pendant
-- Artifact vs Bracelet
-
-unless the actual project data has intentionally changed.
-
-Slot identity must be stable for save data.
-
-Slot specialization (focus attributes + recommended secondary stats) is defined in `SlotIdentityService.cs` — see §55.3.
-
-## 10.2 Equipment service responsibilities
-
-The equipment service owns operations such as:
-
-- equip;
-- unequip;
-- swap;
-- equip by `InstanceId`;
-- auto-equip;
-- persistence;
-- slot validation.
-- slot unlocking (cost-based progression)
-
-UI must request equipment operations from the equipment domain instead of directly mutating equipment state.
-
-## 10.3 Stat aggregation
-
-Final equipment stats should be calculated from the authoritative equipment aggregation pipeline.
-
-Relevant sources may include:
-
-- main stats (from equipment level/rarity);
-- set bonuses;
-- special effects (equipment effects);
-- gems (socketed).
-
-Do not manually reconstruct equipment bonuses inside Player UI, tooltips, or individual gameplay classes.
-
-The pipeline: `EquipmentStatCalculator` → `EquipmentEffectService` → `EquipmentModifierService` → `EquipmentSetBonusService` → `ModifierCalculator` → `PlayerStatsManager`.
-
----
-
-# 11. SOCKET AND GEM SYSTEM
-
-Primary systems (in `Scripts/Items/`):
-
-- `GemService` — gem definition lookup, upgrade curves
-- `GemSocketService` — socketing/unsocketing gems
-- `GemUpgradeService` — gem leveling
-- `GemExperienceService` — gem XP handling
-- `GemModifierService` — gem stat contributions
-- `SocketValidationService` — validation rules
-- `SocketConfig` — socket configuration data class
-
-Current design concepts include:
-
-- maximum sockets per item (by rarity);
-- socket unlock requirements (item level/rarity);
-- allowed gem types per socket;
-- adding sockets (costs materials);
-- removing gems (destroys gem);
-- destroying gems;
-- gem experience (from combat/crafting);
-- gem upgrading (costs materials + gold).
-
-The current configuration must be read from:
-
-`Gems/dataConfigSocket.json` (socket rules)
-`Gems/dataGems.json` (gem definitions)
-
-Do not hardcode socket rules into UI.
-
-Gem operations must produce the appropriate domain events:
-
-- gem socketed;
-- gem removed;
-- gem destroyed;
-- gem upgraded;
-- gem experience changed.
-
----
-
-# 12. ATTRIBUTE SYSTEM
-
-Main attributes:
-
-- **CONSTITUTION**
-- **STRENGTH**
-- **INTELLIGENCE**
-- **DEXTERITY**
-
-Default starting attributes: 5 each (from `AccountData`), +5 unspent points per level-up (from `GameConstants`).
-
-Conceptually:
-
-### Constitution
-
-Contributes to:
-
-- HealthPoint
-- DefenseAmount
-- HealthRegen
-- DeathDefy
-
-### Strength
-
-Contributes to:
-
-- AttackDamage
-- KnockbackChance
-- Penetration
-- UltimateAttack
-
-### Intelligence
-
-Contributes to:
-
-- ManaPoint
-- ManaRegen
-- ElementMastery where defined by the combat system
-- AttackRange
-
-### Dexterity
-
-Contributes to:
-
-- AttackSpeed
-- CriticalChance
-- Evasion
-- DamagePerRange
-
-The exact per-point bonuses must come from:
-
-`Player/dataMainAttribute.json` (replaces old `dataAttribute.json`)
-
-Per-level value curves:
-- `Player/dataAttributeMainValuePerLevel.json` — main attribute value per level
-- `Player/dataSOTValuePerLevel.json` — secondary stat value per level
-
-Pipeline: `AttributeStatLoader` → `AttributeModifierManager` → `ModifierCalculator` → `PlayerStatsManager`.
-
-Do not duplicate attribute-to-stat conversion tables in multiple scripts.
-
----
-
-# 13. MODIFIER ARCHITECTURE
-
-CORE FORMULA: Formula global yang didokumentasikan adalah:
-(Base + Flat) * (1 + Percent / 100)
-Jadi simpan semua data langsung dalam bentuk finalnya
-Contoh: data tersimpan adalah 7.25 → jika dalam persen maka artinya 7.25%
-
-The modifier pipeline is central to player progression.
-
-Sources can include:
-
-- base player stats (from `dataPlayer.json`);
-- main attributes (CON/STR/INT/DEX from `AccountData`);
-- cards (equipped card effects);
-- equipment (main stats, affixes, set bonuses, special effects, gems);
-- temporary effects (buffs, status effects);
-- wave/tier progression multipliers.
-
-Primary systems:
-
-- `ModifierCalculator` — core math (flat then percent, additive stacking);
-- `EffectRegistry` — registers all effect types (buffs, equipment effects);
-- `AttributeModifierManager` — attribute → secondary stat conversion;
-- `CardModifierService` — card effect → modifier conversion;
-- `EquipmentModifierService` — equipment → modifier conversion;
-- `PlayerStatsManager` — final stat aggregation + cache invalidation.
-
-## 13.1 Flat vs Percent
-
-Modifiers must clearly distinguish:
-
-- Flat (additive)
-- Percent (multiplicative on base)
-
-Do not mix them accidentally.
-
-Calculation order (enforced in `ModifierCalculator`):
-
-1. Sum all flat modifiers
-2. Apply percent modifiers on (base + flat sum)
-3. Special: some effects (e.g., `DamagePerRange`) have custom formulas
-
-When changing modifier order:
-
-1. document the order;
-2. test the result;
-3. update all affected systems.
-
-## 13.2 Do not cache stale final stats
-
-If a source of modifiers changes, the authoritative stat pipeline must be refreshed.
-
-Examples:
-
-- equip/unequip item;
-- card equipped/removed;
-- attribute point allocated;
-- gem socketed/removed/upgraded;
-- set bonus activated/deactivated;
-- enhancement level changed;
-- wave/tier changed (affects enemy stats, not player).
-
-`PlayerStatsManager.InvalidateCache()` must be called after any modifier source changes.
-
----
-
-# 14. CARD SYSTEM
-
-Primary location:
-
-`Scripts/Card/`
-
-Core components include:
-
-- `CardDatabase` — loads `Card/dataCard.json`
-- `CardInventory` — owns owned cards, duplicates, pity counters
-- `CardUpgradeService` — duplicate → level conversion
-- `CardRollService` — gem-based rolling, pity, bundle pricing
-- `CardEquipmentService` — equip/unequip cards to slots (max 19)
-- `CardModifierService` — card effects → modifier pipeline
-- `VirtualCardInventorySnapshot` — UI snapshot for collection view
-- `CardManager` (in `Scripts/Manager/`) — UI façade, delegates to services
-
-## 14.1 Rarities
-
-Current rarity model (`Card/dataCard.json`, verified) — **six** tiers:
-
-- Common
-- Rare
-- Epic
-- Legendary
-- Mythic
-- **Divine** (rarest; multiplier `0.006` — extreme outlier tier)
-
-Weight/multiplier values per rarity (verified):
-
-| Rarity | Multiplier |
-|---|---|
-| Common | `1000.0` |
-| Rare | `300.0` |
-| Epic | `80.0` |
-| Legendary | `15.0` |
-| Mythic | `1.0` |
-| Divine | `0.006` |
-
-Pity thresholds (verified in `Constantku.cs`):
-
-| Rarity | Pity count |
-|---|---|
-| Epic | 51 |
-| Legendary | 153 |
-| Mythic | 505 |
-
-Divine has no pity threshold — its base multiplier already produces very low pull rates.
-
-## 14.2 Card leveling
-
-Duplicate cards increase card level.
-
-Current progression (`CardUpgradeService.cs`, verified):
-
-```
-Lv1→Lv2 : 2
-Lv2→Lv3 : 4
-Lv3→Lv4 : 7
-Lv4→Lv5 : 11
-Lv5→Lv6 : 19
-Lv6→Lv7 : 31
-Lv7→Lv8 : 47
-Lv8→Lv9 : 69
-Lv9→Lv10: 99
-```
-
-Cumulative duplicates required through level 10:
-
-`289`
-
-Do not change this progression without updating the relevant design/balance document.
-
-## 14.3 Card slots
-
-Card equipment has a defined maximum slot count.
-
-Verified values (`GameConstants.cs`):
-
-- `CARD_START_SLOT = 1`
-- `CARD_MAX_SLOT = 19`
-
-`CARD_SLOT_EXPANSION_COSTS[]` is a cost curve array (18 entries for slots 2-19), length-gated in code. Do not invent new slot costs — add a row to the array.
-
-## 14.4 Card effects
-
-Card effects may be:
-
-- flat stat modifiers;
-- percentage modifiers;
-- special effects (FrostAura, Shield, TimeFast, Gold, Meat).
-
-Special effects must have an explicit owner in the modifier pipeline.
-
-Do not implement special card behavior inside generic UI classes.
-
-## 14.5 Card roll costs
-
-The roll cost is a balance value and must come from the current implementation/data.
-
-Verified (`GameConstants.cs`, `CardRollService.cs`):
-
-- 1x = 20 gems (`ROLL1X_GEM_COST`)
-- 10x = 190 gems (`ROLL10X_GEM_COST`)
-- 100x = 1800 gems (`ROLL100X_GEM_COST`)
-
-**Bundle calculation** (`CalculateRollGemCost(int amount)`): integer-divides amount into hundreds/tens/singles:
-
-```csharp
-hundreds = amount / 100
-tens     = (amount % 100) / 10
-singles  = amount % 10
-total    = hundreds * 1800 + tens * 190 + singles * 20
-```
-
-This is **not** `amount * 20`. Preserves the bundled-discount tier behavior.
-
-## 14.6 CardRoll item
-
-The project supports a free card-roll item (`CardRoll` in inventory).
-
-If the player uses a `CardRoll` inventory item:
-
-- consume the item only when the roll succeeds;
-- if the operation is invalid because card capacity is full, refund/preserve the item;
-- do not substitute a gem refund for an item refund;
-- keep item-based rolls separate from gem-based rolls.
-
----
-
-# 15. PLAYER COMBAT
-
-Primary systems:
-
-- `Player`
-- `PlayerStats`
-- `PlayerStatsManager`
-- `Projectile`
-
-The player is centered in the gameplay arena and auto-attacks.
-
-Player stats include concepts such as:
-
-- AttackDamage
-- AttackSpeed
-- AttackRange
-- CriticalChance
-- Critical/SuperCritical/UltraCritical
-- MultiShoot
-- Bounce
-- Knockback
-- LifeSteal
-- Health
-- HealthRegen
-- Defense
-- Evasion
-- Mana
-- ManaRegen
-- UltimateWeaponAttack
-
-The exact final values must be calculated by the authoritative stat pipeline.
-
----
-
-# 16. PROJECTILE SYSTEM
-
-`Scripts/Player/Projectile.cs`
-
-Projectiles are pooled and reused.
-
-Projectile responsibilities include:
-
-- movement;
-- target handling;
-- collision;
-- damage;
-- critical states;
-- bounce;
-- knockback;
-- stun;
-- life steal;
-- range-based effects;
-- status effects where explicitly configured.
-
-## 16.1 Defense Break
-
-Defense Break is a combat status/effect, not merely a visual indicator.
-
-When a projectile applies Defense Break:
-
-1. determine the source and effect value;
-2. apply it through the authoritative enemy status/effect system;
-3. let the target's defense calculation consume the active effect;
-4. preserve duration/type/stacking rules;
-5. display the effect through UI separately.
-
-Do not make `Projectile` directly manipulate UI state.
-
----
-
-# 17. ENEMY SYSTEM
-
-Primary systems:
-
-- `EnemyAi`
-- `EnemySpawner`
-- `EnemyStatusEffectController`
-- health bar management.
-
-Enemy behavior:
-
-1. spawn outside the player's attack range;
-2. approach the player;
-3. stop at its attack range;
-4. attack according to cooldown;
-5. respond to knockback;
-6. respond to slow/stun/defense break/HeartBreak;
-7. die and distribute rewards.
-
-Movement should use the current steering implementation rather than introducing pathfinding unless the game design actually requires pathfinding.
-
----
-
-# 18. STATUS EFFECTS
-
-Current status concepts include:
-
-- Slow
-- Defense Break
-- Stun
-- HeartBreak / Max Health Reduction
-
-Slow and Defense Break support different effect types such as:
-
-- Permanent
-- Aura
-- Temporary
-
-Stacking behavior must follow the existing status controller rules.
-
-Do not create a second status-effect implementation in another system.
-
-UI indicators should observe status state; they should not become the source of truth.
-
----
-
-# 19. WAVE SYSTEM
-
-Primary system:
-
-`Scripts/Manager/WaveManager.cs`
-
-Wave flow:
-
-- InterWave
-- ActiveWave
-- InterWave
-- repeat
-
-The current design uses:
-
-- wave progression;
-- tier progression;
-- difficulty scaling;
-- spawn scaling;
-- reward scaling;
-- victory/defeat handling.
-
-Verified values (`Constantku.cs`, `WaveManager.cs`):
-
-- `MAX_WAVE_PER_TIER = 350`
-- `CurrentWave` clamped to `[1, _maxWave]` — `WaveManager.cs:79`
-- Inter-wave duration and active-wave duration read from `_interWaveDuration` / `_waveDuration` fields, scaled by `ProgressionSpeed`
-- Difficulty scaling uses `Utilityku.WaveMultiplier(DecayCount, CurrentWave, _maxWave)` — see `Utilityku.cs` for the formula; do not duplicate the curve anywhere else
-- Wave progress fraction `GetWaveProgressMultiplier()` = `Clamp01((CurrentWave - 1) / (_maxWave - 1))` — used by reward/difficulty interpolation
-
-After wave `_maxWave` (350):
-
-- the tier progresses;
-- wave numbering resets according to the current progression design;
-- difficulty continues through tier progression.
-
-Do not modify formulas without documenting the reason and expected progression impact.
-
----
-
-# 20. ULTIMATE SYSTEM
-
-Primary architecture:
-
-- `UltimateManager`
-- `UltimateFactory`
-- individual ultimate handlers.
-
-Current ultimate families include (8) — registered via `UltimateFactory.RegisterHandler(...)` from `UltimateManager.Awake`:
-
-- Void
-- Tank
-- Root
-- Bomb
-- Fountain
-- Cloud
-- Lightning
-- Shockwave
-
-`UltimateFactory` itself is a static registry of `(string id → IUltimateHandler)` plus an active-count map. Handlers live under `Scripts/Ultimate/` and implement `IUltimateHandler` (interface file). When adding a handler, also append the `ultimateId` to `dataUltimate.json` and any spawn-trigger condition in `UltimateManager`.
-
-Each ultimate may define:
-
-- cooldown;
-- activation chance;
-- active duration;
-- damage;
-- element;
-- crowd control;
-- special effects.
-
-New ultimates should follow the existing handler architecture.
-
-Do not create one giant `UltimateManager` switch containing all gameplay logic.
-
----
-
-# 21. ECONOMY
-
-Main currencies/resources:
-
-- Gold
-- Gem
-- Meat
-- EXP
-
-Economy mutation should be centralized.
-
-Do not directly mutate currency values from UI.
-
-For example, avoid:
-
-```csharp
-playerGold += amount;
-```
-
-inside UI code.
-
-Prefer the authoritative economy service/manager.
-
-Every currency mutation must consider:
-
-- validation;
-- balance;
-- save state;
-- relevant events;
-- UI refresh.
-
----
-
-# 22. DAILY REWARD
-
-Daily Reward is a **7-reward sequence within one day**, not merely a conventional 7-day login streak.
-
-Verified constants (`Scripts/Utilities/Constantku.cs`):
-
-- `REWARD_COUNT = 7`
-- `COOLDOWN_MINUTES = 5`
-- `DAILY_GOLD_REWARD = 10_000`     ← doc lama menulis 100.000; angka sebenarnya **10.000**
-- `DAILY_MEAT_REWARD = 500`         ← doc lama menulis 1.000; angka sebenarnya **500**
-- `DAILY_EXP_REWARD = 2_500`        ← doc lama menulis 3.000; angka sebenarnya **2.500**
-- `DATE_FORMAT = "yyyy-MM-dd"` (string compare for daily reset)
-
-Behavior (`Scripts/Daily/DailyRewardService.cs`):
-
-- All 7 rewards claimable in one day, sequential.
-- 5-minute cooldown between claims (`utcNow.AddMinutes(COOLDOWN_MINUTES)` stored in `nextUnlockUtcTicks`).
-- Daily reset via `lastResetDate` string compare on every `EnsureReset(utcNow)`.
-- After reward 7: `completedToday = true`, all buttons disabled until reset.
-- VIP: `SaveManager.Instance.IsDailyEnabled()` forces `Waiting → Claimable` in `GetState`.
-
-Reward contents (`Scripts/Daily/DailyRewardData.cs`, `DailyRewardProvider.GetReward(index)`):
-
-| # | Type | Source | Amount rule |
-|---|---|---|---|
-| 0 | Gold | `EconomyManager.AddCurrency(Gold, amount, "Daily reward")` | `Math.Max(DAILY_GOLD_REWARD, SaveManager.GetHighestGoldEarned())` |
-| 1 | Gem | `EconomyManager.AddCurrency(Gem, 11, …)` | **hardcoded `11`** |
-| 2 | Meat | `EconomyManager.AddCurrency(Meat, amount, …)` | `Math.Max(DAILY_MEAT_REWARD, SaveManager.GetHighestMeatEarned())` |
-| 3 | Item | `InventoryManager.AddItem("CardRoll", 1)` | accumulatable free-roll ticket |
-| 4 | EXP | `AccountManager.AddExp(amount, …)` | `Math.Max(DAILY_EXP_REWARD, HighestExpEarned / 2 * tier)` |
-| 5 | Item | `InventoryManager.AddItem("UltimateStone", 3)` then roll N variants | **3 random UltimateStones** |
-| 6 | Item | `InventoryManager.AddItem("SkinShard", 1)` | permanent skin exchange progress |
-
-UltimateStone reward rolls from 8 variants (`DailyRewardService.cs:15-25`):
-
-```
-UltimateStone_None
-UltimateStone_Metal
-UltimateStone_Wood
-UltimateStone_Fire
-UltimateStone_Water
-UltimateStone_Earth
-UltimateStone_Lightning
-UltimateStone_Wind
-```
-
-Each `count` pick rolls independently: `UnityEngine.Random.Range(0, variants.Length)`. If non-`None` is desired, gate the reward provider or the inventory accept rule — current code has **no** filter for `_None`, so the roll can yield a no-op token.
-
-### Persistence requirement
-
-`DailyRewardSaveData` (`Scripts/Daily/DailyRewardSaveData.cs`):
-
-- `currentRewardIndex` (0..7)
-- `nextUnlockUtcTicks` (`DateTime.UtcNow.Ticks` for next claim)
-- `completedToday` (bool)
-- `lastResetDate` (`"yyyy-MM-dd"`)
-- `claimedToday` (counter, mostly informational)
-
-Must survive scene changes / app close / app restart. Eligibility is never derived from UI state — `DailyRewardService.GetState(utcNow)` is the source of truth.
-
----
-
-# 23. IDLE REWARD
-
-Idle rewards calculate offline progression.
-
-## 23.1 Verified scope
-
-Idle reward currently grants **only Gold + Meat**. EXP is not part of the offline calculation (see `IdleRewardManager` public surface: `GoldReward`, `MeatReward`, `CanClaim`, `Progress` — no EXP property).
-
-## 23.2 Owner files
-
-- `Scripts/IdleReward/IdleRewardManager.cs` (singleton MonoBehaviour, DontDestroyOnLoad)
-- `Scripts/IdleReward/IdleRewardData.cs` (persisted via `SaveManager.GetIdleRewardData()`)
-- `Scripts/IdleReward/IdleRewardUI.cs` (display only)
-
-## 23.3 Persistence (`IdleRewardData`)
-
-```csharp
-public long lastClaimUtcTicks = DateTime.UtcNow.Ticks;  // UTC ticks
-public int  maxDurationSeconds = 4 * 3600;              // 4h cap on offline accumulation
-public int  minimumClaimSeconds = 600;                  // 10 min before claim available
-public float rewardMultiplier = 1f;
-```
-
-`GetAccumulatedSeconds()` returns `min((UtcNow - lastClaim).TotalSeconds, maxDurationSeconds)`. The 4h cap means a player offline 24h still gets only 4h worth.
-
-## 23.4 Gold formula (verified `IdleRewardManager.CalculateGoldReward`)
-
-```text
-totalWaveProgress = (highestTier - 1) * MAX_WAVE_PER_TIER + highestWaveInTier
-waveMultiplier   = 1.0 + totalWaveProgress / MAX_WAVE_PER_TIER
-tierMultiplier   = 1.35^(highestTier - 1)
-goldPerMinute    = 15.0 * tierMultiplier * waveMultiplier
-minutes          = GetAccumulatedSeconds() / 60
-gold             = round(goldPerMinute * minutes * rewardMultiplier)
-```
-
-`highestTier` and `highestWaveInTier` come from `SaveManager.GetHighestUnlockedTier()` + `SaveManager.GetHighestWave(tier)`. These are the player's record, not current state.
-
-## 23.5 Meat formula
-
-`MeatReward = roundToInt(GoldReward / 30)`. No separate scaling.
-
-## 23.6 Claim semantics
-
-- `IsClaimAvailable()` ⇒ `GetAccumulatedSeconds() >= minimumClaimSeconds` (10 min).
-- `Progress` UI bar ⇒ `GetAccumulatedSeconds() / minimumClaimSeconds`.
-- `ResetCount()` stamps `lastClaimUtcTicks = UtcNow.Ticks` then `SaveManager.SaveAll()`. **It does not grant the reward** — grant happens at the UI/claim call site, not here. Do not assume `ResetCount` pays out.
-
-## 23.7 VIP / multipliers
-
-`rewardMultiplier` defaults to `1.0`. If VIP integration exists in `IdleRewardManager`, check the current file before assuming — older docs reference a VIP multiplier but the current field is a single scalar and no VIP write is visible in the read-first scan.
-
-## 23.8 Persistence requirement
-
-The data is owned by `SaveManager.GetIdleRewardData()`. Do not rely on the scene staying alive. The `IdleRewardManager` itself is DontDestroyOnLoad, but the data survives via `SaveData.idleReward.*` regardless of whether the manager instance is alive.
-
----
-
-# 24. SCENE AND PERSISTENCE ARCHITECTURE
-
-Important scenes include:
-
-- `Bootstrap.unity`
-- `MainMenu.unity`
-- `Game.unity`
-- `CardCollection.unity`
-- `Inventory.unity`
-- `Crafting.unity`
-
-Persistent services/managers must not accidentally duplicate when changing scenes.
-
-## UI persistence rule
-
-A UI component that exists in multiple scenes must not assume that it is globally unique unless the architecture explicitly guarantees it.
-
-Example:
-
-If `TooltipUI` exists in both Main Menu and Inventory:
-
-- do not blindly mark every copy `DontDestroyOnLoad`;
-- do not destroy the new scene's instance because an old instance still exists;
-- decide whether TooltipUI is:
-  - scene-local, or
-  - a single persistent service/view.
-
-The architecture must have one clear ownership model.
-
----
-
-# 25. UI ARCHITECTURE
-
-UI is a presentation layer.
-
-UI should:
-
-- display state;
-- send user intent;
-- subscribe to domain events;
-- request operations from services.
-
-UI should not own:
-
-- save logic;
-- item definitions;
-- currency mutation;
-- equipment state;
-- card progression;
-- combat formulas.
-
-## Tooltips
-
-Tooltip positioning must account for:
-
-- canvas size;
-- tooltip size;
-- mouse/screen position;
-- offset;
-- screen boundaries.
-
-Do not hardcode offsets that only work at one resolution.
-
-When a tooltip is required across scenes, decide persistence ownership explicitly.
-
----
-
-# 26. ITEM DATA AND MATERIALS
-
-Items are divided conceptually into:
-
-- Consumables
-- Materials
-- Equipment
-- Gems
-- Tickets / special items
-
-Material naming and item definitions should remain stable.
-
-Do not change IDs merely to make names prettier.
-
-If a material needs a new display name:
-
-- preserve the `Id`;
-- change the display `Name`;
-- update localization/data as required.
-
----
-
-# 27. CRAFTING
-
-Crafting is a domain system, not a UI timer.
-
-Relevant systems include:
-
-- `CraftService`
-- `CraftJob`
-- `CraftContextBuilder`
-- `CraftCompletionService`
-- `CraftModifiers`
-- `RecipeData`
-
-Craft queue state must be persisted.
-
-When changing crafting:
-
-- preserve queued jobs;
-- define behavior for completed jobs after restart;
-- avoid duplicating completion logic between UI and service.
+# 8. SYSTEM DESIGN DOCUMENTATION
+
+All detailed system specifications have been extracted into modular design documents under `Assets/Resources/Data/Design/`.
+
+See **§53 Design Documentation Index** for the authoritative documentation catalog covering:
+- Core systems (Modifier, Attribute, Combat, Player, Projectile, Enemy, StatusEffect)
+- Progression (Wave, Spawn, Card, Ultimate)
+- Economy & Items (Item, Consumable, Economy, Reward, DailyReward, IdleReward)
+- Persistence & Technical (SaveManager, ScenePersistence, UI, Crafting, Mission, VIP)
+- Equipment & Inventory (Equipment, Inventory, DropBag, EnemyDrop, Material, Herb, PetSystem)
 
 ---
 
@@ -1547,6 +589,7 @@ Existing service concepts include:
 - Audio service;
 - Ads service;
 - Analytics service;
+- Pet service;
 - game manager access.
 
 When adding a new globally consumed service, first evaluate whether it belongs in the existing service architecture.
@@ -1621,7 +664,7 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Crafting (own domain) | `Scripts/Crafting/CraftingManager.cs` is the entry point. Pipeline files in `Scripts/Crafting/`: `CraftRollService.cs`, `CraftValidator.cs`, `CraftRecipeValidationRunner.cs`, `CraftCostResolver.cs`, `CraftTransactionService.cs`, `CraftContextBuilder.cs`, `CraftPipeline.cs`, `CraftResultValidator.cs`, `CraftRewardBuilder.cs`, `CraftRewardService.cs`, `CraftCompletionService.cs`, `CraftPersistenceService.cs`, `CraftQueueService.cs`, `CraftModifiers.cs`, `CraftRecipeData.cs`, `CraftRecipeRepository.cs`, `CraftingConfig.cs`, `CraftData.cs`, `CraftJob.cs`, `AttributeRollService.cs`. UI: `Scripts/Crafting/JobEntryUI.cs`, `Scripts/Controller/CraftingController.cs`, `CraftingUIController.cs`, `CraftingRecipeEntry.cs`. Data: `Assets/Resources/Data/Crafting/dataConfigCrafting.json`, `Crafting/Equipment/dataBaseEquipment.json`, per-slot `Crafting/Equipment/dataRecipeHat.json` … `dataRecipeShoes.json`, `Crafting/Potion/dataRecipeHealthPotion.json`, `dataRecipeManaPotion.json`. **There is no `Scripts/Items/CraftService.cs`** — the file map in old CLAUDE.md is wrong. |
 | Potion (consumable subtypes) | `Assets/Resources/Data/Items/Potion/dataHealthPotion.json`, `dataManaPotion.json`; consumed via `Scripts/UI/Game/ItemConsumableUI.cs` |
 | Economy | `Scripts/Economy/EconomyManager.cs`, `Scripts/Economy/CurrencyData.cs`, `Scripts/Core/Interfaces/IEconomyService.cs` |
-| Save | `Scripts/Manager/SaveManager.cs` (root), `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`; constants: `Scripts/Utilities/GameConstants.cs` (`CURRENT_SAVE_VERSION = 3`) |
+| Save | `Scripts/Manager/SaveManager.cs` (root), `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`; constants: `Scripts/Utilities/GameConstants.cs` (`CURRENT_SAVE_VERSION = 4`) |
 | Daily | `Scripts/Daily/DailyRewardService.cs` (logic), `DailyRewardManager.cs`, `DailyRewardSaveData.cs`, `DailyRewardSlot.cs`, `DailyRewardUI.cs` |
 | Idle | `Scripts/IdleReward/IdleRewardManager.cs`, `IdleRewardUI.cs`, `IdleRewardData.cs` |
 | Ultimates | `Scripts/Ultimate/UltimateManager.cs` (registration host), `UltimateFactory.cs` (static registry), `IUltimateHandler.cs` (interface). 8 handler ids registered from `UltimateManager.Awake`: Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave. Definitions: `Assets/Resources/Data/Player/dataUltimate.json`. Handler implementations exist as separate files under `Scripts/Ultimate/` (e.g., `VoidHandler.cs`, `TankHandler.cs`, etc.). |
@@ -1632,6 +675,8 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Mission | `Scripts/Mission/MissionService.cs` (singleton, DontDestroyOnLoad), `MissionUI.cs`, `MissionSlot.cs`. Templates: `Assets/Resources/Data/Player/dataMission.json` |
 | Account | `Scripts/Manager/AccountManager.cs` (wraps `SaveManager.GetAccountData`) |
 | VIP | `Scripts/Data/VIPData.cs`; integrated via `DailyRewardService.IsDailyEnabled`, `GameSpeedController`, `CraftContextBuilder` |
+| SkillTree | `Scripts/SkillTree/SkillTreeBonusManager.cs`, `SkillTreeBonusUIController.cs`, `SkillTreeChoiceSkillUI.cs`; data: `Scripts/Data/SkillTreeBonusData.cs`; saved in `SaveData.skillTreeBonus` |
+| Pet | `Scripts/Pet/PetManager.cs` (singleton, ServiceLocator.PetService), `IPetService.cs`, `PetDefinition.cs`, `PetRuntime.cs`, `PetState.cs`, `PetTargeting.cs`; skills: `Skills/PetSkill.cs`, `VoidBolt.cs`, `VoidPulse.cs`, `BlackHole.cs`; passives: `Passives/LastHorizon.cs`; data: `Assets/Resources/Data/Pet/dataPet.json`; doc: `Design/PetSystem.md`; saved in `SaveData.pets` (v4) |
 | Analytics | `Scripts/Manager/AnalyticsManager.cs`, `Scripts/Core/Interfaces/IAnalyticsService.cs` |
 | Audio | `Scripts/Manager/AudioManager.cs`, `Scripts/Core/Interfaces/IAudioService.cs` |
 | Advertising | `Scripts/Manager/AdvertisingManager.cs`, `Scripts/Core/Interfaces/IAdsService.cs` |
@@ -1808,7 +853,7 @@ Routing: callers invoke `MissionService.Instance?.UpdateProgress(MissionEventTyp
 
 ## 45.2 Slot cap
 
-`MissionService._maxMission` is sourced from `SaveData.account.maxMission` (default `1`, minimum `1`). Public mutation: `SetMaxMission(int)` — clamps ≥ 1, writes through `SaveManager.Instance.GetAccountData()` and calls `GenerateMissingMissions()` + `SaveMissions()`. Cap can grow but should never silently shrink inside `MissionUI.EnsurePool` — slot layout stays stable across cap changes.
+`MissionService._maxMission` is sourced from `SaveData.account.maxMission` (cap defined by `GameConstants.MAX_MISSION = 6`, minimum `1`). Public mutation: `SetMaxMission(int)` — clamps ≥ 1, writes through `SaveManager.Instance.GetAccountData()` and calls `GenerateMissingMissions()` + `SaveMissions()`. Cap can grow but should never silently shrink inside `MissionUI.EnsurePool` — slot layout stays stable across cap changes.
 
 ## 45.3 Mission lifecycle
 
@@ -1894,10 +939,12 @@ Start by reading the listed owner file, then the matching §39–§44 workflow, 
 | a new socket/gem rule | `Scripts/Items/GemSocketService.cs` + `SocketValidationService.cs` | `GemExperienceService`, `GemUpgradeService` | `Resources/Data/dataConfigSocket.json`, `dataGems.json` |
 | a new crafting recipe | `Scripts/Crafting/CraftingManager.cs` | `CraftContextBuilder`, `CraftCompletionService` | `Assets/Resources/Data/Crafting/Equipment/dataRecipe*.json` + `Assets/Resources/Data/Crafting/dataConfigCrafting.json` |
 | a new consumable | `dataConsumables.json` consumer | `Scripts/Item/Items.cs` (`ItemClickManager`) | `Resources/Data/dataConsumables.json` |
-| a new daily reward slot | `Scripts/Daily/DailyRewardService.cs` | `DailyRewardSaveData`, `DailyRewardUI` | `Resources/Data/Player/dataDailyReward.json` (verify path) |
+| a new daily reward slot | `Scripts/Daily/DailyRewardService.cs` | `DailyRewardSaveData`, `DailyRewardUI` | none — no separate JSON; configured in code |
 | a new mission event | `Scripts/Mission/MissionService.cs` | `MissionUI.GetMissionIcon` switch | `Resources/Data/Player/dataMission.json` |
 | a new VIP perk | `Scripts/Data/VIPData.cs` | `SaveManager.IsDailyEnabled`, `GameSpeedController` | none — bool flag |
-| a new save domain | `Scripts/Data/SaveData.cs` | `Scripts/Save/EquipmentSerializer.cs` pattern, `SaveManager.OnSaveLoaded` | none — code-only, requires §52 version bump |
+| a new skill tree bonus | `Scripts/SkillTree/SkillTreeBonusManager.cs` | `SkillTreeBonusData.cs`, `SkillTreeBonusUIController.cs` | none — SaveData.skillTreeBonus sub-section |
+| a new pet | `Scripts/Pet/PetManager.cs` | `PetDefinition.cs`, `PetSkill.cs`, `PetTargeting.cs` | `Assets/Resources/Data/Pet/dataPet.json` |
+| a new save domain | `Scripts/Data/SaveData.cs` | `Scripts/Save/EquipmentSerializer.cs` pattern, `SaveManager.OnSaveLoaded` | none — code-only, requires §48 version bump |
 | a new scene | `Scripts/Core/SceneLoader.cs` + `BootstrapInitializer.cs` | §24 scene list | none — must update §24 |
 
 ## 47.2 New / emerging domains (not in §47 table)
@@ -1927,7 +974,7 @@ These domains exist in the codebase but were not in the original extension table
 
 Any non-additive `SaveData` shape change requires:
 
-1. Bump `GameConstants.CURRENT_SAVE_VERSION` in `Scripts/Utilities/Constantku.cs`.
+1. Bump `GameConstants.CURRENT_SAVE_VERSION` in `Scripts/Utilities/GameConstants.cs`.
 2. Add migration case in `SaveManager.LoadFromDisk` (or equivalent).
 3. Append the version row to §52 of this document.
 4. Test: load save at `version - 1` → upgrade → reload → confirm shape.
@@ -1936,10 +983,11 @@ Any non-additive `SaveData` shape change requires:
 
 # 48. SAVE VERSION LOG
 
-`GameConstants.CURRENT_SAVE_VERSION` is the authoritative version stamp written into every `SaveData`. Source of truth lives in `Scripts/Utilities/Constantku.cs`.
+`GameConstants.CURRENT_SAVE_VERSION` is the authoritative version stamp written into every `SaveData`. Source of truth lives in `Scripts/Utilities/GameConstants.cs`.
 
 | Version | Date | Schema break | Migration |
 |---|---|---|---|
+| 4 | 2026-09 | `pets` array added (`List<PetSaveEntry>`) | backward compatible with v3; no migration needed for new array |
 | 3 | 2026-08 | flat `Items[]` save; category derived from `ItemId`; slot via `SlotIndex` | see `Scripts/Save/InventorySerializer.cs` and `Scripts/Save/EquipmentSerializer.cs`; old nested save shapes are normalized on load |
 | 2 | prior | per-domain nested save sections | superseded by v3 flat layout |
 | 1 | initial | first shipping save | superseded by v2 |
@@ -1957,6 +1005,65 @@ If on-disk version is **above** `CURRENT_SAVE_VERSION`, reject the save (do not 
 ```
 
 Update this table in the same commit as the version bump.
+
+---
+
+# 53. DESIGN DOCUMENTATION INDEX
+
+**Authoritative design documentation:** `Assets/Resources/Data/Design/README.md`
+
+The master index contains:
+- Design map (29 domains)
+- Dependency map visualization
+- Task → document routing table
+- Synchronization rules
+
+All detailed system specifications (formerly §8-27 of this file) have been extracted into modular design documents:
+
+| File | Domain | Key sections |
+|---|---|---|
+| **Core Systems** | | |
+| `Modifier_Design.md` | Modifier pipeline | Formula `(Base + Flat) × (1 + Percent/100)`, cache invalidation |
+| `Attribute_Design.md` | Attribute system | CON/STR/INT/DEX → secondary stats, per-point bonuses |
+| `Combat_Design.md` | Combat mechanics | Damage pipeline, defense formula, hit chance |
+| `Player_Design.md` | Player mechanics | Auto-attack, stat aggregation, positioning |
+| `Projectile_Design.md` | Projectile system | Damage delivery, bounce, life steal, pooling |
+| `Enemy_Design.md` | Enemy AI | Orchestrator architecture, spatial grid, movement |
+| `StatusEffect_Design.md` | Status effects | Slow/Stun/DefenseBreak/HeartBreak, duration types |
+| **Progression** | | |
+| `Wave_Design.md` | Wave system | MAX_WAVE_PER_TIER=350, tier progression |
+| `Spawn_Design.md` | Spawn system | Weighted spawning, positioning, pooling |
+| `Card_Design.md` | Card system | 6 rarities, pity, leveling, roll costs |
+| `Ultimate_Design.md` | Ultimate system | 8 handlers, cooldowns, special effects |
+| **Economy & Items** | | |
+| `Item_Design.md` | Item system | ItemId vs InstanceId, 7 categories, stackability |
+| `Consumable_Design.md` | Consumables | Health/mana potions, buff scrolls, cooldowns |
+| `Economy_Design.md` | Economy | 4 currencies, transaction validation, overflow protection |
+| `Reward_Design.md` | Reward system | Unified reward flow, 6 sources, multipliers |
+| `DailyReward_Design.md` | Daily rewards | 7 rewards in 1 day, 5-min cooldown, VIP override |
+| `IdleReward_Design.md` | Idle rewards | Gold+Meat only, 4h cap, formula |
+| **Systems** | | |
+| `Mission_Design.md` | Mission system | 6 event types, lifecycle, cooldowns |
+| `VIP_Design.md` | VIP system | 3 bool flags, integrations |
+| `Crafting_Design.md` | Crafting system | Pipeline stages, queue management, VIP modifiers |
+| `SaveManager_Design.md` | Save/load system | Schema v1-v4, migration flows |
+| **Technical** | | |
+| `ScenePersistence_Design.md` | Scene architecture | 6 scenes, DontDestroyOnLoad pattern |
+| `UI_Design.md` | UI architecture | Presentation layer principles, event-driven updates |
+| **Equipment & Inventory** | | |
+| `Equipment_Design.md` | Equipment system | 11 slots, durability, auto-equip, stat aggregation |
+| `Inventory_Design.md` | Inventory system | Capacity, slots, categories, persistence |
+| `DropBag_Design.md` | Post-combat loot | Drop tables, item generation, pickup flow |
+| `EnemyDrop_Design.md` | Enemy rewards | Currency/material drop rules, tier scaling |
+| `Material_Design.md` | Crafting materials | Material types, sources, usage patterns |
+| `Herb_Design.md` | Herb materials | Alchemical ingredients, crafting integration |
+| `PetSystem.md` | Pet system | State machine, Voidling spec, skills, emergency mode |
+
+When adding a new design doc:
+1. Create `.md` file under `Assets/Resources/Data/Design/`
+2. Add row to `Design/README.md` master index
+3. Update this table
+4. Include: behavior overview, formulas, data schema, integration points, extension guide
 
 ---
 
@@ -1980,7 +1087,7 @@ Domain → owner file → sibling services → JSON. Read owner first, always.
 
 | Concern | Owner | Sibling services | Data file |
 |---|---|---|---|
-| Save/load | `Scripts/Manager/SaveManager.cs` | `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`, `Scripts/Save/CustomDataConverter.cs` | none — code-only; bump `Constantku.CURRENT_SAVE_VERSION` on shape change |
+| Save/load | `Scripts/Manager/SaveManager.cs` | `Scripts/Data/SaveData.cs`, `Scripts/Save/EquipmentSerializer.cs`, `Scripts/Save/InventorySerializer.cs`, `Scripts/Save/CustomDataConverter.cs` | none — code-only; bump `GameConstants.CURRENT_SAVE_VERSION` on shape change |
 | Boot/ServiceLocator | `Scripts/Core/BootstrapInitializer.cs` | `Scripts/Core/ServiceLocator.cs`, `Scripts/Core/SceneLoader.cs`, `Scripts/Core/SceneCleanupHandler.cs`, `Scripts/Core/CanvasRoot.cs` | none |
 | Account field | `Scripts/Manager/AccountManager.cs` | `SaveData.account.*` sub-section, `SaveManager.GetAccountData()` | none |
 
@@ -2013,11 +1120,11 @@ New modifiers must register in `EffectRegistry` and feed through `ModifierCalcul
 
 | Concern | Owner | Sibling services | Data file |
 |---|---|---|---|
-| Roll cost | `Scripts/Card/CardRollService.cs` | `Constantku.cs` (`ROLL1X/10X/100X_GEM_COST`) | `Card/dataCard.json` |
+| Roll cost | `Scripts/Card/CardRollService.cs` | `GameConstants.cs` (`ROLL1X/10X/100X_GEM_COST`) | `Card/dataCard.json` |
 | Roll item vs gem | `CardRollService.cs` (gem path) | `Scripts/Inventory/InventoryService.cs` (`CardRoll` item path), `Scripts/Item/ItemCategory.cs` | `dataCard.json`, `dataConsumables.json` |
 | Inventory | `CardInventory.cs` | `VirtualCardInventorySnapshot.cs` (snapshot for UI) | none |
-| Duplicate → level | `CardUpgradeService.cs` | constants in `Constantku.cs` | none — curve `[2,4,7,11,19,31,47,69,99]` |
-| Equip | `CardEquipmentService.cs` | `Constantku.cs` (`CARD_MAX_SLOT=19`) | none |
+| Duplicate → level | `CardUpgradeService.cs` | constants in `GameConstants.cs` | none — curve `[2,4,7,11,19,31,47,69,99]` |
+| Equip | `CardEquipmentService.cs` | `GameConstants.cs` (`CARD_MAX_SLOT=19`) | none |
 | Stat effect | `CardModifierService.cs` | `Scripts/Modifiers/EffectRegistry.cs` | `dataCard.json` |
 | UI façade | `Scripts/Manager/CardManager.cs` | `Scripts/UI/CardCollection/CardCollectionUI.cs`, `CardRollButtonUI.cs`, `CardLevelValueItemUI.cs`, `Scripts/Controller/CardCollectionController.cs` | none |
 
@@ -2110,7 +1217,59 @@ Persistence: `Scripts/Save/InventorySerializer.cs` (flat `Items[]`, see §48 v3)
 
 To add a new item category: extend `ItemCategory`, update `InventorySerializer`, update `CustomDataConverter` if the converter references the enum, bump `CURRENT_SAVE_VERSION` only if shape changes.
 
-## 55.11 Consoles / cross-cutting
+## 55.11 Pet System
+
+Owner: `Scripts/Pet/PetManager.cs` (singleton, `ServiceLocator.PetService`)
+
+Core architecture:
+- `Scripts/Pet/IPetService.cs` — service interface (EquipPet, UnequipPet, GetActivePets, GrantPet)
+- `Scripts/Pet/PetDefinition.cs` — static pet data (id, stats, skills, behavior config)
+- `Scripts/Pet/PetRuntime.cs` — instance state (level, XP, cooldowns, target, position, state)
+- `Scripts/Pet/PetState.cs` — enum (Idle, Follow, SearchTarget, Attack, Emergency, Dead)
+- `Scripts/Pet/PetTargeting.cs` — target scoring (ClosestToPlayer, Elite, HighestHp priorities)
+- `Scripts/Pet/PetManager.cs` — manager (equip/unequip, state machine, 0.2s target scan)
+
+Skills & Passives:
+- `Scripts/Pet/Skills/PetSkill.cs` — base class (cooldown, damage calculation, execution hooks)
+- `Scripts/Pet/Skills/VoidBolt.cs` — basic attack projectile (reuses ProjectilePool)
+- `Scripts/Pet/Skills/VoidPulse.cs` — AOE skill (1.5× ATK, radius 3.5, Slow 35% for 2.5s, CD 12s)
+- `Scripts/Pet/Skills/BlackHole.cs` — evolution skill (pull + 0.6× ATK DoT, 3× ATK explosion, CD 25s)
+- `Scripts/Pet/Passives/LastHorizon.cs` — emergency passive (8% player max HP shield, 20% DR, 3s, CD 25s)
+
+Data & Documentation:
+- `Assets/Resources/Data/Pet/dataPet.json` — pet definitions database
+- `Assets/Resources/Data/Design/PetSystem.md` — design doc (13 sections: architecture, formulas, state machine, targeting, emergency mode, save schema, performance, extension guide)
+
+UI & Tests:
+- `Scripts/UI/Pet/PetUI.cs` — event-driven UI (icon, cooldown overlay, emergency indicator)
+- `Tests/EditMode/PetStatCalculationTest.cs` — 8 tests (stat growth, rarity multipliers, level scaling)
+
+Voidling (pet_voidling):
+- Role: Support / Crowd Control
+- Behavior: Guardian (prioritize ClosestToPlayer → Elite → HighestHp)
+- Emergency mode: activates at player HP ≤ 30%, triggers LastHorizon, forces VoidPulse cast
+- Evolution: BlackHole unlocks at level 10
+
+Integration points:
+- Projectiles: reuses `ProjectilePool.Instance.Get()` (zero duplication)
+- Status effects: `EnemyStatusEffectController.AddEffect(new SlowStatus(...))` (reuses existing system)
+- Emergency detection: subscribes to `Player.OnHealthChanged` event (zero polling)
+- Save: `List<PetSaveEntry>` in SaveData v4 (backward compatible with v3)
+- Service: registered as `ServiceLocator.PetService`
+
+Performance:
+- Target scan: 0.2s interval (5 queries/sec, not per-frame)
+- State machine: event-driven transitions (no per-frame state polling)
+- Projectiles: pooled via existing ProjectilePool
+- Cooldowns: efficient dictionary countdown
+
+Adding new pets:
+1. Add entry to `dataPet.json` with unique id
+2. Create `Behaviors/[PetName]Behavior.cs` if custom behavior needed
+3. Implement skills in `Skills/` folder extending `PetSkill` base class
+4. Test save/load, state transitions, performance
+
+## 55.12 Consoles / cross-cutting
 
 | Concern | Owner | Sibling services | Data file |
 |---|---|---|---|

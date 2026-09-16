@@ -37,5 +37,8 @@ namespace IdleDefenseSurvival.Data
 
         // SkillTreeBonus System
         public SkillTreeBonusData skillTreeBonus = new();
+
+        // Pet System (v4)
+        public List<Pet.PetSaveEntry> pets = new();
     }
 }

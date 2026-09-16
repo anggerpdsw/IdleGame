@@ -278,3 +278,16 @@ The rule: **every expansion converts to attributes or consumes them — never by
 - JSON rarity ladder: store `RarityMechanicConfig` (SocketCount/SecondaryCount/PassiveTier per rarity) in `dataItems.json` so tuning a rarity never touches code.
 
 **Design constant:** the attribute system is the product. Equipment is the delivery vehicle.
+
+---
+
+## Related Design Documents
+
+- [Modifier_Design.md](Modifier_Design.md) — Core modifier formula `(Base + Flat) × (1 + Percent/100)`, pipeline architecture
+- [Attribute_Design.md](Attribute_Design.md) — CON/STR/INT/DEX → secondary stat conversion, per-point bonuses
+- [Combat_Design.md](Combat_Design.md) — Damage pipeline, defense formula, equipment stat integration
+- [Item_Design.md](Item_Design.md) — ItemId vs InstanceId, 7 categories, stackability rules
+- [Inventory_Design.md](Inventory_Design.md) — Capacity, slots, equipment storage, persistence
+- [Crafting_Design.md](Crafting_Design.md) — Equipment crafting pipeline, recipe validation, stat rolling
+- [SaveManager_Design.md](SaveManager_Design.md) — Equipment serialization, InstanceId persistence, migration
+- [Material_Design.md](Material_Design.md) — Crafting materials for equipment upgrades and repairs

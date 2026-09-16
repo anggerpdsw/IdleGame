@@ -334,6 +334,7 @@ namespace IdleDefenseSurvival.Manager
             data.cardInventory ??= new CardInventoryData();
             data.inventory ??= new Dictionary<string, long>();
             data.missions ??= new List<MissionInstance>();
+            data.pets ??= new List<Pet.PetSaveEntry>();
         }
 
         public void DeleteAll()
@@ -688,6 +689,7 @@ namespace IdleDefenseSurvival.Manager
             var craftQueue = CraftingManager.Instance != null ? CraftingManager.Instance.GetQueueSaveData() : null;
             var missions = MissionService.Instance != null ? MissionService.Instance.GetAllMissions().ToList() : new List<MissionInstance>();
             var skillTreeBonus = SkillTreeBonusManager.Instance != null ? SkillTreeBonusManager.Instance.GetSaveData() : null;
+            var pets = Pet.PetManager.Instance != null ? Pet.PetManager.Instance.GetSaveData() : new List<Pet.PetSaveEntry>();
 
             return new SaveData
             {
@@ -707,7 +709,8 @@ namespace IdleDefenseSurvival.Manager
                 equipmentData = equipmentData,
                 craftQueue = craftQueue,
                 missions = missions,
-                skillTreeBonus = skillTreeBonus
+                skillTreeBonus = skillTreeBonus,
+                pets = pets
             };
         }
 
@@ -780,6 +783,7 @@ namespace IdleDefenseSurvival.Manager
             ApplyCardInventory(data.cardInventory);
             ApplyInventoryData(data.inventoryData);
             ApplyEquipmentData(data.equipmentData);
+            ApplyPetData(data.pets);
 
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftingManager.Instance != null && data.craftQueue != null)
@@ -875,6 +879,12 @@ namespace IdleDefenseSurvival.Manager
 
         private void ApplyEquipmentData(EquipmentSaveData data) =>
             EquipmentService.Instance?.LoadFromSaveData(data);
+
+        private void ApplyPetData(List<Pet.PetSaveEntry> data)
+        {
+            if (Pet.PetManager.Instance != null)
+                Pet.PetManager.Instance.LoadSaveData(data ?? new List<Pet.PetSaveEntry>());
+        }
 
         // -------------------------------------------------------------------
         // Statistics & Info (unchanged)

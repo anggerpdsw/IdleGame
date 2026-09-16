@@ -4,7 +4,7 @@ namespace IdleDefenseSurvival
 {
     public static class GameConstants
     {
-        public const int CURRENT_SAVE_VERSION = 3; // v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
+        public const int CURRENT_SAVE_VERSION = 4; // v4 = pets array added; v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
         public const int MAX_WAVE_PER_TIER = 350;
         public const int MAX_MISSION = 6;
         public const int BASE_LEVEL = 7903;

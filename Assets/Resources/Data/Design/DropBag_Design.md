@@ -72,3 +72,15 @@ Runtime data is the source of truth; UI (`Content`) is only its visual represent
 - `Scripts/UI/DropBag/DropBagUI.cs` — panel ↔ Content binding.
 - Hooked: `EnemyAi.DropItemDrops`, `WaveManager.InitializeRun`/`EndRun`,
   `BootstrapController` (EnsureSingleton).
+
+---
+
+## Related Design Documents
+
+- [Item_Design.md](Item_Design.md) — ItemId canonical identifiers, item definitions
+- [Inventory_Design.md](Inventory_Design.md) — Persistent inventory, AddItem flow integration
+- [Enemy_Design.md](Enemy_Design.md) — Enemy death sequence, drop trigger point
+- [EnemyDrop_Design.md](EnemyDrop_Design.md) — Drop weight calculation, tier gating, reward distribution
+- [Wave_Design.md](Wave_Design.md) — Run lifecycle (InitializeRun/EndRun), victory/defeat flow
+- [Material_Design.md](Material_Design.md) — Material drops from enemies
+- [Consumable_Design.md](Consumable_Design.md) — Consumable drops (potions, tickets)

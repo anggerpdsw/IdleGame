@@ -415,3 +415,17 @@ Coal → terutama proses Metal/Armor
 Adhesive → bahan pengikat lintas equipment
 Essence → endgame / special equipment
 
+---
+
+## Related Design Documents
+
+- [Item_Design.md](Item_Design.md) — ItemId definitions, material categories, stackability
+- [Crafting_Design.md](Crafting_Design.md) — Material consumption, recipe validation, tier requirements
+- [Equipment_Design.md](Equipment_Design.md) — Equipment crafting requirements, material progression tiers
+- [EnemyDrop_Design.md](EnemyDrop_Design.md) — Material drop sources, tier gating, progression flow
+- [Inventory_Design.md](Inventory_Design.md) — Material storage, capacity management
+- [DropBag_Design.md](DropBag_Design.md) — Material drop tracking per run
+- [Herb_Design.md](Herb_Design.md) — Alchemical ingredients (separate category from minerals)
+- [Economy_Design.md](Economy_Design.md) — Material sell prices, vendor integration
+- [SaveManager_Design.md](SaveManager_Design.md) — Material persistence in inventory save data
+

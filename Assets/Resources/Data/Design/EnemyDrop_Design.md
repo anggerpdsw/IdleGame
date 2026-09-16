@@ -133,3 +133,16 @@ Checks: every enemy has dropItems; every ItemId ∈ `dataItems.json`; `Weight �
 - `DropTableId` kept (dead field, removal = risk without benefit).
 - No new ItemId; drops reference existing materials only.
 - Combat balance, enemy stats, wave duration, XP, gold, cards, equipment: **not modified** — this rebalance touched only drop data + the additive `DropItemDrops()` call.
+
+---
+
+## Related Design Documents
+
+- [Enemy_Design.md](Enemy_Design.md) — Enemy death sequence, DropRewards/DropItemDrops integration
+- [Item_Design.md](Item_Design.md) — ItemId definitions, item categories
+- [Material_Design.md](Material_Design.md) — Material tier progression, crafting integration
+- [Wave_Design.md](Wave_Design.md) — CurrentTier gating, tier progression, spawn scaling
+- [Inventory_Design.md](Inventory_Design.md) — AddItem flow, capacity handling, events
+- [DropBag_Design.md](DropBag_Design.md) — Drop tracking UI, run aggregation
+- [Economy_Design.md](Economy_Design.md) — Gold/Gem/Meat drop flow (unchanged by this system)
+- [Reward_Design.md](Reward_Design.md) — Unified reward system, drop multipliers

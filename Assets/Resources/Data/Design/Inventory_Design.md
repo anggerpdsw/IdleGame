@@ -201,3 +201,16 @@ Konsekuensi:
 - [x] **Drag E2E visual** — `InventoryDragItem.prefab`, `_dragCanvas` + `_dragItemPrefab` di InventoryUI.
 - [ ] **Compare panel** (deferral) — `EquipmentComparePanel` tak ada di scene; ditangani editor: buat obj
       ComparePanel, wire ke `EquipmentUI._comparePanel`, isi prefab stat entry. InfoPanel Inventory tetap ada.
+
+---
+
+## Related Design Documents
+
+- [Equipment_Design.md](Equipment_Design.md) — 11 equipment slots, durability, auto-equip, stat aggregation
+- [Item_Design.md](Item_Design.md) — ItemId vs InstanceId, 7 categories, stackability rules
+- [Consumable_Design.md](Consumable_Design.md) — Consumable use flow, validation, inventory events
+- [Material_Design.md](Material_Design.md) — Crafting materials storage and usage
+- [DropBag_Design.md](DropBag_Design.md) — Post-combat item pickup flow into inventory
+- [Crafting_Design.md](Crafting_Design.md) — Material consumption from inventory, crafted item storage
+- [SaveManager_Design.md](SaveManager_Design.md) — Inventory serialization, flat Items[] structure
+- [Modifier_Design.md](Modifier_Design.md) — Equipment stat contribution to modifier pipeline

@@ -1,6 +1,7 @@
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core.Interfaces;
+using IdleDefenseSurvival.Pet;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -15,6 +16,7 @@ namespace IdleDefenseSurvival.Core
         public static IAudioService AudioService => AudioManager.Instance;
         public static IAdsService AdsService => AdvertisingManager.Instance;
         public static IAnalyticsService AnalyticsService => AnalyticsManager.Instance;
+        public static IPetService PetService => PetManager.Instance;
         // GameManager does not have an interface; expose the concrete instance for direct use.
         public static GameManager Manager => GameManager.Instance;
     }

@@ -1,0 +1,386 @@
+{
+  "pets": [
+    {
+      "id": "pet_voidling",
+      "name": "Voidling",
+      "description": "Void creature that protects player in emergencies. Prioritizes enemies near player and provides shields when HP is critical.",
+      "role": "Support",
+      "rarity": "Epic",
+      "baseStats": {
+        "attack": 10,
+        "attackSpeed": 1.5,
+        "skillDamage": 1.5,
+        "moveSpeed": 5,
+        "targetRange": 8,
+        "health": 100
+      },
+      "growth": {
+        "attackPerLevel": 2,
+        "skillDamagePerLevel": 0.1,
+        "healthPerLevel": 10
+      },
+      "behaviorType": "Guardian",
+      "targetPriority": [
+        "ClosestToPlayer",
+        "Elite",
+        "HighestHp"
+      ],
+      "skills": {
+        "basic": "void_bolt",
+        "active": "void_pulse",
+        "passive": "last_horizon",
+        "evolution": "black_hole"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.5,
+      "emergencyThreshold": 0.3,
+      "behaviorDefinitions": [
+        {
+          "id": "voidling_basic_attack",
+          "priority": 40,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Priority",
+            "range": 8,
+            "priorities": ["ClosestToPlayer", "Elite", "HighestHp"]
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.0
+          },
+          "modifiers": [],
+          "cooldown": 0.67
+        },
+        {
+          "id": "voidling_aoe_pulse",
+          "priority": 60,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Priority",
+            "range": 8,
+            "priorities": ["ClosestToPlayer"]
+          },
+          "trigger": {
+            "type": "CooldownReady",
+            "skillId": "void_pulse"
+          },
+          "condition": {
+            "type": "ANY",
+            "subconditions": [
+              {
+                "type": "EnemyCountAbove",
+                "value": 3
+              },
+              {
+                "type": "BossExists"
+              }
+            ]
+          },
+          "action": {
+            "type": "AOEAttackSelf",
+            "damageMultiplier": 1.5,
+            "radius": 3.5,
+            "statusType": "Slow",
+            "statusDuration": 2.5,
+            "statusValue": 0.35
+          },
+          "modifiers": [],
+          "cooldown": 12
+        }
+      ]
+    },
+    {
+      "id": "pet_ember_fox",
+      "name": "Ember Fox",
+      "description": "Aggressive fire fox that executes low-HP enemies with bonus damage",
+      "role": "DPS",
+      "rarity": "Legendary",
+      "baseStats": {
+        "attack": 15,
+        "attackSpeed": 2.0,
+        "skillDamage": 1.8,
+        "moveSpeed": 6,
+        "targetRange": 10,
+        "health": 80
+      },
+      "growth": {
+        "attackPerLevel": 3,
+        "skillDamagePerLevel": 0.15,
+        "healthPerLevel": 8
+      },
+      "behaviorType": "Aggressive",
+      "targetPriority": [
+        "LowestHp",
+        "ClosestToPet"
+      ],
+      "skills": {
+        "basic": "flame_bolt",
+        "active": "fire_storm",
+        "passive": "burning_aura",
+        "evolution": "inferno"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 3.0,
+      "emergencyThreshold": 0.25,
+      "behaviorDefinitions": [
+        {
+          "id": "executioner_attack",
+          "priority": 80,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "LowestHP",
+            "range": 10
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.2
+          },
+          "modifiers": [
+            {
+              "type": "Finisher",
+              "value": 0.3
+            },
+            {
+              "type": "Execute",
+              "value": 0.1
+            }
+          ],
+          "cooldown": 0.5
+        }
+      ]
+    },
+    {
+      "id": "pet_thunder_pup",
+      "name": "Thunder Pup",
+      "description": "Chain lightning specialist that bounces attacks between clustered enemies",
+      "role": "DPS",
+      "rarity": "Epic",
+      "baseStats": {
+        "attack": 12,
+        "attackSpeed": 1.8,
+        "skillDamage": 1.6,
+        "moveSpeed": 5.5,
+        "targetRange": 9,
+        "health": 90
+      },
+      "growth": {
+        "attackPerLevel": 2.5,
+        "skillDamagePerLevel": 0.12,
+        "healthPerLevel": 9
+      },
+      "behaviorType": "Aggressive",
+      "targetPriority": [
+        "Cluster",
+        "ClosestToPet"
+      ],
+      "skills": {
+        "basic": "lightning_bolt",
+        "active": "chain_lightning",
+        "passive": "static_field",
+        "evolution": "thunderstorm"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.8,
+      "emergencyThreshold": 0.3,
+      "behaviorDefinitions": [
+        {
+          "id": "cluster_bomber",
+          "priority": 70,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Cluster",
+            "range": 9
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "EnemyCountAbove",
+            "value": 2
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.0
+          },
+          "modifiers": [
+            {
+              "type": "Chain",
+              "count": 3,
+              "value": 0.5
+            },
+            {
+              "type": "Splash",
+              "value": 2.0
+            }
+          ],
+          "cooldown": 0.55
+        }
+      ]
+    },
+    {
+      "id": "pet_blood_bat",
+      "name": "Blood Bat",
+      "description": "Vampiric bat that steals life from high-HP targets",
+      "role": "Support",
+      "rarity": "Rare",
+      "baseStats": {
+        "attack": 8,
+        "attackSpeed": 2.5,
+        "skillDamage": 1.2,
+        "moveSpeed": 7,
+        "targetRange": 7,
+        "health": 70
+      },
+      "growth": {
+        "attackPerLevel": 1.5,
+        "skillDamagePerLevel": 0.08,
+        "healthPerLevel": 7
+      },
+      "behaviorType": "Aggressive",
+      "targetPriority": [
+        "HighestHp",
+        "ClosestToPet"
+      ],
+      "skills": {
+        "basic": "blood_drain",
+        "active": "vampiric_strike",
+        "passive": "blood_aura",
+        "evolution": "crimson_feast"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.0,
+      "emergencyThreshold": 0.35,
+      "behaviorDefinitions": [
+        {
+          "id": "vampiric_assault",
+          "priority": 50,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "HighestHP",
+            "range": 7
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.0
+          },
+          "modifiers": [
+            {
+              "type": "Leech",
+              "value": 25.0
+            }
+          ],
+          "cooldown": 0.4
+        }
+      ]
+    },
+    {
+      "id": "pet_iron_tortoise",
+      "name": "Iron Tortoise",
+      "description": "Defensive guardian that shields the player when HP drops",
+      "role": "Tank",
+      "rarity": "Epic",
+      "baseStats": {
+        "attack": 6,
+        "attackSpeed": 1.0,
+        "skillDamage": 1.0,
+        "moveSpeed": 3,
+        "targetRange": 6,
+        "health": 150
+      },
+      "growth": {
+        "attackPerLevel": 1,
+        "skillDamagePerLevel": 0.05,
+        "healthPerLevel": 15
+      },
+      "behaviorType": "Guardian",
+      "targetPriority": [
+        "ClosestToPlayer",
+        "Boss"
+      ],
+      "skills": {
+        "basic": "rock_throw",
+        "active": "shell_shield",
+        "passive": "iron_defense",
+        "evolution": "fortress_mode"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.0,
+      "emergencyThreshold": 0.4,
+      "behaviorDefinitions": [
+        {
+          "id": "guardian_shield",
+          "priority": 90,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Nearest",
+            "range": 6
+          },
+          "trigger": {
+            "type": "HealthBelow",
+            "value": 0.4
+          },
+          "condition": {
+            "type": "PlayerHPBelow",
+            "value": 0.4
+          },
+          "action": {
+            "type": "HealPercent",
+            "damageMultiplier": 8.0
+          },
+          "modifiers": [],
+          "cooldown": 25
+        },
+        {
+          "id": "basic_taunt",
+          "priority": 30,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Priority",
+            "range": 6,
+            "priorities": ["ClosestToPlayer", "Boss"]
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 0.8
+          },
+          "modifiers": [],
+          "cooldown": 1.0
+        }
+      ]
+    }
+  ]
+}

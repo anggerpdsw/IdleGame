@@ -508,7 +508,7 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
             // Move away from player
             Vector2 direction = (enemy.transform.position - _playerTransform.position).normalized;
-            enemy.transform.position += (Vector3)(direction * enemy.MoveSpeed * deltaTime);
+            enemy.transform.position += (Vector3)(deltaTime * enemy.MoveSpeed * direction);
         }
 
         public override void OnExpire(EnemyAi enemy)
