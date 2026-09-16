@@ -2441,8 +2441,8 @@
         }],
         "aura": [{
           "effect": "Regeneration",
-          "value": 2.7,
-          "radius": 3.51
+          "value": 2.82,
+          "radius": 3.75
         }]
       }],
       "prefabName": "Basic",

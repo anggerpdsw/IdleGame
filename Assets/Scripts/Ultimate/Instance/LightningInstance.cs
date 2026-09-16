@@ -12,7 +12,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// LightningInstance handles the chain lightning visual and damage logic.
     /// Visual flow:
     ///
-    /// Kill 20 → Lightning strikes from sky
+    /// Kill 5 → Lightning strikes from sky
     /// ↓ 0.05s
     /// Enemy A (first target) ⚡
     /// ↓ 0.05s
@@ -71,17 +71,22 @@ namespace IdleDefenseSurvival.Ultimate
         private DamageData _baseDamageData;
         private int _currentChainIndex = 0;
         private int _maxChains;
-        private int _enemyLayerMask;
         private bool _isChaining = false;
         private EnemyAi _lastTarget = null;
-        private readonly List<EnemyAi> _hitEnemies = new();
+        private readonly HashSet<EnemyAi> _hitEnemies = new();
         private Coroutine _chainCoroutine;
         private WaitForSeconds _chainWait;
 
         private void Awake()
         {
-            _enemyLayerMask = LayerMask.GetMask("Enemy");
             _chainWait = new WaitForSeconds(_chainDelay);
+        }
+
+        private static Vector2Int PositionToCell(Vector2 pos)
+        {
+            int x = Mathf.FloorToInt(pos.x / EnemySpatialGrid.CellSize);
+            int y = Mathf.FloorToInt(pos.y / EnemySpatialGrid.CellSize);
+            return new Vector2Int(x, y);
         }
 
         public void Initialize(Player.Player player, UltimateData lightningData)
@@ -134,22 +139,36 @@ namespace IdleDefenseSurvival.Ultimate
             if (_player == null) return null;
 
             float attackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
-            float searchRadius = attackRange + 5f; // Search a bit beyond attack range
+            float searchRadius = attackRange + 5f;
+            float radiusSq = searchRadius * searchRadius;
+            Vector2 playerPos = _player.transform.position;
 
-            Collider2D[] hits = Physics2D.OverlapCircleAll(_player.transform.position, searchRadius, _enemyLayerMask);
+            Vector2Int centerCell = PositionToCell(playerPos);
+            int cellRadius = Mathf.CeilToInt(searchRadius / EnemySpatialGrid.CellSize);
 
             EnemyAi nearest = null;
-            float nearestDist = float.MaxValue;
+            float nearestDistSq = float.MaxValue;
 
-            foreach (Collider2D col in hits)
+            for (int dx = -cellRadius; dx <= cellRadius; dx++)
             {
-                if (col.TryGetComponent(out EnemyAi enemy) && enemy.gameObject.activeInHierarchy)
+                for (int dy = -cellRadius; dy <= cellRadius; dy++)
                 {
-                    float dist = Vector2.Distance(_player.transform.position, enemy.transform.position);
-                    if (dist < nearestDist)
+                    Vector2Int queryCell = new(centerCell.x + dx, centerCell.y + dy);
+                    List<EnemyAi> candidates = EnemySpatialGrid.GetNeighborsInCells(queryCell);
+
+                    foreach (EnemyAi enemy in candidates)
                     {
-                        nearestDist = dist;
-                        nearest = enemy;
+                        if (enemy == null || !enemy.gameObject.activeInHierarchy) continue;
+                        if (enemy.EnemyData != null && enemy.EnemyData.IsSummonedByNecromancer) continue;
+
+                        float distSq = ((Vector2)enemy.transform.position - playerPos).sqrMagnitude;
+                        if (distSq > radiusSq) continue;
+
+                        if (distSq < nearestDistSq)
+                        {
+                            nearestDistSq = distSq;
+                            nearest = enemy;
+                        }
                     }
                 }
             }
@@ -159,20 +178,36 @@ namespace IdleDefenseSurvival.Ultimate
 
         private EnemyAi FindNextTargetFromPosition(Vector3 fromPosition)
         {
-            Collider2D[] hits = Physics2D.OverlapCircleAll(fromPosition, _chainSearchRadius, _enemyLayerMask);
+            float radiusSq = _chainSearchRadius * _chainSearchRadius;
+            Vector2 fromPos = fromPosition;
+
+            Vector2Int centerCell = PositionToCell(fromPos);
+            int cellRadius = Mathf.CeilToInt(_chainSearchRadius / EnemySpatialGrid.CellSize);
 
             EnemyAi nearest = null;
-            float nearestDist = float.MaxValue;
+            float nearestDistSq = float.MaxValue;
 
-            foreach (Collider2D col in hits)
+            for (int dx = -cellRadius; dx <= cellRadius; dx++)
             {
-                if (col.TryGetComponent(out EnemyAi enemy) && enemy.gameObject.activeInHierarchy && !_hitEnemies.Contains(enemy))
+                for (int dy = -cellRadius; dy <= cellRadius; dy++)
                 {
-                    float dist = Vector2.Distance(fromPosition, enemy.transform.position);
-                    if (dist < nearestDist)
+                    Vector2Int queryCell = new(centerCell.x + dx, centerCell.y + dy);
+                    List<EnemyAi> candidates = EnemySpatialGrid.GetNeighborsInCells(queryCell);
+
+                    foreach (EnemyAi enemy in candidates)
                     {
-                        nearestDist = dist;
-                        nearest = enemy;
+                        if (enemy == null || !enemy.gameObject.activeInHierarchy) continue;
+                        if (_hitEnemies.Contains(enemy)) continue;
+                        if (enemy.EnemyData != null && enemy.EnemyData.IsSummonedByNecromancer) continue;
+
+                        float distSq = ((Vector2)enemy.transform.position - fromPos).sqrMagnitude;
+                        if (distSq > radiusSq) continue;
+
+                        if (distSq < nearestDistSq)
+                        {
+                            nearestDistSq = distSq;
+                            nearest = enemy;
+                        }
                     }
                 }
             }
@@ -196,9 +231,7 @@ namespace IdleDefenseSurvival.Ultimate
                 Vector3 currentTargetPos = currentTarget.transform.position; // Save position before strike
 
                 if (_currentChainIndex < _maxChains)
-                {
                     nextTarget = FindNextTargetFromPosition(currentTargetPos);
-                }
 
                 // Strike current target (may destroy it)
                 yield return StartCoroutine(StrikeTarget(currentTarget, isClimaxStrike));
@@ -353,18 +386,12 @@ namespace IdleDefenseSurvival.Ultimate
         private void Update()
         {
             // Rotate the lightning center visual if needed
-            if (_isChaining)
-            {
-                transform.Rotate(0, 0, _rotationSpeed * Time.unscaledDeltaTime);
-            }
+            if (_isChaining) transform.Rotate(0, 0, _rotationSpeed * Time.unscaledDeltaTime);
         }
 
         private void OnDestroy()
         {
-            if (_chainCoroutine != null)
-            {
-                StopCoroutine(_chainCoroutine);
-            }
+            if (_chainCoroutine != null) StopCoroutine(_chainCoroutine);
         }
 
 #if UNITY_EDITOR
