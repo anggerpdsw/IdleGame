@@ -708,17 +708,17 @@
         "type": "Frost",
         "onHit": [{
           "effect": "Slow",
-          "value": 50,
+          "value": 70,
           "duration": 66
         }],
         "aura": [{
           "effect": "Slow",
-          "value": 30,
+          "value": 50,
           "radius": 5.55
         }],
         "onTakeDamage": [{
           "effect": "Slow",
-          "value": 20,
+          "value": 30,
           "duration": 33
         }]
       }],
@@ -747,12 +747,12 @@
         "type": "Defense",
         "aura": [{
           "effect": "DamageReduction",
-          "value": 30,
+          "value": 40,
           "radius": 6.5
         }],
         "onTakeDamage": [{
           "effect": "Burn",
-          "value": 10,
+          "value": 44,
           "duration": 30
         }]
       }],
@@ -2441,8 +2441,8 @@
         }],
         "aura": [{
           "effect": "Regeneration",
-          "value": 2.82,
-          "radius": 3.75
+          "value": 2.91,
+          "radius": 3.77
         }]
       }],
       "prefabName": "Basic",
@@ -4807,17 +4807,17 @@
         }],
         "onDeath": [{
           "effect": "Revive",
-          "value": 30,
+          "value": 45,
           "duration": 165
         }],
         "onPeriodic": [{
           "effect": "Spawn",
           "value": 6,
-          "duration": 39
+          "duration": 34
         }]
       }],
       "prefabName": "Basic",
-      "attackRange": 4.82,
+      "attackRange": 5.12,
       "attackSpeed": 1.24,
       "damage": 12.5,
       "health": 69.6,

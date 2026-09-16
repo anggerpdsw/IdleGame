@@ -156,7 +156,7 @@
             "scaleOnTier": false,
             "reward": {
                 "gold": 2500,
-                "gem": 7,
+                "gem": 6,
                 "meat": 300
             },
             "claimCooldownMinutes": 3,
