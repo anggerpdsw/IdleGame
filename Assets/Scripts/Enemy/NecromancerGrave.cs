@@ -36,9 +36,9 @@ namespace IdleDefenseSurvival.Enemy
 
         private IEnumerator ReviveCountdown()
         {
+            // WorldSpace canvas needs per-frame screen conversion for RectTransform positioning
             while (_reviveTime > 0)
             {
-                // Update screen position setiap frame (follow camera)
                 if (_camera != null && _rectTransform != null)
                 {
                     Vector3 screenPos = _camera.WorldToScreenPoint(_worldPosition);
@@ -52,11 +52,11 @@ namespace IdleDefenseSurvival.Enemy
                 _reviveTime -= Time.deltaTime;
             }
 
-            // Revive complete - trigger owner, destroy self
+            // Revive complete - trigger owner, return to pool
             if (_owner != null)
                 _owner.OnReviveComplete(_worldPosition);
 
-            Destroy(gameObject);
+            ReturnToPool();
         }
 
         private void OnDisable()
@@ -66,6 +66,15 @@ namespace IdleDefenseSurvival.Enemy
                 StopCoroutine(_reviveRoutine);
                 _reviveRoutine = null;
             }
+        }
+
+        private void ReturnToPool()
+        {
+            var pool = Manager.BehaviorPool.Instance;
+            if (pool != null)
+                pool.Return(gameObject);
+            else
+                Destroy(gameObject); // fallback if pool missing
         }
     }
 }

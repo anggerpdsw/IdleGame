@@ -488,11 +488,11 @@ namespace IdleDefenseSurvival.Player
                 // We want it to fill up as cooldown progresses, so invert
                 float fillAmount = 1f - (_shieldCooldownTimer / ShieldCooldownDuration);
                 _shieldCooldownImage.fillAmount = fillAmount;
-                _shieldCooldownImage.enabled = true;
+                _shieldCooldownImage.gameObject.SetActive(true);
             }
             else
             {
-                _shieldCooldownImage.enabled = false;
+                _shieldCooldownImage.gameObject.SetActive(false);
                 _shieldCooldownImage.fillAmount = 0f;
             }
         }
@@ -505,11 +505,11 @@ namespace IdleDefenseSurvival.Player
             if (fillAmount > 0f)
             {
                 _iceCooldownImage.fillAmount = fillAmount;
-                _iceCooldownImage.enabled = true;
+                _iceCooldownImage.gameObject.SetActive(true);
             }
             else
             {
-                _iceCooldownImage.enabled = false;
+                _iceCooldownImage.gameObject.SetActive(false);
                 _iceCooldownImage.fillAmount = 0f;
             }
         }
@@ -520,25 +520,23 @@ namespace IdleDefenseSurvival.Player
 
             float fillAmount = PlayerStatusEffectManager.Instance?.GetBurnCooldownFill() ?? 0f;
             bool active = false;
-            if (fillAmount > 0f)
+            if (fillAmount > 0f) 
             {
                 active = true;
                 _burnCooldownImage.fillAmount = fillAmount;
-                _burnCooldownImage.enabled = active;
-            }
-            else
+            } else
             {
-                _burnCooldownImage.enabled = active;
                 _burnCooldownImage.fillAmount = 0f;
             }
+            _burnCooldownImage.gameObject.SetActive(active);
             SetBurnEffect(active);
         }
 
         private bool IsUnregenerationActive()
         {
-            if (_unregenCooldownImage == null) return false;
             bool active = PlayerStatusEffectManager.Instance?.IsUnregenerationActive ?? false;
-            _unregenCooldownImage.enabled = active;
+            if (_unregenCooldownImage != null)
+                _unregenCooldownImage.gameObject.SetActive(active);
             return active;
         }
 
@@ -549,7 +547,7 @@ namespace IdleDefenseSurvival.Player
         {
             if (_shieldRenderer == null) return;
             bool hasShield = _currentShield > 0;
-            _shieldRenderer.enabled = hasShield;
+            _shieldRenderer.gameObject.SetActive(hasShield);
             if (!hasShield) return;
 
             float shieldPercent = _maxShield > 0 ? _currentShield / _maxShield : 0f;

@@ -717,7 +717,7 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         private void ApplyHeartBreak(EnemyAi enemy)
         {
             float newMaxHealth = _originalMaxHealth * (1f - _percentReduction);
-            enemy.ReduceMaxHealthTo(newMaxHealth);
+            enemy.SetMaxHealthTo(newMaxHealth);
         }
 
         public override void OnExpire(EnemyAi enemy)

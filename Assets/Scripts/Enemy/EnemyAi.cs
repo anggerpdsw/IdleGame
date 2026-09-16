@@ -662,13 +662,13 @@ namespace IdleDefenseSurvival.Enemy
 
             // Immediately apply the max health reduction
             float newMaxHealth = _maxHealth * (1f - percent);
-            ReduceMaxHealthTo(newMaxHealth);
+            SetMaxHealthTo(newMaxHealth);
         }
 
         /// <summary>
         /// Internal method to set max health to a specific value and clamp current health.
         /// </summary>
-        public void ReduceMaxHealthTo(float newMaxHealth)
+        public void SetMaxHealthTo(float newMaxHealth)
         {
             _maxHealth = Mathf.Max(1f, newMaxHealth);
             if (_currentHealth > _maxHealth) _currentHealth = _maxHealth;
@@ -676,6 +676,12 @@ namespace IdleDefenseSurvival.Enemy
             RefreshEnemyStatus();
             EnemyStatisticsManager.Instance?.MarkDirty();
         }
+
+        /// <summary>
+        /// Set enemy damage (for runtime scaling like necromancer revive).
+        /// </summary>
+        public void SetDamage(float damage)
+            => _damage = Mathf.Max(0f, damage);
 
         /// <summary>
         /// Heal enemy by amount. Clamps to MaxHealth. Used by Vampiric LifeSteal and Regeneration aura.

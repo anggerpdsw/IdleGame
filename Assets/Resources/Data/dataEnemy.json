@@ -4813,7 +4813,7 @@
         "onPeriodic": [{
           "effect": "Spawn",
           "value": 6,
-          "duration": 40
+          "duration": 39
         }]
       }],
       "prefabName": "Basic",
@@ -4846,7 +4846,7 @@
       "spawnWeight": 1.5,
       "evasion": 8.8,
       "element": "None",
-      "exp": 3,
+      "exp": 1,
       "dropItems": []
     }
   ]

@@ -31,6 +31,8 @@ namespace IdleDefenseSurvival.Enemy
         private float _reviveHealthIncrementPercent = 30f; // default 30%
         private float _reviveDuration = 165f; // default 165s
         private float _baseMaxHealth = 0f; // Original max health at first spawn
+        private float _baseDamage = 0f; // Original damage at first spawn
+        private EnemyData _originalData; // Original data snapshot for full restore
 
         // Grave reference (set by death handler)
         private NecromancerGrave _activeGrave;
@@ -48,7 +50,9 @@ namespace IdleDefenseSurvival.Enemy
         public void Initialize(EnemyData data, EnemySpawner spawner)
         {
             _spawner = spawner;
+            _originalData = data; // Save original data for revive restore
             _baseMaxHealth = _enemyAi.MaxHealth;
+            _baseDamage = _enemyAi.EnemyAttackDamage;
 
             if (data.effects != null)
             {
@@ -164,7 +168,8 @@ namespace IdleDefenseSurvival.Enemy
                     element = baseData.element,
                     exp = baseData.exp,
                     dropItems = baseData.dropItems,
-                    effects = baseData.effects
+                    effects = baseData.effects,
+                    IsSummonedByNecromancer = true
                 };
 
                 Vector2 randomOffset = Random.insideUnitCircle * scatterRadius;
@@ -180,19 +185,31 @@ namespace IdleDefenseSurvival.Enemy
 
         /// <summary>
         /// Called by Grave when revive completes.
-        /// Restores Necromancer with increased health.
+        /// Restores Necromancer with increased health and damage (compound growth).
         /// </summary>
         public void OnReviveComplete(Vector3 revivePosition)
         {
             _reviveCount++;
 
-            // Additive linear: base + (30% of base × revive count)
-            // Revive 1: 100 + (30 × 1) = 130
-            // Revive 2: 100 + (30 × 2) = 160
-            // Revive 3: 100 + (30 × 3) = 190
-            float increment = _baseMaxHealth * (_reviveHealthIncrementPercent / 100f);
-            float newMaxHealth = _baseMaxHealth + (increment * _reviveCount);
-            _enemyAi.ReduceMaxHealthTo(newMaxHealth);
+            // Compound growth per revive:
+            // Revive 1: 100 * (1.30)^1 = 130
+            // Revive 2: 100 * (1.30)^2 = 169
+            // Revive 3: 100 * (1.30)^3 = 219.7
+            float multiplierH = 1f + _reviveHealthIncrementPercent * 0.01f;
+            float multiplierD = 1f + _reviveHealthIncrementPercent * 0.001f;
+            float newMaxHealth = _baseMaxHealth * Mathf.Pow(multiplierH, _reviveCount);
+            float newDamage = _baseDamage * Mathf.Pow(multiplierD, _reviveCount);
+
+            // Restore all original stats from data (attack speed, move speed, etc.)
+            if (_originalData != null)
+            {
+                _enemyAi.SetAttackSpeed(_originalData.attackSpeed);
+                // Other immutable stats (defense, evasion, element) remain from initial load
+            }
+
+            // Apply compound growth to health and damage only
+            _enemyAi.SetMaxHealthTo(newMaxHealth);
+            _enemyAi.SetDamage(newDamage);
 
             // Restore to full health
             _enemyAi.Heal(newMaxHealth);
@@ -220,38 +237,32 @@ namespace IdleDefenseSurvival.Enemy
         public NecromancerGrave SpawnGrave(Vector3 deathPosition)
         {
             // Prevent duplicate graves - reuse existing if already spawned
-            if (_activeGrave != null)
-                return _activeGrave;
+            if (_activeGrave != null) return _activeGrave;
 
             StopPeriodicSpawn();
 
-            // Find Canvas for UI-based grave prefab
-            var canvas = FindFirstObjectByType<Canvas>();
-            if (canvas == null)
+            // ponytail: use BehaviorPool for grave - single world-space canvas managed by pool
+            if (_gravePrefab == null)
             {
-                Debug.LogError("[NecromancerBehavior] No Canvas found - grave won't render");
+                Debug.LogError("[NecromancerBehavior] No grave prefab assigned");
                 return null;
             }
 
-            GameObject graveObj;
-            if (_gravePrefab != null)
+            var pool = BehaviorPool.Instance;
+            if (pool == null)
             {
-                graveObj = Instantiate(_gravePrefab, canvas.transform);
-            }
-            else
-            {
-                graveObj = new GameObject($"NecromancerGrave_{GetInstanceID()}");
-                graveObj.transform.SetParent(canvas.transform, false);
+                Debug.LogError("[NecromancerBehavior] BehaviorPool not found in scene");
+                return null;
             }
 
-            // Set UI layer to prevent enemy collision detection
-            int uiLayer = LayerMask.NameToLayer("UI");
-            if (uiLayer >= 0)
-                SetLayerRecursive(graveObj, uiLayer);
+            var grave = pool.Get<NecromancerGrave>(_gravePrefab);
+            if (grave == null)
+            {
+                Debug.LogError("[NecromancerBehavior] Failed to get grave from pool");
+                return null;
+            }
 
-            if (!graveObj.TryGetComponent<NecromancerGrave>(out var grave))
-                grave = graveObj.AddComponent<NecromancerGrave>();
-
+            grave.transform.position = deathPosition;
             grave.Initialize(this, _reviveDuration, deathPosition);
             _activeGrave = grave;
             return grave;

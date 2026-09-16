@@ -129,17 +129,19 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         private static void DropAllRewards(EnemyAi enemy)
         {
+            var enemyData = enemy.EnemyData;
+
+            // Skip gold/meat for necromancer-summoned enemies
+            long gold = (enemyData != null && enemyData.IsSummonedByNecromancer) ? 0 : enemy.GoldReward;
+            long meat = (enemyData != null && enemyData.IsSummonedByNecromancer) ? 0 : enemy.MeatReward;
+
             // Currency rewards (gold/exp instant, gem/meat pickups)
             EnemyRewardDistributor.DropRewards(
-                enemy.GoldReward,
-                enemy.GemReward,
-                enemy.MeatReward,
-                enemy.ExpReward,
+                gold, enemy.GemReward, meat, enemy.ExpReward,
                 enemy.transform.position,
                 enemy.ItemPrefab,
                 enemy.gameObject.name,
-                enemy.SaveMgr,
-                enemy.EconomyMgr);
+                enemy.SaveMgr, enemy.EconomyMgr);
 
             // Material drops
             EnemyRewardDistributor.DropMaterialItems(enemy.EnemyData);

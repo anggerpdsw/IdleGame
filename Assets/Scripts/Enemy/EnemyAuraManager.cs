@@ -142,8 +142,7 @@ namespace IdleDefenseSurvival.Enemy
                     foreach (var action in effect.aura)
                     {
                         if (action == null || action.effect == StatusEffectType.None) continue;
-                        // Binary effects (Unregeneration) don't need value check
-                        if (action.effect != StatusEffectType.Unregeneration || action.radius <= 0f) continue;
+                        if (action.radius <= 0f) continue;
 
                         float distSq = (enemy.transform.position - _playerTransform.position).sqrMagnitude;
                         if (distSq > action.radius * action.radius) continue;

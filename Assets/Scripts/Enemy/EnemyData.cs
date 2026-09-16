@@ -70,6 +70,12 @@ namespace IdleDefenseSurvival.Data
         public EnemyEffect[] effects;
 
         // ------------------------------------------------------------
+        // Spawn flags (runtime only, not serialized from JSON)
+        // ------------------------------------------------------------
+        [NonSerialized]
+        public bool IsSummonedByNecromancer = false;
+
+        // ------------------------------------------------------------
         // Derived properties
         // ------------------------------------------------------------
         public bool IsElite => 

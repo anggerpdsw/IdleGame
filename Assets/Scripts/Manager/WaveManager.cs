@@ -215,7 +215,7 @@ namespace IdleDefenseSurvival.Manager
 
             // Spawn Necromancer at wave multiples of 31
             // Guard: only spawn if spawner is ready and wave qualifies
-            if (CurrentWave > 0 && CurrentWave % 31 == 0 && _enemySpawner != null)
+            if (CurrentWave > 0 && CurrentWave % 2 == 0 && _enemySpawner != null)
                 SpawnNecromancer();
 
             State = WaveState.ActiveWave;
