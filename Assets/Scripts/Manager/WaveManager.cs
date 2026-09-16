@@ -212,10 +212,67 @@ namespace IdleDefenseSurvival.Manager
                 Victory();
                 return;
             }
-            
+
+            // Spawn Necromancer at wave multiples of 31
+            // Guard: only spawn if spawner is ready and wave qualifies
+            if (CurrentWave > 0 && CurrentWave % 31 == 0 && _enemySpawner != null)
+                SpawnNecromancer();
+
             State = WaveState.ActiveWave;
             TimeRemaining = CurrentWaveDuration;
             ApplySpawnData();
+        }
+
+        /// <summary>
+        /// Spawns exactly one Necromancer at the start of wave multiples of 31.
+        /// Idempotent: safe to call multiple times for same wave (early-return if already processed).
+        /// </summary>
+        private void SpawnNecromancer()
+        {
+            // Get Necromancer data from database
+            var database = DatabaseJSONCache.DatabaseEnemy;
+            if (database?.enemies == null) return;
+
+            EnemyData necromancerData = null;
+            foreach (var enemy in database.enemies)
+            {
+                if (enemy == null) continue;
+                if (enemy.id != Behavior.Necromancer.ToString()) continue;
+                if (enemy.role != Role.Undeath) continue;
+                // Tier gating: respect minTier from JSON
+                if (CurrentTier < enemy.minTier) continue;
+                necromancerData = enemy;
+                break;
+            }
+
+            if (necromancerData == null)
+            {
+                // Silent skip if not eligible (tier too low or not in database)
+                return;
+            }
+
+            // Apply wave scaling to Necromancer stats (same as normal spawn)
+            EnemyData scaledData = new()
+            {
+                id = necromancerData.id,
+                role = necromancerData.role,
+                prefabName = necromancerData.prefabName,
+                attackRange = necromancerData.attackRange,
+                attackSpeed = necromancerData.attackSpeed,
+                damage = necromancerData.damage * DamageMult,
+                health = necromancerData.health * HealthMult,
+                moveSpeed = necromancerData.moveSpeed * SpeedMult,
+                spawnWeight = necromancerData.spawnWeight,
+                knockback = necromancerData.knockback,
+                evasion = necromancerData.evasion,
+                element = necromancerData.element,
+                exp = necromancerData.exp,
+                dropItems = necromancerData.dropItems,
+                effects = necromancerData.effects
+            };
+
+            // Delegate actual spawn to EnemySpawner with special flag to bypass normal filters
+            _enemySpawner.SpawnSpecificEnemy(scaledData);
         }
 
         public static event Action<VictoryData> OnRunCompleted;

@@ -48,6 +48,9 @@ public static class Utilityku
             case Role.BOSS:
                 defense = Mathf.RoundToInt(defense * 1.55f);
                 break;
+            case Role.Undeath:
+                defense = Mathf.RoundToInt(defense * 0.9f);
+                break;
         }
         return defense;
     }
@@ -118,7 +121,7 @@ public static class Utilityku
     }
 
     public static Vector3 WorldToScreen(Vector3 worldPosition)
-        => UnityEngine.Camera.main.WorldToScreenPoint(worldPosition);
+        => Camera.main.WorldToScreenPoint(worldPosition);
 
     public static void PlaySfx(AudioSource source, AudioClip clip, float volume = 1f)
     {

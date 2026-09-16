@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using IdleDefenseSurvival.Data;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -115,6 +116,9 @@ namespace IdleDefenseSurvival.Core
         private static EnemyDatabase _databaseEnemy;
         public static EnemyDatabase DatabaseEnemy
         { get { if (_databaseEnemy == null) LoadEnemy(); return _databaseEnemy; }}
+        private static EnemyData[] _undeathSummonableEnemies;
+        public static EnemyData[] UndeathSummonableEnemies
+        { get { if (_databaseEnemy == null) LoadEnemy(); return _undeathSummonableEnemies; }}
         private static void LoadEnemy()
         {
             TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_ENEMY);
@@ -129,7 +133,14 @@ namespace IdleDefenseSurvival.Core
                 Debug.LogError($"Enemy database in {DATA_ENEMY} is empty or invalid.");
                 return;
             }
+            // Cache sekali saat database diload
             _databaseEnemy = database;
+            _undeathSummonableEnemies = database.enemies
+                .Where(enemy =>
+                    enemy != null &&
+                    enemy.role == Role.Undeath &&
+                    enemy.id != Behavior.Necromancer.ToString())
+                .ToArray();
         }
 
         private const string DATA_MAIN_ATTRIBUTE = "Data/Player/dataMainAttribute";

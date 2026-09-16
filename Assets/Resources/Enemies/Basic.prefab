@@ -312,8 +312,9 @@ GameObject:
   - component: {fileID: 8956951214503799395}
   - component: {fileID: 2171929160586597651}
   - component: {fileID: 6836594484995198180}
-  - component: {fileID: 8760648504213372293}
   - component: {fileID: -3365906772020504700}
+  - component: {fileID: 8760648504213372293}
+  - component: {fileID: 3404007754764270316}
   m_Layer: 6
   m_Name: Basic
   m_TagString: Enemy
@@ -419,6 +420,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e00d6e98983896441b6663beae26c95f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Enemy.EnemyStatusEffectController
+--- !u!114 &-3365906772020504700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4115171156768869594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef84acb43cad4a2499c70f504c4e7aaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Enemy.EnemyAuraVisualController
+  _auraRangeRenderer: {fileID: 5943116777313866150}
+  _auraRotationSpeed: 2
+  _auraScaleRange: 1
+  _auraPulseRenderer: {fileID: 8351405496408694669}
+  _auraPulseDuration: 1.2
+  _auraPulseInterval: 0.35
+  _auraPulseMaxAlpha: 0.45
+  _auraPulseColor: {r: 0.1, g: 0.55, b: 1, a: 1}
 --- !u!114 &8760648504213372293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,7 +467,7 @@ MonoBehaviour:
   _dizzyEffect: {fileID: 3520291935792346840}
   _statusEffectController: {fileID: 6836594484995198180}
   _itemPrefab: {fileID: 7351252771090480809, guid: cc16b2faa5c81a341825e77a8f34f971, type: 3}
---- !u!114 &-3365906772020504700
+--- !u!114 &3404007754764270316
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -455,17 +476,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4115171156768869594}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef84acb43cad4a2499c70f504c4e7aaf, type: 3}
+  m_Script: {fileID: 11500000, guid: 260b279e21de9984faf758eb85f4b518, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Enemy.EnemyAuraVisualController
-  _auraRangeRenderer: {fileID: 5943116777313866150}
-  _auraRotationSpeed: 2
-  _auraScaleRange: 1
-  _auraPulseRenderer: {fileID: 8351405496408694669}
-  _auraPulseDuration: 1.2
-  _auraPulseInterval: 0.35
-  _auraPulseMaxAlpha: 0.45
-  _auraPulseColor: {r: 0.1, g: 0.55, b: 1, a: 1}
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Enemy.NecromancerBehavior
+  _gravePrefab: {fileID: 7866686871589888206, guid: b90f0b07c64dae8469cd42e884258ee9, type: 3}
+  _enemyAi: {fileID: 8760648504213372293}
 --- !u!1 &8371961166102414644
 GameObject:
   m_ObjectHideFlags: 0

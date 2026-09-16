@@ -53,6 +53,7 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Image _shieldCooldownImage;
         [SerializeField] private Image _iceCooldownImage;
         [SerializeField] private Image _burnCooldownImage;
+        [SerializeField] private Image _unregenCooldownImage;
         private float _attackRangeSpeedRotate = 2f;
         // Immunity flag for DeathDefy
         private bool _isImmune;
@@ -329,6 +330,9 @@ namespace IdleDefenseSurvival.Player
 
         private void TryRegeneration()
         {
+            // Block regeneration if Necromancer Unregeneration aura is active
+            if (IsUnregenerationActive()) return;
+
             _regenTimer += Time.deltaTime;
             if (_regenTimer < 1f) return;
 
@@ -528,6 +532,14 @@ namespace IdleDefenseSurvival.Player
                 _burnCooldownImage.fillAmount = 0f;
             }
             SetBurnEffect(active);
+        }
+
+        private bool IsUnregenerationActive()
+        {
+            if (_unregenCooldownImage == null) return false;
+            bool active = PlayerStatusEffectManager.Instance?.IsUnregenerationActive ?? false;
+            _unregenCooldownImage.enabled = active;
+            return active;
         }
 
         /// <summary>

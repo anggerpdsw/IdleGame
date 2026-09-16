@@ -1,16 +1,17 @@
+using System;
+using System.Collections.Generic;
 using IdleDefenseSurvival.Core;
-using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using IdleDefenseSurvival.Stats;
+using UnityEngine;
 
 namespace IdleDefenseSurvival.Enemy
 {
     public class EnemySpawner : MonoBehaviour
     {
-        [SerializeField] private bool _debug = false;
+        [Header("Debug")]
+        [SerializeField] private bool _debug;
 
         [Header("Configuration")]
         [Tooltip("Base spawn interval (seconds between spawns).")]
@@ -19,31 +20,36 @@ namespace IdleDefenseSurvival.Enemy
         [SerializeField] private SpawnMode _spawnMode = SpawnMode.Circle;
 
         [Header("TEST")]
-        [SerializeField] private bool _testMode = false;
+        [SerializeField] private bool _testMode;
         [SerializeField] private string _testSpecificID = "Vampire";
         [SerializeField] private Role _testRole = Role.Fighter;
 
         private EnemyDatabase EnemyDatabase => DatabaseJSONCache.DatabaseEnemy;
+        private readonly Dictionary<Role, Transform> _roleParents = new();
         private float _timer;
 
-        // Public properties for WaveManager integration
+        // Fractional reward accumulator.
+        // Pecahan reward tidak hilang dan dibawa ke enemy berikutnya.
+        private float _goldFraction;
+        private float _meatFraction;
+
+        // =========================================================
+        // PUBLIC
+        // =========================================================
         public float SpawnInterval
         {
             get => _spawnInterval;
-            set => _spawnInterval = Mathf.Max(0.01f, value); // Min 0.01s
+            set => _spawnInterval = Mathf.Max(0.01f, value);
         }
 
-        private readonly Dictionary<Role, Transform> _roleParents = new();
+        // =========================================================
+        // UNITY LIFECYCLE
+        // =========================================================
         private void Awake()
         {
-            foreach (Role role in System.Enum.GetValues(typeof(Role)))
-            {
-                GameObject go = new(role.ToString());
-                go.transform.SetParent(transform);
-                _roleParents.Add(role, go.transform);
-            }
+            CreateRoleParents();
         }
-        
+
         private void Start()
         {
             WaveManager.Instance.RegisterSpawner(this);
@@ -52,89 +58,266 @@ namespace IdleDefenseSurvival.Enemy
 
         private void Update()
         {
-            if (_player == null || EnemyDatabase == null) return;
-            if (WaveManager.Instance.State != WaveState.ActiveWave) return;
-
+            if (!CanSpawn()) return;
             _timer += Time.deltaTime;
-            if (_timer >= _spawnInterval)
-            {
-                SpawnEnemy();
-                _timer = 0f;
-            }
+            if (_timer < _spawnInterval) return;
+            SpawnEnemy();
+            _timer = 0f;
         }
 
+        private void OnEnable()
+        {
+            WaveManager.OnRunCompleted += StopSpawn;
+        }
+
+        private void OnDisable()
+        {
+            WaveManager.OnRunCompleted -= StopSpawn;
+        }
+
+        // =========================================================
+        // SPAWN
+        // =========================================================
         public void SpawnEnemy()
         {
             EnemyData rawData = GetRandomEnemy();
             if (rawData == null) return;
+            EnemyData spawnedEnemy = CreateScaledEnemyData(rawData);
+            SpawnEnemyInternal(spawnedEnemy, GetSpawnPosition());
+        }
 
-            EnemyData spawnedEnemy = new()
-            {
-                id   = rawData.id,
-                role = rawData.role,
-                prefabName  = rawData.prefabName,
-                attackRange = rawData.attackRange,
-                attackSpeed = rawData.attackSpeed,
-                damage      = rawData.damage * WaveManager.Instance.DamageMult,
-                health      = rawData.health * WaveManager.Instance.HealthMult,
-                moveSpeed   = rawData.moveSpeed * WaveManager.Instance.SpeedMult,
-                spawnWeight = rawData.spawnWeight,
-                knockback   = rawData.knockback,
-                evasion     = rawData.evasion,
-                element     = rawData.element,
-                exp         = rawData.exp,
-                dropItems   = rawData.dropItems,
-                effects     = rawData.effects
-            };
+        /// <summary>
+        /// Spawns a specific enemy with pre-scaled stats.
+        /// Used by WaveManager for special spawns.
+        /// Bypasses normal weight-based selection and wave restrictions.
+        /// </summary>
+        public void SpawnSpecificEnemy(EnemyData spawnedEnemy)
+            => SpawnSpecificEnemy(spawnedEnemy, GetSpawnPosition());
 
-            // Calculate rewards based on enemy stats and wave
+        /// <summary>
+        /// Spawns a specific enemy at a custom position.
+        /// Used by Necromancer periodic spawn to summon Undeath.
+        /// </summary>
+        public void SpawnSpecificEnemy(EnemyData spawnedEnemy, Vector2 spawnPos)
+        {
+            if (spawnedEnemy == null || _player == null) return;
+            SpawnEnemyInternal(spawnedEnemy, spawnPos);
+        }
+
+        private void SpawnEnemyInternal(EnemyData spawnedEnemy, Vector2 spawnPos)
+        {
+            if (spawnedEnemy == null) return;
+
             long goldReward = CalculateGoldReward(spawnedEnemy.health);
-            long gemReward  = CalculateGemReward();
+            long gemReward = CalculateGemReward();
             long meatReward = CalculateMeatReward(spawnedEnemy.health);
 
-            Vector2 spawnPos = GetSpawnPosition();
-
             GameObject prefab = EnemyResources.GetEnemyPrefab(spawnedEnemy.prefabName);
-
             if (prefab == null)
             {
-                if (_debug) Debug.LogError($"Enemy prefab not found: Enemies/{spawnedEnemy.prefabName}");
+                LogMissingPrefab(spawnedEnemy.prefabName);
                 return;
             }
 
-            Transform parent = _roleParents[spawnedEnemy.role];
-            GameObject enemy = Instantiate(prefab, spawnPos, Quaternion.identity, parent);
-            enemy.name = $"{spawnedEnemy.id}_{enemy.GetInstanceID()}";
+            GameObject enemy = InstantiateEnemy(prefab, spawnedEnemy, spawnPos);
+            if (enemy == null) return;
+            if (!TryInitializeEnemy(
+                    enemy, spawnedEnemy,
+                    goldReward, gemReward, meatReward,
+                    spawnPos))
+                return;
 
+            AddNecroBehavior(spawnedEnemy, enemy);
+            RegisterEnemy(enemy);
+        }
+
+        private GameObject InstantiateEnemy(
+            GameObject prefab, EnemyData enemyData, Vector2 spawnPos)
+        {
+            Transform parent = _roleParents[enemyData.role];
+            GameObject enemy = Instantiate(prefab, spawnPos, Quaternion.identity, parent);
+            enemy.name = $"{enemyData.id}_{enemy.GetInstanceID()}";
+            return enemy;
+        }
+
+        private bool TryInitializeEnemy(
+            GameObject enemy, EnemyData enemyData,
+            long goldReward, long gemReward, long meatReward,
+            Vector2 spawnPos)
+        {
             if (!enemy.TryGetComponent(out EnemyAi enemyAi))
             {
-                if (_debug) Debug.LogWarning("Enemy prefab Basic is missing EnemyAi component.");
-                return;
+                if (_debug)
+                    Debug.LogWarning("Enemy prefab Basic is missing EnemyAi component.");
+                return false;
             }
 
-            Sprite sprite = EnemyResources.GetEnemySprite(spawnedEnemy.id);
+            SetupEnemySprite(enemyAi, enemyData.id);
+            SetupEnemyFacing(enemyAi, spawnPos);
+
+            enemyAi.Initialize(enemyData, goldReward, gemReward, meatReward);
+            return true;
+        }
+
+        private void SetupEnemySprite(EnemyAi enemyAi, string enemyId)
+        {
+            Sprite sprite = EnemyResources.GetEnemySprite(enemyId);
             if (sprite != null)
             {
                 enemyAi.SetSprite(sprite);
+                return;
             }
-            else if (_debug)
-            {
-                Debug.LogWarning($"[EnemySpawner] Sprite '{spawnedEnemy.id}' not found.");
-            }
-            
-            // Flip berdasarkan posisi player
-            enemyAi.SetFacing(spawnPos.x > _player.transform.position.x);
-
-            // Inisialisasi data enemy dengan rewards
-            enemyAi.Initialize(spawnedEnemy, goldReward, gemReward, meatReward);
-
-            // Register with statistics service
-            EnemyStatisticsManager.Instance?.Register(enemyAi);
+            if (_debug) Debug.LogWarning($"[EnemySpawner] Sprite '{enemyId}' not found.");
         }
 
+        private void SetupEnemyFacing(EnemyAi enemyAi, Vector2 spawnPos)
+            => enemyAi.SetFacing(spawnPos.x > _player.transform.position.x);
+
+        private void AddNecroBehavior(EnemyData spawnedEnemy, GameObject enemy)
+        {
+            if (spawnedEnemy.id != Behavior.Necromancer.ToString()) return;
+            if (enemy.TryGetComponent<NecromancerBehavior>(out var necroBehavior))
+                necroBehavior.Initialize(spawnedEnemy, this);
+        }
+
+        private void RegisterEnemy(GameObject enemy)
+        {
+            if (enemy.TryGetComponent(out EnemyAi enemyAi))
+                EnemyStatisticsManager.Instance?.Register(enemyAi);
+        }
+
+        // =========================================================
+        // ENEMY DATA
+        // =========================================================
+        private EnemyData CreateScaledEnemyData(EnemyData rawData)
+        {
+            return new EnemyData
+            {
+                id = rawData.id,
+                role = rawData.role,
+                prefabName = rawData.prefabName,
+                attackRange = rawData.attackRange,
+                attackSpeed = rawData.attackSpeed,
+
+                damage = rawData.damage * WaveManager.Instance.DamageMult,
+                health = rawData.health * WaveManager.Instance.HealthMult,
+                moveSpeed = rawData.moveSpeed * WaveManager.Instance.SpeedMult,
+
+                spawnWeight = rawData.spawnWeight,
+                knockback = rawData.knockback,
+                evasion = rawData.evasion,
+                element = rawData.element,
+                exp = rawData.exp,
+                dropItems = rawData.dropItems,
+                effects = rawData.effects
+            };
+        }
+
+        // =========================================================
+        // RANDOM ENEMY SELECTION
+        // =========================================================
+        private EnemyData GetRandomEnemy()
+        {
+            if (EnemyDatabase?.enemies == null || EnemyDatabase.enemies.Length == 0)
+                return null;
+            if (!_testMode) return GetRandomEnemyByWeight();
+            return GetTestEnemy();
+        }
+
+        private EnemyData GetTestEnemy()
+        {
+            if (!string.IsNullOrEmpty(_testSpecificID))
+                return GetEnemyById(_testSpecificID);
+            return GetRandomEnemyByRole(_testRole);
+        }
+
+        private EnemyData GetRandomEnemyByRole(Role role)
+        {
+            float totalWeight = 0f;
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (enemy == null || enemy.role != role) continue;
+                totalWeight += enemy.spawnWeight;
+            }
+
+            float randomValue = UnityEngine.Random.Range(0f, totalWeight);
+            float cumulativeWeight = 0f;
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (enemy == null || enemy.role != role) continue;
+                cumulativeWeight += enemy.spawnWeight;
+                if (randomValue <= cumulativeWeight) return enemy;
+            }
+
+            return null;
+        }
+
+        private EnemyData GetRandomEnemyByWeight()
+        {
+            int currentWave = WaveManager.Instance.CurrentWave;
+            int currentTier = WaveManager.Instance.CurrentTier;
+
+            float totalWeight = CalculateEligibleWeight(currentWave, currentTier);
+            if (totalWeight <= 0f) return null;
+            float randomValue = UnityEngine.Random.Range(0f, totalWeight);
+
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (!IsEnemyEligible(enemy, currentWave, currentTier)) continue;
+                randomValue -= enemy.spawnWeight;
+                if (randomValue <= 0f) return enemy;
+            }
+
+            return null;
+        }
+
+        private float CalculateEligibleWeight(int currentWave, int currentTier)
+        {
+            float totalWeight = 0f;
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (!IsEnemyEligible(enemy, currentWave, currentTier)) continue;
+                totalWeight += enemy.spawnWeight;
+            }
+            return totalWeight;
+        }
+
+        private bool IsEnemyEligible(EnemyData enemy, int currentWave, int currentTier)
+        {
+            if (enemy == null || enemy.spawnWeight <= 0f) return false;
+            // Undeath hanya bisa muncul melalui summon Necromancer.
+            if (enemy.role == Role.Undeath) return false;
+            // Enemy baru aktif setelah tier requirement terpenuhi.
+            if (currentTier <= enemy.minTier) return false;
+            // Caster, Ranger, dan Boss belum boleh muncul pada early wave.
+            if (currentWave <= 15 &&
+                (enemy.role == Role.Caster ||
+                 enemy.role == Role.Ranger ||
+                 enemy.role == Role.BOSS))
+                return false;
+            return true;
+        }
+
+        private EnemyData GetEnemyById(string enemyId)
+        {
+            if (EnemyDatabase?.enemies == null) return null;
+            foreach (EnemyData enemy in EnemyDatabase.enemies)
+            {
+                if (enemy == null) continue;
+                if (string.Equals(enemy.id, enemyId, StringComparison.OrdinalIgnoreCase))
+                    return enemy;
+            }
+            return null;
+        }
+
+        // =========================================================
+        // SPAWN POSITION
+        // =========================================================
         private Vector2 GetSpawnPosition()
         {
-            float radius = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) + WaveManager.Instance.SpawnBuffer;
+            float radius =
+                PlayerStatsManager.Instance.GetStat(SkillType.AttackRange)
+                + WaveManager.Instance.SpawnBuffer;
             return _spawnMode switch
             {
                 SpawnMode.Circle => GetCircleSpawn(radius),
@@ -145,15 +328,15 @@ namespace IdleDefenseSurvival.Enemy
 
         private Vector2 GetCircleSpawn(float radius)
         {
-            Vector2 dir = Random.insideUnitCircle.normalized;
-            return (Vector2)_player.transform.position + dir * radius;
+            Vector2 direction = UnityEngine.Random.insideUnitCircle.normalized;
+            return (Vector2)_player.transform.position + direction * radius;
         }
 
         private Vector2 GetFourSideSpawn(float radius)
         {
             Vector2 center = _player.transform.position;
-            float offset = Random.Range(-radius, radius);
-            return Random.Range(0, 4) switch
+            float offset = UnityEngine.Random.Range(-radius, radius);
+            return UnityEngine.Random.Range(0, 4) switch
             {
                 // Top
                 0 => center + new Vector2(offset, radius),
@@ -162,121 +345,42 @@ namespace IdleDefenseSurvival.Enemy
                 // Left
                 2 => center + new Vector2(-radius, offset),
                 // Right
-                _ => center + new Vector2(radius, offset),
+                _ => center + new Vector2(radius, offset)
             };
         }
 
-        private EnemyData GetRandomEnemy()
-        {
-            if (EnemyDatabase == null || EnemyDatabase.enemies.Length == 0) return null;
-            if (_testMode) {
-                if (_testSpecificID != string.Empty)
-                    return GetEnemyById(_testSpecificID);
-                return GetRandomEnemyByRole(_testRole);
-            }
-            return GetRandomEnemyByWeight();
-        }
-                
-        private EnemyData GetRandomEnemyByRole(Role role)
-        {
-            float totalWeight = 0f;
-            // Hitung total weight hanya untuk role yang dipilih.
-            foreach (EnemyData enemy in EnemyDatabase.enemies)
-            {
-                if (enemy == null) continue;
-                if (enemy.role != role) continue;
-                totalWeight += enemy.spawnWeight;
-            }
-
-            // Weighted random hanya dari role yang dipilih.
-            float randomValue = Random.Range(0f, totalWeight);
-            float cumulativeWeight = 0f;
-
-            foreach (EnemyData enemy in EnemyDatabase.enemies)
-            {
-                if (enemy == null) continue;
-                if (enemy.role != role) continue;
-                cumulativeWeight += enemy.spawnWeight;
-                if (randomValue <= cumulativeWeight)
-                    return enemy;
-            }
-
-            return null;
-        }
-
-        private EnemyData GetRandomEnemyByWeight()
-        {
-            if (EnemyDatabase?.enemies == null) return null;
-            int currentWave = WaveManager.Instance.CurrentWave;
-            float totalWeight = 0f;
-            // First pass: calculate weight of eligible enemies only.
-            foreach (EnemyData enemy in EnemyDatabase.enemies)
-            {
-                if (enemy == null || enemy.spawnWeight <= 0f) continue;
-                if (currentWave <= 15 &&
-                    (enemy.role == Role.Caster ||
-                    enemy.role == Role.Ranger ||
-                    enemy.role == Role.BOSS)) continue;
-                totalWeight += enemy.spawnWeight;
-            }
-            if (totalWeight <= 0f) return null;
-            float randomValue = Random.Range(0f, totalWeight);
-            float cumulativeWeight = 0f;
-            // Second pass: weighted selection.
-            foreach (EnemyData enemy in EnemyDatabase.enemies)
-            {
-                if (enemy == null || enemy.spawnWeight <= 0f) continue;
-                if (currentWave <= 15 &&
-                    (enemy.role == Role.Caster ||
-                    enemy.role == Role.Ranger ||
-                    enemy.role == Role.BOSS)) continue;
-                cumulativeWeight += enemy.spawnWeight;
-                if (randomValue <= cumulativeWeight) return enemy;
-            }
-            return null;
-        }
-
-        private EnemyData GetEnemyById(string enemyId)
-        {
-            if (EnemyDatabase?.enemies == null) return null;
-            foreach (EnemyData enemy in EnemyDatabase.enemies)
-            {
-                if (enemy == null) continue;
-                if (string.Equals(enemy.id, enemyId, 
-                    System.StringComparison.OrdinalIgnoreCase))
-                    return enemy;
-            }
-            return null;
-        }
-
+        // =========================================================
+        // REWARDS
+        // =========================================================
         /// <summary>
         /// Calculate gold reward based on tier and enemy health.
-        /// Tier-based system: 350 waves per tier, tier increases every tier completion.
-        /// - Tier 1: ~1-2 gold (wave 1-350)
-        /// - Tier 2: ~2-4 gold (wave 1-350, tier 2)
-        /// - Tier 3: ~4-8 gold (wave 1-350, tier 3)
-        /// Scaling uses tier as primary, with diminishing returns.
         /// </summary>
         private long CalculateGoldReward(float enemyHealth)
         {
             int tier = WaveManager.Instance.CurrentTier;
-            // Base reward grows steadily with tier.
             float baseGold = 0.5f + tier * 2.5f;
-            // Health contributes, but with diminishing returns.
             float hpBonus = Mathf.Pow(enemyHealth, 0.35f);
-            // Additional tier scaling.
             float tierMultiplier = 1f + (tier - 1) * 0.15f;
-            // Calculate final gold
             float rawGold = (baseGold + hpBonus) * tierMultiplier;
-            float goldMultiplier = CardModifierService.GetEffectResult(CardEffectType.Gold, 1f);
-            rawGold *= goldMultiplier;
-
-            // Equipment GoldGain (percent from SecondaryStat.GoldGain -> SkillType.GoldGain)
+            float cardMultiplier = CardModifierService.GetEffectResult(CardEffectType.Gold, 1f);
+            rawGold *= cardMultiplier;
             float equipGoldGain = PlayerStatsManager.Instance.GetStat(SkillType.GoldGain);
             rawGold *= 1f + equipGoldGain / 100f;
-
             rawGold *= Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_GOLD);
-            return (long)System.Math.Max(1, Mathf.Floor(rawGold));
+            // Tambahkan pecahan dari enemy sebelumnya.
+            rawGold += _goldFraction;
+            long gold = (long)Mathf.Floor(rawGold);
+            // Simpan kembali bagian pecahannya.
+            _goldFraction = rawGold - gold;
+            return Math.Max(1, gold);
+        }
+
+        private long CalculateGemReward()
+        {
+            float dropChance = Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_GEM);
+            if (Utilityku.Chance01(dropChance)) return 0;
+            if (!CanEarnGem()) return 0;
+            return 1;
         }
 
         private bool CanEarnGem()
@@ -291,35 +395,54 @@ namespace IdleDefenseSurvival.Enemy
             return true;
         }
 
-        private long CalculateGemReward()
-        {
-            float dropChance = Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_GEM);
-            if (Utilityku.Chance01(dropChance)) return 0;
-            if (!CanEarnGem()) return 0;
-            return 1; // allocate 1 gem
-        }
-
         /// <summary>
-        /// Calculate meat reward (special resource).
-        /// 2% chance to drop 1-2 meat, scaled by tier.
+        /// Calculate meat reward.
+        /// 1% chance to drop 1-2 meat, scaled by tier.
         /// </summary>
         private long CalculateMeatReward(float enemyHealth)
         {
-            // Bonus kartu juga meningkatkan peluang drop.
             float dropChance = Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_MEAT);
             if (Utilityku.Chance01(dropChance)) return 0;
             int tier = WaveManager.Instance.CurrentTier;
             float hpBonus = Mathf.Pow(enemyHealth, 0.25f) * 0.08f;
             float rawMeat = 1f + tier * 0.35f + hpBonus;
-            long meat = (long)Mathf.Floor(rawMeat);
             float meatDropMultiplier = CardModifierService.GetEffectResult(CardEffectType.Meat, 1f);
-            meat = (long)Mathf.Floor(meat * meatDropMultiplier);
-            return System.Math.Max(1, meat);
+            rawMeat *= meatDropMultiplier;
+            // Tambahkan pecahan dari enemy sebelumnya.
+            rawMeat += _meatFraction;
+            long meat = (long)Mathf.Floor(rawMeat);
+            // Simpan kembali bagian pecahannya.
+            _meatFraction = rawMeat - meat;
+            return Math.Max(1, meat);
+        }
+
+        // =========================================================
+        // ROLE PARENTS
+        // =========================================================
+        private void CreateRoleParents()
+        {
+            foreach (Role role in Enum.GetValues(typeof(Role)))
+            {
+                GameObject roleObject = new(role.ToString());
+                roleObject.transform.SetParent(transform);
+                _roleParents.Add(role, roleObject.transform);
+            }
+        }
+
+        // =========================================================
+        // VALIDATION / STATE
+        // =========================================================
+        private bool CanSpawn()
+        {
+            if (_player == null || EnemyDatabase == null) return false;
+            return WaveManager.Instance.State == WaveState.ActiveWave;
+        }
+
+        private void LogMissingPrefab(string prefabName)
+        {
+            if (_debug) Debug.LogError($"Enemy prefab not found: Enemies/{prefabName}");
         }
 
         private void StopSpawn(VictoryData data) => enabled = false;
-        private void OnEnable() => WaveManager.OnRunCompleted += StopSpawn;
-        private void OnDisable() => WaveManager.OnRunCompleted -= StopSpawn;
-
     }
 }

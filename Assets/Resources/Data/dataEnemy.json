@@ -6,7 +6,7 @@
       "attackRange": 2.5,
       "attackSpeed": 1.12,
       "damage": 20,
-      "health": 103.7,
+      "health": 113.7,
       "moveSpeed": 0.112,
       "spawnWeight": 2,
       "evasion": 11.5,
@@ -91,7 +91,7 @@
       "attackRange": 2.85,
       "attackSpeed": 1.6,
       "damage": 22,
-      "health": 110.5,
+      "health": 121.5,
       "moveSpeed": 0.041,
       "spawnWeight": 3,
       "evasion": 4.6,
@@ -4794,6 +4794,60 @@
           "MinTier": 1
         }
       ]
+    },
+    {
+      "id": "Necromancer",
+      "role": "Undeath",
+      "minTier": 5,
+      "effects": [{
+        "type": "Curse",
+        "aura": [{
+          "effect": "Unregeneration",
+          "radius": 7.3
+        }],
+        "onDeath": [{
+          "effect": "Revive",
+          "value": 30,
+          "duration": 165
+        }],
+        "onPeriodic": [{
+          "effect": "Spawn",
+          "value": 6,
+          "duration": 40
+        }]
+      }],
+      "prefabName": "Basic",
+      "attackRange": 4.82,
+      "attackSpeed": 1.24,
+      "damage": 12.5,
+      "health": 69.6,
+      "moveSpeed": 0.027,
+      "spawnWeight": 1.5,
+      "evasion": 4.3,
+      "element": "None",
+      "exp": 44,
+      "dropItems": [{
+        "ItemId": "decomposed_common",
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Weight": 0.0025,
+        "MinTier": 2
+      }]
+    },
+    {
+      "id": "Skeleton",
+      "role": "Undeath",
+      "prefabName": "Basic",
+      "attackRange": 0.99,
+      "attackSpeed": 1.57,
+      "damage": 24.24,
+      "health": 33.3,
+      "moveSpeed": 0.432,
+      "spawnWeight": 1.5,
+      "evasion": 8.8,
+      "element": "None",
+      "exp": 3,
+      "dropItems": []
     }
   ]
 }

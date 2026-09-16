@@ -52,7 +52,7 @@
             "SkillType": "AttackRange",
             "Mode": "Flat",
             "BaseValue": 0.45,
-            "ValuePerLevel": 0.21,
+            "ValuePerLevel": 0.17,
             "CardRarity": "Common"
         }, {
             "Id": "swift_strike",
@@ -131,8 +131,8 @@
             "EffectType": "",
             "SkillType": "KnockbackForce",
             "Mode": "Percent",
-            "BaseValue": 125,
-            "ValuePerLevel": 15,
+            "BaseValue": 5,
+            "ValuePerLevel": 13,
             "CardRarity": "Common"
         }, {
             "Id": "blood_pact",
@@ -247,7 +247,7 @@
         }, {
             "Id": "frost_aura",
             "Name": "Frost Aura",
-            "Description": "Enemies entering attack range are slowed by 2%",
+            "Description": "Enemies entering attack range are slowed by 26%",
             "EffectType": "FrostAura",
             "SkillType": "",
             "Mode": "Percent",
@@ -257,7 +257,7 @@
         }, {
             "Id": "shield",
             "Name": "Shield",
-            "Description": "Can add shield until 10% of max HP when have max HP",
+            "Description": "Can add shield until 51% of max HP when have max HP",
             "EffectType": "Shield",
             "SkillType": "",
             "Mode": "Percent",
@@ -267,7 +267,7 @@
         }, {
             "Id": "time_fast",
             "Name": "Time Fast",
-            "Description": "Increase wave progression speed by 8%",
+            "Description": "Increase wave progression speed by 46%",
             "EffectType": "TimeFast",
             "SkillType": "",
             "Mode": "Percent",

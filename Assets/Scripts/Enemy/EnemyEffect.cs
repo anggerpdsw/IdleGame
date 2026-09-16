@@ -26,6 +26,15 @@ namespace IdleDefenseSurvival.Data
         /// Effect triggered when enemy receives direct damage.
         /// </summary>
         public EnemyEffectAction[] onTakeDamage;
+        /// <summary>
+        /// Effect triggered when enemy dies.
+        /// </summary>
+        public EnemyEffectAction[] onDeath;
+        /// <summary>
+        /// Effect triggered periodically while enemy is alive.
+        /// Duration field = interval in seconds.
+        /// </summary>
+        public EnemyEffectAction[] onPeriodic;
     }
 
     [Serializable]

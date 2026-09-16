@@ -42,6 +42,9 @@ namespace IdleDefenseSurvival.Data
         [Tooltip("Spawn weight for random selection (higher = more common).")]
         public float spawnWeight = 1f;
 
+        [Tooltip("Minimum tier required for this enemy to spawn. Default 1 (no restriction).")]
+        public int minTier = 1;
+
         [Tooltip("Duration of knockback effect in seconds. Default stunt duration in EnemyAi→_knockbackDuration")]
         public float knockback = 0.2f;
 

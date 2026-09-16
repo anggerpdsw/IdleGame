@@ -546,6 +546,8 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public void ApplyKnockback(Vector2 direction, float force)
         {
+            // ponytail: Undeath enemies immune to knockback
+            if (EnemyData != null && EnemyData.role == Role.Undeath) return;
             if (_rb == null) return;
 
             _rb.linearVelocity = direction * force;

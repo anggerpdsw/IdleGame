@@ -35,7 +35,18 @@ namespace IdleDefenseSurvival.Enemy
             // Step 9: Update missions
             UpdateMissions(enemy);
 
-            // Step 10: Destroy game object
+            // Step 9b: Necromancer special death handling
+            if (enemy.EnemyData?.id == Behavior.Necromancer.ToString() &&
+                enemy.TryGetComponent<NecromancerBehavior>(out var necroBehavior))
+            {
+                // Spawn grave, keep enemy inactive for revive
+                necroBehavior.SpawnGrave(enemy.transform.position);
+                enemy.gameObject.SetActive(false);
+                // Skip destroy – Grave will handle cleanup after revive
+                return;
+            }
+
+            // Step 10: Destroy game object (regular enemies)
             Object.Destroy(enemy.gameObject);
         }
 

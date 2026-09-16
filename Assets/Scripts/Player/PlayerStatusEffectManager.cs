@@ -62,6 +62,8 @@ namespace IdleDefenseSurvival.Player
         // Reuse removal lists to avoid per-frame allocations
         private readonly List<EnemyAuraManager.StatusSourceId> _effectsToRemove = new();
         private readonly List<EnemyAuraManager.StatusSourceId> _burnsToRemove = new();
+        // Unregeneration aura sources (Necromancer) - binary effect (any source = blocked)
+        private readonly HashSet<EnemyAuraManager.StatusSourceId> _unregenerationSources = new();
 
         // Dirty flags – only rebuild modifiers when needed
         private bool _slowDirty;
@@ -82,6 +84,9 @@ namespace IdleDefenseSurvival.Player
 
         // Whether player is currently stunned
         public bool IsStunned => _isStunned;
+
+        // Whether player regeneration is blocked by Necromancer aura
+        public bool IsUnregenerationActive => _unregenerationSources.Count > 0;
 
         // Number of active effect sources
         public int ActiveEffectCount => _activeEffects.Count + _activeBurnEffects.Count;
@@ -315,6 +320,13 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public void ApplyAuraEffect(EnemyAuraManager.StatusSourceId sourceId, PlayerEffectType effectType, float percent, float radius, Vector2 enemyPosition)
         {
+            // Unregeneration is binary - track source separately (no percent/duration needed)
+            if (effectType == PlayerEffectType.Unregeneration)
+            {
+                _unregenerationSources.Add(sourceId);
+                return;
+            }
+
             if (percent <= 0f) return;
 
             // Aura: duration = 5x refresh interval (0.5s) so effect persists between 10Hz refreshes
@@ -326,7 +338,13 @@ namespace IdleDefenseSurvival.Player
         /// <summary>
         /// Removes an aura effect when player leaves range.
         /// </summary>
-        public void RemoveAuraEffect(EnemyAuraManager.StatusSourceId sourceId) => RemoveEffect(sourceId);
+        public void RemoveAuraEffect(EnemyAuraManager.StatusSourceId sourceId)
+        {
+            // Remove from Unregeneration sources if present
+            _unregenerationSources.Remove(sourceId);
+            // Also try regular removal (for Slow/Stun/Burn)
+            RemoveEffect(sourceId);
+        }
 
         /// <summary>
         /// Applies burn damage to player from all active burn sources.
@@ -544,7 +562,8 @@ namespace IdleDefenseSurvival.Player
         {
             Slow,
             Stun,
-            Burn
+            Burn,
+            Unregeneration
         }
 
         /// <summary>

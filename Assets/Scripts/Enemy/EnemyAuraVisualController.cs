@@ -69,6 +69,7 @@ namespace IdleDefenseSurvival.Enemy
                             StatusEffectType.Slow => GameColors.rareBlue,
                             StatusEffectType.DamageReduction => GameColors.gemRuby,
                             StatusEffectType.Regeneration => GameColors.green,
+                            StatusEffectType.Unregeneration => GameColors.ancientPurple,
                             _ => GameColors.empty,
                         };
                     }

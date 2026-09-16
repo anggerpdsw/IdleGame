@@ -112,6 +112,9 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         HeartBreak = 36,
         LifeSteal = 37,
         Regeneration = 38,
+        Unregeneration = 39,
+        Spawn = 40,
+        Revive = 41,
     }
 
     /// <summary>
