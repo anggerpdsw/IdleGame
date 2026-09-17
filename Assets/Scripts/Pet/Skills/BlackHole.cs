@@ -65,7 +65,7 @@ namespace IdleDefenseSurvival.Pet.Skills
             float elapsed = 0f;
             float nextDotTick = 0f;
 
-            HashSet<EnemyAi> affectedEnemies = new HashSet<EnemyAi>();
+            HashSet<EnemyAi> affectedEnemies = new();
 
             // TODO: Spawn black hole visual effect at centerPosition
 

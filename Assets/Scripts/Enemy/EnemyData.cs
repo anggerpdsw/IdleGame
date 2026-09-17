@@ -15,7 +15,7 @@ namespace IdleDefenseSurvival.Data
     {
         [Tooltip("Unique identifier for this enemy type.")]
         public string id;
-
+        public EnemyType type = EnemyType.IsBasic;
         public Role role;
 
         [Tooltip("Prefab name in Resources/Enemies/ folder.")]
@@ -76,12 +76,11 @@ namespace IdleDefenseSurvival.Data
         public bool IsSummonedByNecromancer = false;
 
         // ------------------------------------------------------------
-        // Derived properties
+        // Derived properties (data-driven from JSON type field)
         // ------------------------------------------------------------
-        public bool IsElite => 
-            role == Role.Agile ||  role == Role.Caster ||  role == Role.Ranger;
-        public bool IsBoss => role == Role.BOSS;
-        public bool IsSpecial => effects != null;
+        public bool IsElite => type == EnemyType.IsElite;
+        public bool IsBoss => type == EnemyType.IsBoss;
+        public bool IsSpecial => type == EnemyType.IsSpecial;
     }
 
     /// <summary>

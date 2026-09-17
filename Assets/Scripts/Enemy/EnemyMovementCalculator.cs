@@ -80,6 +80,7 @@ namespace IdleDefenseSurvival.Enemy
         /// <summary>
         /// Calculate final velocity from seek/flee and separation forces.
         /// Prioritizes separation when neighbors are close (exponential falloff on seek).
+        /// Adds lateral steering when blocked to let fast enemies navigate around slow ones.
         /// Clamps final result to moveSpeed.
         /// </summary>
         public static Vector2 CalculateFinalVelocity(Vector2 seek, Vector2 separation, float moveSpeed)
@@ -98,7 +99,23 @@ namespace IdleDefenseSurvival.Enemy
             // Use exponential falloff: seek * (1 - strength²)
             Vector2 adjustedSeek = seek * (1f - separationStrength * separationStrength);
 
-            Vector2 combined = adjustedSeek + separation;
+            // Lateral avoidance: when blocked, steer left/right around obstacle
+            // Lets faster enemies navigate around slower ones instead of pushing straight
+            Vector2 lateral = Vector2.zero;
+            if (separationStrength > 0.3f)
+            {
+                // Perpendicular to movement direction
+                Vector2 perp = new(-adjustedSeek.y, adjustedSeek.x);
+                if (perp.sqrMagnitude > 0.01f)
+                {
+                    perp.Normalize();
+                    // Random side to avoid all enemies steering same direction
+                    float side = Random.value < 0.5f ? -1f : 1f;
+                    lateral = 0.7f * moveSpeed * separationStrength * side * perp;
+                }
+            }
+
+            Vector2 combined = adjustedSeek + separation + lateral;
 
             // Limit max speed
             if (combined.magnitude > moveSpeed)

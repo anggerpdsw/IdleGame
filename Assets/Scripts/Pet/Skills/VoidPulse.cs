@@ -69,7 +69,7 @@ namespace IdleDefenseSurvival.Pet.Skills
 
             float damage = CalculateDamage();
 
-            List<EnemyAi> hitEnemies = new List<EnemyAi>();
+            List<EnemyAi> hitEnemies = new();
 
             foreach (var hit in hits)
             {

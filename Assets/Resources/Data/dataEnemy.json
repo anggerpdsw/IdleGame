@@ -2,6 +2,7 @@
   "enemies": [{
       "id": "Infernal Lord",
       "role": "BOSS",
+      "type": "IsBoss",
       "prefabName": "Basic",
       "attackRange": 2.5,
       "attackSpeed": 1.12,
@@ -87,6 +88,7 @@
     {
       "id": "Stone Titan",
       "role": "BOSS",
+      "type": "IsBoss",
       "prefabName": "Basic",
       "attackRange": 2.85,
       "attackSpeed": 1.6,
@@ -186,6 +188,7 @@
     {
       "id": "Red-Eye Tank",
       "role": "BOSS",
+      "type": "IsBoss",
       "prefabName": "Basic",
       "attackRange": 4,
       "attackSpeed": 1.48,
@@ -704,6 +707,7 @@
     {
       "id": "Frost Guardian",
       "role": "Golem",
+      "type": "IsSpecial",
       "effects": [{
         "type": "Frost",
         "onHit": [{
@@ -743,6 +747,7 @@
     {
       "id": "Iron Guardian",
       "role": "Golem",
+      "type": "IsSpecial",
       "effects": [{
         "type": "Defense",
         "aura": [{
@@ -1334,6 +1339,7 @@
     {
       "id": "Forest Archer",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 5,
       "attackSpeed": 1.32,
@@ -1398,6 +1404,7 @@
     {
       "id": "Bone Archer",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 5.35,
       "attackSpeed": 1.44,
@@ -1434,6 +1441,7 @@
     {
       "id": "Arcane Warlock",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 5.1,
       "attackSpeed": 1.44,
@@ -1484,6 +1492,7 @@
     {
       "id": "Ice Mage",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 4,
       "attackSpeed": 1.56,
@@ -1555,6 +1564,7 @@
     {
       "id": "Void Mage",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 4,
       "attackSpeed": 1.68,
@@ -1640,6 +1650,7 @@
     {
       "id": "Fire Shaman",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 4,
       "attackSpeed": 1.32,
@@ -1690,6 +1701,7 @@
     {
       "id": "Dark Sage",
       "role": "Caster",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 4,
       "attackSpeed": 1.32,
@@ -1747,6 +1759,7 @@
     {
       "id": "Archer Elf",
       "role": "Ranger",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 3.5,
       "attackSpeed": 1.25,
@@ -1797,6 +1810,7 @@
     {
       "id": "Cave Bat",
       "role": "Ranger",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 3,
       "attackSpeed": 1.12,
@@ -1840,6 +1854,7 @@
     {
       "id": "Thorn Sprite",
       "role": "Ranger",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 3,
       "attackSpeed": 1.36,
@@ -1904,6 +1919,7 @@
     {
       "id": "Buzz Drone",
       "role": "Ranger",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 3,
       "attackSpeed": 1.12,
@@ -2433,6 +2449,7 @@
     {
       "id": "Vampire",
       "role": "Beast",
+      "type": "IsSpecial",
       "effects": [{
         "type": "Vampiric",
         "onHit": [{
@@ -2466,6 +2483,7 @@
     {
       "id": "Ice Sprite",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 2.5,
       "attackSpeed": 1.48,
@@ -2516,6 +2534,7 @@
     {
       "id": "Goblin Scout",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 1.7,
       "attackSpeed": 1.36,
@@ -2566,6 +2585,7 @@
     {
       "id": "Watcher",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 2.15,
       "attackSpeed": 1.6,
@@ -2602,6 +2622,7 @@
     {
       "id": "Shadow Stalker",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 1.7,
       "attackSpeed": 1.6,
@@ -2659,6 +2680,7 @@
     {
       "id": "Rogue Imp",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 1.5,
       "attackSpeed": 1.48,
@@ -2709,6 +2731,7 @@
     {
       "id": "Ash Assassin",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 1.5,
       "attackSpeed": 1,
@@ -2759,6 +2782,7 @@
     {
       "id": "Night Rogue",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 1.5,
       "attackSpeed": 1.6,
@@ -2816,6 +2840,7 @@
     {
       "id": "Shadow Ninja",
       "role": "Agile",
+      "type": "IsElite",
       "prefabName": "Basic",
       "attackRange": 1.5,
       "attackSpeed": 1,
@@ -4798,6 +4823,7 @@
     {
       "id": "Necromancer",
       "role": "Undeath",
+      "type": "IsBoss",
       "minTier": 5,
       "effects": [{
         "type": "Curse",
@@ -4808,7 +4834,7 @@
         "onDeath": [{
           "effect": "Revive",
           "value": 45,
-          "duration": 165
+          "duration": 203
         }],
         "onPeriodic": [{
           "effect": "Spawn",

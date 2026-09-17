@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using IdleDefenseSurvival.Player;
+using PlayerClass = IdleDefenseSurvival.Player.Player;
 using IdleDefenseSurvival.Pet.Behavior;
 
 namespace IdleDefenseSurvival.Pet
@@ -43,10 +43,10 @@ namespace IdleDefenseSurvival.Pet
         private List<PetRuntime> _equippedPets = new();
 
         // Player reference
-        private IdleDefenseSurvival.Player.Player _player;
+        private PlayerClass _player;
 
         // Shared behavior context (reused across all pets per frame)
-        private Behavior.ActionModifierData _sharedModifierData = new Behavior.ActionModifierData();
+        private ActionModifierData _sharedModifierData = new();
         private float _battleTime = 0f;
 
         // Events
@@ -71,11 +71,8 @@ namespace IdleDefenseSurvival.Pet
         private void Start()
         {
             // Find player and subscribe to health changes for emergency mode
-            _player = IdleDefenseSurvival.Player.Player.Instance;
-            if (_player != null)
-            {
-                _player.OnHealthChanged += CheckEmergencyMode;
-            }
+            _player = PlayerClass.Instance;
+            if (_player != null) _player.OnHealthChanged += CheckEmergencyMode;
         }
 
         private void Update()
@@ -97,10 +94,7 @@ namespace IdleDefenseSurvival.Pet
 
         private void OnDestroy()
         {
-            if (_player != null)
-            {
-                _player.OnHealthChanged -= CheckEmergencyMode;
-            }
+            if (_player != null) _player.OnHealthChanged -= CheckEmergencyMode;
         }
 
         /// <summary>
@@ -216,7 +210,7 @@ namespace IdleDefenseSurvival.Pet
 
             // Calculate orbit position
             float angle = pet.OrbitIndex * (360f / Mathf.Max(1, _equippedPets.Count)) * Mathf.Deg2Rad;
-            Vector3 offset = new Vector3(
+            Vector3 offset = new(
                 Mathf.Cos(angle) * pet.Definition.orbitRadius,
                 Mathf.Sin(angle) * pet.Definition.orbitRadius,
                 0f
@@ -460,10 +454,7 @@ namespace IdleDefenseSurvival.Pet
 
                 _ownedPets[entry.instanceId] = pet;
 
-                if (entry.isEquipped)
-                {
-                    EquipPet(entry.instanceId);
-                }
+                if (entry.isEquipped) EquipPet(entry.instanceId);
             }
         }
 
