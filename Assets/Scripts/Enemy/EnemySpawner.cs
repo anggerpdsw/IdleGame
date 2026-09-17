@@ -82,7 +82,7 @@ namespace IdleDefenseSurvival.Enemy
         {
             EnemyData rawData = GetRandomEnemy();
             if (rawData == null) return;
-            EnemyData spawnedEnemy = CreateScaledEnemyData(rawData);
+            EnemyData spawnedEnemy = Utilityku.CreateScaledEnemy(rawData);
             SpawnEnemyInternal(spawnedEnemy, GetSpawnPosition());
         }
 
@@ -184,33 +184,6 @@ namespace IdleDefenseSurvival.Enemy
         {
             if (enemy.TryGetComponent(out EnemyAi enemyAi))
                 EnemyStatisticsManager.Instance?.Register(enemyAi);
-        }
-
-        // =========================================================
-        // ENEMY DATA
-        // =========================================================
-        private EnemyData CreateScaledEnemyData(EnemyData rawData)
-        {
-            return new EnemyData
-            {
-                id = rawData.id,
-                role = rawData.role,
-                prefabName = rawData.prefabName,
-                attackRange = rawData.attackRange,
-                attackSpeed = rawData.attackSpeed,
-
-                damage = rawData.damage * WaveManager.Instance.DamageMult,
-                health = rawData.health * WaveManager.Instance.HealthMult,
-                moveSpeed = rawData.moveSpeed * WaveManager.Instance.SpeedMult,
-
-                spawnWeight = rawData.spawnWeight,
-                knockback = rawData.knockback,
-                evasion = rawData.evasion,
-                element = rawData.element,
-                exp = rawData.exp,
-                dropItems = rawData.dropItems,
-                effects = rawData.effects
-            };
         }
 
         // =========================================================

@@ -1,6 +1,8 @@
 // Updated EnemyData to include EXP reward
 using System;
 using UnityEngine;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using IdleDefenseSurvival.Items;
 
 namespace IdleDefenseSurvival.Data
@@ -15,7 +17,9 @@ namespace IdleDefenseSurvival.Data
     {
         [Tooltip("Unique identifier for this enemy type.")]
         public string id;
-        public EnemyType type = EnemyType.IsBasic;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public EnemyType enemyType = EnemyType.IsBasic;
+        [JsonConverter(typeof(StringEnumConverter))]
         public Role role;
 
         [Tooltip("Prefab name in Resources/Enemies/ folder.")]
@@ -49,6 +53,7 @@ namespace IdleDefenseSurvival.Data
         public float knockback = 0.2f;
 
         public float evasion;
+        [JsonConverter(typeof(StringEnumConverter))]
         public Element element;
 
         // -------------------------------------------------------------------
@@ -78,9 +83,9 @@ namespace IdleDefenseSurvival.Data
         // ------------------------------------------------------------
         // Derived properties (data-driven from JSON type field)
         // ------------------------------------------------------------
-        public bool IsElite => type == EnemyType.IsElite;
-        public bool IsBoss => type == EnemyType.IsBoss;
-        public bool IsSpecial => type == EnemyType.IsSpecial;
+        public bool IsElite => enemyType == EnemyType.IsElite;
+        public bool IsBoss => enemyType == EnemyType.IsBoss;
+        public bool IsSpecial => enemyType == EnemyType.IsSpecial;
     }
 
     /// <summary>

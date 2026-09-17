@@ -152,26 +152,8 @@ namespace IdleDefenseSurvival.Enemy
             {
                 var baseData = pool[Random.Range(0, pool.Length)];
 
-                var scaledData = new EnemyData
-                {
-                    id = baseData.id,
-                    role = baseData.role,
-                    prefabName = baseData.prefabName,
-                    attackRange = baseData.attackRange,
-                    attackSpeed = baseData.attackSpeed,
-                    damage = baseData.damage * waveManager.DamageMult,
-                    health = baseData.health * waveManager.HealthMult,
-                    moveSpeed = baseData.moveSpeed * waveManager.SpeedMult,
-                    spawnWeight = baseData.spawnWeight,
-                    knockback = baseData.knockback,
-                    evasion = baseData.evasion,
-                    element = baseData.element,
-                    exp = baseData.exp,
-                    dropItems = baseData.dropItems,
-                    effects = baseData.effects,
-                    IsSummonedByNecromancer = true
-                };
-
+                var scaledData = Utilityku.CreateScaledEnemy(baseData, true);
+                
                 Vector2 randomOffset = Random.insideUnitCircle * scatterRadius;
                 Vector2 spawnPos = necroPos + randomOffset;
 

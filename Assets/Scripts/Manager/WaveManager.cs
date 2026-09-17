@@ -252,24 +252,7 @@ namespace IdleDefenseSurvival.Manager
             }
 
             // Apply wave scaling to Necromancer stats (same as normal spawn)
-            EnemyData scaledData = new()
-            {
-                id = necromancerData.id,
-                role = necromancerData.role,
-                prefabName = necromancerData.prefabName,
-                attackRange = necromancerData.attackRange,
-                attackSpeed = necromancerData.attackSpeed,
-                damage = necromancerData.damage * DamageMult,
-                health = necromancerData.health * HealthMult,
-                moveSpeed = necromancerData.moveSpeed * SpeedMult,
-                spawnWeight = necromancerData.spawnWeight,
-                knockback = necromancerData.knockback,
-                evasion = necromancerData.evasion,
-                element = necromancerData.element,
-                exp = necromancerData.exp,
-                dropItems = necromancerData.dropItems,
-                effects = necromancerData.effects
-            };
+            EnemyData scaledData = Utilityku.CreateScaledEnemy(necromancerData);
 
             // Delegate actual spawn to EnemySpawner with special flag to bypass normal filters
             _enemySpawner.SpawnSpecificEnemy(scaledData);

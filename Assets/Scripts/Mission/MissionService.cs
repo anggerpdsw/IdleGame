@@ -333,11 +333,11 @@ namespace IdleDefenseSurvival.Mission
             if (dirty) SaveMissions();
         }
 
-        private bool DoesEventMatchMission(MissionEventType ev, string tId, MissionTemplate t,
-            MissionInstance m)
+        private bool DoesEventMatchMission(
+            MissionEventType ev, string tId, MissionTemplate t, MissionInstance m)
         {
             if (ev != t.type) return false;
-            return t.type switch
+            return ev switch
             {
                 MissionEventType.SpecificEnemyKilled or MissionEventType.Blacksmithing or MissionEventType.Alchemist
                     => IsTargetMatch(m.targetId, tId),

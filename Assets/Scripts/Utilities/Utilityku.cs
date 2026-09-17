@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using IdleDefenseSurvival;
 using IdleDefenseSurvival.Controller;
+using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 using UnityEngine;
@@ -219,4 +220,30 @@ public static class Utilityku
             .Trim('_');
     }
 
+    public static EnemyData CreateScaledEnemy(EnemyData data, bool IsSummonedByNecromancer = false)
+    {
+        // Apply wave scaling to Necromancer stats (same as normal spawn)
+        EnemyData scaledData = new()
+        {
+            id = data.id,
+            role = data.role,
+            enemyType = data.enemyType,
+            prefabName = data.prefabName,
+            attackRange = data.attackRange,
+            attackSpeed = data.attackSpeed,
+            damage = data.damage * WaveManager.Instance.DamageMult,
+            health = data.health * WaveManager.Instance.HealthMult,
+            moveSpeed = data.moveSpeed * WaveManager.Instance.SpeedMult,
+            spawnWeight = data.spawnWeight,
+            knockback = data.knockback,
+            evasion = data.evasion,
+            element = data.element,
+            exp = data.exp,
+            dropItems = data.dropItems,
+            effects = data.effects,
+            IsSummonedByNecromancer = IsSummonedByNecromancer
+        };
+
+        return scaledData;
+    }
 }
