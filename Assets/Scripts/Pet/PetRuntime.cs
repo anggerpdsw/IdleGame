@@ -27,6 +27,10 @@ namespace IdleDefenseSurvival.Pet
         public Transform Target { get; set; }
         public PetState CurrentState { get; set; }
 
+        // Stamina state
+        public float CurrentStamina { get; private set; }
+        public float MaxStamina { get; private set; }
+
         // Cooldowns (skill id -> remaining time)
         public Dictionary<string, float> Cooldowns { get; private set; }
 
@@ -66,6 +70,10 @@ namespace IdleDefenseSurvival.Pet
 
             // Initialize health
             CurrentHealth = CalculateStat(definition.baseStats.health, definition.growth.healthPerLevel);
+
+            // Initialize stamina
+            MaxStamina = definition.maxStamina;
+            CurrentStamina = MaxStamina;
         }
 
         /// <summary>
@@ -215,6 +223,51 @@ namespace IdleDefenseSurvival.Pet
         {
             if (!IsTargetValid())
                 Target = null;
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // STAMINA SYSTEM
+        // ═══════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Get stamina as percentage (0-1). Used for potion targeting.
+        /// </summary>
+        public float StaminaPercent => MaxStamina > 0f ? CurrentStamina / MaxStamina : 0f;
+
+        /// <summary>
+        /// Check if pet has enough stamina for skill.
+        /// </summary>
+        public bool CanConsumeStamina(float amount)
+        {
+            return CurrentStamina >= amount;
+        }
+
+        /// <summary>
+        /// Consume stamina for skill cast. Clamps to [0, MaxStamina].
+        /// </summary>
+        public void ConsumeStamina(float amount)
+        {
+            CurrentStamina = Mathf.Clamp(CurrentStamina - amount, 0f, MaxStamina);
+        }
+
+        /// <summary>
+        /// Restore stamina (regen or potion). Clamps to MaxStamina.
+        /// </summary>
+        public void RestoreStamina(float amount)
+        {
+            CurrentStamina = Mathf.Clamp(CurrentStamina + amount, 0f, MaxStamina);
+        }
+
+        /// <summary>
+        /// Tick stamina regeneration per frame.
+        /// Called from PetManager.Update.
+        /// </summary>
+        public void TickStaminaRegen(float deltaTime)
+        {
+            if (Definition == null) return;
+            float regen = Definition.staminaRegen;
+            if (regen > 0f)
+                RestoreStamina(regen * deltaTime);
         }
     }
 }

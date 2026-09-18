@@ -412,7 +412,14 @@ namespace IdleDefenseSurvival.Manager
         public float CurrentWaveDuration => _waveDuration * ProgressionSpeed;
         public float CurrentInterWaveDuration => _interWaveDuration * ProgressionSpeed;
         public float CurrentBaseSpawnInterval => _baseSpawnInterval * ProgressionSpeed;
-        public float CurrentMinSpawnInterval => _minSpawnInterval * ProgressionSpeed;
+        // ponytail: linear tier scaling for min spawn interval; base value from JSON corresponds to Tier 1.
+        private float GetTierAdjustedMinSpawnInterval()
+        {
+            float adjusted = _minSpawnInterval - (CurrentTier - 1) * 0.00031f;
+            // Clamp to a reasonable floor to avoid zero/negative intervals.
+            return Mathf.Max(adjusted, 0.05f);
+        }
+        public float CurrentMinSpawnInterval => GetTierAdjustedMinSpawnInterval() * ProgressionSpeed;
 
         private void OnEnable() => SaveManager.OnSaveLoaded += LoadWaveData;
         private void OnDisable() => SaveManager.OnSaveLoaded -= LoadWaveData;

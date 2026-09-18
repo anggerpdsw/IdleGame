@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Core.Interfaces;
-using IdleDefenseSurvival.Items.Decomposition;
 
 namespace IdleDefenseSurvival.Items
 {
@@ -67,41 +65,40 @@ namespace IdleDefenseSurvival.Items
             // Potion recipes get potion_hp_1/potion_mp_1; equipment recipes get decomposed_* materials.
             // Double-injection caused validation failure when player had hidden ingredient but not decomposed material.
 
-            // Reserve currency
-            if (recipe.GoldCost > 0)
+            // Reserve currency via resolver (includes base gold/meat scaled by rarity)
+            var costSnapshot = CraftCostResolver.ComputeCurrencyCost(recipe, count);
+
+            if (costSnapshot.GoldSnapshot > 0)
             {
-                long cost = recipe.GoldCost * count;
-                if (!_economy.HasEnoughCurrency(CurrencyType.Gold, cost))
+                if (!_economy.HasEnoughCurrency(CurrencyType.Gold, costSnapshot.GoldSnapshot))
                 {
                     Rollback();
-                    return TransactionResult.Fail($"Insufficient gold: need {cost}");
+                    return TransactionResult.Fail($"Insufficient gold: need {costSnapshot.GoldSnapshot}");
                 }
-                _reservedCurrency[CurrencyType.Gold] = cost;
+                _reservedCurrency[CurrencyType.Gold] = costSnapshot.GoldSnapshot;
             }
 
-            if (recipe.GemCost > 0)
+            if (costSnapshot.GemSnapshot > 0)
             {
-                long cost = recipe.GemCost * count;
-                if (!_economy.HasEnoughCurrency(CurrencyType.Gem, cost))
+                if (!_economy.HasEnoughCurrency(CurrencyType.Gem, costSnapshot.GemSnapshot))
                 {
                     Rollback();
-                    return TransactionResult.Fail($"Insufficient gems: need {cost}");
+                    return TransactionResult.Fail($"Insufficient gems: need {costSnapshot.GemSnapshot}");
                 }
-                _reservedCurrency[CurrencyType.Gem] = cost;
+                _reservedCurrency[CurrencyType.Gem] = costSnapshot.GemSnapshot;
             }
 
-            if (recipe.AdditionalCosts != null)
+            foreach (var entry in costSnapshot.AdditionalCosts)
             {
-                foreach (var cost in recipe.AdditionalCosts)
+                if (!Enum.TryParse<CurrencyType>(entry.CurrencyId, out var currencyType))
+                    continue;
+                if (entry.Amount <= 0) continue;
+                if (!_economy.HasEnoughCurrency(currencyType, entry.Amount))
                 {
-                    long totalCost = cost.Amount * count;
-                    if (!_economy.HasEnoughCurrency(cost.Currency, totalCost))
-                    {
-                        Rollback();
-                        return TransactionResult.Fail($"Insufficient {cost.Currency}: need {totalCost}");
-                    }
-                    _reservedCurrency[cost.Currency] = totalCost;
+                    Rollback();
+                    return TransactionResult.Fail($"Insufficient {currencyType}: need {entry.Amount}");
                 }
+                _reservedCurrency[currencyType] = entry.Amount;
             }
 
             return TransactionResult.Success();
@@ -177,29 +174,30 @@ namespace IdleDefenseSurvival.Items
 
             // ponytail: decomposed validation removed — recipe.Ingredients already complete after repository injection
 
-            // Check currency
-            if (recipe.GoldCost > 0)
+            // Check currency via resolver (matches reservation logic)
+            var costSnapshot = CraftCostResolver.ComputeCurrencyCost(recipe, count);
+
+            if (costSnapshot.GoldSnapshot > 0)
             {
-                long cost = recipe.GoldCost * count;
-                if (!_economy.HasEnoughCurrency(CurrencyType.Gold, cost))
-                    return ValidationResult.Fail($"Not enough gold: need {cost}");
+                if (!_economy.HasEnoughCurrency(CurrencyType.Gold, costSnapshot.GoldSnapshot))
+                    return ValidationResult.Fail($"Not enough gold: need {costSnapshot.GoldSnapshot}");
             }
 
-            if (recipe.GemCost > 0)
+            if (costSnapshot.GemSnapshot > 0)
             {
-                long cost = recipe.GemCost * count;
-                if (!_economy.HasEnoughCurrency(CurrencyType.Gem, cost))
-                    return ValidationResult.Fail($"Not enough gems: need {cost}");
+                if (!_economy.HasEnoughCurrency(CurrencyType.Gem, costSnapshot.GemSnapshot))
+                    return ValidationResult.Fail($"Not enough gems: need {costSnapshot.GemSnapshot}");
             }
 
-            if (recipe.AdditionalCosts != null)
+            foreach (var entry in costSnapshot.AdditionalCosts)
             {
-                foreach (var cost in recipe.AdditionalCosts)
-                {
-                    long totalCost = cost.Amount * count;
-                    if (!_economy.HasEnoughCurrency(cost.Currency, totalCost))
-                        return ValidationResult.Fail($"Not enough {cost.Currency}: need {totalCost}");
-                }
+                if (!System.Enum.TryParse<CurrencyType>(entry.CurrencyId, out var currencyType))
+                    continue;
+
+                if (entry.Amount <= 0) continue;
+
+                if (!_economy.HasEnoughCurrency(currencyType, entry.Amount))
+                    return ValidationResult.Fail($"Not enough {currencyType}: need {entry.Amount}");
             }
 
             return ValidationResult.Success();

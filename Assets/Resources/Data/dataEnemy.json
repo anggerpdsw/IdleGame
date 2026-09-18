@@ -757,7 +757,7 @@
         }],
         "onTakeDamage": [{
           "effect": "Burn",
-          "value": 44,
+          "value": 18,
           "duration": 30
         }]
       }],
@@ -2458,7 +2458,7 @@
         }],
         "aura": [{
           "effect": "Regeneration",
-          "value": 2.91,
+          "value": 3.91,
           "radius": 3.77
         }]
       }],

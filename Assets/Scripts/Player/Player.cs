@@ -265,7 +265,28 @@ namespace IdleDefenseSurvival.Player
             {
                 float rawMultiShootCount = PlayerStatsManager.Instance.GetStat(SkillType.MultiShootCount);
                 int accumulatedCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawMultiShootCount, AccumulatedCountType.Multi);
-                maxTargets = Mathf.Min(accumulatedCount, targets.Count);
+                int potentialTargets = Mathf.Min(accumulatedCount, targets.Count);
+
+                // Check mana: if not enough, reduce target count or fallback to single shot
+                int availableMana = Mathf.FloorToInt(_currentMana);
+                if (availableMana < potentialTargets)
+                {
+                    // If mana < 1, fallback to single-shot (no mana cost)
+                    if (availableMana < 1)
+                    {
+                        multiShoot = false;
+                        maxTargets = 1;
+                    }
+                    else
+                    {
+                        // Use available mana
+                        maxTargets = availableMana;
+                    }
+                }
+                else
+                {
+                    maxTargets = potentialTargets;
+                }
             }
 
             // Get projectile from pool for each distinct target (no duplicate targeting)
@@ -282,8 +303,8 @@ namespace IdleDefenseSurvival.Player
                     projectile.transform.SetPositionAndRotation(spawnPos, Quaternion.identity);
 
                     // Projectile pertama = damage penuh
-                    float damageMultiplier = (i == 0) ? 1f : 0.75f;
-                    projectile.Initialize(target, this, damageMultiplier);
+                    float damageMultiplier = (i == 0) ? 1f : 0.77f;
+                    projectile.Initialize(target, this, damageMultiplier, multiShoot);
                 }
             }
         }

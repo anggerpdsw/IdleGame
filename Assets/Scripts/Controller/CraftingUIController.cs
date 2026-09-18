@@ -56,6 +56,7 @@ namespace IdleDefenseSurvival.Controller
 
         [Header("Controls & Economy")]
         [SerializeField] private TextMeshProUGUI _goldCostText;
+        [SerializeField] private TextMeshProUGUI _meatCostText;
         [SerializeField] private TextMeshProUGUI _gemCostText;
         [SerializeField] private TextMeshProUGUI _levelNeed;
         [SerializeField] private TextMeshProUGUI _quantityText;
@@ -299,6 +300,7 @@ namespace IdleDefenseSurvival.Controller
             if (_materialList == null) Debug.LogError("[CraftingUIController] Missing required reference: _materialList");
             if (_materialRowTemplate == null) Debug.LogError("[CraftingUIController] Missing required reference: _materialRowTemplate");
             if (_goldCostText == null) Debug.LogError("[CraftingUIController] Missing required reference: _goldCostText");
+            if (_meatCostText == null) Debug.LogError("[CraftingUIController] Missing required reference: _meatCostText");
             if (_gemCostText == null) Debug.LogError("[CraftingUIController] Missing required reference: _gemCostText");
             if (_levelNeed == null) Debug.LogError("[CraftingUIController] Missing required reference: _levelNeed");
             if (_quantityText == null) Debug.LogError("[CraftingUIController] Missing required reference: _quantityText");
@@ -486,6 +488,7 @@ namespace IdleDefenseSurvival.Controller
             if (_descriptionText != null) _descriptionText.text = "";
             if (_rarityText != null) _rarityText.text = "";
             if (_goldCostText != null) _goldCostText.text = "0";
+            if (_meatCostText != null) _meatCostText.text = "0";
             if (_gemCostText != null) _gemCostText.text = "0";
             if (_levelNeed != null) _levelNeed.text = $"Lv.1/25";
             ClearMaterialRows();
@@ -534,11 +537,13 @@ namespace IdleDefenseSurvival.Controller
             if (svc == null || string.IsNullOrEmpty(_selectedRecipeId))
             {
                 if (_goldCostText != null) _goldCostText.text = "0";
+                if (_meatCostText != null) _meatCostText.text = "0";
                 if (_gemCostText != null) _gemCostText.text = "0";
                 return;
             }
             var cost = svc.GetRecipeCostPreview(_selectedRecipeId, _quantity);
             if (_goldCostText != null) _goldCostText.text = cost.HasValue ? cost.Value.GoldSnapshot.ToString() : "0";
+            if (_meatCostText != null) _meatCostText.text = cost.HasValue ? cost.Value.MeatSnapshot.ToString() : "0";
             if (_gemCostText != null) _gemCostText.text = cost.HasValue ? cost.Value.GemSnapshot.ToString() : "0";
         }
 

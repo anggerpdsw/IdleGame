@@ -61,8 +61,8 @@
             "EffectType": "",
             "SkillType": "AttackSpeed",
             "Mode": "Percent",
-            "BaseValue": 2,
-            "ValuePerLevel": 2,
+            "BaseValue": 4.3,
+            "ValuePerLevel": 4.3,
             "CardRarity": "Common"
         }, {
             "Id": "power_strike",

@@ -45,9 +45,9 @@ namespace IdleDefenseSurvival.Ultimate
         private float _ultimateAttack;
 
         public float TankAttackRange => PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * 0.47f;
-        public float TankAttackDamage => PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * 2.3f * _ultimateAttack;
-        public float TankAttackSpeed => PlayerStatsManager.Instance.GetStat(SkillType.AttackSpeed) * 0.51f;
-        public float TankDamagePerRange => PlayerStatsManager.Instance.GetStat(SkillType.DamagePerRange) * 1.5f;
+        public float TankAttackDamage => PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * 1.7f * _ultimateAttack;
+        public float TankAttackSpeed => 1.3f;
+        public float TankDamagePerRange => PlayerStatsManager.Instance.GetStat(SkillType.DamagePerRange) * 1.2f;
 
         /// <summary>
         /// Fired when the tank's duration expires (not called for manual Destroy).

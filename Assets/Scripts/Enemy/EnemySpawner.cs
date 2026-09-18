@@ -331,7 +331,7 @@ namespace IdleDefenseSurvival.Enemy
         private long CalculateGoldReward(float enemyHealth)
         {
             int tier = WaveManager.Instance.CurrentTier;
-            float baseGold = 0.5f + tier * 2.5f;
+            float baseGold = 0.125f + tier * 1.5f;
             float hpBonus = Mathf.Pow(enemyHealth, 0.35f);
             float tierMultiplier = 1f + (tier - 1) * 0.15f;
             float rawGold = (baseGold + hpBonus) * tierMultiplier;

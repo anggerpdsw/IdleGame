@@ -191,7 +191,7 @@ namespace IdleDefenseSurvival.Player
 
             if (effectType == PlayerEffectType.Burn)
             {
-                // Burn: source-based, non-stacking, refreshes duration
+                // Burn: source-based, stackable (max 5), refreshes duration per hit
                 if (_activeBurnEffects.TryGetValue(sourceId, out var existingBurn))
                 {
                     bool updated = false;
@@ -200,9 +200,11 @@ namespace IdleDefenseSurvival.Player
                         existingBurn.ExpireTime = expireTime;
                         updated = true;
                     }
-                    if (percent > existingBurn.Percent)
+                    // Increment stack (max 5)
+                    if (existingBurn.StackCount < 5)
                     {
-                        existingBurn.Percent = percent;
+                        existingBurn.StackCount++;
+                        existingBurn.Percent = existingBurn.BasePercent * existingBurn.StackCount;
                         updated = true;
                     }
                     if (updated)
@@ -218,7 +220,9 @@ namespace IdleDefenseSurvival.Player
                     {
                         SourceId = sourceId,
                         Type = PlayerEffectType.Burn,
+                        BasePercent = percent,
                         Percent = percent,
+                        StackCount = 1,
                         Duration = duration,
                         ExpireTime = expireTime,
                         MaxHealthAtApplication = _player?.MaxHealth ?? 0f
@@ -570,13 +574,15 @@ namespace IdleDefenseSurvival.Player
         /// Unified status effect data structure.
         /// Slow: Percent (0-1), Duration unused.
         /// Stun: Percent unused (always 100% stun).
-        /// Burn: Percent (% of max HP), Duration, MaxHealthAtApplication (snapshot when applied).
+        /// Burn: Percent (total % = BasePercent × StackCount), StackCount (max 5), Duration, MaxHealthAtApplication (snapshot when applied).
         /// </summary>
         private struct EffectData
         {
             public EnemyAuraManager.StatusSourceId SourceId;
             public PlayerEffectType Type;
             public float Percent;
+            public float BasePercent;
+            public int StackCount;
             public float Duration;
             public float ExpireTime;
             public float MaxHealthAtApplication;

@@ -149,7 +149,8 @@ namespace IdleDefenseSurvival.Mission
         {
             var saveManager = SaveManager.Instance;
             if (saveManager == null) return null;
-            int highestTier = Mathf.Max(1, saveManager.GetHighestUnlockedTier());
+            int svTier = saveManager.GetHighestUnlockedTier();
+            int highestTier = Mathf.Max(1, svTier > 9 ? 9 : svTier);
             float tierMultiplier = 1f + (highestTier - 1) * 0.75f;
 
             // 1. Random target dasar dari template.

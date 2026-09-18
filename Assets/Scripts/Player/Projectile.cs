@@ -60,6 +60,7 @@ namespace IdleDefenseSurvival.Player
         private Rigidbody2D _rb;
         private bool _hasHit = false;
         private int _bounceIndex = 0;  // Track bounce keberapa (0 = first hit)
+        private bool _isMultiShoot = false;  // Track apakah projectile ini dari multi-shoot
 
         // Track enemies yang sudah terkena oleh projectile ini (untuk bounce chain)
         private readonly HashSet<Transform> _hitEnemies = new();
@@ -98,6 +99,7 @@ namespace IdleDefenseSurvival.Player
             _defenseBreakType = DefenseBreakType.None;
             _defenseBreak = 0f;
             _defenseBreakDuration = 0f;
+            _isMultiShoot = false;
             _healthBreak = 0f;
 
             if (_rb != null)
@@ -140,7 +142,7 @@ namespace IdleDefenseSurvival.Player
         /// <summary>
         /// Initialize the projectile with player stats.
         /// </summary>
-        public void Initialize(Transform target, Player player, float damageMultiplier)
+        public void Initialize(Transform target, Player player, float damageMultiplier, bool isMultiShoot = false)
         {
             _owner = ProjectileOwner.Player;
             SetProjectileSprite(_playerBulletSprite);
@@ -148,6 +150,7 @@ namespace IdleDefenseSurvival.Player
             _target = target;
             _player = player;
             _damageMultiplier = damageMultiplier;
+            _isMultiShoot = isMultiShoot;
             _startPosition = transform.position;
             _baseDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage);
             _baseKnockbackForce = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackForce);
@@ -422,6 +425,10 @@ namespace IdleDefenseSurvival.Player
                             ReturnToPool();
                             return;
                         }
+
+                        // Consume 1 mana per enemy hit only when multi-shoot is active
+                        if (_isMultiShoot && _bounceIndex == 0)
+                            _player?.SpendMana(1f);
 
                         // Pump equipped-item + affix passives (e.g. FreezeEnemy):
                         // every hit an armed passive gets its chance to fire.

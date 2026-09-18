@@ -551,11 +551,320 @@ if (_debugMode)
 
 ---
 
-## 13. REFERENCES
+## 13. STAMINA SYSTEM
+
+### 13.1 Overview
+
+Pet stamina system prevents infinite skill spam and creates resource management. Each pet has independent stamina pool with regeneration.
+
+**Key Principles:**
+- **Per-pet stamina** — each pet tracks own stamina independently
+- **Skill costs** — every skill consumes stamina on execution
+- **Automatic regeneration** — stamina recovers over time
+- **Percentage-based potion targeting** — potion restores pet with lowest stamina %
+- **Data-driven** — all values configurable via JSON
+
+### 13.2 Stamina Stats
+
+**PetDefinition fields:**
+```csharp
+public float maxStamina = 100f;
+public float staminaRegen = 2f; // Per second
+```
+
+**Current values (dataPet.json):**
+
+| Pet | Max Stamina | Regen/sec | Design Rationale |
+|-----|-------------|-----------|------------------|
+| Voidling | 100 | 2.0 | Support baseline — balanced pool |
+| Ember Fox | 120 | 2.5 | DPS — aggressive, high sustain |
+| Thunder Pup | 110 | 2.2 | DPS — balanced AOE spam |
+| Blood Bat | 80 | 3.0 | Support — low pool, fast recovery |
+| Iron Tortoise | 150 | 1.5 | Tank — deep pool, slow regen |
+
+**Stat Calculation:**
+```
+MaxStamina = definition.maxStamina (no level scaling)
+CurrentStamina = clamped [0, MaxStamina]
+StaminaPercent = CurrentStamina / MaxStamina
+```
+
+### 13.3 Skill Stamina Cost
+
+**PetSkill base class:**
+```csharp
+public float StaminaCost { get; protected set; }
+```
+
+**Behavior action schema:**
+```json
+{
+  "action": {
+    "type": "BasicAttack",
+    "damageMultiplier": 1.0,
+    "staminaCost": 15
+  }
+}
+```
+
+**Current skill costs:**
+
+| Pet | Skill | Cost | Attacks @ Full |
+|-----|-------|------|----------------|
+| Voidling | Basic Attack | 15 | 6.7× |
+| Voidling | AOE Pulse | 35 | 2.9× |
+| Ember Fox | Executioner | 20 | 6.0× |
+| Thunder Pup | Cluster Bomb | 18 | 6.1× |
+| Blood Bat | Vampiric Assault | 12 | 6.7× |
+| Iron Tortoise | Guardian Shield | 40 | 3.8× |
+| Iron Tortoise | Basic Taunt | 10 | 15.0× |
+
+**Validation Pipeline:**
+```
+PetSkill.CanExecute()
+    ↓
+Check cooldown
+    ↓
+Check Pet.CanConsumeStamina(StaminaCost)
+    ↓
+Check custom conditions
+    ↓
+Execute → ConsumeStamina(cost) → OnExecute()
+```
+
+### 13.4 Stamina Regeneration
+
+**Implementation:**
+```csharp
+// Called every frame in PetManager.Update()
+pet.TickStaminaRegen(deltaTime);
+
+// PetRuntime.TickStaminaRegen()
+public void TickStaminaRegen(float deltaTime)
+{
+    float regen = Definition.staminaRegen;
+    if (regen > 0f)
+        RestoreStamina(regen * deltaTime);
+}
+```
+
+**Regeneration formula:**
+```
+StaminaGain = staminaRegen × deltaTime
+CurrentStamina = Clamp(CurrentStamina + StaminaGain, 0, MaxStamina)
+```
+
+**Examples (60 FPS):**
+- Voidling: 2.0/sec = ~0.033 per frame
+- Blood Bat: 3.0/sec = ~0.05 per frame
+- Iron Tortoise: 1.5/sec = ~0.025 per frame
+
+### 13.5 Stamina Potion
+
+**Data source:** `dataConsumables.json`
+```json
+{
+  "Id": "potion_sp",
+  "Name": "Stamina Potion",
+  "PotionType": 3,
+  "PercentValue": 5,
+  "FlatValue": 100,
+  "EffectDuration": 10,
+  "Cooldown": 5
+}
+```
+
+**Restore calculation:**
+```csharp
+float amount = (MaxStamina × 0.05) + 100;
+pet.RestoreStamina(amount);
+```
+
+**Examples:**
+- Voidling (max 100): restores 5 + 100 = 105 → capped to 100
+- Ember Fox (max 120): restores 6 + 100 = 106 → capped to 120
+- Iron Tortoise (max 150): restores 7.5 + 100 = 107.5 → capped to 150
+
+### 13.6 Potion Targeting Algorithm
+
+**Target selection:** Pet with **lowest stamina percentage** (not absolute value).
+
+**Implementation:**
+```csharp
+public PetRuntime GetPetWithLowestStaminaPercentage()
+{
+    PetRuntime lowestPet = null;
+    float lowestPercent = float.MaxValue;
+    
+    foreach (var pet in _equippedPets)
+    {
+        float percent = pet.StaminaPercent;
+        
+        if (percent < lowestPercent)
+        {
+            lowestPercent = percent;
+            lowestPet = pet;
+        }
+        // Tie-breaker: lowest OrbitIndex
+        else if (Mathf.Approximately(percent, lowestPercent) && 
+                 pet.OrbitIndex < lowestPet.OrbitIndex)
+        {
+            lowestPet = pet;
+        }
+    }
+    
+    return lowestPet;
+}
+```
+
+**Example scenario:**
+```
+Pet A: 80/100 = 80%
+Pet B: 30/100 = 30%
+Pet C: 60/200 = 30%
+
+Potion targets: Pet B (tie with C, but lower OrbitIndex)
+```
+
+**Edge cases:**
+- No equipped pets → potion not consumed
+- All pets at 100% → potion not consumed
+- MaxStamina = 0 → percent = 0, eligible but useless
+
+### 13.7 Persistence Schema
+
+**PetSaveEntry:**
+```csharp
+[Serializable]
+public class PetSaveEntry
+{
+    public string instanceId;
+    public string petId;
+    public int level;
+    public long experience;
+    public int evolutionStage;
+    public bool isEquipped;
+    public float currentStamina = -1f; // -1 = unset (v4 compat)
+}
+```
+
+**Save flow:**
+```csharp
+saveData.Add(new PetSaveEntry {
+    currentStamina = pet.CurrentStamina
+});
+```
+
+**Load flow:**
+```csharp
+var pet = new PetRuntime(...);
+
+// Restore stamina (backward compat)
+if (entry.currentStamina >= 0f)
+    pet.RestoreStamina(entry.currentStamina - pet.CurrentStamina);
+```
+
+**Backward compatibility:**
+- Old saves (no `currentStamina` field) → default `-1` → load at full stamina
+- New saves preserve exact stamina value
+
+### 13.8 UI Integration
+
+**Data source:**
+```csharp
+// PetRuntime properties
+public float CurrentStamina { get; private set; }
+public float MaxStamina { get; private set; }
+public float StaminaPercent => MaxStamina > 0f ? CurrentStamina / MaxStamina : 0f;
+```
+
+**UI implementation (future):**
+```csharp
+public class PetUI : MonoBehaviour
+{
+    [SerializeField] private Image _staminaBar;
+    [SerializeField] private TextMeshProUGUI _staminaText;
+    
+    public void RefreshStamina(PetRuntime pet)
+    {
+        _staminaBar.fillAmount = pet.StaminaPercent;
+        _staminaText.text = $"{pet.CurrentStamina:F0}/{pet.MaxStamina:F0}";
+        
+        // Visual feedback
+        _staminaBar.color = pet.StaminaPercent < 0.3f 
+            ? Color.red 
+            : Color.cyan;
+    }
+}
+```
+
+### 13.9 Extension Guide
+
+**Adding stamina to new pet:**
+```json
+{
+  "id": "pet_new",
+  "maxStamina": 100,
+  "staminaRegen": 2.0,
+  "behaviorDefinitions": [...]
+}
+```
+
+**Adding stamina cost to skill:**
+```json
+{
+  "action": {
+    "type": "BasicAttack",
+    "damageMultiplier": 1.0,
+    "staminaCost": 20
+  }
+}
+```
+
+**Modifying potion values:**
+Edit `dataConsumables.json`:
+```json
+{
+  "Id": "potion_sp_large",
+  "PotionType": 3,
+  "PercentValue": 10,
+  "FlatValue": 200
+}
+```
+
+### 13.10 Design Rationale
+
+**Why percentage-based targeting?**
+- Fair across different pet max stamina values
+- Prevents always targeting low-max pets
+- Example: 30/100 (30%) vs 60/200 (30%) → both equally depleted
+
+**Why no stamina overflow to other pets?**
+- Simpler mental model
+- Prevents complex cascade logic
+- One transaction = one pet
+
+**Why regeneration instead of skill-based restore?**
+- Passive recovery reduces micromanagement
+- Encourages strategic timing
+- Different regen rates create pet identity
+
+**Balance considerations:**
+- Tank: High pool, slow regen → sustained presence
+- DPS: Medium pool, fast regen → burst windows
+- Support: Varies by role (Blood Bat: fast regen = spam heals)
+
+---
+
+## 14. REFERENCES
 
 - **CLAUDE.md §56** — Pet System architectural overview
-- **dataPet.json** — Pet definitions database
+- **dataPet.json** — Pet definitions database (includes stamina config)
+- **dataConsumables.json** — Stamina potion definition
 - **dataPlayer.json** — Player stats for emergency threshold
 - **dataEnemy.json** — Enemy roles/stats for targeting
 - **ProjectilePool.cs** — Projectile pooling system
 - **EnemyStatusEffectController.cs** — Status effect application
+- **PetRuntime.cs** — Stamina runtime state implementation
+- **PetManager.cs** — Stamina regeneration tick, potion targeting
+- **PotionPanelController.cs** — Stamina potion consumption handler

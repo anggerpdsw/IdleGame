@@ -31,6 +31,10 @@ namespace IdleDefenseSurvival.Pet
         public float orbitRadius = 2.5f;
         public float emergencyThreshold = 0.3f; // Trigger emergency at 30% player HP
 
+        // Stamina configuration
+        public float maxStamina = 100f;
+        public float staminaRegen = 2f; // Per second
+
         // NEW: Data-driven behavior definitions
         public List<Behavior.PetBehaviorDefinition> behaviorDefinitions;
 

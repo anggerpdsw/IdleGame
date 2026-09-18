@@ -12,7 +12,7 @@
   },
   "spawning": {
     "baseSpawnInterval": 1.51,
-    "minSpawnInterval": 0.117,
+    "minSpawnInterval": 0.127,
     "minWaveSpawnDecay": 200,
     "maxSpawnBuffer": 7.7
   }

@@ -12,6 +12,7 @@ namespace IdleDefenseSurvival.Pet
         public string SkillId { get; protected set; }
         public float BaseCooldown { get; protected set; }
         public float BaseDamageMultiplier { get; protected set; }
+        public float StaminaCost { get; protected set; } // Stamina required to cast
 
         protected PetRuntime Pet { get; private set; }
 
@@ -27,12 +28,13 @@ namespace IdleDefenseSurvival.Pet
         protected virtual void OnInitialize() { }
 
         /// <summary>
-        /// Check if skill can be executed (cooldown, mana, conditions).
+        /// Check if skill can be executed (cooldown, stamina, conditions).
         /// </summary>
         public virtual bool CanExecute()
         {
             if (Pet == null) return false;
             if (Pet.IsSkillOnCooldown(SkillId)) return false;
+            if (!Pet.CanConsumeStamina(StaminaCost)) return false;
             return CheckCustomConditions();
         }
 
@@ -50,6 +52,9 @@ namespace IdleDefenseSurvival.Pet
         public void Execute()
         {
             if (!CanExecute()) return;
+
+            // Consume stamina before execution
+            Pet.ConsumeStamina(StaminaCost);
 
             OnExecute();
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using IdleDefenseSurvival.Pet;
+using TMPro;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -16,6 +17,8 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private Image _petIcon;
         [SerializeField] private Image _skillCooldownOverlay;
         [SerializeField] private GameObject _emergencyIndicator;
+        [SerializeField] private Image _staminaBar;
+        [SerializeField] private TextMeshProUGUI _staminaText;
 
         [Header("Configuration")]
         [SerializeField] private Sprite _voidlingIcon;
@@ -160,6 +163,12 @@ namespace IdleDefenseSurvival.UI
                 _canvasGroup.interactable = visible;
                 _canvasGroup.blocksRaycasts = visible;
             }
+        }
+
+        public void RefreshStamina(PetRuntime pet)
+        {
+            _staminaBar.fillAmount = pet.StaminaPercent;
+            _staminaText.text = $"{pet.CurrentStamina:F0}/{pet.MaxStamina:F0}";
         }
 
         private float GetSkillCooldown(string skillId)

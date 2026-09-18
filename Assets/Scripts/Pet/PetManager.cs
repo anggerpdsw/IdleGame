@@ -87,6 +87,9 @@ namespace IdleDefenseSurvival.Pet
                 // Tick cooldowns (skills + behaviors)
                 pet.TickCooldowns(deltaTime);
 
+                // Tick stamina regeneration
+                pet.TickStaminaRegen(deltaTime);
+
                 // Update state machine and execute behaviors
                 UpdatePetStateMachine(pet, deltaTime);
             }
@@ -404,6 +407,39 @@ namespace IdleDefenseSurvival.Pet
             return _equippedPets.Any(p => p.IsEmergencyMode);
         }
 
+        /// <summary>
+        /// Find equipped pet with lowest stamina percentage.
+        /// Tie-breaker: lowest OrbitIndex (equip order).
+        /// Returns null if no equipped pets.
+        /// </summary>
+        public PetRuntime GetPetWithLowestStaminaPercentage()
+        {
+            if (_equippedPets.Count == 0) return null;
+
+            PetRuntime lowestPet = null;
+            float lowestPercent = float.MaxValue;
+
+            foreach (var pet in _equippedPets)
+            {
+                float percent = pet.StaminaPercent;
+
+                // Lower percentage wins
+                if (percent < lowestPercent)
+                {
+                    lowestPercent = percent;
+                    lowestPet = pet;
+                }
+                // Tie-breaker: lowest OrbitIndex (deterministic)
+                else if (Mathf.Approximately(percent, lowestPercent) &&
+                         (lowestPet == null || pet.OrbitIndex < lowestPet.OrbitIndex))
+                {
+                    lowestPet = pet;
+                }
+            }
+
+            return lowestPet;
+        }
+
         #endregion
 
         #region Save/Load
@@ -421,7 +457,8 @@ namespace IdleDefenseSurvival.Pet
                     level = pet.Level,
                     experience = pet.Experience,
                     evolutionStage = pet.EvolutionStage,
-                    isEquipped = _equippedPets.Contains(pet)
+                    isEquipped = _equippedPets.Contains(pet),
+                    currentStamina = pet.CurrentStamina
                 });
             }
 
@@ -448,6 +485,10 @@ namespace IdleDefenseSurvival.Pet
                     Experience = entry.experience,
                     EvolutionStage = entry.evolutionStage
                 };
+
+                // Restore stamina (backward compat: -1 = unset → use max)
+                if (entry.currentStamina >= 0f)
+                    pet.RestoreStamina(entry.currentStamina - pet.CurrentStamina);
 
                 // NEW: Initialize behaviors from definition
                 pet.InitializeBehaviors(definition);
@@ -482,5 +523,6 @@ namespace IdleDefenseSurvival.Pet
         public long experience;
         public int evolutionStage;
         public bool isEquipped;
+        public float currentStamina = -1f; // -1 = unset (v4 backward compat)
     }
 }

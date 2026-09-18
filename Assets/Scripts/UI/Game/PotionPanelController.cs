@@ -402,10 +402,29 @@ namespace IdleDefenseSurvival.UI.Game
             return false;
         }
 
-        private static bool RestoreStamina()
+        private bool RestoreStamina()
         {
-            // Player doesn't have a stamina system yet.
-            return false;
+            // Restore stamina for equipped pet with lowest stamina percentage
+            var petManager = Pet.PetManager.Instance;
+            if (petManager == null) return false;
+
+            var targetPet = petManager.GetPetWithLowestStaminaPercentage();
+            if (targetPet == null) return false;
+
+            // Check if stamina already full
+            if (targetPet.StaminaPercent >= 1f) return false;
+
+            var potion = GetPotion("potion_sp");
+            if (potion == null) return false;
+
+            // Calculate restore amount (percent + flat)
+            float maxStamina = targetPet.MaxStamina;
+            float amount = potion.CalculateAmount(maxStamina);
+
+            // Restore stamina (clamped internally)
+            targetPet.RestoreStamina(amount);
+
+            return true;
         }
 
         /// <summary>Visual cooldown: updates radial fill on icon while timer runs.</summary>

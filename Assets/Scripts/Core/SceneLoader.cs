@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 
 namespace IdleDefenseSurvival.Core
 {
+    public enum SceneState { 
+        CardCollection, Crafting, Game, Inventory, MainMenu, Upgrade, Pet 
+    }
+
     /// <summary>
     /// Global scene loader.
     /// Handles additive scene loading/unloading.
@@ -23,6 +27,7 @@ namespace IdleDefenseSurvival.Core
         private string _isInventory = SceneState.Inventory.ToString();
         private string _isCrafting = SceneState.Crafting.ToString();
         private string _isUpgrade = SceneState.Upgrade.ToString();
+        private string _isPet = SceneState.Pet.ToString();
 
         private void Awake()
         {
@@ -34,12 +39,6 @@ namespace IdleDefenseSurvival.Core
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-        }
-
-        private void Start()
-        {
-            // Ensure sleep timeout is set after all Awake calls
-            Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
 
         /// <summary>
@@ -69,7 +68,6 @@ namespace IdleDefenseSurvival.Core
         private IEnumerator SwitchSceneRoutine(string unloadScene, string loadScene)
         {
             _isLoading = true;
-
             try
             {
                 // Reset global state ketika kembali ke MainMenu
@@ -91,7 +89,6 @@ namespace IdleDefenseSurvival.Core
                         );
                         yield break;
                     }
-
                     while (!loadOp.isDone) yield return null;
                 }
                 else
@@ -106,8 +103,7 @@ namespace IdleDefenseSurvival.Core
                 if (!loadedScene.IsValid() || !loadedScene.isLoaded)
                 {
                     Debug.LogError(
-                        $"[SceneLoader] Target scene is invalid " +
-                        $"or not loaded: {loadScene}"
+                        $"[SceneLoader] Target scene is invalid or not loaded: {loadScene}"
                     );
                     yield break;
                 }
@@ -130,7 +126,11 @@ namespace IdleDefenseSurvival.Core
                 // =========================
                 // GAME CALLBACK
                 // =========================
-                if (loadScene == _isGame) OnGameSceneLoaded?.Invoke();
+                if (loadScene == _isGame)
+                {
+                    Screen.sleepTimeout = SleepTimeout.NeverSleep;
+                    OnGameSceneLoaded?.Invoke();
+                }
             }
             finally
             {
@@ -145,12 +145,14 @@ namespace IdleDefenseSurvival.Core
         public void LoadInventory() => SwitchScene(_isMainMenu, _isInventory);
         public void LoadCrafting() => SwitchScene(_isMainMenu, _isCrafting);
         public void LoadUpgrade() => SwitchScene(_isMainMenu, _isUpgrade);
+        public void LoadPet() => SwitchScene(_isMainMenu, _isPet);
         
         public void ReturnToMainMenuFromGame() => SwitchScene(_isGame, _isMainMenu);
         public void ReturnToMainMenuFromCardCollection() => SwitchScene(_isCardCollection, _isMainMenu);
         public void ReturnToMainMenuFromInventory() => SwitchScene(_isInventory, _isMainMenu);
         public void ReturnToMainMenuFromCrafting() => SwitchScene(_isCrafting, _isMainMenu);
         public void ReturnToMainMenuFromUpgrade() => SwitchScene(_isUpgrade, _isMainMenu);
+        public void ReturnToMainMenuFromPetCollection() => SwitchScene(_isPet, _isMainMenu);
 
         private bool IsSceneLoaded(string sceneName)
         {
@@ -163,8 +165,8 @@ namespace IdleDefenseSurvival.Core
             Time.timeScale = 1f;
         }
 
-        private void OnEnable() => Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        private void OnApplicationQuit()  => Screen.sleepTimeout = SleepTimeout.SystemSetting;
+        private void OnEnable() => Screen.sleepTimeout = SleepTimeout.SystemSetting;
+        private void OnApplicationQuit() => Screen.sleepTimeout = SleepTimeout.SystemSetting;
         private void OnDisable() => Screen.sleepTimeout = SleepTimeout.SystemSetting;
         private void OnDestroy() => Screen.sleepTimeout = SleepTimeout.SystemSetting;
 

@@ -1,6 +1,5 @@
 {
-  "pets": [
-    {
+  "pets": [{
       "id": "pet_voidling",
       "name": "Voidling",
       "description": "Void creature that protects player in emergencies. Prioritizes enemies near player and provides shields when HP is critical.",
@@ -36,8 +35,9 @@
       },
       "orbitRadius": 2.5,
       "emergencyThreshold": 0.3,
-      "behaviorDefinitions": [
-        {
+      "maxStamina": 100,
+      "staminaRegen": 2.0,
+      "behaviorDefinitions": [{
           "id": "voidling_basic_attack",
           "priority": 40,
           "executionMode": "Exclusive",
@@ -74,8 +74,7 @@
           },
           "condition": {
             "type": "ANY",
-            "subconditions": [
-              {
+            "subconditions": [{
                 "type": "EnemyCountAbove",
                 "value": 3
               },
@@ -132,38 +131,37 @@
       },
       "orbitRadius": 3.0,
       "emergencyThreshold": 0.25,
-      "behaviorDefinitions": [
-        {
-          "id": "executioner_attack",
-          "priority": 80,
-          "executionMode": "Exclusive",
-          "targeter": {
-            "type": "LowestHP",
-            "range": 10
+      "maxStamina": 120,
+      "staminaRegen": 2.5,
+      "behaviorDefinitions": [{
+        "id": "executioner_attack",
+        "priority": 80,
+        "executionMode": "Exclusive",
+        "targeter": {
+          "type": "LowestHP",
+          "range": 10
+        },
+        "trigger": {
+          "type": "Always"
+        },
+        "condition": {
+          "type": "TargetExists"
+        },
+        "action": {
+          "type": "BasicAttack",
+          "damageMultiplier": 1.2
+        },
+        "modifiers": [{
+            "type": "Finisher",
+            "value": 0.3
           },
-          "trigger": {
-            "type": "Always"
-          },
-          "condition": {
-            "type": "TargetExists"
-          },
-          "action": {
-            "type": "BasicAttack",
-            "damageMultiplier": 1.2
-          },
-          "modifiers": [
-            {
-              "type": "Finisher",
-              "value": 0.3
-            },
-            {
-              "type": "Execute",
-              "value": 0.1
-            }
-          ],
-          "cooldown": 0.5
-        }
-      ]
+          {
+            "type": "Execute",
+            "value": 0.1
+          }
+        ],
+        "cooldown": 0.5
+      }]
     },
     {
       "id": "pet_thunder_pup",
@@ -200,40 +198,39 @@
       },
       "orbitRadius": 2.8,
       "emergencyThreshold": 0.3,
-      "behaviorDefinitions": [
-        {
-          "id": "cluster_bomber",
-          "priority": 70,
-          "executionMode": "Exclusive",
-          "targeter": {
-            "type": "Cluster",
-            "range": 9
+      "maxStamina": 110,
+      "staminaRegen": 2.2,
+      "behaviorDefinitions": [{
+        "id": "cluster_bomber",
+        "priority": 70,
+        "executionMode": "Exclusive",
+        "targeter": {
+          "type": "Cluster",
+          "range": 9
+        },
+        "trigger": {
+          "type": "Always"
+        },
+        "condition": {
+          "type": "EnemyCountAbove",
+          "value": 2
+        },
+        "action": {
+          "type": "BasicAttack",
+          "damageMultiplier": 1.0
+        },
+        "modifiers": [{
+            "type": "Chain",
+            "count": 3,
+            "value": 0.5
           },
-          "trigger": {
-            "type": "Always"
-          },
-          "condition": {
-            "type": "EnemyCountAbove",
-            "value": 2
-          },
-          "action": {
-            "type": "BasicAttack",
-            "damageMultiplier": 1.0
-          },
-          "modifiers": [
-            {
-              "type": "Chain",
-              "count": 3,
-              "value": 0.5
-            },
-            {
-              "type": "Splash",
-              "value": 2.0
-            }
-          ],
-          "cooldown": 0.55
-        }
-      ]
+          {
+            "type": "Splash",
+            "value": 2.0
+          }
+        ],
+        "cooldown": 0.55
+      }]
     },
     {
       "id": "pet_blood_bat",
@@ -270,34 +267,32 @@
       },
       "orbitRadius": 2.0,
       "emergencyThreshold": 0.35,
-      "behaviorDefinitions": [
-        {
-          "id": "vampiric_assault",
-          "priority": 50,
-          "executionMode": "Exclusive",
-          "targeter": {
-            "type": "HighestHP",
-            "range": 7
-          },
-          "trigger": {
-            "type": "Always"
-          },
-          "condition": {
-            "type": "TargetExists"
-          },
-          "action": {
-            "type": "BasicAttack",
-            "damageMultiplier": 1.0
-          },
-          "modifiers": [
-            {
-              "type": "Leech",
-              "value": 25.0
-            }
-          ],
-          "cooldown": 0.4
-        }
-      ]
+      "maxStamina": 80,
+      "staminaRegen": 3.0,
+      "behaviorDefinitions": [{
+        "id": "vampiric_assault",
+        "priority": 50,
+        "executionMode": "Exclusive",
+        "targeter": {
+          "type": "HighestHP",
+          "range": 7
+        },
+        "trigger": {
+          "type": "Always"
+        },
+        "condition": {
+          "type": "TargetExists"
+        },
+        "action": {
+          "type": "BasicAttack",
+          "damageMultiplier": 1.0
+        },
+        "modifiers": [{
+          "type": "Leech",
+          "value": 25.0
+        }],
+        "cooldown": 0.4
+      }]
     },
     {
       "id": "pet_iron_tortoise",
@@ -334,8 +329,9 @@
       },
       "orbitRadius": 2.0,
       "emergencyThreshold": 0.4,
-      "behaviorDefinitions": [
-        {
+      "maxStamina": 150,
+      "staminaRegen": 1.5,
+      "behaviorDefinitions": [{
           "id": "guardian_shield",
           "priority": 90,
           "executionMode": "Exclusive",
