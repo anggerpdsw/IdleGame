@@ -434,7 +434,8 @@ namespace IdleDefenseSurvival.Player
                         // every hit an armed passive gets its chance to fire.
                         TriggerEquipmentHitEffects(enemy);
 
-                        if (_lifeSteal > 0f) {
+                        // Block lifesteal if Necromancer Unregeneration aura is active
+                        if (_lifeSteal > 0f && !_player.IsUnregenerationActive()) {
                             float heal = Mathf.Max(0.1f, actualDamage * _lifeSteal * 0.01f);
                             _player.Heal(heal);
                         }

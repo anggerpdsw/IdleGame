@@ -205,31 +205,78 @@ namespace IdleDefenseSurvival.Pet
         }
 
         /// <summary>
-        /// Update follow behavior - orbit around player.
+        /// Update follow behavior - formation anchor relatif player.
+        /// Pet tidak langsung menuju player, tapi ke formation slot.
         /// </summary>
         private void UpdateFollowBehavior(PetRuntime pet, float deltaTime)
         {
             if (_player == null || pet.Transform == null) return;
 
-            // Calculate orbit position
-            float angle = pet.OrbitIndex * (360f / Mathf.Max(1, _equippedPets.Count)) * Mathf.Deg2Rad;
-            Vector3 offset = new(
-                Mathf.Cos(angle) * pet.Definition.orbitRadius,
-                Mathf.Sin(angle) * pet.Definition.orbitRadius,
-                0f
-            );
+            // Calculate formation offset (cartesian, bukan polar)
+            Vector3 formationOffset = CalculateFormationOffset(pet.OrbitIndex, _equippedPets.Count, pet.Definition.orbitRadius);
+            Vector3 formationPos = _player.transform.position + formationOffset;
 
-            Vector3 targetPos = _player.transform.position + offset;
-
-            // Smooth movement
+            float distance = Vector3.Distance(pet.Transform.position, formationPos);
             float moveSpeed = pet.Definition.baseStats.moveSpeed;
-            pet.Transform.position = Vector3.MoveTowards(
-                pet.Transform.position,
-                targetPos,
-                moveSpeed * deltaTime
-            );
+
+            // Distance-based catch-up behavior
+            if (distance > 8f)
+            {
+                // Safety snap - pet tertinggal terlalu jauh
+                pet.Transform.position = formationPos;
+            }
+            else if (distance > 5f)
+            {
+                // Aggressive return - speed boost 2x
+                pet.Transform.position = Vector3.MoveTowards(
+                    pet.Transform.position,
+                    formationPos,
+                    moveSpeed * 2f * deltaTime
+                );
+            }
+            else if (distance > 2f)
+            {
+                // Catch up - speed boost 1.5x
+                pet.Transform.position = Vector3.MoveTowards(
+                    pet.Transform.position,
+                    formationPos,
+                    moveSpeed * 1.5f * deltaTime
+                );
+            }
+            else
+            {
+                // Normal follow - base speed
+                pet.Transform.position = Vector3.MoveTowards(
+                    pet.Transform.position,
+                    formationPos,
+                    moveSpeed * deltaTime
+                );
+            }
 
             pet.Position = pet.Transform.position;
+        }
+
+        /// <summary>
+        /// Calculate formation offset untuk pet index.
+        /// Formation pattern: spread horizontal di belakang player.
+        /// </summary>
+        private Vector3 CalculateFormationOffset(int index, int totalCount, float baseRadius)
+        {
+            if (totalCount == 1)
+            {
+                // Single pet: langsung di belakang player
+                return new Vector3(0f, -baseRadius, 0f);
+            }
+
+            // Multi-pet: spread horizontal
+            float spacing = baseRadius * 0.8f;
+            float totalWidth = (totalCount - 1) * spacing;
+            float startX = -totalWidth / 2f;
+
+            float x = startX + (index * spacing);
+            float y = -baseRadius; // Behind player
+
+            return new Vector3(x, y, 0f);
         }
 
         /// <summary>

@@ -17,10 +17,10 @@
         "shortName": "ADG"
       },
       "attackSpeed": {
-        "baseValue": 1.15,
-        "bonusPerPoint": 0.01,
-        "ValuePerLevel": 0.02,
-        "ValuePerEnhance": 0.02,
+        "baseValue": 0.9,
+        "bonusPerPoint": 0.005,
+        "ValuePerLevel": 0.001,
+        "ValuePerEnhance": 0.01,
         "description": "Speed projectiles are fired from player",
         "displayName": "Attack Speed",
         "shortName": "ASP"
@@ -98,9 +98,9 @@
         "shortName": "MCH"
       },
       "multiShootCount": {
-        "baseValue": 2,
-        "bonusPerPoint": 0.05,
-        "ValuePerLevel": 0.02,
+        "baseValue": 0.03,
+        "bonusPerPoint": 0.0025,
+        "ValuePerLevel": 0.0125,
         "ValuePerEnhance": 0.1,
         "description": "Number of projectiles shot when multishot activates",
         "displayName": "Multi-Shot Count",

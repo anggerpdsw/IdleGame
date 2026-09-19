@@ -263,7 +263,7 @@ namespace IdleDefenseSurvival.Player
             int maxTargets = 1;
             if (multiShoot)
             {
-                float rawMultiShootCount = PlayerStatsManager.Instance.GetStat(SkillType.MultiShootCount);
+                float rawMultiShootCount = maxTargets + PlayerStatsManager.Instance.GetStat(SkillType.MultiShootCount);
                 int accumulatedCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawMultiShootCount, AccumulatedCountType.Multi);
                 int potentialTargets = Mathf.Min(accumulatedCount, targets.Count);
 
@@ -553,7 +553,7 @@ namespace IdleDefenseSurvival.Player
             SetBurnEffect(active);
         }
 
-        private bool IsUnregenerationActive()
+        public bool IsUnregenerationActive()
         {
             bool active = PlayerStatusEffectManager.Instance?.IsUnregenerationActive ?? false;
             if (_unregenCooldownImage != null)
