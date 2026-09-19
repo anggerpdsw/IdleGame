@@ -52,7 +52,19 @@ namespace IdleDefenseSurvival
         public const string KEY_PITY_LEGENDARY = "PityLegendary";
         public const string KEY_PITY_MYTHIC = "PityMythic";
 
-        // Daily Reward        
+        // Pet System
+        public const int PET_START_SLOT = 1;
+        public const int PET_MAX_SLOT = 5;
+        public static readonly int[] PET_SLOT_EXPANSION_COSTS =
+        {
+            0,      // Slot 1 (free)
+            200,    // Slot 2
+            400,    // Slot 3
+            1000,   // Slot 4
+            2000    // Slot 5
+        };
+
+        // Daily Reward
         public const int REWARD_COUNT = 7;
         public const int COOLDOWN_MINUTES = 5;
         public const int DAILY_GOLD_REWARD = 10000;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Pet;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -78,6 +79,12 @@ namespace IdleDefenseSurvival.Core
 
         public static Sprite GetIcon(string id)
             => ResourceCache.Load<Sprite>($"Art/Card/Icon/{id}");
+    }
+    
+    public static class PetResources
+    {
+        public static Sprite GetPetIcon(string petID)
+            => ResourceCache.Load<Sprite>($"Art/Pet/{petID}");
     }
     
     public static class PlayerResources
@@ -201,6 +208,27 @@ namespace IdleDefenseSurvival.Core
                 return;
             }
             _databaseUltimate = database;
+        }
+        
+        private const string DATA_PET = "Data/Pet/dataPet";
+        private static PetDataWrapper _databasePet;
+        public static PetDataWrapper DatabasePet
+        { get { if (_databasePet == null) LoadPet(); return _databasePet; }}
+        private static void LoadPet()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_PET);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_PET}.json");
+                return;
+            }
+            var database = JsonConvert.DeserializeObject<PetDataWrapper>(jsonFile.text);
+            if (database == null || database.pets == null || database.pets.Count == 0)
+            {
+                Debug.LogError($"Pet database in {DATA_PET} is empty or invalid.");
+                return;
+            }
+            _databasePet = database;
         }
         
         public static void ClearAll()

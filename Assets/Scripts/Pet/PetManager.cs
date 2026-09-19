@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using PlayerClass = IdleDefenseSurvival.Player.Player;
 using IdleDefenseSurvival.Pet.Behavior;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Pet
 {
@@ -42,6 +43,9 @@ namespace IdleDefenseSurvival.Pet
         // Equipped pets (currently active in combat)
         private List<PetRuntime> _equippedPets = new();
 
+        // Unlocked pet slots
+        private int _unlockedSlots = GameConstants.PET_START_SLOT;
+
         // Player reference
         private PlayerClass _player;
 
@@ -54,6 +58,7 @@ namespace IdleDefenseSurvival.Pet
         public event Action<PetRuntime, string> OnPetSkillReady;
         public event Action<PetRuntime> OnPetEquipped;
         public event Action<PetRuntime> OnPetUnequipped;
+        public event Action OnSlotExpanded;
 
         private void Awake()
         {
@@ -64,25 +69,43 @@ namespace IdleDefenseSurvival.Pet
             }
             _instance = this;
             DontDestroyOnLoad(gameObject);
-
-            LoadPetDefinitions();
         }
 
         private void Start()
         {
-            // Find player and subscribe to health changes for emergency mode
-            _player = PlayerClass.Instance;
-            if (_player != null) _player.OnHealthChanged += CheckEmergencyMode;
+            LoadPetDefinitions();
+            TryBindPlayer();
+
+            // DEBUG: Check setup
+            Debug.Log($"[PetManager] Prefab assigned: {_petPrefab != null}, Container assigned: {_petContainer != null}");
+            Debug.Log($"[PetManager] Equipped pets: {_equippedPets.Count}, Owned pets: {_ownedPets.Count}");
         }
 
         private void Update()
         {
+            // Late-bind Player if not available at Start (Bootstrap → Game transition)
+            if (_player == null)
+            {
+                TryBindPlayer();
+            }
+
             float deltaTime = Time.deltaTime;
             _battleTime += deltaTime;
 
             foreach (var pet in _equippedPets)
             {
-                if (pet == null || pet.GameObject == null) continue;
+                if (pet == null) continue;
+
+                // Spawn visual if not yet instantiated (late equip after Player exists)
+                if (pet.GameObject == null && _petPrefab != null && _petContainer != null)
+                {
+                    var petObj = Instantiate(_petPrefab, _petContainer);
+                    pet.GameObject = petObj;
+                    pet.Transform = petObj.transform;
+                    Debug.Log($"[PetManager] Late-spawned visual for {pet.PetId}");
+                }
+
+                if (pet.GameObject == null) continue;
 
                 // Tick cooldowns (skills + behaviors)
                 pet.TickCooldowns(deltaTime);
@@ -101,32 +124,39 @@ namespace IdleDefenseSurvival.Pet
         }
 
         /// <summary>
+        /// Bind Player reference and auto-assign container.
+        /// Called when Player becomes available (Bootstrap → Game transition).
+        /// </summary>
+        private void TryBindPlayer()
+        {
+            if (_player != null) return;
+
+            _player = PlayerClass.Instance;
+            if (_player == null) return;
+
+            _player.OnHealthChanged += CheckEmergencyMode;
+
+            // Auto-assign Player as container if not set in Inspector
+            if (_petContainer == null)
+            {
+                _petContainer = _player.transform;
+                Debug.Log("[PetManager] Auto-assigned Player as pet container");
+            }
+        }
+
+        /// <summary>
         /// Load pet definitions from dataPet.json.
         /// </summary>
         private void LoadPetDefinitions()
         {
-            var textAsset = Resources.Load<TextAsset>("Data/Pet/dataPet");
-            if (textAsset == null)
+            PetDataWrapper _database = DatabaseJSONCache.DatabasePet;
+            if (_database?.pets != null)
             {
-                Debug.LogWarning("[PetManager] dataPet.json not found in Resources/Data/Pet/");
-                return;
-            }
-
-            try
-            {
-                var wrapper = JsonUtility.FromJson<PetDataWrapper>(textAsset.text);
-                if (wrapper?.pets != null)
+                foreach (var def in _database.pets)
                 {
-                    foreach (var def in wrapper.pets)
-                    {
-                        _petDefinitions[def.id] = def;
-                    }
-                    Debug.Log($"[PetManager] Loaded {_petDefinitions.Count} pet definitions");
+                    _petDefinitions[def.id] = def;
                 }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"[PetManager] Failed to parse dataPet.json: {e.Message}");
+                Debug.Log($"[PetManager] Loaded {_petDefinitions.Count} pet definitions");
             }
         }
 
@@ -377,14 +407,70 @@ namespace IdleDefenseSurvival.Pet
             return new List<PetRuntime>(_equippedPets);
         }
 
+        public Dictionary<string, PetDefinition> GetAllDefinitions()
+        {
+            return _petDefinitions;
+        }
+
+        public bool HasPet(string petId)
+        {
+            return _ownedPets.Values.Any(p => p.PetId == petId);
+        }
+
+        public bool IsPetEquipped(string petId)
+        {
+            return _equippedPets.Any(p => p.PetId == petId);
+        }
+
+        public int UnlockedSlotCount => _unlockedSlots;
+        public int MaxSlots => GameConstants.PET_MAX_SLOT;
+        public int EquippedPetCount => _equippedPets.Count;
+
+        public int NextSlotCostGem
+        {
+            get
+            {
+                if (_unlockedSlots >= GameConstants.PET_MAX_SLOT) return 0;
+                return GameConstants.PET_SLOT_EXPANSION_COSTS[_unlockedSlots];
+            }
+        }
+
+        public bool ExpandSlot()
+        {
+            if (_unlockedSlots >= GameConstants.PET_MAX_SLOT)
+            {
+                Debug.LogWarning("[PetManager] Cannot expand: already at max slots");
+                return false;
+            }
+
+            int cost = NextSlotCostGem;
+            var economyService = ServiceLocator.EconomyService;
+            if (economyService == null)
+            {
+                Debug.LogError("[PetManager] EconomyService not available");
+                return false;
+            }
+
+            if (!economyService.HasEnoughCurrency(CurrencyType.Gem, cost))
+            {
+                Debug.LogWarning($"[PetManager] Not enough gems. Need {cost}");
+                return false;
+            }
+
+            economyService.TrySpendCurrency(CurrencyType.Gem, cost, "PetSlotExpansion");
+            _unlockedSlots++;
+            OnSlotExpanded?.Invoke();
+
+            Debug.Log($"[PetManager] Expanded pet slots to {_unlockedSlots}");
+            return true;
+        }
+
         public bool EquipPet(string instanceId)
         {
-            if (!_ownedPets.TryGetValue(instanceId, out var pet))
-                return false;
-
-            if (_equippedPets.Contains(pet))
-                return false; // Already equipped
-
+            if (!_ownedPets.TryGetValue(instanceId, out var pet)) return false;
+            // Already equipped
+            if (_equippedPets.Contains(pet)) return false;
+            if (_equippedPets.Count >= _unlockedSlots) return false;
             // Spawn visual GameObject
             if (_petPrefab != null && _petContainer != null)
             {
@@ -392,12 +478,15 @@ namespace IdleDefenseSurvival.Pet
                 pet.GameObject = petObj;
                 pet.Transform = petObj.transform;
                 pet.OrbitIndex = _equippedPets.Count; // Assign orbit position
+                Debug.Log($"[PetManager] Spawned visual for {pet.PetId} at {petObj.transform.position}");
             }
-
+            else
+            {
+                Debug.LogWarning($"[PetManager] Cannot spawn visual: Prefab={_petPrefab != null}, Container={_petContainer != null}");
+            }
             _equippedPets.Add(pet);
             pet.CurrentState = PetState.Follow;
             OnPetEquipped?.Invoke(pet);
-
             return true;
         }
 
@@ -405,9 +494,7 @@ namespace IdleDefenseSurvival.Pet
         {
             var pet = _equippedPets.FirstOrDefault(p => p.InstanceId == instanceId);
             if (pet == null) return false;
-
             _equippedPets.Remove(pet);
-
             // Destroy visual GameObject
             if (pet.GameObject != null)
             {
@@ -415,20 +502,14 @@ namespace IdleDefenseSurvival.Pet
                 pet.GameObject = null;
                 pet.Transform = null;
             }
-
             OnPetUnequipped?.Invoke(pet);
             return true;
         }
 
         public PetDefinition GetPetDefinition(string petId)
-        {
-            return _petDefinitions.TryGetValue(petId, out var def) ? def : null;
-        }
-
+            => _petDefinitions.TryGetValue(petId, out var def) ? def : null;
         public PetRuntime GetOwnedPet(string instanceId)
-        {
-            return _ownedPets.TryGetValue(instanceId, out var pet) ? pet : null;
-        }
+            => _ownedPets.TryGetValue(instanceId, out var pet) ? pet : null;
 
         public string GrantPet(string petId, int level = 1)
         {
@@ -449,10 +530,7 @@ namespace IdleDefenseSurvival.Pet
             return instanceId;
         }
 
-        public bool IsEmergencyModeActive()
-        {
-            return _equippedPets.Any(p => p.IsEmergencyMode);
-        }
+        public bool IsEmergencyModeActive() => _equippedPets.Any(p => p.IsEmergencyMode);
 
         /// <summary>
         /// Find equipped pet with lowest stamina percentage.
@@ -505,7 +583,8 @@ namespace IdleDefenseSurvival.Pet
                     experience = pet.Experience,
                     evolutionStage = pet.EvolutionStage,
                     isEquipped = _equippedPets.Contains(pet),
-                    currentStamina = pet.CurrentStamina
+                    currentStamina = pet.CurrentStamina,
+                    unlockedSlots = _unlockedSlots
                 });
             }
 
@@ -518,6 +597,12 @@ namespace IdleDefenseSurvival.Pet
 
             _ownedPets.Clear();
             _equippedPets.Clear();
+
+            // Restore unlocked slots from first entry (all entries share same slot count)
+            if (saveData.Count > 0 && saveData[0].unlockedSlots > 0)
+                _unlockedSlots = saveData[0].unlockedSlots;
+            else
+                _unlockedSlots = GameConstants.PET_START_SLOT;
 
             foreach (var entry in saveData)
             {
@@ -547,6 +632,10 @@ namespace IdleDefenseSurvival.Pet
         }
 
         #endregion
+        
+        #region UI Navigation
+        public void OpenPet() => SceneLoader.Instance.LoadPet();
+        #endregion
     }
 
     /// <summary>
@@ -571,5 +660,6 @@ namespace IdleDefenseSurvival.Pet
         public int evolutionStage;
         public bool isEquipped;
         public float currentStamina = -1f; // -1 = unset (v4 backward compat)
+        public int unlockedSlots = 1; // v4.1: default 1 for backward compat
     }
 }

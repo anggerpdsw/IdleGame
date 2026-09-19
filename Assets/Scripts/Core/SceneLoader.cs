@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 namespace IdleDefenseSurvival.Core
 {
     public enum SceneState { 
-        CardCollection, Crafting, Game, Inventory, MainMenu, Upgrade, Pet 
+        CardCollection, Crafting, Game, Inventory, MainMenu, Upgrade, PetCollection 
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ namespace IdleDefenseSurvival.Core
         private string _isInventory = SceneState.Inventory.ToString();
         private string _isCrafting = SceneState.Crafting.ToString();
         private string _isUpgrade = SceneState.Upgrade.ToString();
-        private string _isPet = SceneState.Pet.ToString();
+        private string _isPet = SceneState.PetCollection.ToString();
 
         private void Awake()
         {

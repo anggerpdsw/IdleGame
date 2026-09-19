@@ -10,6 +10,7 @@ using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.SkillTree;
 using IdleDefenseSurvival.Upgrade;
+using IdleDefenseSurvival.Pet;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -67,6 +68,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<UpgradeService>();
             EnsureSingleton<SkillTreeBonusManager>();
             EnsureSingleton<UpgradeManager>();
+            EnsureSingleton<PetManager>();
 
             // Right After SaveData Loaded do this
             if (SaveManager.Instance?.IsSaveLoaded == true) {

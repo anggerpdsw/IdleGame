@@ -204,6 +204,23 @@ namespace IdleDefenseSurvival.Pet
                 }
             }
         }
+                
+        public float GetActiveSkillCooldown()
+        {
+            if (Definition?.behaviorDefinitions == null) return 0f;
+            string activeSkillId = Definition.skills?.active;
+            if (string.IsNullOrEmpty(activeSkillId)) return 0f;
+            // Cari behavior yang trigger.skillId match
+            foreach (var behavior in Definition.behaviorDefinitions)
+            {
+                if (behavior.trigger?.type == "CooldownReady" && 
+                    behavior.trigger?.skillId == activeSkillId)
+                {
+                    return behavior.cooldown;
+                }
+            }
+            return 0f;
+        }
 
         /// <summary>
         /// Check if target is valid (exists, active, has EnemyAi).
