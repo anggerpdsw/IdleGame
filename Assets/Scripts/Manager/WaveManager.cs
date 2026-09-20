@@ -262,19 +262,19 @@ namespace IdleDefenseSurvival.Manager
         private void Victory()
         {
             State = WaveState.Victory;
-            var result = BuildData(State);
+            var result = BuildData(State, "");
             OnRunCompleted?.Invoke(result);
             SaveManager.Instance.CompleteTier(CurrentTier);
             EndRun();
         }
-        public void Defeat()
+        public void Defeat(string killer = "")
         {
             State = WaveState.Defeat;
-            var result = BuildData(State);
+            var result = BuildData(State, killer);
             OnRunCompleted?.Invoke(result);
             EndRun();
         }
-        private VictoryData BuildData(WaveState waveState)
+        private VictoryData BuildData(WaveState waveState, string killer)
         {
             long bonusGold = Utilityku.WaveBonusVictory(_waveGoldEarned, CurrentTier, CurrentWave);
             long bonusMeat = Utilityku.WaveBonusVictory(_waveMeatEarned, CurrentTier, CurrentWave);
@@ -286,7 +286,8 @@ namespace IdleDefenseSurvival.Manager
                 MeatEarned  = _waveMeatEarned,
                 ExpEarned   = _waveExpEarned,
                 BonusGold   = bonusGold,
-                BonusMeat   = bonusMeat
+                BonusMeat   = bonusMeat,
+                KilledBy    = killer
             };
         }
         public void EndRun()

@@ -64,7 +64,7 @@
   ],
   "dexterity": [{
       "stat": "AttackSpeed",
-      "flat": 0.057,
+      "flat": 0.0077,
       "percent": 0
     },
     {

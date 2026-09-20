@@ -25,6 +25,9 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private TextMeshProUGUI _totalMeat;
         [SerializeField] private Button _close;
 
+        [SerializeField] private Image _iconEnemy;
+        [SerializeField] private TextMeshProUGUI _killedBy;
+
         private float _posBG;
 
         private void OnEnable()
@@ -45,11 +48,15 @@ namespace IdleDefenseSurvival.Controller
             if (result.State == WaveState.Defeat) {
                 _posBG = -271f;
                 _defeat.SetActive(true);
+                _iconEnemy.sprite = EnemyResources.GetEnemySprite(result.KilledBy);
+                _killedBy.text = $"Killed by: {result.KilledBy}";
             }
             else
             {
                 _posBG = -370f;
                 _defeat.SetActive(false);
+                _iconEnemy.gameObject.SetActive(false);
+                _killedBy.gameObject.SetActive(false);
             }
 
             _totalReward.anchoredPosition = new Vector2(_totalReward.anchoredPosition.x, _posBG);

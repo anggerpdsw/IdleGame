@@ -57,6 +57,7 @@ namespace IdleDefenseSurvival.Player
         private float _attackRangeSpeedRotate = 2f;
         // Immunity flag for DeathDefy
         private bool _isImmune;
+        private string _lastDamageSource;
 
         // Runtime state
         private List<TankInstance> _activeTanks;
@@ -760,6 +761,7 @@ namespace IdleDefenseSurvival.Player
             {
                 _currentHealth -= finalDamage;
                 _currentHealth = Mathf.Clamp(_currentHealth, 0, PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
+                _lastDamageSource = damageData.Source;
                 ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
             }
 
@@ -888,7 +890,7 @@ namespace IdleDefenseSurvival.Player
             }
 
             // Handle player death (e.g., trigger game over, respawn, etc.)
-            WaveManager.Instance.Defeat();
+            WaveManager.Instance.Defeat(_lastDamageSource);
         }
 
         // Coroutine that grants immunity and shows the barrier for the given duration.

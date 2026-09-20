@@ -757,7 +757,7 @@
         }],
         "onTakeDamage": [{
           "effect": "Burn",
-          "value": 44,
+          "value": 31,
           "duration": 30
         }]
       }],

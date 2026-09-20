@@ -15,5 +15,7 @@ namespace IdleDefenseSurvival.Data
 
         public long TotalGold => GoldEarned + BonusGold;
         public long TotalMeat => MeatEarned + BonusMeat;
+
+        public string KilledBy;
     }
 }
