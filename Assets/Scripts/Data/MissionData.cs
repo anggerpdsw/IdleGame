@@ -31,6 +31,8 @@ namespace IdleDefenseSurvival.Data
         public long gold;
         public long gem;
         public long meat;
+        public string itemId;
+        public int itemCount;
     }
 
     /// <summary>

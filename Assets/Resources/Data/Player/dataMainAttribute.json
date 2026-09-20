@@ -6,7 +6,7 @@
     },
     {
       "stat": "DefenseAmount",
-      "flat": 0.102,
+      "flat": 0.0912,
       "percent": 0
     },
     {
@@ -16,7 +16,7 @@
     },
     {
       "stat": "DeathDefy",
-      "flat": 0.05,
+      "flat": 0.0095,
       "percent": 0
     }
   ],
@@ -37,7 +37,7 @@
     },
     {
       "stat": "UltimateAttack",
-      "flat": 0.105,
+      "flat": 0.051,
       "percent": 0
     }
   ],
@@ -48,7 +48,7 @@
     },
     {
       "stat": "ManaRegen",
-      "flat": 0.131,
+      "flat": 0.063,
       "percent": 0
     },
     {
@@ -58,19 +58,19 @@
     },
     {
       "stat": "AttackRange",
-      "flat": 0.007,
+      "flat": 0.0067,
       "percent": 0
     }
   ],
   "dexterity": [{
       "stat": "AttackSpeed",
-      "flat": 0.017,
+      "flat": 0.057,
       "percent": 0
     },
     {
       "stat": "CriticalChance",
       "flat": 0,
-      "percent": 0.111
+      "percent": 0.062
     },
     {
       "stat": "Evasion",
@@ -80,7 +80,7 @@
     {
       "stat": "DamagePerRange",
       "flat": 0,
-      "percent": 0.075
+      "percent": 0.00975
     }
   ]
 }

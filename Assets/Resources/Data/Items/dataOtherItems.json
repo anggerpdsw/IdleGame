@@ -8,6 +8,60 @@
     "SellPrice": 20,
     "StackSize": 999
 }, {
+    "Id": "common_egg",
+    "Name": "Common Egg",
+    "Description": "A simple pet egg containing an ordinary companion.",
+    "Category": 5,
+    "ItemRarity": 1,
+    "IconKey": "Pet/Egg/common",
+    "SellPrice": 100,
+    "StackSize": 999
+}, {
+    "Id": "rare_egg",
+    "Name": "Rare Egg",
+    "Description": "A rare pet egg with a chance to hatch a valuable companion.",
+    "Category": 5,
+    "ItemRarity": 2,
+    "IconKey": "Pet/Egg/rare",
+    "SellPrice": 500,
+    "StackSize": 999
+}, {
+    "Id": "epic_egg",
+    "Name": "Epic Egg",
+    "Description": "An extraordinary pet egg containing a powerful companion.",
+    "Category": 5,
+    "ItemRarity": 3,
+    "IconKey": "Pet/Egg/epic",
+    "SellPrice": 2500,
+    "StackSize": 999
+}, {
+    "Id": "legendary_egg",
+    "Name": "Legendary Egg",
+    "Description": "A legendary pet egg said to contain an exceptionally powerful companion.",
+    "Category": 5,
+    "ItemRarity": 4,
+    "IconKey": "Pet/Egg/legendary",
+    "SellPrice": 10000,
+    "StackSize": 999
+}, {
+    "Id": "mythic_egg",
+    "Name": "Mythic Egg",
+    "Description": "A mythical pet egg containing a companion of extraordinary power.",
+    "Category": 5,
+    "ItemRarity": 5,
+    "IconKey": "Pet/Egg/mythic",
+    "SellPrice": 50000,
+    "StackSize": 999
+}, {
+    "Id": "divine_egg",
+    "Name": "Divine Egg",
+    "Description": "A divine pet egg said to hold a companion blessed with unimaginable power.",
+    "Category": 5,
+    "ItemRarity": 6,
+    "IconKey": "Pet/Egg/divine",
+    "SellPrice": 250000,
+    "StackSize": 999
+}, {
     "Id": "gold_pouch",
     "Name": "Gold Pouch",
     "Description": "A pouch of gold coins. Sell for a tidy sum.",

@@ -387,6 +387,7 @@ namespace IdleDefenseSurvival.Mission
             if (r.gold > 0) list.Add(new RewardData(RewardType.Gold, r.gold));
             if (r.gem > 0) list.Add(new RewardData(RewardType.Gem, r.gem));
             if (r.meat > 0) list.Add(new RewardData(RewardType.Meat, r.meat));
+            if (!string.IsNullOrEmpty(r.itemId) && r.itemCount > 0) list.Add(new RewardData(RewardType.Item, r.itemId, r.itemCount));
             return list;
         }
 
@@ -409,6 +410,11 @@ namespace IdleDefenseSurvival.Mission
             if (r.gold > 0) econ.AddCurrency(CurrencyType.Gold, r.gold, "MissionReward");
             if (r.gem > 0) econ.AddCurrency(CurrencyType.Gem, r.gem, "MissionReward");
             if (r.meat > 0) econ.AddCurrency(CurrencyType.Meat, r.meat, "MissionReward");
+            if (!string.IsNullOrEmpty(r.itemId) && r.itemCount > 0)
+            {
+                var inv = Inventory.InventoryService.Instance;
+                if (inv != null) inv.AddItem(r.itemId, r.itemCount);
+            }
         }
 
         public void RefreshMissions()

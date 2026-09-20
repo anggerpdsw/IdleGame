@@ -10,7 +10,9 @@
             "reward": {
                 "gold": 2500,
                 "gem": 2,
-                "meat": 35
+                "meat": 35,
+                "itemId": "common_egg",
+                "itemCount": 1
             },
             "claimCooldownMinutes": 1,
             "cancelCooldownMinutes": 15

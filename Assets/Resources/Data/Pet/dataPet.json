@@ -4,7 +4,7 @@
       "name": "Voidling",
       "description": "Void creature that protects player in emergencies. Prioritizes enemies near player and provides shields when HP is critical.",
       "role": "Support",
-      "rarity": "Epic",
+      "rarity": "Common",
       "baseStats": {
         "attack": 10,
         "attackSpeed": 1.5,
@@ -97,49 +97,49 @@
       ]
     },
     {
-      "id": "pet_ember_fox",
-      "name": "Ember Fox",
-      "description": "Aggressive fire fox that executes low-HP enemies with bonus damage",
-      "role": "DPS",
-      "rarity": "Legendary",
+      "id": "pet_blood_bat",
+      "name": "Blood Bat",
+      "description": "Vampiric bat that steals life from high-HP targets",
+      "role": "Support",
+      "rarity": "Rare",
       "baseStats": {
-        "attack": 15,
-        "attackSpeed": 2.0,
-        "skillDamage": 1.8,
-        "moveSpeed": 6,
-        "targetRange": 10,
-        "health": 80
+        "attack": 8,
+        "attackSpeed": 2.5,
+        "skillDamage": 1.2,
+        "moveSpeed": 7,
+        "targetRange": 7,
+        "health": 70
       },
       "growth": {
-        "attackPerLevel": 3,
-        "skillDamagePerLevel": 0.15,
-        "healthPerLevel": 8
+        "attackPerLevel": 1.5,
+        "skillDamagePerLevel": 0.08,
+        "healthPerLevel": 7
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
-        "LowestHp",
+        "HighestHp",
         "ClosestToPet"
       ],
       "skills": {
-        "basic": "flame_bolt",
-        "active": "fire_storm",
-        "passive": "burning_aura",
-        "evolution": "inferno"
+        "basic": "blood_drain",
+        "active": "vampiric_strike",
+        "passive": "blood_aura",
+        "evolution": "crimson_feast"
       },
       "evolutionRequirement": {
         "level": 10
       },
-      "orbitRadius": 3.0,
-      "emergencyThreshold": 0.25,
-      "maxStamina": 120,
-      "staminaRegen": 2.5,
+      "orbitRadius": 2.0,
+      "emergencyThreshold": 0.35,
+      "maxStamina": 80,
+      "staminaRegen": 3.0,
       "behaviorDefinitions": [{
-        "id": "executioner_attack",
-        "priority": 80,
+        "id": "vampiric_assault",
+        "priority": 50,
         "executionMode": "Exclusive",
         "targeter": {
-          "type": "LowestHP",
-          "range": 10
+          "type": "HighestHP",
+          "range": 7
         },
         "trigger": {
           "type": "Always"
@@ -149,18 +149,13 @@
         },
         "action": {
           "type": "BasicAttack",
-          "damageMultiplier": 1.2
+          "damageMultiplier": 1.0
         },
         "modifiers": [{
-            "type": "Finisher",
-            "value": 0.3
-          },
-          {
-            "type": "Execute",
-            "value": 0.1
-          }
-        ],
-        "cooldown": 0.5
+          "type": "Leech",
+          "value": 25.0
+        }],
+        "cooldown": 0.4
       }]
     },
     {
@@ -233,49 +228,49 @@
       }]
     },
     {
-      "id": "pet_blood_bat",
-      "name": "Blood Bat",
-      "description": "Vampiric bat that steals life from high-HP targets",
-      "role": "Support",
-      "rarity": "Rare",
+      "id": "pet_ember_fox",
+      "name": "Ember Fox",
+      "description": "Aggressive fire fox that executes low-HP enemies with bonus damage",
+      "role": "DPS",
+      "rarity": "Legendary",
       "baseStats": {
-        "attack": 8,
-        "attackSpeed": 2.5,
-        "skillDamage": 1.2,
-        "moveSpeed": 7,
-        "targetRange": 7,
-        "health": 70
+        "attack": 15,
+        "attackSpeed": 2.0,
+        "skillDamage": 1.8,
+        "moveSpeed": 6,
+        "targetRange": 10,
+        "health": 80
       },
       "growth": {
-        "attackPerLevel": 1.5,
-        "skillDamagePerLevel": 0.08,
-        "healthPerLevel": 7
+        "attackPerLevel": 3,
+        "skillDamagePerLevel": 0.15,
+        "healthPerLevel": 8
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
-        "HighestHp",
+        "LowestHp",
         "ClosestToPet"
       ],
       "skills": {
-        "basic": "blood_drain",
-        "active": "vampiric_strike",
-        "passive": "blood_aura",
-        "evolution": "crimson_feast"
+        "basic": "flame_bolt",
+        "active": "fire_storm",
+        "passive": "burning_aura",
+        "evolution": "inferno"
       },
       "evolutionRequirement": {
         "level": 10
       },
-      "orbitRadius": 2.0,
-      "emergencyThreshold": 0.35,
-      "maxStamina": 80,
-      "staminaRegen": 3.0,
+      "orbitRadius": 3.0,
+      "emergencyThreshold": 0.25,
+      "maxStamina": 120,
+      "staminaRegen": 2.5,
       "behaviorDefinitions": [{
-        "id": "vampiric_assault",
-        "priority": 50,
+        "id": "executioner_attack",
+        "priority": 80,
         "executionMode": "Exclusive",
         "targeter": {
-          "type": "HighestHP",
-          "range": 7
+          "type": "LowestHP",
+          "range": 10
         },
         "trigger": {
           "type": "Always"
@@ -285,13 +280,18 @@
         },
         "action": {
           "type": "BasicAttack",
-          "damageMultiplier": 1.0
+          "damageMultiplier": 1.2
         },
         "modifiers": [{
-          "type": "Leech",
-          "value": 25.0
-        }],
-        "cooldown": 0.4
+            "type": "Finisher",
+            "value": 0.3
+          },
+          {
+            "type": "Execute",
+            "value": 0.1
+          }
+        ],
+        "cooldown": 0.5
       }]
     },
     {
@@ -299,7 +299,7 @@
       "name": "Iron Tortoise",
       "description": "Defensive guardian that shields the player when HP drops",
       "role": "Tank",
-      "rarity": "Epic",
+      "rarity": "Mythic",
       "baseStats": {
         "attack": 6,
         "attackSpeed": 1.0,
