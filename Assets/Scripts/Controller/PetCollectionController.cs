@@ -21,6 +21,7 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addSlotButton;
         [SerializeField] private TextMeshProUGUI _slotMaxCount;
+        [SerializeField] private TextMeshProUGUI _slotMaxCount2;
         [SerializeField] private TextMeshProUGUI _nextSlotCostGem;
         [SerializeField] private PetDetailUI _petDetailUI;
 
@@ -75,9 +76,11 @@ namespace IdleDefenseSurvival.Controller
         {
             if (PetManager.Instance == null) return;
 
-            if (_slotMaxCount != null)
+            if (_slotMaxCount != null && _slotMaxCount2 != null) {
                 _slotMaxCount.text = $"{PetManager.Instance.EquippedPetCount}/{PetManager.Instance.UnlockedSlotCount}";
-
+                _slotMaxCount2.text = _slotMaxCount.text;
+            }
+            
             if (_nextSlotCostGem != null)
             {
                 _nextSlotCostGem.text =

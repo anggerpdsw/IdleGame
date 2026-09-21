@@ -32,6 +32,11 @@ namespace IdleDefenseSurvival.Crafting
         public int RecipeVersion = 1; // v3.5 §8.1 — defaults to 1 when JSON omits the field
         public PotionType PotionType = PotionType.None; // For potion recipes
 
+        // ============ Egg / Pet Crafting ============
+        public int PetType = 0; // 0=not an egg, 1-6=pet rarity tier (Common..Divine)
+        public string SpecificPetId; // If non-null, guaranteed pet ID instead of random by rarity
+        public bool IsEgg => PetType > 0;
+
         // ============ Requirements ============
         public int RequiredAlchemistLevel = 1;
         public int RequiredBlacksmithLevel = 1;

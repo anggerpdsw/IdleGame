@@ -43,6 +43,12 @@ namespace IdleDefenseSurvival.Crafting
                 baseMeat = GameConstants.BASE_CRAFT_POTION_MEAT_COST;
                 baseGem = GameConstants.BASE_CRAFT_POTION_GEM_COST;
             }
+            else if (recipe.IsEgg)
+            {
+                baseGold = GameConstants.BASE_CRAFT_PET_GOLD_COST;
+                baseMeat = GameConstants.BASE_CRAFT_PET_MEAT_COST;
+                baseGem = GameConstants.BASE_CRAFT_PET_GEM_COST;
+            }
 
             // rarity multiplier from config (1.0..4.5)
             float rarityMul = CraftingConfig.Load().GetRarityMultiplier(recipe.Rarity);

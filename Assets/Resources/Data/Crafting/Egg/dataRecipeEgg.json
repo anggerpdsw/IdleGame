@@ -1,0 +1,89 @@
+{
+  "SchemaVersion": 1,
+  "Recipes": [
+    {
+      "RecipeId": "craft_egg_r1",
+      "DisplayName": "Common Random Pet",
+      "Description": "Hatch common egg to get common Pet.",
+      "PetType": 1,
+      "Rarity": 1,
+      "RequiredAlchemistLevel": 1,
+      "Ingredients": [
+        { "ItemId": "common_egg_pet", "Count": 1 },
+        { "ItemId": "water", "Count": 1 }
+      ],
+      "BaseCraftTime": 5.0,
+      "TimePerAdditionalUnit": 5.0
+    },
+    {
+      "RecipeId": "craft_egg_r2",
+      "DisplayName": "Rare Random Pet",
+      "Description": "Hatch rare egg to get rare Pet.",
+      "PetType": 2,
+      "Rarity": 2,
+      "RequiredAlchemistLevel": 5,
+      "Ingredients": [
+        { "ItemId": "rare_egg_pet", "Count": 1 },
+        { "ItemId": "water", "Count": 2 }
+      ],
+      "BaseCraftTime": 8.0,
+      "TimePerAdditionalUnit": 8.0
+    },
+    {
+      "RecipeId": "craft_egg_r3",
+      "DisplayName": "Epic Random Pet",
+      "Description": "Hatch epic egg to get epic Pet.",
+      "PetType": 3,
+      "Rarity": 3,
+      "RequiredAlchemistLevel": 10,
+      "Ingredients": [
+        { "ItemId": "epic_egg_pet", "Count": 1 },
+        { "ItemId": "water", "Count": 3 }
+      ],
+      "BaseCraftTime": 12.0,
+      "TimePerAdditionalUnit": 12.0
+    },
+    {
+      "RecipeId": "craft_egg_r4",
+      "DisplayName": "Legendary Random Pet",
+      "Description": "Hatch legendary egg to get legendary Pet.",
+      "PetType": 4,
+      "Rarity": 4,
+      "RequiredAlchemistLevel": 15,
+      "Ingredients": [
+        { "ItemId": "legendary_egg_pet", "Count": 1 },
+        { "ItemId": "water", "Count": 4 }
+      ],
+      "BaseCraftTime": 18.0,
+      "TimePerAdditionalUnit": 18.0
+    },
+    {
+      "RecipeId": "craft_egg_r5",
+      "DisplayName": "Mythic Random Pet",
+      "Description": "Hatch mythic egg to get mythic Pet.",
+      "PetType": 5,
+      "Rarity": 5,
+      "RequiredAlchemistLevel": 20,
+      "Ingredients": [
+        { "ItemId": "mythic_egg_pet", "Count": 1 },
+        { "ItemId": "water", "Count": 5 }
+      ],
+      "BaseCraftTime": 25.0,
+      "TimePerAdditionalUnit": 25.0
+    },
+    {
+      "RecipeId": "craft_egg_r6",
+      "DisplayName": "Divine Random Pet",
+      "Description": "Hatch divine egg to get divine Pet.",
+      "PetType": 6,
+      "Rarity": 6,
+      "RequiredAlchemistLevel": 25,
+      "Ingredients": [
+        { "ItemId": "divine_egg_pet", "Count": 1 },
+        { "ItemId": "water", "Count": 6 }
+      ],
+      "BaseCraftTime": 35.0,
+      "TimePerAdditionalUnit": 35.0
+    }
+  ]
+}

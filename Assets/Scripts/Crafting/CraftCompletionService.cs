@@ -122,6 +122,16 @@ namespace IdleDefenseSurvival.Crafting
                 for (int qty = 0; qty < jobCount; qty++)
                 {
                     int seedForThis = (int)(completionSeed + qty);
+
+                    // Egg recipes bypass roll service - hatch directly
+                    if (recipe.IsEgg)
+                    {
+                        var eggResult = HatchEgg(recipe, seedForThis);
+                        if (eggResult != null)
+                            allItems.Add(eggResult);
+                        continue;
+                    }
+
                     var rollResult = _rollService.RollCraftSeeded(job.RecipeId, context, seedForThis);
                     Debug.Log($"[CraftCompletion] RollCraft qty={qty + 1}/{jobCount} success={rollResult.Success} entries={rollResult.Entries?.Count ?? 0}");
 
@@ -211,6 +221,52 @@ namespace IdleDefenseSurvival.Crafting
                 Failed?.Invoke(jobId, "Internal error");
                 Claimed?.Invoke(jobId, false);
             }
+        }
+
+        /// <summary>
+        /// Hatch egg recipe: grant pet or upgrade duplicate.
+        /// No InventoryItem returned - pet goes directly to PetManager.
+        /// </summary>
+        private InventoryItem HatchEgg(CraftRecipeData recipe, int seed)
+        {
+            var petManager = IdleDefenseSurvival.Pet.PetManager.Instance;
+            if (petManager == null)
+            {
+                Debug.LogError("[CraftCompletion] PetManager not found - cannot hatch egg");
+                return null;
+            }
+
+            string petId;
+            bool isNewPet;
+
+            // Specific pet or random by rarity
+            if (!string.IsNullOrEmpty(recipe.SpecificPetId))
+            {
+                petId = recipe.SpecificPetId;
+            }
+            else
+            {
+                petId = petManager.GetRandomPetByRarity(recipe.Rarity, seed);
+                if (string.IsNullOrEmpty(petId))
+                {
+                    Debug.LogError($"[CraftCompletion] No pet found for rarity {recipe.Rarity}");
+                    return null;
+                }
+            }
+
+            // Grant or upgrade
+            string result = petManager.HandleEggHatch(petId, out isNewPet);
+            if (string.IsNullOrEmpty(result))
+            {
+                Debug.LogError($"[CraftCompletion] Failed to hatch pet {petId}");
+                return null;
+            }
+
+            Debug.Log($"[CraftCompletion] Hatched {petId} (new={isNewPet})");
+
+            // Pet tidak masuk inventory - return null
+            // UI pet unlock/duplicate handled via PetManager events
+            return null;
         }
     }
 }

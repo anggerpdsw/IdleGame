@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Pet;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -24,6 +25,7 @@ namespace IdleDefenseSurvival.UI
         private string _petId;
         private PetRuntime _pet;
         private bool _isOwned;
+        private string _rarity;
         private Action<string> _onSelected;
 
         public void Setup(string petId, PetDefinition definition, bool isOwned, Sprite icon, Action<string> onSelected = null)
@@ -31,6 +33,7 @@ namespace IdleDefenseSurvival.UI
             _petId = petId;
             _isOwned = isOwned;
             _onSelected = onSelected;
+            _rarity = definition.rarity;
 
             if (_icon != null) _icon.sprite = icon;
             if (_nameText != null) _nameText.text = definition.name;
@@ -38,6 +41,7 @@ namespace IdleDefenseSurvival.UI
             RefreshOwnershipVisual();
             RefreshLevel();
             RefreshEquipState();
+            RefreshRarity();
 
             _button?.onClick.RemoveAllListeners();
             _button?.onClick.AddListener(OnClick);
@@ -49,6 +53,7 @@ namespace IdleDefenseSurvival.UI
             _petId = pet.PetId;
             _isOwned = true;
             _onSelected = onSelected;
+            _rarity = pet.Definition.rarity;
 
             if (_icon != null) _icon.sprite = icon;
             if (_nameText != null) _nameText.text = pet.Definition.name;
@@ -56,6 +61,7 @@ namespace IdleDefenseSurvival.UI
 
             RefreshOwnershipVisual();
             RefreshEquipState();
+            RefreshRarity();
 
             _button?.onClick.RemoveAllListeners();
             _button?.onClick.AddListener(OnClick);
@@ -101,22 +107,16 @@ namespace IdleDefenseSurvival.UI
             _equippedIndicator?.SetActive(equipped);
         }
 
+        private void RefreshRarity()
+        {
+            if (_rarityBorder == null || string.IsNullOrEmpty(_rarity)) return;
+            _rarityBorder.sprite = CardResources.GetFrame(_rarity);
+        }
+
         private void OnClick()
         {
-            if (!_isOwned || PetManager.Instance == null) return;
-
+            // Only show detail panel - equip/unequip handled by PetDetailUI button
             _onSelected?.Invoke(_petId);
-
-            // Find runtime instance
-            var saveData = PetManager.Instance.GetSaveData();
-            var entry = saveData.Find(e => e.petId == _petId);
-            if (entry == null) return;
-
-            bool equipped = PetManager.Instance.IsPetEquipped(_petId);
-            if (equipped)
-                PetManager.Instance.UnequipPet(entry.instanceId);
-            else
-                PetManager.Instance.EquipPet(entry.instanceId);
         }
     }
 }

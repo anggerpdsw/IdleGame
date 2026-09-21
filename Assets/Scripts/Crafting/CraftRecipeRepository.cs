@@ -83,7 +83,9 @@ namespace IdleDefenseSurvival.Crafting
                 "Data/Crafting/Potion/dataRecipeHealthPotion",
                 "Data/Crafting/Potion/dataRecipeManaPotion",
                 "Data/Crafting/Potion/dataRecipeStaminaPotion",
-                "Data/Crafting/Potion/dataRecipeDebuffPotion"
+                "Data/Crafting/Potion/dataRecipeDebuffPotion",
+
+                "Data/Crafting/Egg/dataRecipeEgg"
             };
 
             int totalLoaded = 0;
@@ -106,11 +108,16 @@ namespace IdleDefenseSurvival.Crafting
                     {
                         if (string.IsNullOrEmpty(recipe.RecipeId)) continue;
 
-                        // Inject requirements into Ingredients array
+                        // Inject requirements into Ingredients array (skip for egg recipes)
                         var extraIngredients = new List<CraftIngredient>();
 
+                        // Egg recipes: use only ingredients from JSON (egg item itself), no extra materials
+                        if (recipe.PetType > 0)
+                        {
+                            // Skip decomposed material injection for eggs
+                        }
                         // Potion-specific: require common-tier potion of same type instead of decomposed materials
-                        if (recipe.PotionType > 0 && recipe.Rarity > 1)
+                        else if (recipe.PotionType > 0 && recipe.Rarity > 1)
                         {
                             // Map PotionType to actual ItemId prefix
                             // PotionType enum: 1=Health (hp), 2=Mana (mp), 3=Stamina, 4=DebuffCleanse
@@ -162,6 +169,10 @@ namespace IdleDefenseSurvival.Crafting
                         // Set category for potion recipes
                         if (recipe.PotionType > 0)
                             recipe.Category = ItemCategory.Consumable;
+
+                        // Set category for egg recipes
+                        if (recipe.PetType > 0)
+                            recipe.Category = ItemCategory.Pet;
 
                         _allRecipes[recipe.RecipeId] = recipe;
                         totalLoaded++;

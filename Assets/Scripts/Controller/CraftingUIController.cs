@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Crafting;
 using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.UI.Tooltip;
@@ -26,9 +25,11 @@ namespace IdleDefenseSurvival.Controller
 
         [Header("Category Tabs")]
         [SerializeField] private Button _equipmentTabButton;
-        [SerializeField] private Button _potionTabButton;
         [SerializeField] private Image _equipmentTabSelection;
+        [SerializeField] private Button _potionTabButton;
         [SerializeField] private Image _potionTabSelection;
+        [SerializeField] private Button _petTabButton;
+        [SerializeField] private Image _petTabSelection;
 
         [Header("Equipment Sub-Filters")]
         [SerializeField] private Button _categoryAllEquipmentButton;
@@ -43,6 +44,13 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private Image _categoryAllPotionSelection;
         [SerializeField] private Image[] _categoryPotionSelections;
         [SerializeField] private GameObject _potionFilterPanel;
+
+        [Header("Pet Sub-Filters")]
+        [SerializeField] private Button _categoryAllPetButton;
+        [SerializeField] private Button[] _categoryPetButtons;
+        [SerializeField] private Image _categoryAllPetSelection;
+        [SerializeField] private Image[] _categoryPetSelections;
+        [SerializeField] private GameObject _petFilterPanel;
 
         [Header("Detail Panel")]
         [SerializeField] private Image _resultIcon;
@@ -68,7 +76,7 @@ namespace IdleDefenseSurvival.Controller
         [SerializeField] private RectTransform _jobList;
         [SerializeField] private JobEntryUI _jobEntryPrefab;
 
-        private enum CategoryTab { Equipment, Potion }
+        private enum CategoryTab { Equipment, Potion, Pet }
 
         private CategoryTab _currentTab = CategoryTab.Equipment;
         private string _selectedRecipeId;
@@ -147,6 +155,8 @@ namespace IdleDefenseSurvival.Controller
                 _equipmentTabButton.onClick.AddListener(() => OnTabChanged(CategoryTab.Equipment));
             if (_potionTabButton != null)
                 _potionTabButton.onClick.AddListener(() => OnTabChanged(CategoryTab.Potion));
+            if (_petTabButton != null)
+                _petTabButton.onClick.AddListener(() => OnTabChanged(CategoryTab.Pet));
         }
 
         private void BindCategoryButtons()
@@ -222,12 +232,16 @@ namespace IdleDefenseSurvival.Controller
                 _equipmentTabSelection.gameObject.SetActive(_currentTab == CategoryTab.Equipment);
             if (_potionTabSelection != null)
                 _potionTabSelection.gameObject.SetActive(_currentTab == CategoryTab.Potion);
+            if (_petTabSelection != null)
+                _petTabSelection.gameObject.SetActive(_currentTab == CategoryTab.Pet);
 
             // Show/hide filter panels
             if (_equipmentFilterPanel != null)
                 _equipmentFilterPanel.SetActive(_currentTab == CategoryTab.Equipment);
             if (_potionFilterPanel != null)
                 _potionFilterPanel.SetActive(_currentTab == CategoryTab.Potion);
+            if (_petFilterPanel != null)
+                _petFilterPanel.SetActive(_currentTab == CategoryTab.Pet);
         }
 
         private void UpdateCategorySelection()
@@ -351,7 +365,7 @@ namespace IdleDefenseSurvival.Controller
                     (_currentCategoryEquipmentFilter == EquipmentType.None || r.EquipmentType == _currentCategoryEquipmentFilter)
                 );
             }
-            else
+            else if (_currentTab == CategoryTab.Potion)
             {
                 // Show potion recipes only, filtered by potion sub-filter
                 filteredRecipes = recipes.Where(r =>
@@ -359,6 +373,15 @@ namespace IdleDefenseSurvival.Controller
                     !string.IsNullOrEmpty(r.RecipeId) &&
                     r.PotionType != PotionType.None &&
                     (_currentCategoryPotionFilter == PotionType.None || r.PotionType == _currentCategoryPotionFilter)
+                );
+            }
+            else // Pet
+            {
+                // Show egg/pet recipes only
+                filteredRecipes = recipes.Where(r =>
+                    r != null &&
+                    !string.IsNullOrEmpty(r.RecipeId) &&
+                    r.IsEgg
                 );
             }
 
@@ -405,6 +428,13 @@ namespace IdleDefenseSurvival.Controller
         private Sprite ResolveRecipeIcon(CraftRecipeData recipe)
         {
             if (recipe == null) return null;
+
+            // Egg/Pet recipes
+            if (recipe.IsEgg)
+            {
+                string eggName = Utilityku.ToItemId(recipe.DisplayName);
+                return ItemResources.GetItemSource($"Egg/{eggName}");
+            }
 
             // Potion recipes
             if (recipe.PotionType != PotionType.None)
@@ -517,7 +547,7 @@ namespace IdleDefenseSurvival.Controller
                 var icon = row.GetComponentInChildren<Image>();
                 if (icon != null)
                 {   
-                    Sprite showMaterial= ItemResources.GetItemSource($"Material/{_id}") ?? ItemResources.GetItemSource($"Herb/{_id}") ?? ItemResources.GetItemSource($"Potion/base/{_id}");
+                    Sprite showMaterial= ItemResources.GetItemSource($"{_id}") ?? ItemResources.GetItemSource($"Material/{_id}") ?? ItemResources.GetItemSource($"Herb/{_id}") ?? ItemResources.GetItemSource($"Potion/base/{_id}") ?? ItemResources.GetItemSource($"Egg/{_id}");
                     icon.sprite = showMaterial;
                 }
                 var text = row.GetComponentInChildren<TextMeshProUGUI>();
@@ -565,7 +595,11 @@ namespace IdleDefenseSurvival.Controller
                 _craftButton.interactable = false;
                 return;
             }
-            CraftType craftType = recipe.PotionType != PotionType.None ? CraftType.Potion : CraftType.Equipment;
+            CraftType craftType = CraftType.Equipment;
+            if (recipe.IsEgg)
+                craftType = CraftType.Pet;
+            else if (recipe.PotionType != PotionType.None)
+                craftType = CraftType.Potion;
 
             // Validate via CraftValidator (includes level requirement, materials, currency, inventory space, conditions)
             var validation = svc.CanCraft(craftType, _selectedRecipeId, _quantity);
@@ -605,8 +639,13 @@ namespace IdleDefenseSurvival.Controller
             // Determine craft type from selected recipe
             CraftType craftType = CraftType.Equipment;
             var recipe = svc.TryGetRecipe(_selectedRecipeId, out var r) ? r : null;
-            if (recipe != null && recipe.PotionType != PotionType.None)
-                craftType = CraftType.Potion;
+            if (recipe != null)
+            {
+                if (recipe.IsEgg)
+                    craftType = CraftType.Pet;
+                else if (recipe.PotionType != PotionType.None)
+                    craftType = CraftType.Potion;
+            }
 
             var jobId = svc.StartCraft(craftType, _selectedRecipeId, _quantity);
             if (!string.IsNullOrEmpty(jobId))
@@ -734,6 +773,12 @@ namespace IdleDefenseSurvival.Controller
 
             Debug.Log($"[CraftingUIController] Claim requested | JobId={jobId}");
             svc.ClaimJob(jobId);
+
+            // Force refresh — event may not fire or be delayed
+            PopulateJobList();
+            RebuildMaterials();
+            RefreshCost();
+            RefreshControls();
         }
 
         private void ClearJobEntries()

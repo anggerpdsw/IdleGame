@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Pet;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -31,6 +32,7 @@ namespace IdleDefenseSurvival.UI
         [Header("Progression")]
         [SerializeField] private TextMeshProUGUI _petLevel;
         [SerializeField] private TextMeshProUGUI _petExperience;
+        [SerializeField] private Slider _experienceSlider;
         [SerializeField] private TextMeshProUGUI _evolutionStage;
 
         [Header("Base Stats")]
@@ -57,6 +59,12 @@ namespace IdleDefenseSurvival.UI
 
         private string _currentPetId;
         private bool _isOwned;
+
+        private void Awake()
+        {
+            // Start hidden - only show when pet is selected
+            if (_detailRoot != null) _detailRoot.SetActive(false);
+        }
 
         private void OnEnable()
         {
@@ -90,6 +98,7 @@ namespace IdleDefenseSurvival.UI
             if (_detailRoot != null) _detailRoot.SetActive(true);
 
             RefreshIdentity(definition, icon);
+            RefreshRarity(definition.rarity);
             RefreshProgression(petId, isOwned);
             RefreshBaseStats(definition);
             RefreshSkills(definition);
@@ -115,12 +124,19 @@ namespace IdleDefenseSurvival.UI
             }
         }
 
+        private void RefreshRarity(string rarity)
+        {
+            if (_petFrame == null || string.IsNullOrEmpty(rarity)) return;
+            _petFrame.sprite = CardResources.GetFrame(rarity);
+        }
+
         private void RefreshProgression(string petId, bool isOwned)
         {
             if (!isOwned)
             {
                 if (_petLevel != null) _petLevel.text = "Locked";
                 if (_petExperience != null) _petExperience.text = string.Empty;
+                if (_experienceSlider != null) { _experienceSlider.value = 0f; _experienceSlider.gameObject.SetActive(false); }
                 if (_evolutionStage != null) _evolutionStage.text = string.Empty;
                 return;
             }
@@ -131,7 +147,30 @@ namespace IdleDefenseSurvival.UI
             if (entry != null)
             {
                 if (_petLevel != null) _petLevel.text = $"Lv. {entry.level}";
-                if (_petExperience != null) _petExperience.text = $"XP: {entry.experience:N0}";
+
+                // Calculate XP progress for next level
+                var definition = PetManager.Instance?.GetPetDefinition(petId);
+                if (definition != null && PetManager.Instance != null)
+                {
+                    int rarityTier = PetManager.Instance.GetRarityTier(definition.rarity);
+                    long expRequired = PetManager.Instance.GetExpRequiredForLevel(entry.level + 1, rarityTier);
+                    float progress = expRequired > 0 ? (float)entry.experience / expRequired : 0f;
+
+                    if (_petExperience != null)
+                        _petExperience.text = $"XP: {entry.experience:N0} / {expRequired:N0} ({progress * 100f:F0}%)";
+
+                    if (_experienceSlider != null)
+                    {
+                        _experienceSlider.gameObject.SetActive(true);
+                        _experienceSlider.value = Mathf.Clamp01(progress);
+                    }
+                }
+                else
+                {
+                    if (_petExperience != null) _petExperience.text = $"XP: {entry.experience:N0}";
+                    if (_experienceSlider != null) _experienceSlider.gameObject.SetActive(false);
+                }
+
                 if (_evolutionStage != null)
                     _evolutionStage.text = entry.evolutionStage > 0 ? "Evolved" : "Base Form";
             }
@@ -140,11 +179,11 @@ namespace IdleDefenseSurvival.UI
         private void RefreshBaseStats(PetDefinition definition)
         {
             var stats = definition.baseStats;
-            if (_attackText != null) _attackText.text = $"ATK: {stats.attack}";
-            if (_attackSpeedText != null) _attackSpeedText.text = $"ATK Speed: {stats.attackSpeed:F1}";
-            if (_healthText != null) _healthText.text = $"HP: {stats.health}";
-            if (_moveSpeedText != null) _moveSpeedText.text = $"Move: {stats.moveSpeed}";
-            if (_targetRangeText != null) _targetRangeText.text = $"Range: {stats.targetRange}";
+            if (_attackText != null) _attackText.text = $"{stats.attack}";
+            if (_attackSpeedText != null) _attackSpeedText.text = $"{stats.attackSpeed:F1}";
+            if (_healthText != null) _healthText.text = $"{stats.health}";
+            if (_moveSpeedText != null) _moveSpeedText.text = $"{stats.moveSpeed}";
+            if (_targetRangeText != null) _targetRangeText.text = $"{stats.targetRange}";
         }
 
         private void RefreshSkills(PetDefinition definition)

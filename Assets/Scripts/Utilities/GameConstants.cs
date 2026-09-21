@@ -4,12 +4,13 @@ namespace IdleDefenseSurvival
 {
     public static class GameConstants
     {
-        public const int CURRENT_SAVE_VERSION = 4; // v4 = pets array added; v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
+        public const int CURRENT_SAVE_VERSION = 5; // v5 = petUnlockedSlots moved to top-level; v4 = pets array added; v3 = flat Items[] save; category derived from ItemId; slot via SlotIndex
         public const int MAX_WAVE_PER_TIER = 350;
         public const int MAX_MISSION = 6;
         public const int BASE_LEVEL = 7903;
         public const int BASE_LEVEL_BLACKSMITH = 5;
         public const int BASE_LEVEL_ALCHEMIST = 7;
+        public const int BASE_LEVEL_PET = 17;
         public const int RARITY_COUNT = 6;
         public const int STARTING_STAT_POINTS = 5;  // Level 1 start
         public const int POINTS_PER_LEVEL = 5;      // Bonus per level-up
@@ -81,10 +82,13 @@ namespace IdleDefenseSurvival
         // Upgrade cost equipment
         public const int BASE_CRAFT_EQUIPMENT_GOLD_COST = 52500;
         public const int BASE_CRAFT_EQUIPMENT_MEAT_COST = 1125;
-        public const int BASE_CRAFT_EQUIPMENT_GEM_COST = 100;
+        public const int BASE_CRAFT_EQUIPMENT_GEM_COST = 23;
         public const int BASE_CRAFT_POTION_GOLD_COST = 1250;
         public const int BASE_CRAFT_POTION_MEAT_COST = 213;
-        public const int BASE_CRAFT_POTION_GEM_COST = 10;
+        public const int BASE_CRAFT_POTION_GEM_COST = 1;
+        public const int BASE_CRAFT_PET_GOLD_COST = 25200;
+        public const int BASE_CRAFT_PET_MEAT_COST = 2250;
+        public const int BASE_CRAFT_PET_GEM_COST = 2;
         public const int BASE_UPGRADE_GOLD_COST = 100000;
         public const int BASE_UPGRADE_MEAT_COST = 925;
 

@@ -632,6 +632,29 @@ namespace IdleDefenseSurvival.Manager
                         Converters = { new CustomDataConverter() }
                     });
 
+                // v4->v5 migration: petUnlockedSlots moved from per-pet to AccountData.maxPet
+                if (save.version < 5)
+                {
+                    if (save.account == null) save.account = new AccountData();
+
+                    if (save.pets != null && save.pets.Count > 0)
+                    {
+                        // Extract from first pet entry (all had same value in v4)
+                        var firstPet = save.pets[0];
+                        var petType = firstPet.GetType();
+                        var unlockedSlotsField = petType.GetField("unlockedSlots");
+                        if (unlockedSlotsField != null)
+                        {
+                            var value = unlockedSlotsField.GetValue(firstPet);
+                            save.account.maxPet = value != null ? (int)value : GameConstants.PET_START_SLOT;
+                        }
+                        else
+                            save.account.maxPet = GameConstants.PET_START_SLOT;
+                    }
+                    else
+                        save.account.maxPet = GameConstants.PET_START_SLOT;
+                }
+
                 // MigrateEquipmentSecondAttributes(save);
 
                 return save;
@@ -690,6 +713,10 @@ namespace IdleDefenseSurvival.Manager
             var missions = MissionService.Instance != null ? MissionService.Instance.GetAllMissions().ToList() : new List<MissionInstance>();
             var skillTreeBonus = SkillTreeBonusManager.Instance != null ? SkillTreeBonusManager.Instance.GetSaveData() : null;
             var pets = Pet.PetManager.Instance != null ? Pet.PetManager.Instance.GetSaveData() : new List<Pet.PetSaveEntry>();
+
+            // Update account.maxPet before gathering
+            if (account != null && Pet.PetManager.Instance != null)
+                account.maxPet = Pet.PetManager.Instance.UnlockedSlotCount;
 
             return new SaveData
             {
@@ -783,7 +810,7 @@ namespace IdleDefenseSurvival.Manager
             ApplyCardInventory(data.cardInventory);
             ApplyInventoryData(data.inventoryData);
             ApplyEquipmentData(data.equipmentData);
-            ApplyPetData(data.pets);
+            ApplyPetData(data.pets, data.account?.maxPet ?? GameConstants.PET_START_SLOT);
 
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftingManager.Instance != null && data.craftQueue != null)
@@ -880,10 +907,10 @@ namespace IdleDefenseSurvival.Manager
         private void ApplyEquipmentData(EquipmentSaveData data) =>
             EquipmentService.Instance?.LoadFromSaveData(data);
 
-        private void ApplyPetData(List<Pet.PetSaveEntry> data)
+        private void ApplyPetData(List<Pet.PetSaveEntry> data, int petUnlockedSlots)
         {
             if (Pet.PetManager.Instance != null)
-                Pet.PetManager.Instance.LoadSaveData(data ?? new List<Pet.PetSaveEntry>());
+                Pet.PetManager.Instance.LoadSaveData(data ?? new List<Pet.PetSaveEntry>(), petUnlockedSlots);
         }
 
         // -------------------------------------------------------------------

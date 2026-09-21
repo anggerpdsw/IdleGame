@@ -49,11 +49,12 @@ namespace IdleDefenseSurvival.Crafting
                 break;
 
                 case CraftType.Potion:
+                case CraftType.Pet:
                 if (playerAlchemistLevel < recipe.RequiredAlchemistLevel)
                     return ValidationResult.Fail($"Requires Alchemist level {recipe.RequiredAlchemistLevel} (current: {playerAlchemistLevel})");
                 break;
 
-                default: return ValidationResult.Fail("Level check requirement");
+                default: return ValidationResult.Fail("Invalid craft type");
             }
             
 

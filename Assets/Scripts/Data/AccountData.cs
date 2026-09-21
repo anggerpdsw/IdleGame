@@ -12,6 +12,9 @@ namespace IdleDefenseSurvival.Data
         // Mission System
         public int maxMission = 1;
 
+        // Pet System
+        public int maxPet = 1;
+
         // alchemist & Blacksmithing
         public int alchemistLevel = 1;
         public long alchemistCurrentExp = 0;

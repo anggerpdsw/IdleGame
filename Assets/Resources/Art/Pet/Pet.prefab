@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 6500632674257510720}
   - component: {fileID: -7131256604902302055}
   m_Layer: 6
-  m_Name: Basic
+  m_Name: Pet
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

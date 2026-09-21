@@ -480,10 +480,6 @@ namespace IdleDefenseSurvival.Pet
                 pet.OrbitIndex = _equippedPets.Count; // Assign orbit position
                 Debug.Log($"[PetManager] Spawned visual for {pet.PetId} at {petObj.transform.position}");
             }
-            else
-            {
-                Debug.LogWarning($"[PetManager] Cannot spawn visual: Prefab={_petPrefab != null}, Container={_petContainer != null}");
-            }
             _equippedPets.Add(pet);
             pet.CurrentState = PetState.Follow;
             OnPetEquipped?.Invoke(pet);
@@ -531,6 +527,137 @@ namespace IdleDefenseSurvival.Pet
         }
 
         public bool IsEmergencyModeActive() => _equippedPets.Any(p => p.IsEmergencyMode);
+
+        /// <summary>
+        /// Get random pet ID by rarity tier. Used for egg hatching.
+        /// Returns null if no pets match the rarity.
+        /// </summary>
+        public string GetRandomPetByRarity(int rarity, int seed = 0)
+        {
+            // Map rarity int to string (1=Common, 2=Rare, 3=Epic, 4=Legendary, 5=Mythic, 6=Divine)
+            string rarityStr = rarity switch
+            {
+                1 => "Common",
+                2 => "Rare",
+                3 => "Epic",
+                4 => "Legendary",
+                5 => "Mythic",
+                6 => "Divine",
+                _ => null
+            };
+
+            if (string.IsNullOrEmpty(rarityStr))
+            {
+                Debug.LogError($"[PetManager] Invalid rarity: {rarity}");
+                return null;
+            }
+
+            // Find all pets matching rarity
+            var candidates = _petDefinitions.Values
+                .Where(p => p.rarity == rarityStr)
+                .ToList();
+
+            if (candidates.Count == 0)
+            {
+                Debug.LogError($"[PetManager] No pets found for rarity {rarityStr}");
+                return null;
+            }
+
+            // Deterministic random selection
+            if (seed != 0)
+            {
+                UnityEngine.Random.InitState(seed);
+            }
+
+            int index = UnityEngine.Random.Range(0, candidates.Count);
+            return candidates[index].id;
+        }
+
+        /// <summary>
+        /// Handle egg hatch: grant new pet or upgrade existing duplicate.
+        /// Returns instanceId (new) or petId (duplicate), sets isNewPet flag.
+        /// </summary>
+        public string HandleEggHatch(string petId, out bool isNewPet)
+        {
+            if (!_petDefinitions.TryGetValue(petId, out var definition))
+            {
+                Debug.LogError($"[PetManager] Pet definition not found: {petId}");
+                isNewPet = false;
+                return null;
+            }
+
+            // Check if player already owns this pet
+            var existingPet = _ownedPets.Values.FirstOrDefault(p => p.PetId == petId);
+
+            if (existingPet == null)
+            {
+                // New pet - grant level 1
+                isNewPet = true;
+                string instanceId = GrantPet(petId, level: 1);
+                Debug.Log($"[PetManager] Granted new pet {petId}, instanceId={instanceId}");
+                return instanceId;
+            }
+            else
+            {
+                // Duplicate - add experience for level up
+                isNewPet = false;
+                long expGain = CalculateDuplicateExp();
+                existingPet.Experience += expGain;
+
+                // Check level up
+                int rarityTier = GetRarityTier(existingPet.Definition.rarity);
+                while (existingPet.Experience >= GetExpRequiredForLevel(existingPet.Level + 1, rarityTier))
+                {
+                    existingPet.Experience -= GetExpRequiredForLevel(existingPet.Level + 1, rarityTier);
+                    existingPet.Level++;
+                    Debug.Log($"[PetManager] Pet {petId} leveled up to {existingPet.Level}");
+                }
+
+                Debug.Log($"[PetManager] Duplicate pet {petId}, added {expGain} exp (total={existingPet.Experience})");
+                return petId; // Return petId for duplicate path
+            }
+        }
+
+        /// <summary>
+        /// Calculate exp gained from duplicate pet.
+        /// Each duplicate = 1 XP point (matches crafting duplicate pattern).
+        /// </summary>
+        private long CalculateDuplicateExp()
+        {
+            // ponytail: flat 1 XP per duplicate; scale with rarity if needed
+            return 1;
+        }
+
+        /// <summary>
+        /// Get exp required to reach target level.
+        /// Uses BASE_LEVEL_PET (17) + rarity tier as base per-level requirement.
+        /// Level 2 needs (17 + rarity) XP, scales linearly.
+        /// Public for UI access (PetDetailUI progress display).
+        /// </summary>
+        public long GetExpRequiredForLevel(int targetLevel, int rarityTier)
+        {
+            // ponytail: linear scaling ((BASE_LEVEL_PET + rarity) * (level - 1))
+            // Common Level 2 → (17+1)*1 = 18 XP, Epic Level 2 → (17+3)*1 = 20 XP
+            return (long)(GameConstants.BASE_LEVEL_PET + rarityTier) * (targetLevel - 1);
+        }
+
+        /// <summary>
+        /// Map rarity string to numeric tier (1-6).
+        /// Public for UI access (PetDetailUI XP calculation).
+        /// </summary>
+        public int GetRarityTier(string rarity)
+        {
+            return rarity switch
+            {
+                "Common" => 1,
+                "Rare" => 2,
+                "Epic" => 3,
+                "Legendary" => 4,
+                "Mythic" => 5,
+                "Divine" => 6,
+                _ => 1 // fallback to Common
+            };
+        }
 
         /// <summary>
         /// Find equipped pet with lowest stamina percentage.
@@ -583,24 +710,23 @@ namespace IdleDefenseSurvival.Pet
                     experience = pet.Experience,
                     evolutionStage = pet.EvolutionStage,
                     isEquipped = _equippedPets.Contains(pet),
-                    currentStamina = pet.CurrentStamina,
-                    unlockedSlots = _unlockedSlots
+                    currentStamina = pet.CurrentStamina
                 });
             }
 
             return saveData;
         }
 
-        public void LoadSaveData(List<PetSaveEntry> saveData)
+        public void LoadSaveData(List<PetSaveEntry> saveData, int unlockedSlots = -1)
         {
             if (saveData == null) return;
 
             _ownedPets.Clear();
             _equippedPets.Clear();
 
-            // Restore unlocked slots from first entry (all entries share same slot count)
-            if (saveData.Count > 0 && saveData[0].unlockedSlots > 0)
-                _unlockedSlots = saveData[0].unlockedSlots;
+            // Restore unlocked slots from parameter (SaveManager pass from SaveData.petUnlockedSlots)
+            if (unlockedSlots > 0)
+                _unlockedSlots = unlockedSlots;
             else
                 _unlockedSlots = GameConstants.PET_START_SLOT;
 
@@ -660,6 +786,5 @@ namespace IdleDefenseSurvival.Pet
         public int evolutionStage;
         public bool isEquipped;
         public float currentStamina = -1f; // -1 = unset (v4 backward compat)
-        public int unlockedSlots = 1; // v4.1: default 1 for backward compat
     }
 }
