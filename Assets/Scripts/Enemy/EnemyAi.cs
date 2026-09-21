@@ -465,7 +465,7 @@ namespace IdleDefenseSurvival.Enemy
                 : EnemyData.IsElite
                     ? PlayerStatsManager.Instance.GetStat(SkillType.EliteDamage)
                     : 0f;
-            damageAfterDefense *= 1f + damageBonus * 0.01f;
+            damageAfterDefense *= 1f + damageBonus * 0.017f;
 
             // Apply Damage Reduction aura (from Iron Guardian etc.) AFTER defense
             // This is a final damage multiplier: damage * (1 - reductionPercent)

@@ -23,7 +23,7 @@ namespace IdleDefenseSurvival.Pet.Behavior
 
             if (hpPercent <= _hpThreshold)
             {
-                data.DamageMultiplier *= (1f + _damageBonus);
+                data.DamageMultiplier *= 1f + _damageBonus;
                 data.BerserkerHPThreshold = _hpThreshold;
                 data.BerserkerDamageBonus = _damageBonus;
             }

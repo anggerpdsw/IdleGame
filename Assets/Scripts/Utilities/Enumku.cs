@@ -59,7 +59,10 @@ namespace IdleDefenseSurvival
         Gold, Meat,
         FrostAura,            // Slows enemies in attack range (aura)
         TimeFast,
-        Shield                // Grants shield up to % of max HP when at full HP
+        Shield,               // Grants shield up to % of max HP when at full HP
+        Berserker,            // Increase AttackDamage based on missing HP (1% missing = 1% bonus, capped by card level)
+        HealOnKill,           // Heal player by % of enemy MaxHP when player kills enemy
+        Immortal              // Revive on death (DeathDefy fails) + immune 1 wave, cooldown per card level
     }
 	
     public enum Element { None, Metal, Wood, Fire, Water, Earth, Lightning, Wind }

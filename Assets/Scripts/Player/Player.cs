@@ -54,6 +54,11 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Image _iceCooldownImage;
         [SerializeField] private Image _burnCooldownImage;
         [SerializeField] private Image _unregenCooldownImage;
+        // Card Effect
+        [SerializeField] private Image _berserkerImage;
+        [SerializeField] private Image _vampireImage;
+        [SerializeField] private Image _angelCooldownImage;
+        
         private float _attackRangeSpeedRotate = 2f;
         // Immunity flag for DeathDefy
         private bool _isImmune;
@@ -111,9 +116,16 @@ namespace IdleDefenseSurvival.Player
             _activeTanks = new List<TankInstance>();
 
             // Ensure effect renderer starts disabled
-            SetBarrierEffect(false);
-            SetIceEffect(false);
-            SetBurnEffect(false);
+            DisabledInitialImageEffect(false);
+        }
+
+        private void DisabledInitialImageEffect(bool disabled)
+        {
+            SetBarrierEffect(disabled);
+            SetIceEffect(disabled);
+            SetBurnEffect(disabled);
+            SetBerserkerEffect(disabled);
+            SetVampireEffect(disabled);
         }
 
         /// <summary>
@@ -137,6 +149,7 @@ namespace IdleDefenseSurvival.Player
             UpdateHealthUI();
             UpdateManaUI();
             UpdateShieldVisual();
+            OnHealthChanged?.Invoke();
             AttackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
         }
 
@@ -167,6 +180,11 @@ namespace IdleDefenseSurvival.Player
             DrawAttackRange();
 
             _ultimateManager = UltimateManager.Instance;
+
+            // Refresh card modifiers and visual effects (Berserker, Vampire Bite)
+            CardModifierService.Refresh();
+            // Ensure Berserker card subscription after Player is ready
+            CardModifierService.EnsureBerserkerSubscription();
         }
 
         private void Update()
@@ -179,6 +197,10 @@ namespace IdleDefenseSurvival.Player
             UpdateIceCooldownUI();
             UpdateBurnCooldownUI();
             // Aura effects now handled by AuraCollider trigger system
+
+            // Update Angel card cooldown
+            CardModifierService.UpdateAngelCooldown(Time.deltaTime);
+            UpdateAngelCooldownUI();
 
             _attackRangeRenderer.transform.Rotate(0, 0, _attackRangeSpeedRotate * Time.deltaTime);
         }
@@ -430,6 +452,7 @@ namespace IdleDefenseSurvival.Player
                     float actual = _currentHealth - before;
                     if (actual >= 1f)
                         UpdateHealthUI();
+                    OnHealthChanged?.Invoke();
                 }
                 // Show heal tick popup every second regardless of actual heal (visual feedback)
                 ShowDamagePopup(tickAmount, DamageType.Heal, CriticalType.None, "+");
@@ -542,7 +565,7 @@ namespace IdleDefenseSurvival.Player
 
             float fillAmount = PlayerStatusEffectManager.Instance?.GetBurnCooldownFill() ?? 0f;
             bool active = false;
-            if (fillAmount > 0f) 
+            if (fillAmount > 0f)
             {
                 active = true;
                 _burnCooldownImage.fillAmount = fillAmount;
@@ -552,6 +575,38 @@ namespace IdleDefenseSurvival.Player
             }
             _burnCooldownImage.gameObject.SetActive(active);
             SetBurnEffect(active);
+        }
+
+        private void UpdateAngelCooldownUI()
+        {
+            if (_angelCooldownImage == null) return;
+
+            // Hide UI if card not equipped
+            if (!CardModifierService.HasEffect(CardEffectType.Immortal))
+            {
+                _angelCooldownImage.gameObject.SetActive(false);
+                return;
+            }
+
+            float maxCooldown = CardModifierService.GetAngelMaxCooldown();
+            float remaining = CardModifierService.GetAngelCooldownRemaining();
+
+            if (maxCooldown <= 0f)
+            {
+                _angelCooldownImage.gameObject.SetActive(false);
+                return;
+            }
+
+            // Ready state: fillAmount = 1 (full)
+            // Cooldown state: fillAmount starts at 0, fills up as timer counts down
+            float fillAmount = 1f - Mathf.Clamp01(remaining / maxCooldown);
+            _angelCooldownImage.fillAmount = fillAmount;
+            _angelCooldownImage.gameObject.SetActive(true);
+
+            // Sync barrier visual with immunity state
+            bool hasImmunity = CardModifierService.HasAngelImmunity();
+            if (!hasImmunity && _barrierRenderer != null && _barrierRenderer.enabled)
+                SetBarrierEffect(false);
         }
 
         public bool IsUnregenerationActive()
@@ -710,7 +765,10 @@ namespace IdleDefenseSurvival.Player
             // 1. Immunity / Evasion
             // --------------------------------------------------
             bool evaded = canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.Evasion));
-            if (_isImmune || evaded)
+
+            // Check Angel immunity (wave-based)
+            bool angelImmune = CardModifierService.HasAngelImmunity();
+            if (_isImmune || angelImmune || evaded)
             {
                 ShowDamagePopup(0f, DamageType.Miss, CriticalType.None);
                 return 0f;
@@ -763,6 +821,7 @@ namespace IdleDefenseSurvival.Player
                 _currentHealth = Mathf.Clamp(_currentHealth, 0, PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
                 _lastDamageSource = damageData.Source;
                 ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
+                OnHealthChanged?.Invoke();
             }
 
             // --------------------------------------------------
@@ -824,6 +883,7 @@ namespace IdleDefenseSurvival.Player
             if (!Mathf.Approximately(oldHealth, _currentHealth))
             {
                 UpdateHealthUI();
+                OnHealthChanged?.Invoke();
 
                 // Show heal popup
                 if (actualHeal >= 1f) ShowDamagePopup(actualHeal, DamageType.Heal, CriticalType.None, "+");
@@ -876,6 +936,7 @@ namespace IdleDefenseSurvival.Player
 
         private void Die()
         {
+            // DeathDefy check first
             if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
             {
                 // Heal a small amount and grant temporary immunity with visual barrier.
@@ -886,6 +947,25 @@ namespace IdleDefenseSurvival.Player
                 // ensure we can start coroutine
                 if (gameObject.activeInHierarchy)
                     StartCoroutine(ImmunityRoutine(15f));
+                return;
+            }
+
+            // Angel card (Immortal) check - triggers when DeathDefy fails
+            if (CardModifierService.CanTriggerAngel())
+            {
+                // Full heal + wave-based immunity
+                float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
+                _currentHealth = maxHealth;
+                UpdateHealthUI();
+                OnHealthChanged?.Invoke();
+
+                // Trigger Angel effect (cooldown + immunity for 1 wave)
+                CardModifierService.TriggerAngel();
+
+                // Visual feedback
+                SetBarrierEffect(true);
+                ShowDamagePopup(maxHealth, DamageType.Heal, CriticalType.None, "⚕ ");
+
                 return;
             }
 
@@ -914,6 +994,14 @@ namespace IdleDefenseSurvival.Player
         public void SetBurnEffect(bool enabled)
         {
             if (_burnRenderer != null) _burnRenderer.enabled = enabled;
+        }
+        public void SetBerserkerEffect(bool enabled)
+        {
+            if (_berserkerImage != null) _berserkerImage.gameObject.SetActive(enabled);
+        }
+        public void SetVampireEffect(bool enabled)
+        {
+            if (_vampireImage != null) _vampireImage.gameObject.SetActive(enabled);
         }
 
         private void DrawAttackRange()

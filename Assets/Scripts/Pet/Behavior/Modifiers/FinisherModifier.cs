@@ -23,7 +23,7 @@ namespace IdleDefenseSurvival.Pet.Behavior
             float hpPercent = enemy.CurrentHealth / enemy.MaxHealth;
             if (hpPercent <= _hpThreshold)
             {
-                data.DamageMultiplier *= (1f + _damageBonus);
+                data.DamageMultiplier *= 1f + _damageBonus;
                 data.EnableFinisher = true;
             }
         }

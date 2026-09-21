@@ -6256,7 +6256,7 @@ MonoBehaviour:
   _evolutionSkillText: {fileID: 0}
   _equippedIndicator: {fileID: 0}
   _lockedOverlay: {fileID: 0}
-  _detailRoot: {fileID: 0}
+  _detailRoot: {fileID: 1845409688}
   _equipButton: {fileID: 147691834}
   _equipButtonText: {fileID: 1776780919}
 --- !u!1 &1886170849

@@ -329,7 +329,7 @@ namespace IdleDefenseSurvival.Player
                 if (_target.TryGetComponent(out EnemyAi enemy))
                 {
                     // Kalkulasi damage dengan geometric reduction: baseDamage * (0.5 ^ bounceIndex)
-                    // Bounce 0 (first hit): 100%, Bounce 1: 50%, Bounce 2: 25%, etc.
+                    // Bounce 0 (first hit): 100%, Bounce 1: 90%, Bounce 2: 81%, etc.
                     float currentDamage = _baseDamage * Mathf.Pow(0.9f, _bounceIndex);
 
                     // Tambahkan target ke hit history
@@ -439,7 +439,7 @@ namespace IdleDefenseSurvival.Player
 
                         // Block lifesteal if Necromancer Unregeneration aura is active
                         if (_lifeSteal > 0f && !_player.IsUnregenerationActive()) {
-                            float heal = Mathf.Max(0.1f, actualDamage * _lifeSteal * 0.01f);
+                            float heal = Mathf.Max(0.51f, actualDamage * _lifeSteal * 0.01f);
                             _player.Heal(heal);
                         }
 

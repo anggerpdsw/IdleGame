@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Stats;
+using PlayerClass = IdleDefenseSurvival.Player.Player;
+using UnityEngine;
+using IdleDefenseSurvival.Enemy;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -26,6 +29,19 @@ namespace IdleDefenseSurvival.Manager
         /// </summary>
         private static readonly HashSet<string> _cardsWithStatModifiers = new();
 
+        // Berserker dynamic modifier
+        private const string BerserkerModifierId = "Card:BerserkerDynamic";
+        private static float _berserkerMaxPercent = 0f;
+        private static bool _berserkerSubscribed = false;
+
+        // HealOnKill subscription
+        private static bool _healOnKillSubscribed = false;
+
+        // Angel (Immortal) cooldown tracking
+        private static float _angelCooldownRemaining = 0f;
+        private static float _angelCooldownMax = 0f;
+        private static int _angelImmunityWavesRemaining = 0;
+
         /// <summary>
         /// Clears all existing card modifiers and re-applies modifiers from currently equipped cards.
         /// Called when cards are equipped/unequipped/upgraded or on game load.
@@ -40,6 +56,13 @@ namespace IdleDefenseSurvival.Manager
             }
             _cardsWithStatModifiers.Clear();
             _effectValues.Clear();
+
+            // Reset Berserker
+            _berserkerMaxPercent = 0f;
+            ModifierManager.Instance.RemoveModifier(BerserkerModifierId);
+
+            // Track visual effects
+            bool hasHealOnKill = false;
 
             // Re-apply modifiers from currently equipped cards
             var equipped = CardEquipmentService.Instance.EquippedCards;
@@ -66,6 +89,21 @@ namespace IdleDefenseSurvival.Manager
                             Mode = ParseModifierMode(cardData.Mode),
                             Value = value
                         };
+
+                        // Berserker: store max cap
+                        if (effectType == CardEffectType.Berserker)
+                            _berserkerMaxPercent = value;
+
+                        // HealOnKill: ensure subscription and track visual
+                        if (effectType == CardEffectType.HealOnKill)
+                        {
+                            EnsureHealOnKillSubscription();
+                            hasHealOnKill = true;
+                        }
+
+                        // Immortal (Angel): store max cooldown
+                        if (effectType == CardEffectType.Immortal)
+                            _angelCooldownMax = value;
                     }
                 }
 
@@ -91,7 +129,97 @@ namespace IdleDefenseSurvival.Manager
                 }
             }
 
+            // Update visual effects
+            var player = PlayerClass.Instance;
+            if (player != null)
+            {
+                player.SetVampireEffect(hasHealOnKill);
+            }
+
             OnModifierChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Update Angel cooldown timer (call from Player.Update or dedicated manager).
+        /// </summary>
+        public static void UpdateAngelCooldown(float deltaTime)
+        {
+            if (_angelCooldownRemaining > 0f)
+                _angelCooldownRemaining -= deltaTime;
+        }
+
+        /// <summary>
+        /// Notify wave completed - decrement Angel immunity counter.
+        /// </summary>
+        public static void OnWaveCompleted()
+        {
+            if (_angelImmunityWavesRemaining > 0)
+                _angelImmunityWavesRemaining--;
+
+            // Disable barrier visual when immunity expires
+            if (_angelImmunityWavesRemaining == 0 && PlayerClass.Instance != null)
+                PlayerClass.Instance.SetBarrierEffect(false);
+        }
+
+        /// <summary>
+        /// Check if Angel card can trigger (cooldown ready + equipped).
+        /// </summary>
+        public static bool CanTriggerAngel()
+        {
+            if (_angelCooldownRemaining > 0f) return false;
+            if (!HasEffect(CardEffectType.Immortal)) return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Trigger Angel effect: grant immunity for 1 wave, start cooldown.
+        /// Returns true if triggered successfully.
+        /// </summary>
+        public static bool TriggerAngel()
+        {
+            if (!CanTriggerAngel()) return false;
+
+            // Get cooldown duration from card level
+            float cooldownSeconds = GetEffectResult(CardEffectType.Immortal, 550f);
+            _angelCooldownRemaining = cooldownSeconds;
+            _angelImmunityWavesRemaining = 1;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check if player currently has Angel immunity active.
+        /// </summary>
+        public static bool HasAngelImmunity() => _angelImmunityWavesRemaining > 0;
+
+        /// <summary>
+        /// Get current Angel cooldown remaining (for UI).
+        /// </summary>
+        public static float GetAngelCooldownRemaining() => Mathf.Max(_angelCooldownRemaining, 0f);
+
+        /// <summary>
+        /// Get max Angel cooldown (for UI fill calculation).
+        /// </summary>
+        public static float GetAngelMaxCooldown() => _angelCooldownMax;
+
+        /// <summary>
+        /// Ensure berserker health-change subscription is set.
+        /// Call after Player instance is ready (e.g. in Player.Start).
+        /// </summary>
+        public static void EnsureBerserkerSubscription()
+        {
+            var player = PlayerClass.Instance;
+            if (player == null)
+            {
+                Debug.LogWarning("[Berserker] Player.Instance still null");
+                return;
+            }
+
+            if (_berserkerSubscribed) return;
+
+            player.OnHealthChanged += UpdateBerserkerModifier;
+            _berserkerSubscribed = true;
+            UpdateBerserkerModifier(); // Init with current HP
         }
 
         /// <summary>
@@ -132,5 +260,95 @@ namespace IdleDefenseSurvival.Manager
 
         private static ModifierMode ParseModifierMode(string mode) =>
             Enum.TryParse<ModifierMode>(mode, true, out var m) ? m : ModifierMode.Percent;
+
+        /// <summary>
+        /// Recalculates Berserker bonus based on missing HP.
+        /// 1% missing HP = 1% AttackDamage, capped by card level.
+        /// </summary>
+        private static void UpdateBerserkerModifier()
+        {
+            var player = PlayerClass.Instance;
+            if (player == null)
+            {
+                Debug.LogWarning("[Berserker] UpdateBerserkerModifier: Player.Instance is null");
+                return;
+            }
+
+            if (_berserkerMaxPercent <= 0f)
+            {
+                player.SetBerserkerEffect(false);
+                return;
+            }
+
+            float maxHp = player.MaxHealth;
+            float curHp = player.CurrentHealth;
+            if (maxHp <= 0f) return;
+
+            float missingPercent = (maxHp - curHp) / maxHp * 100f;
+            float bonusPercent = Mathf.Min(missingPercent, _berserkerMaxPercent);
+
+            ModifierManager.Instance.RemoveModifier(BerserkerModifierId);
+
+            bool isActive = bonusPercent > 0f;
+            if (isActive)
+            {
+                var mod = new StatModifier
+                {
+                    Id = BerserkerModifierId,
+                    Source = ModifierSource.Card,
+                    Stat = SkillType.AttackDamage,
+                    Mode = ModifierMode.Percent,
+                    Value = bonusPercent,
+                    Permanent = false
+                };
+                ModifierManager.Instance.AddModifier(mod);
+            }
+
+            // Visual: show when HP < 100%, hide when full
+            player.SetBerserkerEffect(isActive);
+        }
+
+        /// <summary>
+        /// Ensure HealOnKill subscription is set.
+        /// Called when Bat Stalker card is equipped.
+        /// </summary>
+        private static void EnsureHealOnKillSubscription()
+        {
+            if (_healOnKillSubscribed) return;
+            EnemyDeathHandler.OnEnemyKilled += OnEnemyKilledHandler;
+            _healOnKillSubscribed = true;
+        }
+
+        /// <summary>
+        /// Handle enemy death for HealOnKill effect (Bat Stalker card).
+        /// Only heals when player is the kill source.
+        /// </summary>
+        private static void OnEnemyKilledHandler(EnemyAi enemy, string damageSource)
+        {
+            if (enemy == null) return;
+
+            // Only heal on player kills
+            if (damageSource != UltimateDMG.Player.ToString()) return;
+
+            // Find equipped HealOnKill cards
+            var equipped = CardEquipmentService.Instance.EquippedCards;
+            foreach (string cardId in equipped)
+            {
+                if (string.IsNullOrEmpty(cardId)) continue;
+
+                var cardData = CardDatabase.Instance.GetCard(cardId);
+                if (cardData == null) continue;
+
+                var effectType = ParseEffectType(cardData.EffectType);
+                if (effectType != CardEffectType.HealOnKill) continue;
+
+                var inventory = CardInventory.Instance.GetOwnedCard(cardId);
+                int level = inventory?.Level ?? 1;
+                float percent = cardData.CalculateValue(level);
+
+                float healAmount = enemy.MaxHealth * (percent * 0.01f);
+                PlayerClass.Instance?.Heal(healAmount);
+            }
+        }
     }
 }

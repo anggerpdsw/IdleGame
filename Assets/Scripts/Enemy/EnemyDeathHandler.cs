@@ -3,7 +3,6 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.UI;
-using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Enemy
 {
@@ -15,6 +14,11 @@ namespace IdleDefenseSurvival.Enemy
     public static class EnemyDeathHandler
     {
         /// <summary>
+        /// Event fired when enemy is killed. Used by card effects (e.g. Bat Stalker).
+        /// </summary>
+        public static event System.Action<EnemyAi, string> OnEnemyKilled;
+
+        /// <summary>
         /// Execute full death sequence.
         /// Preserves exact order from original EnemyAi.Die().
         /// </summary>
@@ -22,6 +26,9 @@ namespace IdleDefenseSurvival.Enemy
         {
             // Step 1: Record kill in save system
             RecordEnemyKill(enemy, lastDamageSource);
+
+            // Step 1b: Notify card effects (HealOnKill, etc.)
+            OnEnemyKilled?.Invoke(enemy, lastDamageSource);
 
             // Step 2-3: Ultimate triggers (Lightning, Cloud)
             ProcessUltimateTriggers(enemy, lastDamageSource);

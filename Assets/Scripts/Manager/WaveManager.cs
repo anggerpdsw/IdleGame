@@ -213,6 +213,9 @@ namespace IdleDefenseSurvival.Manager
                 return;
             }
 
+            // Decrement Angel immunity counter after InterWave ends
+            CardModifierService.OnWaveCompleted();
+
             // Spawn Necromancer at wave multiples of 51
             // Guard: only spawn if spawner is ready and wave qualifies
             if (CurrentWave > 0 && CurrentWave % 51 == 0 && _enemySpawner != null)
@@ -307,12 +310,12 @@ namespace IdleDefenseSurvival.Manager
             // 1 WAVE COMPLETED
             MissionService.Instance?.UpdateProgress(MissionEventType.WaveCompleted, null, 1);
             // =====================================================
-            
+
             // Record progress before transitioning to inter‑wave
             SaveManager.Instance.UpdateHighestWave(CurrentTier, CurrentWave);
 
             WaveBonusInterest();
-
+            
             State = WaveState.InterWave;
             _enemySpawner.enabled = false;
             TimeRemaining = CurrentInterWaveDuration;
