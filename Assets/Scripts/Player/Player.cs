@@ -709,7 +709,7 @@ namespace IdleDefenseSurvival.Player
             // --------------------------------------------------
             // 1. Immunity / Evasion
             // --------------------------------------------------
-            bool evaded = canEvade && Utilityku.Chance( PlayerStatsManager.Instance.GetStat(SkillType.Evasion));
+            bool evaded = canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.Evasion));
             if (_isImmune || evaded)
             {
                 ShowDamagePopup(0f, DamageType.Miss, CriticalType.None);

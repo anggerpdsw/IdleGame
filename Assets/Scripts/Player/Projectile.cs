@@ -41,6 +41,7 @@ namespace IdleDefenseSurvival.Player
         private ProjectileOwner _owner;
         private Player _player;
         private TankInstance _tank;
+        private string _sourceName;
         private float _baseDamage;  // Base stats untuk geometric reduction
         private float _damageMultiplier = 1f;
         private float _baseKnockbackForce;
@@ -101,6 +102,7 @@ namespace IdleDefenseSurvival.Player
             _defenseBreakDuration = 0f;
             _isMultiShoot = false;
             _healthBreak = 0f;
+            _sourceName = null;
 
             if (_rb != null)
             {
@@ -192,6 +194,7 @@ namespace IdleDefenseSurvival.Player
             _target = target;
             _startPosition = transform.position;
             _baseDamage = enemy.EnemyAttackDamage;
+            _sourceName = enemy?.EnemyId ?? _owner.ToString();
         }
 
         private void FixedUpdate()
@@ -293,7 +296,7 @@ namespace IdleDefenseSurvival.Player
                 damage: _baseDamage,
                 type: DamageType.Normal,
                 crit: CriticalType.None,
-                source: ProjectileOwner.Enemy.ToString()
+                source: _sourceName
             );
 
             float actualDamageDealt = player.TakeDamage(damageData);

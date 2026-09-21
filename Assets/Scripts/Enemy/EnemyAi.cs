@@ -71,6 +71,7 @@ namespace IdleDefenseSurvival.Enemy
         private int _expReward = 0;
 
         public EnemyData EnemyData { get; private set; }
+        public string EnemyId => _enemyId;
 
         // -------------------------------------------------------------------
         // Runtime references
