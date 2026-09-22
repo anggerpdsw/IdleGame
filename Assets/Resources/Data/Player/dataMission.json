@@ -6,7 +6,7 @@
             "type": 0,
             "targetId": "",
             "minCount": 5000,
-            "maxCount": 100000,
+            "maxCount": 50000,
             "reward": {
                 "gold": 2500,
                 "gem": 2,

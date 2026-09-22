@@ -752,12 +752,12 @@
         "type": "Defense",
         "aura": [{
           "effect": "DamageReduction",
-          "value": 40,
+          "value": 39,
           "radius": 6.5
         }],
         "onTakeDamage": [{
           "effect": "Burn",
-          "value": 31,
+          "value": 27,
           "duration": 30
         }]
       }],
