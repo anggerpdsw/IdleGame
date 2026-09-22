@@ -218,7 +218,7 @@ namespace IdleDefenseSurvival.Manager
             CardModifierService.OnWaveCompleted();
 
             // TODO After wave 150
-            if (CurrentWave > 1) CardModifierService.OnAfterWave150();
+            if (CurrentWave > 150) CardModifierService.OnAfterWave150();
 
             // Spawn Necromancer at wave multiples of 51
             // Guard: only spawn if spawner is ready and wave qualifies
