@@ -10,6 +10,7 @@ using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
 using System;
 using IdleDefenseSurvival.Stats;
+using TMPro;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -58,6 +59,10 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Image _berserkerImage;
         [SerializeField] private Image _vampireImage;
         [SerializeField] private Image _angelCooldownImage;
+        [SerializeField] private GameObject _crazyGambler;
+        [SerializeField] private TextMeshProUGUI _crazyGamblerText;
+        [SerializeField] private GameObject _desperados;
+        [SerializeField] private TextMeshProUGUI _desperadosText;
         
         private float _attackRangeSpeedRotate = 2f;
         // Immunity flag for DeathDefy
@@ -185,6 +190,9 @@ namespace IdleDefenseSurvival.Player
             CardModifierService.Refresh();
             // Ensure Berserker card subscription after Player is ready
             CardModifierService.EnsureBerserkerSubscription();
+
+            CardModifierService.OnModifierChanged += UpdateGamblerUI;
+            UpdateGamblerUI();
         }
 
         private void Update()
@@ -1009,6 +1017,32 @@ namespace IdleDefenseSurvival.Player
             float diameter = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * 2f;
             _attackRangeRenderer.transform.localScale = new Vector3(diameter, diameter, 1f);
             _attackRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
+        }
+
+        private void OnDestroy()
+        {
+            CardModifierService.OnModifierChanged -= UpdateGamblerUI;
+        }
+
+        private void UpdateGamblerUI()
+        {
+            // CrazyGambler: -300% to +500% range
+            bool hasGambler = CardModifierService.HasEffect(CardEffectType.CrazyGambler);
+            if (_crazyGambler != null) _crazyGambler.SetActive(hasGambler);
+            if (hasGambler && _crazyGamblerText != null)
+            {
+                float bonus = CardModifierService.GetCrazyGamblerBonus();
+                _crazyGamblerText.text = $"{bonus:0}%";
+            }
+
+            // Desperados: -300% to +500% range
+            bool hasDesperados = CardModifierService.HasEffect(CardEffectType.Desperados);
+            if (_desperados != null) _desperados.SetActive(hasDesperados);
+            if (hasDesperados && _desperadosText != null)
+            {
+                float bonus = CardModifierService.GetDesperadosBonus();
+                _desperadosText.text = $"{bonus:0}%";
+            }
         }
 
 #if UNITY_EDITOR

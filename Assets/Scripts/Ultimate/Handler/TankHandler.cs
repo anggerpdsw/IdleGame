@@ -28,9 +28,10 @@ namespace IdleDefenseSurvival.Ultimate
             // Check if ultimate is active
             if (!ultimateData.GetActive()) return false;
 
-            // Check count limit
-            int activeCount = UltimateFactory.GetActiveCount(UltimateId);
-            if (activeCount >= ultimateData.GetCount()) return false;
+            // Check count limit (with card modifiers)
+            int activeCount = GetActiveCount();
+            int maxCount = UltimateManager.Instance?.GetMaxStack(UltimateId) ?? ultimateData.GetCount();
+            if (activeCount >= maxCount) return false;
 
             // Try to instantiate
             GameObject tankObj = Instantiate(_tankPrefab, player.transform.position, Quaternion.identity, UIManager.Instance.UltimateRoot);
@@ -43,7 +44,12 @@ namespace IdleDefenseSurvival.Ultimate
                 return false;
             }
 
-            tankInstance.Initialize(player, destination, ultimateData.GetDuration());
+            // Apply AddTank card duration bonus
+            float duration = ultimateData.GetDuration();
+            if (UltimateManager.Instance != null)
+                duration *= UltimateManager.Instance.GetTankDurationMultiplier();
+
+            tankInstance.Initialize(player, destination, duration);
 
             // Track active count
             UltimateFactory.IncrementActiveCount(UltimateId);

@@ -260,8 +260,8 @@ namespace IdleDefenseSurvival.Enemy
             if (enemy == null || enemy.spawnWeight <= 0f) return false;
             // Undeath hanya bisa muncul melalui summon Necromancer.
             if (enemy.role == Role.Undeath) return false;
-            // Enemy baru aktif setelah tier requirement terpenuhi.
-            if (currentTier <= enemy.minTier) return false;
+            // Enemy aktif ketika tier memenuhi atau melebihi minTier-nya.
+            if (currentTier < enemy.minTier) return false;
             // Caster, Ranger, dan Boss belum boleh muncul pada early wave.
             if (currentWave <= 15 &&
                 (enemy.role == Role.Caster ||

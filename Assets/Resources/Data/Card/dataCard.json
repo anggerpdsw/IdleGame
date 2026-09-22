@@ -187,6 +187,15 @@
             "ValuePerLevel": 15,
             "CardRarity": "Common"
         }, {
+            "Id": "annihilation",
+            "Name": "Annihilation",
+            "Description": "Increase penetration to defense enemy",
+            "SkillType": "Penetration",
+            "Mode": "Percent",
+            "BaseValue": 35,
+            "ValuePerLevel": 9,
+            "CardRarity": "Common"
+        }, {
             "Id": "phantom_step",
             "Name": "Phantom Step",
             "Description": "Increase Evasion Chance",
@@ -222,6 +231,33 @@
             "BaseValue": 2,
             "ValuePerLevel": 0.75,
             "CardRarity": "Common"
+        }, {
+            "Id": "extra_tank",
+            "Name": "Extra Tank",
+            "Description": "An additional tank to protect you. More duration on Tank",
+            "EffectType": "AddTank",
+            "Mode": "Percent",
+            "BaseValue": 27,
+            "ValuePerLevel": 0.85,
+            "CardRarity": "Common"
+        }, {
+            "Id": "execution",
+            "Name": "Execution",
+            "Description": "Increase hit rate to enemy",
+            "SkillType": "HitRate",
+            "Mode": "Flat",
+            "BaseValue": 2,
+            "ValuePerLevel": 2,
+            "CardRarity": "Common"
+        }, {
+            "Id": "enemy_balance",
+            "Name": "Enemy Balance",
+            "Description": "Each wave spawns more enemies",
+            "EffectType": "EnemyBalance",
+            "Mode": "Flat",
+            "BaseValue": 1.1,
+            "ValuePerLevel": 0.1,
+            "CardRarity": "Rare"
         }, {
             "Id": "elite_hunter",
             "Name": "Elite Hunter",
@@ -268,6 +304,24 @@
             "ValuePerLevel": 4,
             "CardRarity": "Rare"
         }, {
+            "Id": "crazy_gambler",
+            "Name": "Crazy Gambler",
+            "Description": "After wave 150, there a chance to increase ATK by 25% at the end of each wave, and a chance to decrease ATK by 15% (max 20 stack)",
+            "EffectType": "CrazyGambler",
+            "Mode": "Percent",
+            "BaseValue": 49,
+            "ValuePerLevel": 1.2,
+            "CardRarity": "Rare"
+        }, {
+            "Id": "desperados",
+            "Name": "Desperados",
+            "Description": "After wave 150, there a chance to increase HP by 25% at the end of each wave, and a chance to decrease HP by 15% (max 20 stack)",
+            "EffectType": "Desperados",
+            "Mode": "Percent",
+            "BaseValue": 49,
+            "ValuePerLevel": 1.2,
+            "CardRarity": "Rare"
+        }, {
             "Id": "bat_stalker",
             "Name": "Bat Stalker",
             "Description": "Recover health whenever an enemy is killed",
@@ -300,7 +354,7 @@
             "Description": "When Die, Revive dan Immune to damage in 1x Wave",
             "EffectType": "Immortal",
             "Mode": "Flat",
-            "BaseValue": 550,
+            "BaseValue": 660,
             "ValuePerLevel": -25,
             "CardRarity": "Epic"
         }

@@ -70,7 +70,8 @@ namespace IdleDefenseSurvival.Manager
         public WaveState State { get; private set; }
         public bool IsRunActive { get; set; }
         public float ProgressionSpeed => 1f - CardModifierService.GetEffectResult(CardEffectType.TimeFast);
-            
+        private float EnemyBalance => CardModifierService.GetEffectResult(CardEffectType.EnemyBalance);
+
         // Damage stats tracking per wave
         private Dictionary<string, Dictionary<string, long>> _currentWaveDamage = new();
 
@@ -215,6 +216,9 @@ namespace IdleDefenseSurvival.Manager
 
             // Decrement Angel immunity counter after InterWave ends
             CardModifierService.OnWaveCompleted();
+
+            // TODO After wave 150
+            if (CurrentWave > 1) CardModifierService.OnAfterWave150();
 
             // Spawn Necromancer at wave multiples of 51
             // Guard: only spawn if spawner is ready and wave qualifies
@@ -419,9 +423,9 @@ namespace IdleDefenseSurvival.Manager
         // ponytail: linear tier scaling for min spawn interval; base value from JSON corresponds to Tier 1.
         private float GetTierAdjustedMinSpawnInterval()
         {
-            float adjusted = _minSpawnInterval - (CurrentTier - 1) * 0.00031f;
+            float adjusted = _minSpawnInterval - (CurrentTier - 1 + EnemyBalance) * 0.00031f;
             // Clamp to a reasonable floor to avoid zero/negative intervals.
-            return Mathf.Max(adjusted, 0.05f);
+            return Mathf.Max(adjusted, 0.005f);
         }
         public float CurrentMinSpawnInterval => GetTierAdjustedMinSpawnInterval() * ProgressionSpeed;
 

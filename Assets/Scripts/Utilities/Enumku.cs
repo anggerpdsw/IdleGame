@@ -62,7 +62,11 @@ namespace IdleDefenseSurvival
         Shield,               // Grants shield up to % of max HP when at full HP
         Berserker,            // Increase AttackDamage based on missing HP (1% missing = 1% bonus, capped by card level)
         HealOnKill,           // Heal player by % of enemy MaxHP when player kills enemy
-        Immortal              // Revive on death (DeathDefy fails) + immune 1 wave, cooldown per card level
+        Immortal,             // Revive on death (DeathDefy fails) + immune 1 wave, cooldown per card level
+        EnemyBalance,         // Reduce min spawn interval: more enemies per wave
+        AddTank,              // +1 tank count, increase tank duration by card value%
+        CrazyGambler,         // After wave 150: chance to +25% ATK or -15% ATK each wave (max 20 stack)
+        Desperados            // After wave 150: chance to +25% HP or -15% HP each wave (max 20 stack)
     }
 	
     public enum Element { None, Metal, Wood, Fire, Water, Earth, Lightning, Wind }

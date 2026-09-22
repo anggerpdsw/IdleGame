@@ -149,7 +149,7 @@
         "ValuePerEnhance": 0.25,
         "description": "Extra Attack Power from Ultimate Weapon",
         "displayName": "Ultimate Weapon Attack",
-        "shortName": "UAK"
+        "shortName": "UWA"
       }
     },
 
@@ -209,9 +209,9 @@
         "shortName": "EVA"
       },
       "hitRate": {
-        "baseValue": 93,
-        "bonusPerPoint": 0.1,
-        "ValuePerLevel": 0.1,
+        "baseValue": 89,
+        "bonusPerPoint": 0.12,
+        "ValuePerLevel": 0.13,
         "ValuePerEnhance": 0.25,
         "description": "Base chance to land a hit. Enemy evasion subtracts from this: HitChance = HitRate - TargetEvasion",
         "displayName": "Hit Rate",

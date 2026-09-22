@@ -42,12 +42,27 @@ namespace IdleDefenseSurvival.Manager
         private static float _angelCooldownMax = 0f;
         private static int _angelImmunityWavesRemaining = 0;
 
+        // CrazyGambler cumulative tracking
+        private const string GamblerModifierId = "Card:CrazyGambler";
+        private static float _crazyGamblerBonus = 0f;
+        public static float GetCrazyGamblerBonus() => _crazyGamblerBonus;
+
+        // Desperados cumulative tracking
+        private const string DesperadosModifierId = "Card:Desperados";
+        private static float _desperadosBonus = 0f;
+        public static float GetDesperadosBonus() => _desperadosBonus;
+
         /// <summary>
         /// Clears all existing card modifiers and re-applies modifiers from currently equipped cards.
         /// Called when cards are equipped/unequipped/upgraded or on game load.
         /// </summary>
         public static void Refresh()
         {
+            // Reset Angel cooldown/immunity (persists across scenes otherwise)
+            _angelCooldownRemaining = 0f;
+            _angelCooldownMax = 0f;
+            _angelImmunityWavesRemaining = 0;
+
             // Clear all existing stat modifiers from ModifierManager
             foreach (string cardId in _cardsWithStatModifiers)
             {
@@ -60,6 +75,14 @@ namespace IdleDefenseSurvival.Manager
             // Reset Berserker
             _berserkerMaxPercent = 0f;
             ModifierManager.Instance.RemoveModifier(BerserkerModifierId);
+
+            // Reset CrazyGambler
+            _crazyGamblerBonus = 0f;
+            ModifierManager.Instance.RemoveModifier(GamblerModifierId);
+
+            // Reset Desperados
+            _desperadosBonus = 0f;
+            ModifierManager.Instance.RemoveModifier(DesperadosModifierId);
 
             // Track visual effects
             bool hasHealOnKill = false;
@@ -161,6 +184,62 @@ namespace IdleDefenseSurvival.Manager
                 PlayerClass.Instance.SetBarrierEffect(false);
         }
 
+
+        public static void OnAfterWave150()
+        {
+            int maxCount = 20;
+            float maxValue = 25f;
+            float minValue = -15f;
+
+            // CrazyGambler: ATK modifier
+            if (HasEffect(CardEffectType.CrazyGambler))
+            {
+                float chancePercent = GetEffectResult(CardEffectType.CrazyGambler, 0f) * 100f;
+                float bonusPercent = Utilityku.Chance(chancePercent) ? maxValue : minValue;
+                _crazyGamblerBonus += bonusPercent;
+                _crazyGamblerBonus = 
+                    Mathf.Clamp(_crazyGamblerBonus, minValue * maxCount, maxValue * maxCount);
+
+                ModifierManager.Instance.RemoveModifier(GamblerModifierId);
+
+                var mod = new StatModifier
+                {
+                    Id = GamblerModifierId,
+                    Source = ModifierSource.Card,
+                    Stat = SkillType.AttackDamage,
+                    Mode = ModifierMode.Percent,
+                    Value = _crazyGamblerBonus,
+                    Permanent = false
+                };
+                ModifierManager.Instance.AddModifier(mod);
+            }
+
+            // Desperados: HP modifier
+            if (HasEffect(CardEffectType.Desperados))
+            {
+                float chancePercent = GetEffectResult(CardEffectType.Desperados, 0f) * 100f;
+                float bonusPercent = Utilityku.Chance(chancePercent) ? maxValue : minValue;
+                _desperadosBonus += bonusPercent;
+                _desperadosBonus = 
+                    Mathf.Clamp(_desperadosBonus, minValue * maxCount, maxValue * maxCount);
+
+                ModifierManager.Instance.RemoveModifier(DesperadosModifierId);
+
+                var mod = new StatModifier
+                {
+                    Id = DesperadosModifierId,
+                    Source = ModifierSource.Card,
+                    Stat = SkillType.HealthPoint,
+                    Mode = ModifierMode.Percent,
+                    Value = _desperadosBonus,
+                    Permanent = false
+                };
+                ModifierManager.Instance.AddModifier(mod);
+            }
+            
+            OnModifierChanged?.Invoke();
+        }
+
         /// <summary>
         /// Check if Angel card can trigger (cooldown ready + equipped).
         /// </summary>
@@ -180,7 +259,7 @@ namespace IdleDefenseSurvival.Manager
             if (!CanTriggerAngel()) return false;
 
             // Get cooldown duration from card level
-            float cooldownSeconds = GetEffectResult(CardEffectType.Immortal, 550f);
+            float cooldownSeconds = GetEffectResult(CardEffectType.Immortal, 660f);
             _angelCooldownRemaining = cooldownSeconds;
             _angelImmunityWavesRemaining = 1;
 

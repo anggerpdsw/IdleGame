@@ -183,7 +183,21 @@ namespace IdleDefenseSurvival.Ultimate
         public int GetMaxStack(string ultimateId)
         {
             if (!TryGetUltimate(ultimateId, out var data)) return 1;
-            return data.GetCount();
+            int baseCount = data.GetCount();
+            // AddTank card: +1 count for Tank ultimate
+            if (ultimateId == UltimateDMG.Tank.ToString() && CardModifierService.HasEffect(CardEffectType.AddTank))
+                baseCount += 1;
+            return baseCount;
+        }
+
+        /// <summary>
+        /// Get Tank duration multiplier from AddTank card.
+        /// Returns 1.0 if card not equipped, else 1.0 + (card value as percent).
+        /// </summary>
+        public float GetTankDurationMultiplier()
+        {
+            if (!CardModifierService.HasEffect(CardEffectType.AddTank)) return 1f;
+            return 1f + CardModifierService.GetEffectResult(CardEffectType.AddTank);
         }
         private int GetTotalUsage(string ultimateId)
         {
