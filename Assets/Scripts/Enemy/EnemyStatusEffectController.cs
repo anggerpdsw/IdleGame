@@ -218,6 +218,7 @@ namespace IdleDefenseSurvival.Enemy
             effect.OnApply(Enemy);
             _effects.Add(effect);
             OnEffectApplied?.Invoke(effect);
+            _enemy?.RefreshEnemyStatus();
         }
 
         private void RemoveEffectInternal(IStatusEffect effect)

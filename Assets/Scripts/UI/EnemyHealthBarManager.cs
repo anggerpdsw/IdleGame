@@ -201,11 +201,33 @@ namespace IdleDefenseSurvival.UI
             SetActiveIfChanged(entry.RootObject, _enemyHealthBarToggle);
 
             _activeHealthBars.Add(enemy, entry);
+
+            // Subscribe to status effect events for real-time icon updates
+            var statusController = enemy.EnemyStatusEffect;
+            if (statusController != null)
+            {
+                statusController.OnEffectApplied += _ => UpdateEnemyStatus(enemy);
+                statusController.OnEffectRemoved += _ => UpdateEnemyStatus(enemy);
+                statusController.OnEffectsChanged += () => UpdateEnemyStatus(enemy);
+            }
+
+            // Initial status refresh
+            UpdateEnemyStatus(enemy);
         }
 
         public void UnregisterEnemy(EnemyAi enemy)
         {
             if (!_activeHealthBars.TryGetValue(enemy, out var entry)) return;
+
+            // Unsubscribe from status effect events
+            var statusController = enemy.EnemyStatusEffect;
+            if (statusController != null)
+            {
+                statusController.OnEffectApplied -= _ => UpdateEnemyStatus(enemy);
+                statusController.OnEffectRemoved -= _ => UpdateEnemyStatus(enemy);
+                statusController.OnEffectsChanged -= () => UpdateEnemyStatus(enemy);
+            }
+
             ReturnHealthBar(entry);
             _activeHealthBars.Remove(enemy);
         }
@@ -249,7 +271,8 @@ namespace IdleDefenseSurvival.UI
             Transform parent, StatusEffectType type, List<StatusIcon> list)
         {
             Transform child = parent.Find(type.ToString());
-            if (child == null) return;
+            if (child == null) {
+                Debug.LogWarning($"[EnemyHealthBar] Child '{type}' not found in prefab"); return;}
             if (!child.TryGetComponent<Image>(out var img)) return;
             list.Add(new StatusIcon { Type = type, Image = img });
         }
@@ -267,8 +290,9 @@ namespace IdleDefenseSurvival.UI
 
         private static void SetImageState(Image image, bool enabled)
         {
-            if (image != null && image.enabled != enabled)
-                image.enabled = enabled;
+            if (image == null) return;
+            GameObject go = image.gameObject;
+            if (go.activeSelf != enabled) go.SetActive(enabled);
         }
 
         private static void SetActiveIfChanged(GameObject target, bool active)

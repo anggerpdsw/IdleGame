@@ -72,6 +72,7 @@ namespace IdleDefenseSurvival.Enemy
 
         public EnemyData EnemyData { get; private set; }
         public string EnemyId => _enemyId;
+        public EnemyStatusEffectController EnemyStatusEffect => _statusEffectController;
 
         // -------------------------------------------------------------------
         // Runtime references
@@ -649,17 +650,13 @@ namespace IdleDefenseSurvival.Enemy
         {
             if (_statusEffectController == null)
             {
-                // Fallback to direct modification
-                percent = Mathf.Clamp01(percent * 0.01f);
-                _maxHealth *= 1f - percent;
-                if (_currentHealth > _maxHealth) _currentHealth = _maxHealth;
-                RefreshHealthBarStatus();
-                EnemyStatisticsManager.Instance?.MarkDirty();
+                Debug.Log($"[EnemyAi] {_statusEffectController} null");
                 return;
             }
 
             percent = Mathf.Clamp01(percent * 0.01f);
-            _statusEffectController.AddEffect(new HeartBreakStatus(percent));
+            // HeartBreak is permanent - use float.MaxValue to prevent auto-expire
+            _statusEffectController.AddEffect(new HeartBreakStatus(percent, float.MaxValue));
 
             // Immediately apply the max health reduction
             float newMaxHealth = _maxHealth * (1f - percent);
@@ -681,8 +678,7 @@ namespace IdleDefenseSurvival.Enemy
         /// <summary>
         /// Set enemy damage (for runtime scaling like necromancer revive).
         /// </summary>
-        public void SetDamage(float damage)
-            => _damage = Mathf.Max(0f, damage);
+        public void SetDamage(float damage) => _damage = Mathf.Max(0f, damage);
 
         /// <summary>
         /// Heal enemy by amount. Clamps to MaxHealth. Used by Vampiric LifeSteal and Regeneration aura.
