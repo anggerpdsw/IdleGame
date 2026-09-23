@@ -23,6 +23,9 @@ namespace IdleDefenseSurvival.Card
         public int GamblerMaxCount = 20;
         public float GamblerPositiveValue = 25f;
         public float GamblerNegativeValue = -15f;
+        public float ChainReactionRadius = 5f;
+        public float ChainReactionExplosionDamage = 0.5f;
+        public float ChainReactionExplosionRadius = 3.5f;
     }
 
 }

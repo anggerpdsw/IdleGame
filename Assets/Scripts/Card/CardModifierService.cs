@@ -8,6 +8,7 @@ using IdleDefenseSurvival.Stats;
 using UnityEngine;
 
 using PlayerClass = IdleDefenseSurvival.Player.Player;
+using EnemyStatusEffects = IdleDefenseSurvival.Enemy.StatusEffects;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -42,17 +43,6 @@ namespace IdleDefenseSurvival.Manager
         // Balance values loaded from Resources/Data/Card/dataCardConfig.json
         // ------------------------------------------------------------------
         private static CardConfig CardConfig => DatabaseJSONCache.CardConfig;
-        private static float DeathChainWindow => CardConfig.DeathChainWindow;
-        private static int DeathChainMaxStack => CardConfig.DeathChainMaxStack;
-        private static float VampiricFrenzyDuration => CardConfig.VampiricFrenzyDuration;
-        private static int VampiricFrenzyMaxStacks => CardConfig.VampiricFrenzyMaxStacks;
-        private static float GuardianHPDrop => CardConfig.GuardianHPDrop;
-        private static float GuardianCooldownDuration => CardConfig.GuardianCooldownDuration;
-        private static float WarMachineContinuityThreshold => CardConfig.WarMachineContinuityThreshold;
-        private static float WarMachineIdleThreshold => CardConfig.WarMachineIdleThreshold;
-        private static int GamblerMaxCount => CardConfig.GamblerMaxCount;
-        private static float GamblerPositiveValue => CardConfig.GamblerPositiveValue;
-        private static float GamblerNegativeValue => CardConfig.GamblerNegativeValue;
         #endregion
 
         #region Card Effect State
@@ -81,17 +71,19 @@ namespace IdleDefenseSurvival.Manager
         private static int _angelImmunityWavesRemaining;
         #endregion
 
-        #region CrazyGambler State
+        #region CrazyGambler & Desperados State
+        private static int GamblerMaxCount => CardConfig.GamblerMaxCount;
+        private static float GamblerPositiveValue => CardConfig.GamblerPositiveValue;
+        private static float GamblerNegativeValue => CardConfig.GamblerNegativeValue;
         private static float _crazyGamblerBonus;
         public static float GetCrazyGamblerBonus() => _crazyGamblerBonus;
-        #endregion
-
-        #region Desperados State
         private static float _desperadosBonus;
         public static float GetDesperadosBonus() => _desperadosBonus;
         #endregion
 
         #region DeathChain State
+        private static float DeathChainWindow => CardConfig.DeathChainWindow;
+        private static int DeathChainMaxStack => CardConfig.DeathChainMaxStack;
         private static readonly Queue<float> _deathChainKills = new();
         private static int _deathChainStack;
         #endregion
@@ -101,17 +93,23 @@ namespace IdleDefenseSurvival.Manager
         #endregion
 
         #region VampiricFrenzy State
+        private static float VampiricFrenzyDuration => CardConfig.VampiricFrenzyDuration;
+        private static int VampiricFrenzyMaxStacks => CardConfig.VampiricFrenzyMaxStacks;
         private static float _vampiricFrenzyAccumulator;
         private static int _vampiricFrenzyStacks;
         private static float _vampiricFrenzyTimer;
         #endregion
 
         #region GuardianInstinct State
+        private static float GuardianHPDrop => CardConfig.GuardianHPDrop;
+        private static float GuardianCooldownDuration => CardConfig.GuardianCooldownDuration;
         private static float _guardianCooldownRemaining;
         private static bool _guardianActive;
         #endregion
 
         #region WarMachine State
+        private static float WarMachineContinuityThreshold => CardConfig.WarMachineContinuityThreshold;
+        private static float WarMachineIdleThreshold => CardConfig.WarMachineIdleThreshold;
         private static float _warMachineContinuityTimer;
         private static float _warMachineIdleTimer;
         private static bool _warMachineActive;
@@ -145,6 +143,12 @@ namespace IdleDefenseSurvival.Manager
         private static bool _voidOverlordActive;
         #endregion
 
+        #region ChainReaction State
+        private static float ChainReactionRadius => CardConfig.ChainReactionRadius;
+        private static float ChainReactionExplosionDamage => CardConfig.ChainReactionExplosionDamage;
+        private static float ChainReactionExplosionRadius => CardConfig.ChainReactionExplosionRadius;
+        #endregion
+
         #region Refresh
         /// <summary>
         /// Clears all existing card modifiers and re-applies modifiers
@@ -170,6 +174,7 @@ namespace IdleDefenseSurvival.Manager
             ResetSoulHarvester();
             ResetDeathReversal();
             ResetVoidOverlord();
+            ResetChainReaction();
 
             bool hasHealOnKill = ApplyEquippedCards();
 
@@ -280,6 +285,11 @@ namespace IdleDefenseSurvival.Manager
             _voidOverlordTimer = 0f;
             _voidOverlordDuration = 0f;
             _voidOverlordActive = false;
+        }
+
+        private static void ResetChainReaction()
+        {
+            // No state to reset - effect is entirely event-driven
         }
         #endregion
 
@@ -789,6 +799,71 @@ namespace IdleDefenseSurvival.Manager
         }
 
         public static bool IsVoidOverlordActive() => _voidOverlordActive;
+        #endregion
+
+        #region ChainReaction
+        public static void OnEnemyKilledChainReaction(EnemyAi deadEnemy)
+        {
+            if (!HasEffect(CardEffectType.ChainReaction)) return;
+            float chancePercent = GetEffectResult(CardEffectType.ChainReaction, 0.2f) * 100f;
+            if (!Utilityku.Chance(chancePercent)) return;
+
+            Collider2D[] hits = Physics2D.OverlapCircleAll(
+                deadEnemy.transform.position,
+                ChainReactionRadius,
+                LayerMask.GetMask("Enemy")
+            );
+
+            foreach (var hit in hits)
+            {
+                if (!hit.TryGetComponent<EnemyAi>(out var target)) continue;
+                if (target == deadEnemy || target.CurrentHealth <= 0) continue;
+                if (!target.TryGetComponent<EnemyStatusEffectController>(out var controller)) continue;
+                controller.AddEffect(new EnemyStatusEffects.VolatileStatus(5f));
+            }
+        }
+
+        public static void OnVolatileEnemyDeath(EnemyAi deadEnemy)
+        {
+            if (!HasEffect(CardEffectType.ChainReaction)) return;
+            if (!deadEnemy.TryGetComponent<EnemyStatusEffectController>(out var controller)) return;
+            if (controller.GetEffect(EnemyStatusEffects.StatusEffectType.Volatile) is not EnemyStatusEffects.VolatileStatus volatileEffect || volatileEffect.HasExploded) return;
+
+            volatileEffect.HasExploded = true;
+
+            // Explosion damage
+            Collider2D[] hits = Physics2D.OverlapCircleAll(
+                deadEnemy.transform.position,
+                ChainReactionExplosionRadius,
+                LayerMask.GetMask("Enemy")
+            );
+
+            float explosionDamage = deadEnemy.MaxHealth * ChainReactionExplosionDamage;
+            foreach (var hit in hits)
+            {
+                if (!hit.TryGetComponent<EnemyAi>(out var target)) continue;
+                if (target == deadEnemy || target.CurrentHealth <= 0) continue;
+
+                var damageData = new DamageData(
+                    explosionDamage,
+                    DamageType.Normal,
+                    CriticalType.None,
+                    "ChainReactionExplosion"
+                )
+                {
+                    Element = Element.Fire
+                };
+                target.TakeDamage(damageData);
+
+                // Spread Volatile to non-exploded enemies
+                if (!target.TryGetComponent<EnemyStatusEffectController>(out var targetController)) continue;
+
+                if (targetController.GetEffect(EnemyStatusEffects.StatusEffectType.Volatile) is not EnemyStatusEffects.VolatileStatus existingVolatile || !existingVolatile.HasExploded)
+                {
+                    targetController.AddEffect(new EnemyStatusEffects.VolatileStatus(5f));
+                }
+            }
+        }
         #endregion
 
         #region Wave

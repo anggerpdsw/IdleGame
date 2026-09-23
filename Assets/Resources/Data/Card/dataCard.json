@@ -403,6 +403,15 @@
             "ValuePerLevel": 0.8,
             "CardRarity": "Legendary"
         }, {
+            "Id": "chain_reaction",
+            "Name": "Chain Reaction",
+            "Description": "Kills have a chance to create Volatile enemies. Killing a Volatile enemy causes an explosion that can spread the effect.",
+            "EffectType": "ChainReaction",
+            "Mode": "Percent",
+            "BaseValue": 20,
+            "ValuePerLevel": 3,
+            "CardRarity": "Legendary"
+        }, {
             "Id": "bullet_storm",
             "Name": "Bullet Storm",
             "Description": "Every 8 attacks automatically fires a burst of 5 additional projectiles at nearby enemies.",

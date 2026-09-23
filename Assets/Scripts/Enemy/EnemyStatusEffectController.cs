@@ -225,6 +225,7 @@ namespace IdleDefenseSurvival.Enemy
             effect.OnExpire(Enemy);
             _effects.Remove(effect);
             OnEffectRemoved?.Invoke(effect);
+            _enemy?.RefreshEnemyStatus();
         }
 
         /// <summary>

@@ -818,4 +818,23 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
             return new RegenerationStatus(Duration) { StackCount = StackCount };
         }
     }
+
+    /// <summary>
+    /// Volatile - marks enemy for explosion on death. Chain Reaction card effect.
+    /// Does not stack; refreshes duration. Tracks if already exploded to prevent loops.
+    /// </summary>
+    [Serializable]
+    public sealed class VolatileStatus : BaseStatusEffect
+    {
+        public override StatusEffectType Type => StatusEffectType.Volatile;
+        public override int MaxStacks => 1;
+        public override StackPolicy StackPolicy => StackPolicy.RefreshDuration;
+        public override StatusEffectCategory Category => StatusEffectCategory.Special;
+        public bool HasExploded { get; set; }
+        public VolatileStatus(float duration) : base(duration) { }
+        public override IStatusEffect Clone()
+        {
+            return new VolatileStatus(Duration) { StackCount = StackCount };
+        }
+    }
 }

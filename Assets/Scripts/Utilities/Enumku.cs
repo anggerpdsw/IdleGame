@@ -79,7 +79,8 @@ namespace IdleDefenseSurvival
         InfiniteArsenal,      // Every 12th attack → special projectile (pierce all, bounce 3x, 100% crit)
         SoulHarvester,        // Each kill → +1 Soul, each Soul +0.5% DMG, every 100 Souls +50 max stack
         DeathReversal,        // First death → rewind 5s (HP/pos), restore 50% HP, reset projectiles (once/wave)
-        VoidOverlord          // Every 100s → 15s state (pierce, +100% DMG, no enemy heal)
+        VoidOverlord,         // Every 100s → 15s state (pierce, +100% DMG, no enemy heal)
+        ChainReaction         // Kill → 20% mark nearby Volatile 5s, Volatile death explodes + spreads (once per enemy)
     }
 	
     public enum Element { None, Metal, Wood, Fire, Water, Earth, Lightning, Wind }

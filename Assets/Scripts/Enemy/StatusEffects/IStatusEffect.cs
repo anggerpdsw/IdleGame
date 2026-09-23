@@ -115,6 +115,7 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         Unregeneration = 39,
         Spawn = 40,
         Revive = 41,
+        Volatile = 42,
     }
 
     /// <summary>

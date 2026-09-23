@@ -24,8 +24,7 @@ namespace IdleDefenseSurvival.Pet.Behavior
             if (!context.HasValidTarget) return false;
             if (!context.CurrentTarget.TryGetComponent<Enemy.EnemyAi>(out var enemy)) return false;
 
-            var controller = enemy.GetComponent<Enemy.EnemyStatusEffectController>();
-            if (controller == null) return false;
+            if (!enemy.TryGetComponent<Enemy.EnemyStatusEffectController>(out var controller)) return false;
 
             // Apply duration/potency modifiers
             float finalDuration = _duration * modifiers.StatusDurationMultiplier;

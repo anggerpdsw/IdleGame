@@ -3,7 +3,6 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.UI;
-using IdleDefenseSurvival.Card;
 
 namespace IdleDefenseSurvival.Enemy
 {
@@ -36,6 +35,17 @@ namespace IdleDefenseSurvival.Enemy
             {
                 CardModifierService.OnEnemyKilledApocalypse();
                 CardModifierService.OnEnemyKilledSoulHarvester();
+            }
+
+            // Step 1d: ChainReaction Volatile check (player kills only)
+            if (lastDamageSource == UltimateDMG.Player.ToString())
+            {
+                var controller = enemy.GetComponent<EnemyStatusEffectController>();
+                if (controller != null && controller.HasEffect(StatusEffects.StatusEffectType.Volatile))
+                {
+                    CardModifierService.OnVolatileEnemyDeath(enemy);
+                }
+                CardModifierService.OnEnemyKilledChainReaction(enemy);
             }
 
             // Step 2-3: Ultimate triggers (Lightning, Cloud)

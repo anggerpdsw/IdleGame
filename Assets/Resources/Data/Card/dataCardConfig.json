@@ -15,5 +15,8 @@
   "InfiniteArsenalMult": 0.9,
   "GamblerMaxCount": 20,
   "GamblerPositiveValue": 25.0,
-  "GamblerNegativeValue": -15.0
+  "GamblerNegativeValue": -15.0,
+  "ChainReactionRadius": 5.0,
+  "ChainReactionExplosionDamage": 0.5,
+  "ChainReactionExplosionRadius": 3.5
 }

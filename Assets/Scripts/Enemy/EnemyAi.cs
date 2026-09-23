@@ -731,6 +731,15 @@ namespace IdleDefenseSurvival.Enemy
         }
 
         /// <summary>
+        /// Generic check for any status effect type.
+        /// Used by health bar UI for extensible status icon display.
+        /// </summary>
+        public bool HasActiveStatus(StatusEffectType type)
+        {
+            return _statusEffectController != null && _statusEffectController.HasEffect(type);
+        }
+
+        /// <summary>
         /// Forces the enemy health bar UI to refresh its status indicators.
         /// </summary>
         public void RefreshHealthBarStatus()
