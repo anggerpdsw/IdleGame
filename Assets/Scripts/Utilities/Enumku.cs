@@ -12,7 +12,7 @@ namespace IdleDefenseSurvival
     public enum RewardType { Gold, Gem, Meat, Exp, Card, Ticket, Energy, Item, Equipment, Hero }
     public enum Role { Fighter, Tank, Golem, Caster, Ranger, Agile, Beast, BOSS, Undeath }
     public enum EnemyType { IsBasic, IsElite, IsBoss, IsSpecial }
-    public enum Behavior { Necromancer }
+    public enum Behavior { Vampiric, Necromancer }
     public enum SpawnMode { Circle, FourSides }
     public enum UltimateDMG { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
     public enum WaveState { ActiveWave, Defeat, InterWave, Victory }

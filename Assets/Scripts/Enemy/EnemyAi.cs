@@ -750,7 +750,7 @@ namespace IdleDefenseSurvival.Enemy
         /// <summary>
         /// Handle enemy death.
         /// </summary>
-        private void Die()
+        public void Die()
         {
             // Delegate to static death handler
             EnemyDeathHandler.ProcessDeath(this, _lastDamageSource);

@@ -59,9 +59,9 @@ namespace IdleDefenseSurvival.Data
                 DamageType.Poison     => GameColors.purple,
                 DamageType.Burn       => GameColors.orange,
                 DamageType.Ice        => GameColors.cyan,
-                DamageType.TrueDamage => GameColors.darkgray,
+                DamageType.TrueDamage => GameColors.white,
                 DamageType.Miss       => GameColors.gray,
-                _                     => GameColors.white
+                _                     => GameColors.darkgray
             };
         }
 

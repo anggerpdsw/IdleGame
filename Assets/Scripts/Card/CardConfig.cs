@@ -26,6 +26,7 @@ namespace IdleDefenseSurvival.Card
         public float ChainReactionRadius = 5f;
         public float ChainReactionExplosionDamage = 0.5f;
         public float ChainReactionExplosionRadius = 3.5f;
+        public float CriticalCascadeMult = 0.9f;
     }
 
 }

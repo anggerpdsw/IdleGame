@@ -45,6 +45,12 @@ namespace IdleDefenseSurvival.Core
         }
     }
 
+    public static class EffectResources
+    {
+        public static GameObject GetEffect(string name)
+            => ResourceCache.Load<GameObject>($"Effects/{name}");
+    }
+
     public static class ItemResources
     {
         public static Sprite GetItemSource(string key)

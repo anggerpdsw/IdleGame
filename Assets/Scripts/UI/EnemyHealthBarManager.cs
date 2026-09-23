@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using IdleDefenseSurvival.Controller;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Enemy.StatusEffects;
-using IdleDefenseSurvival.Data;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -23,17 +22,11 @@ namespace IdleDefenseSurvival.UI
 
         private static EnemyHealthBarManager _instance;
 
-        private class StatusIcon
-        {
-            public StatusEffectType Type;
-            public Image Image;
-        }
-
-        // Pool entry yang menyimpan Slider + StatusIcon array references
+        // Pool entry yang menyimpan Slider + StatusIcon dictionary references
         private class HealthBarEntry
         {
             public Slider Slider;
-            public StatusIcon[] StatusIcons;
+            public Dictionary<StatusEffectType, Image> StatusIcons;
             public GameObject RootObject; // Parent GameObject (PanelHealth)
             public float LastHealth;    // last displayed value – avoids redundant slider updates
 
@@ -136,22 +129,36 @@ namespace IdleDefenseSurvival.UI
                 UnregisterEnemy(_invalidEnemies[i]);
         }
 
+        /// <summary>
+        /// Update single status icon based on effect type (event-driven).
+        /// </summary>
+        private void UpdateStatusIcon(EnemyAi enemy, StatusEffectType type)
+        {
+            if (enemy == null || !_activeHealthBars.TryGetValue(enemy, out var entry)) return;
+            if (entry.StatusIcons == null || !entry.StatusIcons.TryGetValue(type, out var image)) return;
+
+            bool active = type switch
+            {
+                StatusEffectType.DamageReduction => enemy.HasActiveDamageReduction(),
+                StatusEffectType.HeartBreak => enemy.HasReducedMaxHealth(),
+                StatusEffectType.DefenseBreak => enemy.HasActiveDefenseBreak(),
+                StatusEffectType.Volatile => enemy.HasActiveStatus(StatusEffectType.Volatile),
+                _ => false
+            };
+            SetImageState(image, active);
+        }
+
+        /// <summary>
+        /// Refresh all status icons (fallback for batch changes).
+        /// </summary>
         public void UpdateEnemyStatus(EnemyAi enemy)
         {
             if (enemy == null || !_activeHealthBars.TryGetValue(enemy, out var entry)) return;
             if (entry.StatusIcons == null) return;
 
-            foreach (var icon in entry.StatusIcons)
+            foreach (var kvp in entry.StatusIcons)
             {
-                bool active = icon.Type switch
-                {
-                    StatusEffectType.DamageReduction => enemy.HasActiveDamageReduction(),
-                    StatusEffectType.HeartBreak => enemy.HasReducedMaxHealth(),
-                    StatusEffectType.DefenseBreak => enemy.HasActiveDefenseBreak(),
-                    StatusEffectType.Volatile => enemy.HasActiveStatus(StatusEffectType.Volatile),
-                    _ => false
-                };
-                SetImageState(icon.Image, active);
+                UpdateStatusIcon(enemy, kvp.Key);
             }
         }
 
@@ -202,12 +209,12 @@ namespace IdleDefenseSurvival.UI
 
             _activeHealthBars.Add(enemy, entry);
 
-            // Subscribe to status effect events for real-time icon updates
+            // Subscribe to status effect events for targeted icon updates
             var statusController = enemy.EnemyStatusEffect;
             if (statusController != null)
             {
-                statusController.OnEffectApplied += _ => UpdateEnemyStatus(enemy);
-                statusController.OnEffectRemoved += _ => UpdateEnemyStatus(enemy);
+                statusController.OnEffectApplied += effect => UpdateStatusIcon(enemy, effect.Type);
+                statusController.OnEffectRemoved += effect => UpdateStatusIcon(enemy, effect.Type);
                 statusController.OnEffectsChanged += () => UpdateEnemyStatus(enemy);
             }
 
@@ -223,8 +230,8 @@ namespace IdleDefenseSurvival.UI
             var statusController = enemy.EnemyStatusEffect;
             if (statusController != null)
             {
-                statusController.OnEffectApplied -= _ => UpdateEnemyStatus(enemy);
-                statusController.OnEffectRemoved -= _ => UpdateEnemyStatus(enemy);
+                statusController.OnEffectApplied -= effect => UpdateStatusIcon(enemy, effect.Type);
+                statusController.OnEffectRemoved -= effect => UpdateStatusIcon(enemy, effect.Type);
                 statusController.OnEffectsChanged -= () => UpdateEnemyStatus(enemy);
             }
 
@@ -246,7 +253,7 @@ namespace IdleDefenseSurvival.UI
 
             Transform healthBarTf = barTransform.Find("HealthBar");
 
-            var statusIcons = new List<StatusIcon>();
+            var statusIcons = new Dictionary<StatusEffectType, Image>(4);
             AddStatusIcon(barTransform, StatusEffectType.DamageReduction, statusIcons);
             AddStatusIcon(barTransform, StatusEffectType.HeartBreak, statusIcons);
             AddStatusIcon(barTransform, StatusEffectType.DefenseBreak, statusIcons);
@@ -255,7 +262,7 @@ namespace IdleDefenseSurvival.UI
             HealthBarEntry entry = new()
             {
                 Slider = healthBarTf?.GetComponent<Slider>(),
-                StatusIcons = statusIcons.ToArray(),
+                StatusIcons = statusIcons,
                 RootObject = bar,
                 LastHealth = -1f,
                 HasLastScreenPosition = false
@@ -268,13 +275,16 @@ namespace IdleDefenseSurvival.UI
         }
 
         private static void AddStatusIcon(
-            Transform parent, StatusEffectType type, List<StatusIcon> list)
+            Transform parent, StatusEffectType type, Dictionary<StatusEffectType, Image> dict)
         {
             Transform child = parent.Find(type.ToString());
-            if (child == null) {
-                Debug.LogWarning($"[EnemyHealthBar] Child '{type}' not found in prefab"); return;}
+            if (child == null)
+            {
+                Debug.LogWarning($"[EnemyHealthBar] Child '{type}' not found in prefab");
+                return;
+            }
             if (!child.TryGetComponent<Image>(out var img)) return;
-            list.Add(new StatusIcon { Type = type, Image = img });
+            dict[type] = img;
         }
 
         private void ReturnHealthBar(HealthBarEntry entry)
@@ -304,8 +314,8 @@ namespace IdleDefenseSurvival.UI
         private static void ResetIndicatorImages(HealthBarEntry entry)
         {
             if (entry.StatusIcons == null) return;
-            foreach (var icon in entry.StatusIcons)
-                SetImageState(icon.Image, false);
+            foreach (var image in entry.StatusIcons.Values)
+                SetImageState(image, false);
         }
     }
 }

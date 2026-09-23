@@ -16,6 +16,9 @@ namespace IdleDefenseSurvival.Player
     [RequireComponent(typeof(CircleCollider2D))]
     public class Projectile : MonoBehaviour
     {
+        // Cached layer mask - computed once instead of per bounce
+        private static readonly int EnemyLayerMask = LayerMask.GetMask("Enemy");
+
         [Header("Movement")]
         [Tooltip("Speed of the projectile in units per second.")]
         [SerializeField] private float _speed = 23f;
@@ -44,6 +47,7 @@ namespace IdleDefenseSurvival.Player
         public ProjectileOwner Owner => _owner;
         private Player _player;
         private TankInstance _tank;
+        private EnemyAi _enemyShooter;
         private string _sourceName;
         private float _baseDamage;  // Base stats untuk geometric reduction
         private float _damageMultiplier = 1f;
@@ -65,6 +69,7 @@ namespace IdleDefenseSurvival.Player
         private bool _hasHit = false;
         private int _bounceIndex = 0;  // Track bounce keberapa (0 = first hit)
         private bool _isMultiShoot = false;  // Track apakah projectile ini dari multi-shoot
+        private bool _isEnemyDied = false;  // Track apakah enemy sudah Die
 
         // Track enemies yang sudah terkena oleh projectile ini (untuk bounce chain)
         private readonly HashSet<Transform> _hitEnemies = new();
@@ -75,7 +80,7 @@ namespace IdleDefenseSurvival.Player
 
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
-
+        
         // ------------------------------------------------------------------
         // Balance values loaded from Resources/Data/Card/dataCardConfig.json
         // ------------------------------------------------------------------
@@ -84,6 +89,7 @@ namespace IdleDefenseSurvival.Player
         private static float ExecutionProtocolBoss => CardConfig.ExecutionProtocolBoss;
         private static int OverkillCap => CardConfig.OverkillCap;
         private static float InfiniteArsenalMult => CardConfig.InfiniteArsenalMult;
+        private static float CriticalCascadeMult => CardConfig.CriticalCascadeMult;
 
         /// <summary>
         /// Reset projectile state for reuse from object pool.
@@ -93,6 +99,7 @@ namespace IdleDefenseSurvival.Player
         {
             _hasHit = false;
             _bounceIndex = 0;
+            _enemyShooter = null;
             _bounceApproved = false;
             _hitEnemies.Clear();
             _target = null;
@@ -100,6 +107,7 @@ namespace IdleDefenseSurvival.Player
             _player = null;
             _tank = null;
             _baseDamage = 0f;
+            _damageMultiplier = 1f;
             _baseKnockbackForce = 0f;
             _basePerRange = 0f;
             _baseStuntDuration = 0f;
@@ -116,12 +124,29 @@ namespace IdleDefenseSurvival.Player
             _healthBreak = 0f;
             _sourceName = null;
 
-            if (_rb != null)
-            {
-                _rb.linearVelocity = Vector2.zero;
-            }
+            if (_rb != null) _rb.linearVelocity = Vector2.zero;
 
             transform.rotation = Quaternion.identity;
+
+            _isEnemyDied = false;
+            EnemyDeathHandler.OnEnemyKilled -= OnEnemyKilledHandler;
+        }
+
+        /// <summary>
+        /// Called when any enemy dies. Sets flag if killed enemy is this projectile's target.
+        /// </summary>
+        private void OnEnemyKilledHandler(EnemyAi enemy, string source)
+        {
+            if (_target == null || enemy == null) return;
+            if (_target.TryGetComponent(out EnemyAi targetEnemy) && targetEnemy == enemy)
+                _isEnemyDied = true;
+        }
+
+        private void GuardEventSub()
+        {
+            _isEnemyDied = false;
+            EnemyDeathHandler.OnEnemyKilled -= OnEnemyKilledHandler;
+            EnemyDeathHandler.OnEnemyKilled += OnEnemyKilledHandler;
         }
 
         private void Awake()
@@ -142,15 +167,8 @@ namespace IdleDefenseSurvival.Player
         private void ReturnToPool()
         {
             // Check if we have a valid pool reference
-            if (_pool == null)
-            {
-                _pool = ProjectilePool.Instance;
-            }
-
-            if (_pool != null)
-            {
-                _pool.Return(this);
-            }
+            if (_pool == null) _pool = ProjectilePool.Instance;
+            if (_pool != null) _pool.Return(this);
         } 
 
         /// <summary>
@@ -162,6 +180,7 @@ namespace IdleDefenseSurvival.Player
             SetProjectileSprite(_playerBulletSprite);
 
             _target = target;
+            GuardEventSub();            
             _player = player;
             _damageMultiplier = damageMultiplier;
             _isMultiShoot = isMultiShoot;
@@ -188,6 +207,7 @@ namespace IdleDefenseSurvival.Player
             SetProjectileSprite(_tankBulletSprite);
 
             _target = target;
+            GuardEventSub();
             _tank = tank;
             _startPosition = transform.position;
             _baseDamage = tank.TankAttackDamage;
@@ -204,6 +224,8 @@ namespace IdleDefenseSurvival.Player
             SetProjectileSprite(_enemyBulletSprite);
 
             _target = target;
+            _enemyShooter = enemy;
+            GuardEventSub();
             _startPosition = transform.position;
             _baseDamage = enemy.EnemyAttackDamage;
             _sourceName = enemy?.EnemyId ?? _owner.ToString();
@@ -237,30 +259,13 @@ namespace IdleDefenseSurvival.Player
         private void Update()
         {
             if (_hasHit) return;
-
             // Check max distance
             if (Vector3.Distance(_startPosition, transform.position) >= _maxDistance)
             {
                 ReturnToPool();
                 return;
             }
-
-            // Distance-based hit detection (fallback in case trigger doesn't fire)
-            if (_target != null)
-            {
-                float dist = Vector2.Distance(transform.position, _target.position);
-                if (dist <= _hitRadius)
-                {
-                    if (_owner == ProjectileOwner.Enemy && _target.TryGetComponent(out Player player))
-                    {
-                        HitPlayer(player);
-                    }
-                    else
-                    {
-                        HitTarget();
-                    }
-                }
-            }
+            // Hit detection handled by OnTriggerEnter2D with Continuous collision detection
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
@@ -293,13 +298,13 @@ namespace IdleDefenseSurvival.Player
                         (collision.transform == _target || collision.transform.IsChildOf(_target));
                     if (hitAssignedTarget && _target.TryGetComponent(out Player player))
                     {
-                        HitPlayer(player);
+                        EnemyHitPlayer(player);
                     }
                     break;
             }
         }
 
-        private void HitPlayer(Player player)
+        private void EnemyHitPlayer(Player player)
         {
             if (_hasHit) return;
             _hasHit = true;
@@ -314,10 +319,8 @@ namespace IdleDefenseSurvival.Player
             float actualDamageDealt = player.TakeDamage(damageData);
 
             // Process Vampiric LifeSteal after actual damage is known
-            if (_target != null && _target.TryGetComponent<EnemyAi>(out var enemy))
-            {
-                EnemyEffectProcessor.ProcessVampiricLifeSteal(enemy, actualDamageDealt);
-            }
+            if (_enemyShooter != null)
+                EnemyEffectProcessor.ProcessVampiricLifeSteal(_enemyShooter, actualDamageDealt);
 
             ReturnToPool();
         }
@@ -340,10 +343,11 @@ namespace IdleDefenseSurvival.Player
             {
                 if (_target.TryGetComponent(out EnemyAi enemy))
                 {
-                    // Kalkulasi damage dengan geometric reduction: baseDamage * (0.5 ^ bounceIndex)
+                    // Kalkulasi damage dengan geometric reduction: baseDamage * (0.9 ^ bounceIndex)
                     // Bounce 0 (first hit): 100%, Bounce 1: 90%, Bounce 2: 81%, etc.
                     float currentDamage = _baseDamage * Mathf.Pow(0.9f, _bounceIndex);
-
+                    Vector3 lastEnemyPos = enemy.transform.position;
+                    
                     // Tambahkan target ke hit history
                     _hitEnemies.Add(_target);
                     
@@ -461,15 +465,15 @@ namespace IdleDefenseSurvival.Player
                             DefenseBreak = _defenseBreak,
                             DefenseBreakDuration = _defenseBreakDuration
                         };
-
+                        
                         float actualDamage = enemy.TakeDamage(damageData);
-                        bool enemyDied = enemy.CurrentHealth <= 0f;
-
                         if (actualDamage <= 0f)
                         {
                             ReturnToPool();
                             return;
                         }
+
+                        // _isEnemyDied set via OnEnemyKilled event
 
                         // Consume 1 mana per enemy hit only when multi-shoot is active
                         if (_isMultiShoot && _bounceIndex == 0)
@@ -487,22 +491,24 @@ namespace IdleDefenseSurvival.Player
 
                         // === Card Effects ===
                         // ExecutionProtocol: instant kill check
-                        if (CardModifierService.HasEffect(CardEffectType.ExecutionProtocol))
+                        if (!_isEnemyDied && CardModifierService.HasEffect(CardEffectType.ExecutionProtocol))
                         {
                             bool isBossOrElite = enemy.EnemyData != null && (enemy.EnemyData.IsBoss || enemy.EnemyData.IsSpecial);
                             float threshold = isBossOrElite ? ExecutionProtocolBoss : ExecutionProtocolNormal;
                             float chance = CardModifierService.GetEffectResult(CardEffectType.ExecutionProtocol, 0f);
                             if (enemy.CurrentHealth <= enemy.MaxHealth * threshold && Utilityku.Chance(chance * 100f))
                             {
-                                enemy.TakeDamage(new DamageData(enemy.CurrentHealth * 999f, DamageType.TrueDamage, CriticalType.None, "Execution"));
-                                enemyDied = true;
+                                // Spawn sword execution effect
+                                enemy.Die();
+                                _isEnemyDied = true;
+                                EffectPool.Instance?.Spawn("SwordEffect", lastEnemyPos);
                             }
                         }
 
                         // Overkill: transfer excess damage
-                        if (enemyDied && CardModifierService.HasEffect(CardEffectType.Overkill))
+                        if (_isEnemyDied && CardModifierService.HasEffect(CardEffectType.Overkill))
                         {
-                            float excessDamage = actualDamage - enemy.MaxHealth;
+                            float excessDamage = currentDamage - actualDamage;
                             if (excessDamage > 0f)
                             {
                                 float cap = currentDamage * OverkillCap;
@@ -529,25 +535,25 @@ namespace IdleDefenseSurvival.Player
                                     if (cascade != null)
                                     {
                                         cascade.transform.position = transform.position;
-                                        cascade.Initialize(cascadeTarget, _player, 1f, false);
+                                        cascade.Initialize(cascadeTarget, _player, CriticalCascadeMult, false);
                                     }
                                 }
                             }
                         }
 
                         // DeathChain: notify kill
-                        if (enemyDied)
+                        if (_isEnemyDied)
                             CardModifierService.OnEnemyKilledDeathChain();
 
                         // --- Implementasi Knockback ---
-                        if (damageData.HasKnockback)
+                        if (!_isEnemyDied && damageData.HasKnockback)
                         {
                             Vector2 kbDirection = ((Vector2)_target.position - _rb.position).normalized;
                             enemy.ApplyKnockback(kbDirection, damageData.KnockbackForce);
                         }
 
                         // --- Implementasi Stunt ---
-                        if (damageData.HasStunt)
+                        if (!_isEnemyDied && damageData.HasStunt)
                         {
                             float currentStuntDuration = _baseStuntDuration * Mathf.Pow(0.9f, _bounceIndex);
                             enemy.ApplyStunt(currentStuntDuration);
@@ -569,7 +575,7 @@ namespace IdleDefenseSurvival.Player
                         }
 
                         _player.SpawnTank();
-                        UltimateManager.Instance.TryGenerateStack(UltimateDMG.Bomb.ToString(), _player, enemy.transform.position);
+                        UltimateManager.Instance.TryGenerateStack(UltimateDMG.Bomb.ToString(), _player, lastEnemyPos);
                     }
                 }
             }
@@ -591,7 +597,7 @@ namespace IdleDefenseSurvival.Player
         private Transform FindNearestUnhitEnemy(Vector2 fromPosition)
         {
             // Gunakan Physics2D untuk cari semua enemy dalam radius
-            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceRadius, LayerMask.GetMask("Enemy"));
+            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceRadius, EnemyLayerMask);
 
             Transform nearest = null;
             float minDistance = float.MaxValue;
@@ -604,10 +610,10 @@ namespace IdleDefenseSurvival.Player
                 // Skip jika enemy sudah mati (GameObject inactive)
                 if (!col.gameObject.activeInHierarchy) continue;
 
-                float distance = Vector2.Distance(fromPosition, col.transform.position);
-                if (distance < minDistance)
+                float sqrDistance = ((Vector2)col.transform.position - fromPosition).sqrMagnitude;
+                if (sqrDistance < minDistance)
                 {
-                    minDistance = distance;
+                    minDistance = sqrDistance;
                     nearest = col.transform;
                 }
             }
@@ -634,6 +640,7 @@ namespace IdleDefenseSurvival.Player
             _spriteRenderer.transform.localScale = Vector3.one * normalizedScale;
         }
 
+        
 #if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {

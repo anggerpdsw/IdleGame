@@ -39,7 +39,7 @@ namespace IdleDefenseSurvival.Enemy
 
             foreach (var effect in enemy.EnemyData.effects)
             {
-                if (effect?.type != "Vampiric") continue;
+                if (effect?.type != Behavior.Vampiric.ToString()) continue;
                 if (effect?.onHit == null) continue;
 
                 foreach (var action in effect.onHit)

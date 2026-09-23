@@ -18,5 +18,6 @@
   "GamblerNegativeValue": -15.0,
   "ChainReactionRadius": 5.0,
   "ChainReactionExplosionDamage": 0.5,
-  "ChainReactionExplosionRadius": 3.5
+  "ChainReactionExplosionRadius": 3.5,
+  "CriticalCascadeMult": 0.9
 }
