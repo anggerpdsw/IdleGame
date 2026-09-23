@@ -4,7 +4,7 @@ namespace IdleDefenseSurvival
     public enum MainAttribute { Constitution, Strength, Intelligence, Dexterity }
     public enum LevelType { Alchemist, Blacksmith, Level }
     public enum CraftType { Equipment, Potion, Pet }
-    public enum CriticalType { None, Critical, SuperCritical, UltraCritical }
+    public enum CriticalType { None, Critical, SuperCritical, UltraCritical, Arsenal }
     public enum CurrencyType { Gold, Gem, Meat }
     public enum DailyRewardState { Locked, Waiting, Claimable, Claimed, CompletedToday }
     public enum DamageType { Normal, Critical, Heal, Mana, Poison, Burn, Ice, TrueDamage, Miss }
@@ -66,7 +66,20 @@ namespace IdleDefenseSurvival
         EnemyBalance,         // Reduce min spawn interval: more enemies per wave
         AddTank,              // +1 tank count, increase tank duration by card value%
         CrazyGambler,         // After wave 150: chance to +25% ATK or -15% ATK each wave (max 20 stack)
-        Desperados            // After wave 150: chance to +25% HP or -15% HP each wave (max 20 stack)
+        Desperados,           // After wave 150: chance to +25% HP or -15% HP each wave (max 20 stack)
+        DeathChain,           // Each kill within 2s → ATK +4%, stack up to 15x
+        BulletStorm,          // Every 8 attacks → burst 5 projectiles
+        ExecutionProtocol,    // Execute enemies below HP threshold
+        Overkill,             // Excess damage transfers to nearest enemy
+        VampiricFrenzy,       // Lifesteal → AtkSpeed bonus stacking
+        GuardianInstinct,     // HP < 30% → shield + evasion, 30s CD
+        CriticalCascade,      // Crit → 25% spawn extra projectile
+        WarMachine,           // Continuous attack 5s → ATK/AS/CC bonus
+        ApocalypseEngine,     // Every 50 kills → +1% ATK, +0.5% AS, +2% CRIT DMG (current battle)
+        InfiniteArsenal,      // Every 12th attack → special projectile (pierce all, bounce 3x, 100% crit)
+        SoulHarvester,        // Each kill → +1 Soul, each Soul +0.5% DMG, every 100 Souls +50 max stack
+        DeathReversal,        // First death → rewind 5s (HP/pos), restore 50% HP, reset projectiles (once/wave)
+        VoidOverlord          // Every 100s → 15s state (pierce, +100% DMG, no enemy heal)
     }
 	
     public enum Element { None, Metal, Wood, Fire, Water, Earth, Lightning, Wind }

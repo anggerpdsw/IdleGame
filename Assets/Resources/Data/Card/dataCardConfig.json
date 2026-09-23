@@ -1,0 +1,19 @@
+{
+  "DeathChainWindow": 2.0,
+  "DeathChainMaxStack": 15,
+  "BulletStormAdditional": 15,
+  "BulletStormMult": 0.9,
+  "ExecutionProtocolNormal": 0.15,
+  "ExecutionProtocolNormaBoss": 0.08,
+  "OverkillCap": 2,
+  "VampiricFrenzyDuration": 5.0,
+  "VampiricFrenzyMaxStacks": 10,
+  "GuardianHPDrop": 0.3,
+  "GuardianCooldownDuration": 30.0,
+  "WarMachineContinuityThreshold": 5.0,
+  "WarMachineIdleThreshold": 3.0,
+  "InfiniteArsenalMult": 0.9,
+  "GamblerMaxCount": 20,
+  "GamblerPositiveValue": 25.0,
+  "GamblerNegativeValue": -15.0
+}

@@ -336,8 +336,8 @@
             "Description": "After wave 150, there a chance to increase ATK by 25% at the end of each wave, and a chance to decrease ATK by 15% (max 20 stack)",
             "EffectType": "CrazyGambler",
             "Mode": "Percent",
-            "BaseValue": 49,
-            "ValuePerLevel": 1.2,
+            "BaseValue": 43,
+            "ValuePerLevel": 1.4,
             "CardRarity": "Rare"
         }, {
             "Id": "desperados",
@@ -345,8 +345,8 @@
             "Description": "After wave 150, there a chance to increase HP by 25% at the end of each wave, and a chance to decrease HP by 15% (max 20 stack)",
             "EffectType": "Desperados",
             "Mode": "Percent",
-            "BaseValue": 49,
-            "ValuePerLevel": 1.2,
+            "BaseValue": 43,
+            "ValuePerLevel": 1.4,
             "CardRarity": "Rare"
         }, {
             "Id": "bat_stalker",
@@ -387,12 +387,129 @@
         }, {
             "Id": "angel",
             "Name": "Angel",
-            "Description": "When Die, Revive dan Immune to damage in 1x Wave",
+            "Description": "When Die, Revive and Immune to damage in 1x Wave",
             "EffectType": "Immortal",
             "Mode": "Flat",
-            "BaseValue": 660,
+            "BaseValue": 880,
             "ValuePerLevel": -25,
             "CardRarity": "Epic"
+        }, {
+            "Id": "death_chain",
+            "Name": "Death Chain",
+            "Description": "Each enemy killed within 2 seconds increases Attack Damage by 4%, stacking up to 15 times. The stack resets when no enemy is killed for 2 seconds.",
+            "EffectType": "DeathChain",
+            "Mode": "Percent",
+            "BaseValue": 4,
+            "ValuePerLevel": 0.8,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "bullet_storm",
+            "Name": "Bullet Storm",
+            "Description": "Every 8 attacks automatically fires a burst of 5 additional projectiles at nearby enemies.",
+            "EffectType": "BulletStorm",
+            "Mode": "Flat",
+            "BaseValue": 8,
+            "ValuePerLevel": -0.3,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "execution_protocol",
+            "Name": "Execution Protocol",
+            "Description": "Attacks against enemies below 15% HP have a chance to instantly execute them. Boss and Special enemies require them to be below 8% HP.",
+            "EffectType": "ExecutionProtocol",
+            "Mode": "Percent",
+            "BaseValue": 18,
+            "ValuePerLevel": 2,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "overkill",
+            "Name": "Overkill",
+            "Description": "Excess damage from killing an enemy is transferred to the nearest enemy, up to 300% of the original attack damage.",
+            "EffectType": "Overkill",
+            "Mode": "Percent",
+            "BaseValue": 100,
+            "ValuePerLevel": 25,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "vampiric_frenzy",
+            "Name": "Vampiric Frenzy",
+            "Description": "Every 10% HP recovered through Life Steal increases Attack Speed by 3% for 5 seconds, stacking up to 10 times.",
+            "EffectType": "VampiricFrenzy",
+            "Mode": "Percent",
+            "BaseValue": 3,
+            "ValuePerLevel": 0.5,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "guardian_instinct",
+            "Name": "Guardian Instinct",
+            "Description": "When HP falls below 30%, gain a shield equal to 20% of max HP and increase Evasion by 15% for 6 seconds. Cooldown: 30 seconds.",
+            "EffectType": "GuardianInstinct",
+            "Mode": "Percent",
+            "BaseValue": 20,
+            "ValuePerLevel": 3,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "critical_cascade",
+            "Name": "Critical Cascade",
+            "Description": "Every Critical Hit has a 25% chance to trigger another projectile toward the nearest enemy. This projectile can also critically strike.",
+            "EffectType": "CriticalCascade",
+            "Mode": "Percent",
+            "BaseValue": 25,
+            "ValuePerLevel": 3,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "war_machine",
+            "Name": "War Machine",
+            "Description": "When attacking continuously without stopping for 5 seconds, gain 10% Attack Damage, 10% Attack Speed and 10% Critical Chance. The bonuses reset after 3 seconds without attacking.",
+            "EffectType": "WarMachine",
+            "Mode": "Percent",
+            "BaseValue": 10,
+            "ValuePerLevel": 1.5,
+            "CardRarity": "Legendary"
+        }, {
+            "Id": "apocalypse_engine",
+            "Name": "Apocalypse Engine",
+            "Description": "Every 50 enemies killed, increases Attack Damage by 1%, Attack Speed by 0.5% and Critical Damage by 2% for the current battle.",
+            "EffectType": "ApocalypseEngine",
+            "Mode": "Percent",
+            "BaseValue": 1,
+            "ValuePerLevel": 0.2,
+            "CardRarity": "Mythic"
+        }, {
+            "Id": "infinite_arsenal",
+            "Name": "Infinite Arsenal",
+            "Description": "Every 12th attack fires a special projectile that pierces all enemies, bounces 3 times and has a 100% Critical Chance.",
+            "EffectType": "InfiniteArsenal",
+            "Mode": "Flat",
+            "BaseValue": 12,
+            "ValuePerLevel": -0.5,
+            "CardRarity": "Mythic"
+        }, {
+            "Id": "soul_harvester",
+            "Name": "Soul Harvester",
+            "Description": "Every enemy killed grants a Soul. Each Soul increases Damage by 0.5%. Every 100 Souls, increases the maximum Soul stack by 50.",
+            "EffectType": "SoulHarvester",
+            "Mode": "Percent",
+            "BaseValue": 0.5,
+            "ValuePerLevel": 0.1,
+            "CardRarity": "Mythic"
+        }, {
+            "Id": "death_reversal",
+            "Name": "Death Reversal",
+            "Description": "The first time you would die, rewind your HP and position to 5 seconds earlier, restore 50% HP and reset enemy projectiles around you. Can trigger once per wave.",
+            "EffectType": "DeathReversal",
+            "Mode": "Percent",
+            "BaseValue": 50,
+            "ValuePerLevel": 5,
+            "CardRarity": "Mythic"
+        }, {
+            "Id": "void_overlord",
+            "Name": "Void Overlord",
+            "Description": "Every 100 seconds, enter Void Overlord state for 15 seconds. During this state, all attacks pierce enemies, projectiles deal 100% bonus damage and enemies cannot recover HP.",
+            "EffectType": "VoidOverlord",
+            "Mode": "Percent",
+            "BaseValue": 100,
+            "ValuePerLevel": 15,
+            "CardRarity": "Mythic"
         }
 
 

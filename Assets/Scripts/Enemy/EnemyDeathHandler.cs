@@ -3,6 +3,7 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.UI;
+using IdleDefenseSurvival.Card;
 
 namespace IdleDefenseSurvival.Enemy
 {
@@ -29,6 +30,13 @@ namespace IdleDefenseSurvival.Enemy
 
             // Step 1b: Notify card effects (HealOnKill, etc.)
             OnEnemyKilled?.Invoke(enemy, lastDamageSource);
+
+            // Step 1c: ApocalypseEngine and SoulHarvester (player kills only)
+            if (lastDamageSource == UltimateDMG.Player.ToString())
+            {
+                CardModifierService.OnEnemyKilledApocalypse();
+                CardModifierService.OnEnemyKilledSoulHarvester();
+            }
 
             // Step 2-3: Ultimate triggers (Lightning, Cloud)
             ProcessUltimateTriggers(enemy, lastDamageSource);

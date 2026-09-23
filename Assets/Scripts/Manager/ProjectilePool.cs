@@ -145,6 +145,20 @@ namespace IdleDefenseSurvival.Manager
             return (total, available, active);
         }
 
+        /// <summary>
+        /// Clear all active projectiles matching a condition (e.g., enemy projectiles within radius).
+        /// </summary>
+        public void ClearWhere(System.Func<Projectile, bool> predicate)
+        {
+            foreach (var proj in _allProjectiles)
+            {
+                if (proj.gameObject.activeInHierarchy && predicate(proj))
+                {
+                    Return(proj);
+                }
+            }
+        }
+
         [ContextMenu("Show Pool Stats")]
         private void DebugShowPoolStats()
         {

@@ -85,6 +85,7 @@ namespace IdleDefenseSurvival.Manager
 
             _equipped[slot] = cardId;
             CardInventory.Instance.MarkDirty();
+            CardModifierService.Refresh();
             return true;
         }
 
@@ -98,6 +99,7 @@ namespace IdleDefenseSurvival.Manager
 
             _equipped[slot] = EmptySlot;
             CardInventory.Instance.MarkDirty();
+            CardModifierService.Refresh();
             return true;
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Pet;
 using Newtonsoft.Json;
@@ -231,12 +232,30 @@ namespace IdleDefenseSurvival.Core
             _databasePet = database;
         }
         
+        private const string DATA_CARD_CONFIG = "Data/Card/dataCardConfig";
+        private static CardConfig _cardConfig;
+        public static CardConfig CardConfig
+        { get { if (_cardConfig == null) LoadCardConfig(); return _cardConfig; }}
+        private static void LoadCardConfig()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_CARD_CONFIG);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_CARD_CONFIG}.json");
+                return;
+            }
+            _cardConfig = JsonConvert.DeserializeObject<CardConfig>(jsonFile.text);
+            _cardConfig ??= new CardConfig();
+        }
+        
         public static void ClearAll()
         {
             _databaseEnemy = null;
             _databaseMainAttributeConfig = null;
             _databaseSecondaryStatAttribute = null;
             _databaseUltimate = null;
+            _databasePet = null;
+            _cardConfig = new CardConfig();
         }
     }
     

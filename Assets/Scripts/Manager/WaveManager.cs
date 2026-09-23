@@ -217,7 +217,7 @@ namespace IdleDefenseSurvival.Manager
             // Decrement Angel immunity counter after InterWave ends
             CardModifierService.OnWaveCompleted();
 
-            // TODO After wave 150
+            // Card After wave 150
             if (CurrentWave > 150) CardModifierService.OnAfterWave150();
 
             // Spawn Necromancer at wave multiples of 51

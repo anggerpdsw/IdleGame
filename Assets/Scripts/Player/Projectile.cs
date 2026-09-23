@@ -7,6 +7,8 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Modifiers;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Card;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -39,6 +41,7 @@ namespace IdleDefenseSurvival.Player
 
         private Transform _target;
         private ProjectileOwner _owner;
+        public ProjectileOwner Owner => _owner;
         private Player _player;
         private TankInstance _tank;
         private string _sourceName;
@@ -72,6 +75,15 @@ namespace IdleDefenseSurvival.Player
 
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
+
+        // ------------------------------------------------------------------
+        // Balance values loaded from Resources/Data/Card/dataCardConfig.json
+        // ------------------------------------------------------------------
+        private static CardConfig CardConfig => DatabaseJSONCache.CardConfig;
+        private static float ExecutionProtocolNormal => CardConfig.ExecutionProtocolNormal;
+        private static float ExecutionProtocolBoss => CardConfig.ExecutionProtocolBoss;
+        private static int OverkillCap => CardConfig.OverkillCap;
+        private static float InfiniteArsenalMult => CardConfig.InfiniteArsenalMult;
 
         /// <summary>
         /// Reset projectile state for reuse from object pool.
@@ -360,29 +372,49 @@ namespace IdleDefenseSurvival.Player
                     }
 
                     if (_player != null)  {
+                        // Check if this is InfiniteArsenal special projectile
+                        bool isInfiniteArsenal = CardModifierService.IsInfiniteArsenalProjectile;
+
                         // --- Calculate critical tier (None, Critical, SuperCritical) ---
                         CriticalType critTier = CriticalType.None;
                         float crit = PlayerStatsManager.Instance.GetStat(SkillType.CriticalChance);
                         float critDMG = PlayerStatsManager.Instance.GetStat(SkillType.CriticalDamage);
-                        // Normal critical chance roll
-                        if (Utilityku.Chance(crit))
+
+                        // InfiniteArsenal: force 100% crit
+                        if (isInfiniteArsenal)
                         {
-                            critTier = CriticalType.Critical;
-                            _damageMultiplier += critDMG;
-
-                            // SuperCritical roll - nested Chance as specified
-                            if (Utilityku.Chance(crit * 0.5f))
+                            critTier = CriticalType.Arsenal;
+                            _damageMultiplier += critDMG * InfiniteArsenalMult;
+                        }
+                        else
+                        {
+                            // Normal critical chance roll
+                            if (Utilityku.Chance(crit))
                             {
-                                critTier = CriticalType.SuperCritical;
-                                _damageMultiplier += critDMG * 1.05f;
+                                critTier = CriticalType.Critical;
+                                _damageMultiplier += critDMG;
 
-                                // UltraCritical roll - nested Chance as specified
-                                if (Utilityku.Chance(crit * 0.125f))
+                                // SuperCritical roll - nested Chance as specified
+                                if (Utilityku.Chance(crit * 0.5f))
                                 {
-                                    critTier = CriticalType.UltraCritical;
-                                    _damageMultiplier += critDMG * 1.35f;
+                                    critTier = CriticalType.SuperCritical;
+                                    _damageMultiplier += critDMG * 1.05f;
+
+                                    // UltraCritical roll - nested Chance as specified
+                                    if (Utilityku.Chance(crit * 0.125f))
+                                    {
+                                        critTier = CriticalType.UltraCritical;
+                                        _damageMultiplier += critDMG * 1.35f;
+                                    }
                                 }
                             }
+                        }
+
+                        // VoidOverlord bonus damage
+                        if (CardModifierService.IsVoidOverlordActive())
+                        {
+                            float voidBonus = CardModifierService.GetEffectResult(CardEffectType.VoidOverlord, 0f);
+                            _damageMultiplier += voidBonus;
                         }
 
                         currentDamage *= DamagePerRange(_player.transform.position);
@@ -391,12 +423,20 @@ namespace IdleDefenseSurvival.Player
                         // lalu gunakan hasilnya untuk semua bounce berikutnya
                         if (_bounceIndex == 0)
                         {
-                            _bounceApproved = Utilityku.Chance(_bounceChance);
-
-                            if (_bounceApproved)
+                            // InfiniteArsenal: force bounce with 3 bounces
+                            if (isInfiniteArsenal)
                             {
-                                float rawBounceCount = PlayerStatsManager.Instance.GetStat(SkillType.BounceCount);
-                                _bounceCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawBounceCount, AccumulatedCountType.Bounce);
+                                _bounceApproved = true;
+                                _bounceCount = 3;
+                            }
+                            else
+                            {
+                                _bounceApproved = Utilityku.Chance(_bounceChance);
+                                if (_bounceApproved)
+                                {
+                                    float rawBounceCount = PlayerStatsManager.Instance.GetStat(SkillType.BounceCount);
+                                    _bounceCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawBounceCount, AccumulatedCountType.Bounce);
+                                }
                             }
                         }
 
@@ -423,6 +463,8 @@ namespace IdleDefenseSurvival.Player
                         };
 
                         float actualDamage = enemy.TakeDamage(damageData);
+                        bool enemyDied = enemy.CurrentHealth <= 0f;
+
                         if (actualDamage <= 0f)
                         {
                             ReturnToPool();
@@ -442,6 +484,60 @@ namespace IdleDefenseSurvival.Player
                             float heal = Mathf.Max(0.51f, actualDamage * _lifeSteal * 0.01f);
                             _player.Heal(heal);
                         }
+
+                        // === Card Effects ===
+                        // ExecutionProtocol: instant kill check
+                        if (CardModifierService.HasEffect(CardEffectType.ExecutionProtocol))
+                        {
+                            bool isBossOrElite = enemy.EnemyData != null && (enemy.EnemyData.IsBoss || enemy.EnemyData.IsSpecial);
+                            float threshold = isBossOrElite ? ExecutionProtocolBoss : ExecutionProtocolNormal;
+                            float chance = CardModifierService.GetEffectResult(CardEffectType.ExecutionProtocol, 0f);
+                            if (enemy.CurrentHealth <= enemy.MaxHealth * threshold && Utilityku.Chance(chance * 100f))
+                            {
+                                enemy.TakeDamage(new DamageData(enemy.CurrentHealth * 999f, DamageType.TrueDamage, CriticalType.None, "Execution"));
+                                enemyDied = true;
+                            }
+                        }
+
+                        // Overkill: transfer excess damage
+                        if (enemyDied && CardModifierService.HasEffect(CardEffectType.Overkill))
+                        {
+                            float excessDamage = actualDamage - enemy.MaxHealth;
+                            if (excessDamage > 0f)
+                            {
+                                float cap = currentDamage * OverkillCap;
+                                excessDamage = Mathf.Min(excessDamage, cap);
+
+                                Transform nearest = FindNearestUnhitEnemy(transform.position);
+                                if (nearest != null && nearest.TryGetComponent<EnemyAi>(out var nearestEnemy))
+                                {
+                                    nearestEnemy.TakeDamage(new DamageData(excessDamage, DamageType.Normal, CriticalType.None, "Overkill"));
+                                }
+                            }
+                        }
+
+                        // CriticalCascade: spawn extra projectile on crit
+                        if (critTier != CriticalType.None && CardModifierService.HasEffect(CardEffectType.CriticalCascade))
+                        {
+                            float cascadeChance = CardModifierService.GetEffectResult(CardEffectType.CriticalCascade, 0f);
+                            if (Utilityku.Chance(cascadeChance * 100f))
+                            {
+                                Transform cascadeTarget = FindNearestUnhitEnemy(transform.position);
+                                if (cascadeTarget != null)
+                                {
+                                    Projectile cascade = ProjectilePool.Instance.Get();
+                                    if (cascade != null)
+                                    {
+                                        cascade.transform.position = transform.position;
+                                        cascade.Initialize(cascadeTarget, _player, 1f, false);
+                                    }
+                                }
+                            }
+                        }
+
+                        // DeathChain: notify kill
+                        if (enemyDied)
+                            CardModifierService.OnEnemyKilledDeathChain();
 
                         // --- Implementasi Knockback ---
                         if (damageData.HasKnockback)

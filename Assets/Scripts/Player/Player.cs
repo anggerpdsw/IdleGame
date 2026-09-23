@@ -11,6 +11,7 @@ using IdleDefenseSurvival.Manager;
 using System;
 using IdleDefenseSurvival.Stats;
 using TMPro;
+using IdleDefenseSurvival.Card;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -97,6 +98,9 @@ namespace IdleDefenseSurvival.Player
         private const float ShieldCooldownDuration = 30f;
         private bool _isShieldOnCooldown = false;
 
+        // Guardian shield (separate from card shield)
+        private float _guardianShield = 0f;
+
         [SerializeField] private AudioSource _sfxSource;
         public AudioSource SfxSource => _sfxSource;
 
@@ -106,6 +110,14 @@ namespace IdleDefenseSurvival.Player
 
         public float AttackRange;
 
+        // ------------------------------------------------------------------
+        // Balance values loaded from Resources/Data/Card/dataCardConfig.json
+        // ------------------------------------------------------------------
+        private static CardConfig CardConfig => DatabaseJSONCache.CardConfig;
+        private static int BulletStormAdditional => CardConfig.BulletStormAdditional;
+        private static float BulletStormMult => CardConfig.BulletStormMult;
+        private static float InfiniteArsenalMult => CardConfig.InfiniteArsenalMult;
+        
         private void Awake()
         {
             // Initialize singleton
@@ -206,8 +218,8 @@ namespace IdleDefenseSurvival.Player
             UpdateBurnCooldownUI();
             // Aura effects now handled by AuraCollider trigger system
 
-            // Update Angel card cooldown
-            CardModifierService.UpdateAngelCooldown(Time.deltaTime);
+            // Update all card timers
+            CardModifierService.UpdateCardTimers(Time.deltaTime);
             UpdateAngelCooldownUI();
 
             _attackRangeRenderer.transform.Rotate(0, 0, _attackRangeSpeedRotate * Time.deltaTime);
@@ -289,6 +301,13 @@ namespace IdleDefenseSurvival.Player
                 .Select(hit => hit.transform)
                 .ToList();
 
+            if (targets.Count == 0) return;
+
+            // Notify card systems: BulletStorm, WarMachine, InfiniteArsenal
+            CardModifierService.OnAttackBulletStorm();
+            CardModifierService.OnAttackWarMachine();
+            CardModifierService.OnAttackInfiniteArsenal();
+
             // Determine how many distinct targets to fire at based on multi‑shoot chance
             bool multiShoot = Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.MultiShootChance));
             int maxTargets = 1;
@@ -337,6 +356,59 @@ namespace IdleDefenseSurvival.Player
                     float damageMultiplier = (i == 0) ? 1f : 0.77f;
                     projectile.Initialize(target, this, damageMultiplier, multiShoot);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Spawn 5 burst projectiles for BulletStorm card effect.
+        /// </summary>
+        public void SpawnBulletStormBurst()
+        {
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, PlayerStatsManager.Instance.GetStat(SkillType.AttackRange), _enemyLayerMask);
+            if (hits.Length == 0) return;
+
+            List<Transform> targets = hits
+                .Where(hit => hit.TryGetComponent<EnemyAi>(out _))
+                .OrderBy(hit => Vector2.Distance(transform.position, hit.transform.position))
+                .Select(hit => hit.transform)
+                .Take(BulletStormAdditional)
+                .ToList();
+
+            for (int i = 0; i < targets.Count; i++)
+            {
+                Projectile projectile = ProjectilePool.Instance.Get();
+                if (projectile != null)
+                {
+                    Vector3 spawnPos = GetSpawnPositionWithOffset(i);
+                    projectile.transform.SetPositionAndRotation(spawnPos, Quaternion.identity);
+                    projectile.Initialize(targets[i], this, BulletStormMult, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Spawn special InfiniteArsenal projectile (pierce all, bounce 3x, 100% crit).
+        /// </summary>
+        public void SpawnInfiniteArsenalProjectile()
+        {
+            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, PlayerStatsManager.Instance.GetStat(SkillType.AttackRange), _enemyLayerMask);
+            if (hits.Length == 0) return;
+
+            Transform target = hits
+                .Where(hit => hit.TryGetComponent<EnemyAi>(out _))
+                .OrderBy(hit => Vector2.Distance(transform.position, hit.transform.position))
+                .Select(hit => hit.transform)
+                .FirstOrDefault();
+
+            if (target == null) return;
+
+            Projectile projectile = ProjectilePool.Instance.Get();
+            if (projectile != null)
+            {
+                projectile.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
+                CardModifierService.IsInfiniteArsenalProjectile = true;
+                projectile.Initialize(target, this, InfiniteArsenalMult, false);
+                CardModifierService.IsInfiniteArsenalProjectile = false;
             }
         }
 
@@ -631,11 +703,15 @@ namespace IdleDefenseSurvival.Player
         private void UpdateShieldVisual()
         {
             if (_shieldRenderer == null) return;
-            bool hasShield = _currentShield > 0;
+
+            // Combine card shield + guardian shield
+            float totalShield = _currentShield + _guardianShield;
+            bool hasShield = totalShield > 0;
             _shieldRenderer.gameObject.SetActive(hasShield);
             if (!hasShield) return;
 
-            float shieldPercent = _maxShield > 0 ? _currentShield / _maxShield : 0f;
+            float totalMaxShield = _maxShield + _guardianShield;
+            float shieldPercent = totalMaxShield > 0 ? totalShield / totalMaxShield : 0f;
 
             // Height (0 - 0.5)
             float yScale = Mathf.Lerp(0f, 0.5f, shieldPercent);
@@ -804,10 +880,8 @@ namespace IdleDefenseSurvival.Player
                 float shieldAbsorb = Mathf.Min(_currentShield, finalDamage);
                 _currentShield -= shieldAbsorb;
                 finalDamage -= shieldAbsorb;
-
                 if (shieldAbsorb > 0f)
                     ShowDamagePopup(shieldAbsorb, DamageType.Miss, CriticalType.None, "⛨ ");
-
                 // Shield depleted - start cooldown
                 if (_currentShield <= 0f)
                 {
@@ -816,7 +890,19 @@ namespace IdleDefenseSurvival.Player
                     _shieldCooldownTimer = ShieldCooldownDuration;
                     _shieldGranted = false;
                 }
+                UpdateShieldVisual();
+            }
 
+            // --------------------------------------------------
+            // 4b. Guardian shield absorbs AFTER card shield
+            // --------------------------------------------------
+            if (_guardianShield > 0f && finalDamage > 0f)
+            {
+                float guardianAbsorb = Mathf.Min(_guardianShield, finalDamage);
+                _guardianShield -= guardianAbsorb;
+                finalDamage -= guardianAbsorb;
+                if (guardianAbsorb > 0f)
+                    ShowDamagePopup(guardianAbsorb, DamageType.Miss, CriticalType.None, "🛡 ");
                 UpdateShieldVisual();
             }
 
@@ -830,6 +916,10 @@ namespace IdleDefenseSurvival.Player
                 _lastDamageSource = damageData.Source;
                 ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
                 OnHealthChanged?.Invoke();
+
+                // Try trigger GuardianInstinct when HP drops
+                float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
+                CardModifierService.TryTriggerGuardianInstinct(_currentHealth, maxHealth);
             }
 
             // --------------------------------------------------
@@ -888,6 +978,10 @@ namespace IdleDefenseSurvival.Player
             // Calculate actual heal received (clamped by max health)
             float actualHeal = _currentHealth - oldHealth;
 
+            // Notify VampiricFrenzy card if lifesteal heal
+            if (actualHeal > 0f)
+                CardModifierService.OnLifeStealHealVampiricFrenzy(actualHeal);
+
             if (!Mathf.Approximately(oldHealth, _currentHealth))
             {
                 UpdateHealthUI();
@@ -896,6 +990,16 @@ namespace IdleDefenseSurvival.Player
                 // Show heal popup
                 if (actualHeal >= 1f) ShowDamagePopup(actualHeal, DamageType.Heal, CriticalType.None, "+");
             }
+        }
+
+        /// <summary>
+        /// Grant Guardian shield from GuardianInstinct card.
+        /// Called by CardModifierService when HP drops below 30%.
+        /// </summary>
+        public void GrantGuardianShield(float amount)
+        {
+            _guardianShield = amount;
+            UpdateShieldVisual();
         }
 
         private void UpdateHealthUI()
@@ -944,7 +1048,14 @@ namespace IdleDefenseSurvival.Player
 
         private void Die()
         {
-            // DeathDefy check first
+            // DeathReversal check first
+            if (CardModifierService.CanTriggerDeathReversal())
+            {
+                CardModifierService.TriggerDeathReversal();
+                return;
+            }
+
+            // DeathDefy check second
             if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
             {
                 // Heal a small amount and grant temporary immunity with visual barrier.

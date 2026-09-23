@@ -46,6 +46,7 @@ namespace IdleDefenseSurvival.Data
                 {
                     CriticalType.SuperCritical => GameColors.orangered,
                     CriticalType.UltraCritical => GameColors.pink,
+                    CriticalType.Arsenal       => GameColors.blue,
                     _ => GameColors.gold
                 };
             }
@@ -76,6 +77,7 @@ namespace IdleDefenseSurvival.Data
                     CriticalType.Critical      => 1.15f,
                     CriticalType.SuperCritical => 1.33f,
                     CriticalType.UltraCritical => 1.47f,
+                    CriticalType.Arsenal       => 1.27f,
                     _ => 1.03f
                 };
             }
@@ -106,6 +108,7 @@ namespace IdleDefenseSurvival.Data
                     CriticalType.Critical      => "◆",
                     CriticalType.SuperCritical => "★",
                     CriticalType.UltraCritical => "⚔",
+                    CriticalType.Arsenal       => "⚽︎",
                     _ => ""
                 };
             }
