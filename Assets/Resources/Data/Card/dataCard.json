@@ -187,6 +187,15 @@
             "ValuePerLevel": 15,
             "CardRarity": "Common"
         }, {
+            "Id": "armor_breaker",
+            "Name": "Armor Breaker",
+            "Description": "Break the enemy defense",
+            "SkillType": "DefenseBreak",
+            "Mode": "Flat",
+            "BaseValue": 2,
+            "ValuePerLevel": 2,
+            "CardRarity": "Common"
+        }, {
             "Id": "annihilation",
             "Name": "Annihilation",
             "Description": "Increase penetration to defense enemy",
@@ -221,6 +230,24 @@
             "Mode": "Flat",
             "BaseValue": 17,
             "ValuePerLevel": 23,
+            "CardRarity": "Common"
+        }, {
+            "Id": "mana_pool",
+            "Name": "Mana Pool",
+            "Description": "Increase character mana point",
+            "SkillType": "ManaPoint",
+            "Mode": "Percent",
+            "BaseValue": 75,
+            "ValuePerLevel": 26,
+            "CardRarity": "Common"
+        }, {
+            "Id": "mana_flow",
+            "Name": "Mana Flow",
+            "Description": "Increase character mana regen",
+            "SkillType": "ManaRegen",
+            "Mode": "Flat",
+            "BaseValue": 8,
+            "ValuePerLevel": 13,
             "CardRarity": "Common"
         }, {
             "Id": "lucky_hunter",
@@ -338,6 +365,15 @@
             "Mode": "Percent",
             "BaseValue": 28,
             "ValuePerLevel": 2,
+            "CardRarity": "Epic"
+        }, {
+            "Id": "time_warp",
+            "Name": "Time Warp",
+            "Description": "Make progression speed increase",
+            "SkillType": "CooldownReduction",
+            "Mode": "Percent",
+            "BaseValue": 3,
+            "ValuePerLevel": 1.4,
             "CardRarity": "Epic"
         }, {
             "Id": "berserker",

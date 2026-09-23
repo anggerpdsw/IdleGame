@@ -45,9 +45,9 @@ namespace IdleDefenseSurvival
         };
         
         // Pity thresholds (configurable via constants or JSON in the future)
-        public const int PITY_EPIC_THRESHOLD = 51;
-        public const int PITY_LEGENDARY_THRESHOLD = 153;
-        public const int PITY_MYTHIC_THRESHOLD = 505;
+        public const int PITY_EPIC_THRESHOLD = 1257;
+        public const int PITY_LEGENDARY_THRESHOLD = 3769;
+        public const int PITY_MYTHIC_THRESHOLD = 7953;
         // SaveData keys for pity counters
         public const string KEY_PITY_EPIC = "PityEpic";
         public const string KEY_PITY_LEGENDARY = "PityLegendary";
