@@ -245,9 +245,9 @@
         "shortName": "MRG"
       },
       "moveSpeed": {
-        "baseValue": 1,
-        "bonusPerPoint": 0.025,
-        "ValuePerLevel": 0.05,
+        "baseValue": 0.75,
+        "bonusPerPoint": 0.0125,
+        "ValuePerLevel": 0.025,
         "ValuePerEnhance": 0.05,
         "description": "Movement speed of the player",
         "displayName": "Move Speed",

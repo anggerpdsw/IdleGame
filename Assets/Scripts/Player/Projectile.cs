@@ -16,8 +16,8 @@ namespace IdleDefenseSurvival.Player
     [RequireComponent(typeof(CircleCollider2D))]
     public class Projectile : MonoBehaviour
     {
-        // Cached layer mask - computed once instead of per bounce
-        private static readonly int EnemyLayerMask = LayerMask.GetMask("Enemy");
+        // Cached layer mask - computed in Awake (Unity disallows GetMask in static initializer)
+        private int _enemyLayerMask;
 
         [Header("Movement")]
         [Tooltip("Speed of the projectile in units per second.")]
@@ -151,6 +151,8 @@ namespace IdleDefenseSurvival.Player
 
         private void Awake()
         {
+            _enemyLayerMask = LayerMask.GetMask("Enemy");
+
             _rb = GetComponent<Rigidbody2D>();
             _rb.gravityScale = 0f;
             _rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -597,7 +599,7 @@ namespace IdleDefenseSurvival.Player
         private Transform FindNearestUnhitEnemy(Vector2 fromPosition)
         {
             // Gunakan Physics2D untuk cari semua enemy dalam radius
-            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceRadius, EnemyLayerMask);
+            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceRadius, _enemyLayerMask);
 
             Transform nearest = null;
             float minDistance = float.MaxValue;
