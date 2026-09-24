@@ -155,7 +155,7 @@ namespace IdleDefenseSurvival.Manager
         /// from currently equipped cards.
         ///
         /// Called when cards are equipped, unequipped, upgraded,
-        /// or when the game is loaded.
+        /// when the game is loaded, or when a new battle starts (Game scene loaded).
         /// </summary>
         public static void Refresh()
         {
@@ -181,6 +181,21 @@ namespace IdleDefenseSurvival.Manager
             UpdatePlayerVisualEffects(hasHealOnKill);
 
             OnModifierChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// Static constructor: subscribe to scene load event to reset
+        /// temporary battle state (CrazyGambler, Desperados, ApocalypseEngine, etc.)
+        /// when a new battle starts.
+        /// </summary>
+        static CardModifierService()
+        {
+            SceneLoader.OnGameSceneLoaded += OnGameSceneLoaded;
+        }
+
+        private static void OnGameSceneLoaded()
+        {
+            Refresh();
         }
 
         private static void ResetStatModifiers()
