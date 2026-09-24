@@ -64,6 +64,8 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private TextMeshProUGUI _crazyGamblerText;
         [SerializeField] private GameObject _desperados;
         [SerializeField] private TextMeshProUGUI _desperadosText;
+        [SerializeField] private GameObject _deathChain;
+        [SerializeField] private TextMeshProUGUI _deathChainText;
         
         private float _attackRangeSpeedRotate = 2f;
         // Immunity flag for DeathDefy
@@ -1153,6 +1155,15 @@ namespace IdleDefenseSurvival.Player
             {
                 float bonus = CardModifierService.GetDesperadosBonus();
                 _desperadosText.text = $"{bonus:0}%";
+            }
+
+            // Death Chain: 15stacks
+            bool hasDeathChain = CardModifierService.HasEffect(CardEffectType.DeathChain);
+            if (_deathChain != null) _deathChain.SetActive(hasDeathChain);
+            if (hasDeathChain && _deathChainText != null)
+            {
+                float bonus = CardModifierService.GetDeathChainStack();
+                _deathChainText.text = $"s{bonus:0}";
             }
         }
 

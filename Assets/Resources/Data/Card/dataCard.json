@@ -396,7 +396,7 @@
         }, {
             "Id": "death_chain",
             "Name": "Death Chain",
-            "Description": "Each enemy killed within 2 seconds increases Attack Damage by 4%, stacking up to 15 times. The stack resets when no enemy is killed for 2 seconds.",
+            "Description": "Each enemy killed within 5 seconds increases Attack Damage by 4%, stacking up to 15 times. The stack resets when no enemy is killed for 5 seconds.",
             "EffectType": "DeathChain",
             "Mode": "Percent",
             "BaseValue": 4,

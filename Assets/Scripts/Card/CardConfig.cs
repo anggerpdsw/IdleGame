@@ -6,7 +6,7 @@ namespace IdleDefenseSurvival.Card
     [System.Serializable]
     public class CardConfig
     {
-        public float DeathChainWindow = 2f;
+        public float DeathChainWindow = 5f;
         public int DeathChainMaxStack = 15;
         public int BulletStormAdditional = 5;
         public float BulletStormMult = 0.9f;

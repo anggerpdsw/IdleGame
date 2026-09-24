@@ -1,5 +1,5 @@
 {
-  "DeathChainWindow": 2.0,
+  "DeathChainWindow": 5.0,
   "DeathChainMaxStack": 15,
   "BulletStormAdditional": 15,
   "BulletStormMult": 0.9,
