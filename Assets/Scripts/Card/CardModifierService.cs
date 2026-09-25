@@ -23,6 +23,52 @@ namespace IdleDefenseSurvival.Manager
     /// </summary>
     public static class CardModifierService
     {
+        #region Internal Models
+
+        /// <summary>
+        /// Combined effect value per type for backward compatibility.
+        /// For effects with multiple sources, uses highest/aggregated value.
+        /// </summary>
+        private struct CardEffectValue
+        {
+            public ModifierMode Mode;
+            public float Value;
+        }
+
+        /// <summary>
+        /// Resolved state of an equipped card: definition + level + calculated value.
+        /// This is the single source of truth for "what cards are active and their values".
+        /// </summary>
+        public sealed class ActiveCardState
+        {
+            public string CardId { get; set; }
+            public int Level { get; set; }
+            public CardData Definition { get; set; }
+            public float Value { get; set; }
+
+            public ActiveCardState(string cardId, int level, CardData definition, float value)
+            {
+                CardId = cardId;
+                Level = level;
+                Definition = definition;
+                Value = value;
+            }
+        }
+
+        /// <summary>
+        /// Resolved state of a card effect. Supports multiple cards contributing
+        /// to the same effect type (e.g., two cards both giving AttackDamage bonus).
+        /// </summary>
+        public sealed class CardEffectState
+        {
+            public CardEffectType Type { get; set; }
+            public ModifierMode Mode { get; set; }
+            public float Value { get; set; }
+            public string SourceCardId { get; set; }
+        }
+
+        #endregion
+
         #region Events
         public static event Action OnModifierChanged;
         #endregion
@@ -45,16 +91,36 @@ namespace IdleDefenseSurvival.Manager
         private static CardConfig CardConfig => DatabaseJSONCache.CardConfig;
         #endregion
 
-        #region Card Effect State
+        #region Resolved Card State (Single Source of Truth)
+
         /// <summary>
-        /// Current active value for each card effect type.
+        /// All currently equipped cards with their resolved level and calculated values.
+        /// Key = CardId. Populated once per Refresh().
+        /// </summary>
+        private static readonly Dictionary<string, ActiveCardState> _activeCards = new();
+
+        /// <summary>
+        /// All currently active card effects, grouped by effect type.
+        /// Supports multiple source cards per effect type.
+        /// Key = CardEffectType. Populated once per Refresh().
+        /// </summary>
+        private static readonly Dictionary<CardEffectType, List<CardEffectState>> _activeEffects = new();
+
+        /// <summary>
+        /// Backward-compatible flat effect value lookup for existing consumers.
+        /// Populated from _activeEffects in ApplyEquippedCards.
         /// </summary>
         private static readonly Dictionary<CardEffectType, CardEffectValue> _effectValues = new();
+
         /// <summary>
         /// Tracks card IDs that currently have a normal stat modifier.
+        /// Used for cleanup in ResetStatModifiers.
         /// </summary>
         private static readonly HashSet<string> _cardsWithStatModifiers = new();
+
         #endregion
+
+        #region Runtime Effect State (per-effect mechanics)
 
         #region Berserker State
         private static float _berserkerMaxPercent;
@@ -147,6 +213,8 @@ namespace IdleDefenseSurvival.Manager
         private static float ChainReactionRadius => CardConfig.ChainReactionRadius;
         private static float ChainReactionExplosionDamage => CardConfig.ChainReactionExplosionDamage;
         private static float ChainReactionExplosionRadius => CardConfig.ChainReactionExplosionRadius;
+        #endregion
+
         #endregion
 
         #region Refresh
@@ -311,6 +379,10 @@ namespace IdleDefenseSurvival.Manager
         #region Card Application
         private static bool ApplyEquippedCards()
         {
+            _activeCards.Clear();
+            _activeEffects.Clear();
+            _effectValues.Clear();
+
             bool hasHealOnKill = false;
             var equippedCards = CardEquipmentService.Instance.EquippedCards;
             foreach (string cardId in equippedCards)
@@ -324,27 +396,54 @@ namespace IdleDefenseSurvival.Manager
 
                 float value = cardData.CalculateValue(level);
 
-                ApplyCardEffect(cardData, value, ref hasHealOnKill);
+                var activeCard = new ActiveCardState(cardId, level, cardData, value);
+                _activeCards[cardId] = activeCard;
+
+                ApplyCardEffect(activeCard, ref hasHealOnKill);
                 ApplyCardStatModifier(cardId, cardData, value);
             }
             return hasHealOnKill;
         }
 
-        private static void ApplyCardEffect(CardData cardData, float value, ref bool hasHealOnKill)
+        private static void ApplyCardEffect(ActiveCardState activeCard, ref bool hasHealOnKill)
         {
+            var cardData = activeCard.Definition;
             if (string.IsNullOrEmpty(cardData.EffectType)) return;
             CardEffectType effectType = ParseEffectType(cardData.EffectType);
             if (effectType == CardEffectType.None) return;
-            _effectValues[effectType] = new CardEffectValue
+
+            var effectState = new CardEffectState
             {
+                Type = effectType,
                 Mode = ParseModifierMode(cardData.Mode),
-                Value = value
+                Value = activeCard.Value,
+                SourceCardId = activeCard.CardId
             };
+
+            if (!_activeEffects.TryGetValue(effectType, out var list))
+            {
+                list = new List<CardEffectState>();
+                _activeEffects[effectType] = list;
+            }
+            list.Add(effectState);
+
+            // Update flat lookup for backward compatibility (keep highest value for Percent mode)
+            var flatValue = new CardEffectValue
+            {
+                Mode = effectState.Mode,
+                Value = effectState.Value
+            };
+            if (!_effectValues.TryGetValue(effectType, out var existing) ||
+                (effectState.Mode == ModifierMode.Percent && effectState.Value > existing.Value) ||
+                (effectState.Mode == ModifierMode.Flat && effectState.Value > existing.Value))
+            {
+                _effectValues[effectType] = flatValue;
+            }
 
             switch (effectType)
             {
                 case CardEffectType.Berserker:
-                    _berserkerMaxPercent = value;
+                    _berserkerMaxPercent = activeCard.Value;
                     break;
 
                 case CardEffectType.HealOnKill:
@@ -353,7 +452,7 @@ namespace IdleDefenseSurvival.Manager
                     break;
 
                 case CardEffectType.Immortal:
-                    _angelCooldownMax = value;
+                    _angelCooldownMax = activeCard.Value;
                     break;
             }
         }
@@ -1053,25 +1152,21 @@ namespace IdleDefenseSurvival.Manager
         /// <summary>
         /// Handles enemy death for HealOnKill.
         /// Only player kills are counted.
+        /// Reads from cached _activeEffects via HasEffect/GetEffectResult.
         /// </summary>
         private static void OnEnemyKilledHandler(EnemyAi enemy, string damageSource)
         {
             if (enemy == null) return;
             if (damageSource != DamageSource.Player.ToString()) return;
-            var equippedCards = CardEquipmentService.Instance.EquippedCards;
-            foreach (string cardId in equippedCards)
-            {
-                if (string.IsNullOrEmpty(cardId)) continue;
-                var cardData = CardDatabase.Instance.GetCard(cardId);
-                if (cardData == null) continue;
-                CardEffectType effectType = ParseEffectType(cardData.EffectType);
-                if (effectType != CardEffectType.HealOnKill) continue;
-                var inventory = CardInventory.Instance.GetOwnedCard(cardId);
-                int level = inventory?.Level ?? 1;
-                float percent = cardData.CalculateValue(level);
-                float healAmount = enemy.MaxHealth * (percent * 0.01f);
-                PlayerClass.Instance?.Heal(healAmount);
-            }
+            if (!HasEffect(CardEffectType.HealOnKill)) return;
+
+            float healPct = GetEffectResult(CardEffectType.HealOnKill, 0f);
+            if (healPct <= 0f) return;
+
+            float healAmount = enemy.MaxHealth * healPct;
+            var player = PlayerClass.Instance;
+            if (player != null)
+                player.Heal(healAmount);
         }
         #endregion
 
@@ -1107,6 +1202,49 @@ namespace IdleDefenseSurvival.Manager
                     null
                 )
             };
+        }
+        #endregion
+
+        #region Public Query API
+        /// <summary>
+        /// Checks if a specific card is currently equipped.
+        /// </summary>
+        public static bool HasCard(string cardId) => _activeCards.ContainsKey(cardId);
+
+        /// <summary>
+        /// Gets level of equipped card. Returns -1 if not equipped.
+        /// </summary>
+        public static int GetCardLevel(string cardId)
+            => _activeCards.TryGetValue(cardId, out var state) ? state.Level : -1;
+
+        /// <summary>
+        /// Tries to retrieve full ActiveCardState for equipped card.
+        /// </summary>
+        public static bool TryGetCard(string cardId, out ActiveCardState cardState)
+            => _activeCards.TryGetValue(cardId, out cardState);
+
+        /// <summary>
+        /// Retrieves raw effect value without percent conversion.
+        /// </summary>
+        public static float GetEffectValue(CardEffectType effect, float fallback = 0f)
+        {
+            if (!_effectValues.TryGetValue(effect, out var data)) return fallback;
+            return data.Value;
+        }
+
+        /// <summary>
+        /// Tries to get first CardEffectState for given effect type.
+        /// Returns false if none active.
+        /// </summary>
+        public static bool TryGetEffect(CardEffectType effect, out CardEffectState effectState)
+        {
+            if (_activeEffects.TryGetValue(effect, out var list) && list.Count > 0)
+            {
+                effectState = list[0];
+                return true;
+            }
+            effectState = null;
+            return false;
         }
         #endregion
 
