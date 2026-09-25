@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class BombInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Bomb.ToString();
+        private readonly string UltimateID = DamageSource.Bomb.ToString();
         [Header("Lifetime")]
         [Tooltip("Time in seconds before bomb auto-explodes")]
         [SerializeField] private float _lifetime = 13f;

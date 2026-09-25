@@ -32,7 +32,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class LightningInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Lightning.ToString();
+        private readonly string UltimateID = DamageSource.Lightning.ToString();
 
         [Header("Chain Settings")]
 

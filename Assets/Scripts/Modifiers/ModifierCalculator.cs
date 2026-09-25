@@ -1,4 +1,4 @@
-namespace IdleDefenseSurvival.Modifier
+namespace IdleDefenseSurvival.Modifiers
 {
     /// <summary>
     /// Pure stat calculation utility.

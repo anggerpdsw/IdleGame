@@ -11,7 +11,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class TankHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Tank.ToString();
+        public string UltimateId => DamageSource.Tank.ToString();
 
         [SerializeField] private GameObject _tankPrefab;
 

@@ -88,7 +88,7 @@ namespace IdleDefenseSurvival.Enemy
         private float _evasion;
         private bool _isStunt = false;
         private float _attackTimer = 0f;
-        private string _lastDamageSource = UltimateDMG.Player.ToString();
+        private string _lastDamageSource = DamageSource.Player.ToString();
 
         // Spatial grid state
         private Vector2Int _currentGridCell;
@@ -124,7 +124,7 @@ namespace IdleDefenseSurvival.Enemy
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
-            var playerObj = GameObject.FindWithTag(UltimateDMG.Player.ToString());
+            var playerObj = GameObject.FindWithTag(DamageSource.Player.ToString());
             if (playerObj != null)
             {
                 _player = playerObj.transform;

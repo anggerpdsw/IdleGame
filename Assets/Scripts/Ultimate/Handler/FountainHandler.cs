@@ -7,7 +7,7 @@ namespace IdleDefenseSurvival.Ultimate
 {
     public class FountainHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Fountain.ToString();
+        public string UltimateId => DamageSource.Fountain.ToString();
 
         [SerializeField] private GameObject _fountainPrefab;
 

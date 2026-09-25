@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Items;
-using IdleDefenseSurvival.Inventory;
-using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;

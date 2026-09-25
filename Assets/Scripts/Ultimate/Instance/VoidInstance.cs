@@ -14,7 +14,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class VoidInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Void.ToString();
+        private readonly string UltimateID = DamageSource.Void.ToString();
 
         [Header("Damage")]
         [Tooltip("Radius of the void effect")]

@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class LightningHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Lightning.ToString();
+        public string UltimateId => DamageSource.Lightning.ToString();
 
         [SerializeField] private GameObject _lightningPrefab;
 
@@ -44,7 +44,7 @@ namespace IdleDefenseSurvival.Ultimate
         /// </summary>
         public static bool RegisterKill()
         {
-            string ultimateId = UltimateDMG.Lightning.ToString();
+            string ultimateId = DamageSource.Lightning.ToString();
             var lightningData = UltimateManager.Instance?.GetUltimate(ultimateId);
 
             if (lightningData == null || !lightningData.GetActive()) return false;

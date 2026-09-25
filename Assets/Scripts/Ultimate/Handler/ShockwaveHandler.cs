@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class ShockwaveHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Shockwave.ToString();
+        public string UltimateId => DamageSource.Shockwave.ToString();
 
         [SerializeField] private GameObject _shockwavePrefab;
 

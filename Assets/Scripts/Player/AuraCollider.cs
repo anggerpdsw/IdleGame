@@ -18,7 +18,7 @@ namespace IdleDefenseSurvival.Player
             _collider.enabled = false;
             _enemyLayerMask = LayerMask.GetMask("Enemy");
 
-            var player = GameObject.FindWithTag("Player");
+            var player = GameObject.FindWithTag(DamageSource.Player.ToString());
             if (player != null && transform.parent != player.transform)
             {
                 transform.SetParent(player.transform);

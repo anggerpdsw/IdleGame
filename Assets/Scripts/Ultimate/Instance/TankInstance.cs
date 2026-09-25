@@ -12,7 +12,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class TankInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Tank.ToString();
+        private readonly string UltimateID = DamageSource.Tank.ToString();
         [Header("Movement")]
         [Tooltip("Speed at which the tank moves toward its destination.")]
         [SerializeField] private float _moveSpeed = 0.127f;

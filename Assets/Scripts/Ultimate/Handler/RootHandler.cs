@@ -5,7 +5,7 @@ namespace IdleDefenseSurvival.Ultimate
 {
     public class RootHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Root.ToString();
+        public string UltimateId => DamageSource.Root.ToString();
 
         [SerializeField] private GameObject _rootPrefab;
 

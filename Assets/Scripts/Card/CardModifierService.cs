@@ -1057,7 +1057,7 @@ namespace IdleDefenseSurvival.Manager
         private static void OnEnemyKilledHandler(EnemyAi enemy, string damageSource)
         {
             if (enemy == null) return;
-            if (damageSource != UltimateDMG.Player.ToString()) return;
+            if (damageSource != DamageSource.Player.ToString()) return;
             var equippedCards = CardEquipmentService.Instance.EquippedCards;
             foreach (string cardId in equippedCards)
             {

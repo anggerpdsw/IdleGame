@@ -7,7 +7,7 @@ namespace IdleDefenseSurvival.Ultimate
 {
     public class VoidHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Void.ToString();
+        public string UltimateId => DamageSource.Void.ToString();
 
         [SerializeField] private GameObject _voidPrefab;
 

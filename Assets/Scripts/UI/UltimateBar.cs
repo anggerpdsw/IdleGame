@@ -17,7 +17,7 @@ namespace IdleDefenseSurvival.UI
 
         private void Awake()
         {
-            _lightningData = UltimateManager.Instance?.GetUltimate(UltimateDMG.Lightning.ToString());
+            _lightningData = UltimateManager.Instance?.GetUltimate(DamageSource.Lightning.ToString());
             if (_lightningData != null)
                 // Initialize fill amount
                 _fillImage.fillAmount = LightningHandler.Progress;

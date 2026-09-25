@@ -14,7 +14,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class ShockwaveInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Shockwave.ToString();
+        private readonly string UltimateID = DamageSource.Shockwave.ToString();
         [Header("Effect Radius")]
         [Tooltip("Buffer distance beyond player attack range")]
         [SerializeField] private float _radiusBuffer = 2.3f;

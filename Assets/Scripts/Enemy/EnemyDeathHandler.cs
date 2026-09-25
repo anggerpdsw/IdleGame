@@ -31,14 +31,14 @@ namespace IdleDefenseSurvival.Enemy
             OnEnemyKilled?.Invoke(enemy, lastDamageSource);
 
             // Step 1c: ApocalypseEngine and SoulHarvester (player kills only)
-            if (lastDamageSource == UltimateDMG.Player.ToString())
+            if (lastDamageSource == DamageSource.Player.ToString())
             {
                 CardModifierService.OnEnemyKilledApocalypse();
                 CardModifierService.OnEnemyKilledSoulHarvester();
             }
 
             // Step 1d: ChainReaction Volatile check (player kills only)
-            if (lastDamageSource == UltimateDMG.Player.ToString())
+            if (lastDamageSource == DamageSource.Player.ToString())
             {
                 var controller = enemy.GetComponent<EnemyStatusEffectController>();
                 if (controller != null && controller.HasEffect(StatusEffects.StatusEffectType.Volatile))
@@ -107,9 +107,9 @@ namespace IdleDefenseSurvival.Enemy
             var playerComponent = Player.Player.Instance;
             if (playerComponent == null) return;
 
-            string player = UltimateDMG.Player.ToString();
-            string lightning = UltimateDMG.Lightning.ToString();
-            string cloud = UltimateDMG.Cloud.ToString();
+            string player = DamageSource.Player.ToString();
+            string lightning = DamageSource.Lightning.ToString();
+            string cloud = DamageSource.Cloud.ToString();
 
             // Lightning trigger (killed by player or lightning)
             if (lastDamageSource == player || lastDamageSource == lightning)

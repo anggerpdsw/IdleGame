@@ -185,7 +185,7 @@ namespace IdleDefenseSurvival.Ultimate
             if (!TryGetUltimate(ultimateId, out var data)) return 1;
             int baseCount = data.GetCount();
             // AddTank card: +1 count for Tank ultimate
-            if (ultimateId == UltimateDMG.Tank.ToString() && CardModifierService.HasEffect(CardEffectType.AddTank))
+            if (ultimateId == DamageSource.Tank.ToString() && CardModifierService.HasEffect(CardEffectType.AddTank))
                 baseCount += 1;
             return baseCount;
         }
@@ -217,8 +217,8 @@ namespace IdleDefenseSurvival.Ultimate
             if (!TryGetUltimate(ultimateId, out var data)) return false;
             if (!data.UsesStackSystem) return false;
 
-            if (ultimateId == UltimateDMG.Bomb.ToString() 
-                || ultimateId == UltimateDMG.Cloud.ToString())
+            if (ultimateId == DamageSource.Bomb.ToString() 
+                || ultimateId == DamageSource.Cloud.ToString())
                 if (_stackPositions.TryGetValue(ultimateId, out var existingList))
                     foreach (var pos in existingList)
                         if (Vector3.Distance(pos, position) < MIN_STACK_DISTANCE)
@@ -267,7 +267,7 @@ namespace IdleDefenseSurvival.Ultimate
 
             // Determine spawn position: for Bomb/Cloud, first stack spawns on nearest enemy
             Vector3 spawnPos = overridePosition ?? player.transform.position;
-            if (ultimateId == UltimateDMG.Bomb.ToString() || ultimateId == UltimateDMG.Cloud.ToString())
+            if (ultimateId == DamageSource.Bomb.ToString() || ultimateId == DamageSource.Cloud.ToString())
             {
                 // Only use nearest enemy if no override position provided (i.e., first stack)
                 if (!overridePosition.HasValue)
@@ -450,7 +450,7 @@ namespace IdleDefenseSurvival.Ultimate
 
             // For Bomb/Cloud: first cast (no active instances) uses current nearest enemy
             // Subsequent casts use stored positions (FIFO)
-            if (ultimateId == UltimateDMG.Bomb.ToString() || ultimateId == UltimateDMG.Cloud.ToString())
+            if (ultimateId == DamageSource.Bomb.ToString() || ultimateId == DamageSource.Cloud.ToString())
             {
                 int activeCount = UltimateFactory.GetActiveCount(ultimateId);
                 if (activeCount == 0)

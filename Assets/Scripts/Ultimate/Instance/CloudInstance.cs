@@ -9,7 +9,7 @@ namespace IdleDefenseSurvival.Ultimate
 {
     public class CloudInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Cloud.ToString();
+        private readonly string UltimateID = DamageSource.Cloud.ToString();
         [Header("Damage")]
         [Tooltip("Radius of the cloud effect")]
         [SerializeField] private float _cloudRadius = 0.915f;

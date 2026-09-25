@@ -445,10 +445,10 @@ namespace IdleDefenseSurvival.Player
 
             // TrySpawn handles cooldown, active checks, chance, and mana cost
             var pos = transform.position;
-            _ultimateManager.TrySpawn(UltimateDMG.Void.ToString(), pos, this);
-            _ultimateManager.TrySpawn(UltimateDMG.Root.ToString(), pos, this);
-            _ultimateManager.TrySpawn(UltimateDMG.Fountain.ToString(), pos, this);
-            _ultimateManager.TrySpawn(UltimateDMG.Shockwave.ToString(), pos, this);
+            _ultimateManager.TrySpawn(DamageSource.Void.ToString(), pos, this);
+            _ultimateManager.TrySpawn(DamageSource.Root.ToString(), pos, this);
+            _ultimateManager.TrySpawn(DamageSource.Fountain.ToString(), pos, this);
+            _ultimateManager.TrySpawn(DamageSource.Shockwave.ToString(), pos, this);
 
             // Lightning is triggered by kill count in EnemyAi, not cooldown/chance
             // Do not call TrySpawn here - it's handled when enemies die
@@ -761,7 +761,7 @@ namespace IdleDefenseSurvival.Player
         public void SpawnTank()
         {
             if (_ultimateManager == null) return;
-            string ultimateId = UltimateDMG.Tank.ToString();
+            string ultimateId = DamageSource.Tank.ToString();
 
             if (!_ultimateManager.TryGetUltimate(ultimateId, out _))
                 return;

@@ -67,7 +67,7 @@ namespace IdleDefenseSurvival.Item
             _spawnCenterPosition = transform.position;
             _originalPosition = transform.position;
 
-            var playerObj = GameObject.FindWithTag("Player");
+            var playerObj = GameObject.FindWithTag(DamageSource.Player.ToString());
             if (playerObj != null)
                 _player = playerObj.transform;
 

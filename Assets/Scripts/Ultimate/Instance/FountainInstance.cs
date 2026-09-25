@@ -9,7 +9,7 @@ namespace IdleDefenseSurvival.Ultimate
 {
     public class FountainInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Fountain.ToString();
+        private readonly string UltimateID = DamageSource.Fountain.ToString();
         [Header("Damage")]
         [Tooltip("Radius of the fountain effect")]
         [SerializeField] private float _fountainRadius = 0.915f;

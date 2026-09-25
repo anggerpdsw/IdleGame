@@ -14,7 +14,6 @@ namespace IdleDefenseSurvival
     public enum EnemyType { IsBasic, IsElite, IsBoss, IsSpecial }
     public enum Behavior { Vampiric, Necromancer }
     public enum SpawnMode { Circle, FourSides }
-    public enum UltimateDMG { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
     public enum WaveState { ActiveWave, Defeat, InterWave, Victory }
     /// <summary>
     /// Player build profiles. Steering auto-equip attribute weights (EquipmentAutoEquipService)
@@ -29,6 +28,8 @@ namespace IdleDefenseSurvival
 
     public enum SlowSource { Card, Cloud, Enemy, Void, Lightning }
     public enum SlowType { Permanent, Temporary, Aura }
+    
+    public enum DamageSource { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
 
 
     /// <summary>

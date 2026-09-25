@@ -6,7 +6,7 @@ namespace IdleDefenseSurvival.Ultimate
 {
     public class CloudHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Cloud.ToString();
+        public string UltimateId => DamageSource.Cloud.ToString();
 
         [SerializeField] private GameObject _cloudPrefab;
 

@@ -13,7 +13,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class RootInstance : MonoBehaviour
     {
-        private readonly string UltimateID = UltimateDMG.Root.ToString();
+        private readonly string UltimateID = DamageSource.Root.ToString();
         [Header("Effect Duration")]
         [SerializeField] private float _effectDuration = 3f;
 

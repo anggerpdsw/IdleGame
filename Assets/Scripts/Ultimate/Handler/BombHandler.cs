@@ -11,7 +11,7 @@ namespace IdleDefenseSurvival.Ultimate
     /// </summary>
     public class BombHandler : MonoBehaviour, IUltimateHandler
     {
-        public string UltimateId => UltimateDMG.Bomb.ToString();
+        public string UltimateId => DamageSource.Bomb.ToString();
 
         [SerializeField] private GameObject _bombPrefab;
 
