@@ -27,7 +27,45 @@ namespace IdleDefenseSurvival.Data
         public float BaseValue;
         public float ValuePerLevel;
         public Rarity CardRarity;
-        
+
+        // NEW: Structured parameters for complex mechanics (backward compatible)
+        // JSON-serialized dictionary for mechanic-specific values
+        // Example: {"Duration": 5, "MaxStacks": 15, "Threshold": 50}
+        public Dictionary<string, float> Parameters;
+
+        // NEW: Multi-effect support for cards affecting multiple stats
+        // Example: Apocalypse Engine boosts ATK, AS, and CRIT DMG
+        public List<CardEffectDefinition> Effects;
+
+        public float CalculateValue(int level) => BaseValue + ValuePerLevel * (level - 1);
+
+        /// <summary>
+        /// Helper to get parameter value with fallback to default.
+        /// Returns defaultValue if Parameters is null or key not found.
+        /// </summary>
+        public float GetParameter(string key, float defaultValue = 0f)
+        {
+            if (Parameters == null) return defaultValue;
+            return Parameters.TryGetValue(key, out var val) ? val : defaultValue;
+        }
+
+        /// <summary>
+        /// Checks if this card uses the new Effects system.
+        /// </summary>
+        public bool HasMultipleEffects => Effects != null && Effects.Count > 0;
+    }
+
+    /// <summary>
+    /// Individual effect definition for multi-effect cards.
+    /// Used when a single card modifies multiple stats.
+    /// </summary>
+    [Serializable] public class CardEffectDefinition
+    {
+        public string Target;  // SkillType or stat name as string
+        public string Mode;    // "Percent" or "Flat"
+        public float BaseValue;
+        public float ValuePerLevel;
+
         public float CalculateValue(int level) => BaseValue + ValuePerLevel * (level - 1);
     }
 

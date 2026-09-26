@@ -4,7 +4,7 @@
   "BulletStormAdditional": 15,
   "BulletStormMult": 0.9,
   "ExecutionProtocolNormal": 0.15,
-  "ExecutionProtocolNormaBoss": 0.08,
+  "ExecutionProtocolBoss": 0.08,
   "OverkillCap": 2,
   "VampiricFrenzyDuration": 5.0,
   "VampiricFrenzyMaxStacks": 10,
