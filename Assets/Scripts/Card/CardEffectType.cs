@@ -39,8 +39,19 @@ namespace IdleDefenseSurvival.Card
         DivineRetribution,   // Rolling HP-loss threshold triggers an all-enemy blast
         CelestialArsenal,    // Attack milestones summon distinct stacking weapon types
         LawOfCollapse,       // Periodic current-HP loss on the strongest enemy
-        ApexEvolution        // Player chooses a unique mutation at kill milestones
-   
+        ApexEvolution,       // Player chooses a unique mutation at kill milestones
+        MomentumCore,        // Kill streak grants attack speed stacking
+        FractureMark,        // Mark enemy, next 3 hits deal bonus damage
+        StormCharger,        // Every N attacks charge, release lightning to 3 enemies
+        BloodEngine,         // Life steal above 80% HP converts to attack damage
+        GravityWell,         // Every 6s pull nearby enemies and slow them
+        HunterInstinct,      // Bonus damage to enemies below 35% HP
+        EchoShot,            // Every 6th attack creates echo projectile
+        AdrenalineLoop,      // Below 40% HP gain attack speed, kill restores HP
+        VolatileCore,        // Every 12th kill leaves damaging core at death location
+        ArcaneResonance,     // After Ultimate, next 8 attacks gain bonus damage and crit
+        LastBullet           // Every 7th attack is enhanced with bonus damage and guaranteed hit
+
         // Stat Modifiers (handled via SkillType in Effects, not via this enum)
         // These are NOT used as EffectType - they use SkillType directly
     }

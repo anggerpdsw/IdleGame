@@ -9,6 +9,8 @@ using IdleDefenseSurvival.Modifiers;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Card.Behavior;
+using IdleDefenseSurvival.Card.Behavior.Implementations;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -381,10 +383,29 @@ namespace IdleDefenseSurvival.Player
                         bool isVoidOverlord = CardModifierService.IsVoidOverlordActive();
                         float hitDamageMultiplier = _damageMultiplier;
 
+                        // Fracture Mark
+                        float fractureMult = 1f;
+                        if (CardRuntimeManager.Instance?.GetBehavior("fracture_mark") is FractureMarkCardBehavior fracture)
+                            fractureMult = fracture.GetBonusMultiplier(enemy);
+                        hitDamageMultiplier *= fractureMult;
+
+                        // Hunter Instinct
+                        float hunterMult = 1f;
+                        if (CardRuntimeManager.Instance?.GetBehavior("hunter_instinct") is HunterInstinctCardBehavior hunter)
+                            hunterMult = hunter.GetDamageMultiplier(enemy);
+                        hitDamageMultiplier *= hunterMult;
+
                         // --- Calculate critical tier (None, Critical, SuperCritical) ---
                         CriticalType critTier = CriticalType.None;
                         float crit = PlayerStatsManager.Instance.GetStat(SkillType.CriticalChance);
                         float critDMG = PlayerStatsManager.Instance.GetStat(SkillType.CriticalDamage);
+
+                        // LastBullet override
+                        if (_player.GetNextAttackGuaranteedHit())
+                        {
+                            hitDamageMultiplier *= _player.GetNextAttackDamageMultiplier();
+                            crit += _player.GetNextAttackCriticalChanceBonus();
+                        }
 
                         // InfiniteArsenal: force 100% crit
                         if (isInfiniteArsenal)

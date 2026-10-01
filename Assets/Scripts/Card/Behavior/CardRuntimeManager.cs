@@ -190,6 +190,26 @@ namespace IdleDefenseSurvival.Card.Behavior
                     => new[] { CardEventType.OnEnemyKilled },
                 CardEffectType.ApexEvolution
                     => new[] { CardEventType.OnEnemyKilled, CardEventType.OnWaveStart },
+
+                // New Epic cards
+                CardEffectType.MomentumCore or
+                CardEffectType.FractureMark or
+                CardEffectType.VolatileCore
+                    => new[] { CardEventType.OnEnemyKilled },
+                CardEffectType.StormCharger or
+                CardEffectType.EchoShot or
+                CardEffectType.LastBullet or
+                CardEffectType.ArcaneResonance
+                    => new[] { CardEventType.OnPlayerAttack },
+                CardEffectType.BloodEngine
+                    => new[] { CardEventType.OnLifeSteal },
+                CardEffectType.AdrenalineLoop
+                    => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnEnemyKilled },
+                CardEffectType.HunterInstinct
+                    => new[] { CardEventType.OnPlayerAttack },
+                CardEffectType.GravityWell
+                    => Array.Empty<CardEventType>(), // timer-driven, no event subscription
+
                 _ => Array.Empty<CardEventType>(),
             };
 

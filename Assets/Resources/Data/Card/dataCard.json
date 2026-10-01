@@ -423,6 +423,159 @@
             "ValuePerLevel": -27,
             "CardRarity": "Epic"
         }, {
+            "Id": "momentum_core",
+            "Name": "Momentum Core",
+            "Description": "Each enemy killed within 3 seconds grants 2% Attack Speed, stacking up to 8 times. The stack duration refreshes whenever you kill an enemy.",
+            "EffectType": "MomentumCore",
+            "Mode": "Percent",
+            "BaseValue": 2,
+            "ValuePerLevel": 0.35,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "StackDurationSeconds": 3,
+                "MaximumStacks": 8
+            }
+        }, {
+            "Id": "fracture_mark",
+            "Name": "Fracture Mark",
+            "Description": "Attacks have a 20% chance to fracture an enemy for 4 seconds. Your next 3 hits against a Fractured enemy deal 25% bonus damage.",
+            "EffectType": "FractureMark",
+            "Mode": "Percent",
+            "BaseValue": 20,
+            "ValuePerLevel": 2.5,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "MarkDurationSeconds": 4,
+                "MaximumBonusHits": 3,
+                "DamageBonusPercent": 25
+            }
+        }, {
+            "Id": "storm_charger",
+            "Name": "Storm Charger",
+            "Description": "Every 10 attacks charges the Storm Core. At full charge, release lightning that strikes up to 3 nearby enemies for 1.5x damage.",
+            "EffectType": "StormCharger",
+            "Mode": "Flat",
+            "BaseValue": 10,
+            "ValuePerLevel": -0.35,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "MaximumTargets": 3,
+                "DamageMultiplier": 1.5,
+                "ChainRange": 4
+            }
+        }, {
+            "Id": "blood_engine",
+            "Name": "Blood Engine",
+            "Description": "Whenever Life Steal restores health while you are above 80% HP, convert 18% of the healing into Attack Damage for 4 seconds, stacking up to 5 times.",
+            "EffectType": "BloodEngine",
+            "Mode": "Percent",
+            "BaseValue": 18,
+            "ValuePerLevel": 2,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "HealthThresholdPercent": 80,
+                "ConversionPercent": 18,
+                "DurationSeconds": 4,
+                "MaximumStacks": 5
+            }
+        }, {
+            "Id": "gravity_well",
+            "Name": "Gravity Well",
+            "Description": "Every 6 seconds create a Gravity Well around the player that pulls nearby enemies toward its center and reduces their movement speed by 25%.",
+            "EffectType": "GravityWell",
+            "Mode": "Flat",
+            "BaseValue": 6,
+            "ValuePerLevel": -0.2,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "Radius": 5,
+                "DurationSeconds": 2.5,
+                "SlowPercent": 25,
+                "PullStrength": 3
+            }
+        }, {
+            "Id": "hunter_instinct",
+            "Name": "Hunter Instinct",
+            "Description": "Deal 20% bonus damage to enemies below 35% HP. Bonus damage increases with card level.",
+            "EffectType": "HunterInstinct",
+            "Mode": "Percent",
+            "BaseValue": 20,
+            "ValuePerLevel": 3,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "HealthThresholdPercent": 35
+            }
+        }, {
+            "Id": "echo_shot",
+            "Name": "Echo Shot",
+            "Description": "Every 6th attack creates an Echo projectile that repeats the attack after a short delay with 65% damage.",
+            "EffectType": "EchoShot",
+            "Mode": "Flat",
+            "BaseValue": 6,
+            "ValuePerLevel": -0.25,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "EchoDamageMultiplier": 0.65,
+                "EchoDelaySeconds": 0.35
+            }
+        }, {
+            "Id": "adrenaline_loop",
+            "Name": "Adrenaline Loop",
+            "Description": "Below 40% HP, gain 20% Attack Speed. Killing an enemy while the effect is active restores 1.5% of max HP.",
+            "EffectType": "AdrenalineLoop",
+            "Mode": "Percent",
+            "BaseValue": 20,
+            "ValuePerLevel": 2,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "HealthThresholdPercent": 40,
+                "AttackSpeedBonusPercent": 20,
+                "HealOnKillPercent": 1.5
+            }
+        }, {
+            "Id": "volatile_core",
+            "Name": "Volatile Core",
+            "Description": "Every 12th enemy killed leaves a volatile core at its death location. Enemies entering the core take damage over time.",
+            "EffectType": "VolatileCore",
+            "Mode": "Flat",
+            "BaseValue": 12,
+            "ValuePerLevel": -0.5,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "DurationSeconds": 5,
+                "Radius": 2.5,
+                "DamagePerSecondMultiplier": 0.35
+            }
+        }, {
+            "Id": "arcane_resonance",
+            "Name": "Arcane Resonance",
+            "Description": "After using your Ultimate, your next 8 attacks gain 18% bonus damage and +8% Critical Chance for up to 6 seconds.",
+            "EffectType": "ArcaneResonance",
+            "Mode": "Percent",
+            "BaseValue": 18,
+            "ValuePerLevel": 2,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "AttackCount": 8,
+                "AttackDamageBonusPercent": 18,
+                "CriticalChanceBonusPercent": 8,
+                "DurationSeconds": 6
+            }
+        }, {
+            "Id": "last_bullet",
+            "Name": "Last Bullet",
+            "Description": "Every 7th attack becomes a Last Bullet that deals 2x damage, has +25% Critical Chance, and cannot miss.",
+            "EffectType": "LastBullet",
+            "Mode": "Flat",
+            "BaseValue": 7,
+            "ValuePerLevel": -0.25,
+            "CardRarity": "Epic",
+            "Parameters": {
+                "DamageMultiplier": 2.0,
+                "CriticalChanceBonus": 25,
+                "GuaranteedHit": 1
+            }
+        }, {
             "Id": "death_chain",
             "Name": "Death Chain",
             "Description": "Each enemy you kill adds 4% Attack Damage, up to 15 stacks. All stacks reset after 5 seconds without a kill.",
@@ -613,14 +766,14 @@
         }, {
             "Id": "world_breaker",
             "Name": "World Breaker",
-            "Description": "Every 500 kills permanently grants 2% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
+            "Description": "Every 50A kills permanently grants 2% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
             "EffectType": "WorldBreaker",
             "Mode": "Percent",
             "BaseValue": 2,
             "ValuePerLevel": 0.3,
             "CardRarity": "Divine",
             "Parameters": {
-                "KillsPerStack": 500,
+                "KillsPerStack": 50000,
                 "StacksPerDefenseIgnoreMilestone": 5,
                 "DefenseIgnorePercentPerMilestone": 10,
                 "MaximumDefenseIgnorePercent": 100
@@ -672,10 +825,10 @@
         }, {
             "Id": "apex_evolution",
             "Name": "Apex Evolution",
-            "Description": "Every 1000 kills offers a choice of one random Evolution mutation. Each mutation can be chosen only once per battle; the offer interval scales with card level.",
+            "Description": "Every 10A kills offers a choice of one random Evolution mutation. Each mutation can be chosen only once per battle; the offer interval scales with card level.",
             "EffectType": "ApexEvolution",
             "Mode": "Flat",
-            "BaseValue": 1000,
+            "BaseValue": 10000,
             "ValuePerLevel": -50,
             "CardRarity": "Divine",
             "Parameters": {

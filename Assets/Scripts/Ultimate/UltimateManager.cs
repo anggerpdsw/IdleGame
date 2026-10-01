@@ -8,6 +8,8 @@ using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Card;
+using IdleDefenseSurvival.Card.Behavior;
+using IdleDefenseSurvival.Card.Behavior.Implementations;
 
 namespace IdleDefenseSurvival.Ultimate
 {
@@ -390,12 +392,20 @@ namespace IdleDefenseSurvival.Ultimate
                 if (!UltimateFactory.TrySpawn(ultimateData.id, player, position, ultimateData)) return false;
             }
 
+            NotifyUltimateUsed();
+            
             // Set cooldown END TIME (Time.time + effectiveCooldown) — CDR locked at cast.
             if (cooldown > 0f)
                 _cooldownEndTimeMap[ultimateId] = Time.time + cooldown;
 
             player.SpendMana(ultimateData.manaCost);
             return true;
+        }
+
+        private void NotifyUltimateUsed()
+        {
+            if (CardRuntimeManager.Instance?.GetBehavior("arcane_resonance") is ArcaneResonanceCardBehavior arcane)
+                arcane.OnUltimateUsed();
         }
 
         private float GetEffectiveCooldown(UltimateData ultimateData)

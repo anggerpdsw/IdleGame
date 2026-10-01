@@ -13,6 +13,7 @@ using IdleDefenseSurvival.Stats;
 using TMPro;
 using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Card.Behavior;
+using IdleDefenseSurvival.Card.Behavior.Implementations;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -83,6 +84,22 @@ namespace IdleDefenseSurvival.Player
         private Transform _currentTarget;
         private UltimateManager _ultimateManager;
         private int _shotIndex = 0; // Counter untuk radial offset pattern
+
+        // LastBullet card state
+        private bool _nextAttackGuaranteedHit;
+        private float _nextAttackDamageMultiplier = 1f;
+        private float _nextAttackCriticalChanceBonus;
+        public void SetNextProjectileAsLastBullet(bool guaranteed)
+        {
+            if (CardRuntimeManager.Instance?.GetBehavior("last_bullet") is not LastBulletCardBehavior behavior) return;
+            _nextAttackGuaranteedHit = guaranteed;
+            _nextAttackDamageMultiplier = behavior.GetDamageMultiplier();
+            _nextAttackCriticalChanceBonus = behavior.GetCriticalChanceBonus();
+        }
+
+        public bool GetNextAttackGuaranteedHit() => _nextAttackGuaranteedHit;
+        public float GetNextAttackDamageMultiplier() => _nextAttackDamageMultiplier;
+        public float GetNextAttackCriticalChanceBonus() => _nextAttackCriticalChanceBonus;
 
         public float CurrentHealth => _currentHealth;
         public float MaxHealth => PlayerStatsManager.Instance != null
@@ -347,6 +364,10 @@ namespace IdleDefenseSurvival.Player
                     projectile.Initialize(target, this, damageMultiplier, multiShoot);
                 }
             }
+            
+            _nextAttackGuaranteedHit = false;
+            _nextAttackDamageMultiplier = 1f;
+            _nextAttackCriticalChanceBonus = 0f;
         }
 
         /// <summary>

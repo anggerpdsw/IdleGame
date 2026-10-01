@@ -54,6 +54,17 @@ namespace IdleDefenseSurvival.Card.Behavior
             Register<CelestialArsenalCardBehavior>(CardEffectType.CelestialArsenal);
             Register<LawOfCollapseCardBehavior>(CardEffectType.LawOfCollapse);
             Register<ApexEvolutionCardBehavior>(CardEffectType.ApexEvolution);
+            Register<MomentumCoreCardBehavior>(CardEffectType.MomentumCore);
+            Register<FractureMarkCardBehavior>(CardEffectType.FractureMark);
+            Register<StormChargerCardBehavior>(CardEffectType.StormCharger);
+            Register<BloodEngineCardBehavior>(CardEffectType.BloodEngine);
+            Register<GravityWellCardBehavior>(CardEffectType.GravityWell);
+            Register<HunterInstinctCardBehavior>(CardEffectType.HunterInstinct);
+            Register<EchoShotCardBehavior>(CardEffectType.EchoShot);
+            Register<AdrenalineLoopCardBehavior>(CardEffectType.AdrenalineLoop);
+            Register<VolatileCoreCardBehavior>(CardEffectType.VolatileCore);
+            Register<ArcaneResonanceCardBehavior>(CardEffectType.ArcaneResonance);
+            Register<LastBulletCardBehavior>(CardEffectType.LastBullet);
         }
 
         /// <summary>

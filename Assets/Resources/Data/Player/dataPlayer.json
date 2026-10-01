@@ -245,7 +245,7 @@
         "shortName": "MRG"
       },
       "moveSpeed": {
-        "baseValue": 0.75,
+        "baseValue": 0.45,
         "bonusPerPoint": 0.0125,
         "ValuePerLevel": 0.025,
         "ValuePerEnhance": 0.05,
