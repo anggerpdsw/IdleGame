@@ -421,6 +421,8 @@ enemy.StatusController.OnStatusAdded += HandleStatusAdded;
 
 Chain Reaction is the current Volatile source. Its chance, mark radius/duration, explosion radius, and damage multiplier are read from the Chain Reaction card's `Parameters` in `dataCard.json`. `VolatileStatus.HasExploded` prevents a single marked enemy from detonating repeatedly; the card behavior owns explosion damage and spread.
 
+Law of Collapse treats Volatile as the marked state: a Volatile target takes the configured multiple of its current-HP loss. No second generic Mark status is created. The Divine effect selects the active enemy with highest current HP; Bosses use the data-defined Boss loss percentage.
+
 **Application flow:**
 
 ```csharp

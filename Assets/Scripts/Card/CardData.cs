@@ -28,6 +28,7 @@ namespace IdleDefenseSurvival.Data
         public float BaseValue;
         public float ValuePerLevel;
         public Rarity CardRarity;
+        public List<CardMutationDefinition> Mutations;
 
         // NEW: Structured parameters for complex mechanics (backward compatible)
         // JSON-serialized dictionary for mechanic-specific values
@@ -46,6 +47,25 @@ namespace IdleDefenseSurvival.Data
             return Parameters.TryGetValue(key, out var val) ? val : defaultValue;
         }
 
+    }
+
+    [Serializable] public class CardMutationDefinition
+    {
+        public string Id;
+        public string Name;
+        public string Description;
+        public string SkillType;
+        public string EffectType;
+        public string Mode;
+        public float Value;
+        public float HealthThresholdPercent;
+    }
+
+    public enum ApexMutationEffectType
+    {
+        None,
+        Devourer,
+        StormHeart
     }
 
     [Serializable] public class CardInventoryData
@@ -86,6 +106,8 @@ namespace IdleDefenseSurvival.Data
         public string CardId;
         public int Level = 1;
         public int DuplicateCount = 0;
+        public int WorldBreakerStacks;
+        public int WorldBreakerKillProgress;
     }
 
     [Serializable]

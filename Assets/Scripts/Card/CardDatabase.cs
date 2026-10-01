@@ -220,7 +220,60 @@ namespace IdleDefenseSurvival.Manager
                     if (float.IsNaN(value) || float.IsInfinity(value)) return false;
             }
 
+            bool isApexEvolution = string.Equals(
+                card.EffectType,
+                CardEffectType.ApexEvolution.ToString(),
+                StringComparison.OrdinalIgnoreCase);
+            if (!isApexEvolution && card.Mutations != null) return false;
+            if (isApexEvolution && (card.Mutations == null || card.Mutations.Count == 0))
+                return false;
+
+            if (card.Mutations != null)
+            {
+                var mutationIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var mutation in card.Mutations)
+                {
+                    if (mutation == null
+                        || string.IsNullOrWhiteSpace(mutation.Id)
+                        || string.IsNullOrWhiteSpace(mutation.Name)
+                        || string.IsNullOrWhiteSpace(mutation.Description)
+                        || !mutationIds.Add(mutation.Id)
+                        || !IsValidModifierMode(mutation.Mode)
+                        || float.IsNaN(mutation.Value)
+                        || float.IsInfinity(mutation.Value)
+                        || float.IsNaN(mutation.HealthThresholdPercent)
+                        || float.IsInfinity(mutation.HealthThresholdPercent))
+                        return false;
+
+                    bool hasMutationEffect = !string.IsNullOrWhiteSpace(mutation.EffectType);
+                    bool hasMutationSkill = !string.IsNullOrWhiteSpace(mutation.SkillType);
+                    if (hasMutationEffect == hasMutationSkill) return false;
+
+                    if (hasMutationSkill
+                        && (!Enum.TryParse(mutation.SkillType, true, out Stats.SkillType mutationSkill)
+                            || !Enum.IsDefined(typeof(Stats.SkillType), mutationSkill)
+                            || mutationSkill == Stats.SkillType.None))
+                        return false;
+
+                    if (hasMutationEffect
+                        && (!Enum.TryParse(mutation.EffectType, true, out ApexMutationEffectType mutationEffect)
+                            || !Enum.IsDefined(typeof(ApexMutationEffectType), mutationEffect)
+                            || mutationEffect == ApexMutationEffectType.None))
+                        return false;
+
+                    if (string.Equals(mutation.EffectType, nameof(ApexMutationEffectType.Devourer), StringComparison.OrdinalIgnoreCase)
+                        && (mutation.HealthThresholdPercent <= 0f || mutation.HealthThresholdPercent >= 100f))
+                        return false;
+                }
+            }
+
             return true;
+        }
+
+        private static bool IsValidModifierMode(string mode)
+        {
+            return string.Equals(mode, "Flat", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(mode, "Percent", StringComparison.OrdinalIgnoreCase);
         }
 
     }

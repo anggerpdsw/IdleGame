@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.UI;
@@ -444,6 +445,9 @@ namespace IdleDefenseSurvival.Enemy
             }
 
             _lastDamageSource = damageData.Source;
+            bool isPlayerDamage = IsPlayerDamageSource(damageData.Source);
+            if (isPlayerDamage && damageData.Source != "Overkill")
+                damageData.DamageMultiplier *= CardModifierService.GetWorldBreakerDamageMultiplier();
 
             // Calculate final damage value
             // 3-layer element pipeline:
@@ -462,6 +466,8 @@ namespace IdleDefenseSurvival.Enemy
 
             // Apply defense multiplier from status effects (DefenseBreak)
             float effectiveDefense = _defenseAmount * (_statusEffectController != null ? _statusEffectController.GetDefenseMultiplier() : 1f);
+            if (isPlayerDamage)
+                effectiveDefense *= 1f - CardModifierService.GetWorldBreakerDefenseIgnoreFraction();
             float damageAfterDefense = Utilityku.FinalDamage(rawDamage, effectiveDefense, penetration);
 
             float damageBonus = EnemyData.IsBoss
@@ -478,6 +484,11 @@ namespace IdleDefenseSurvival.Enemy
             if (_hasRegenerationAura && _isRegenerating)
                 damageReductionMultiplier *= 0.5f;
             damageAfterDefense *= damageReductionMultiplier;
+            if (isPlayerDamage)
+            {
+                float currentHealthFraction = _currentHealth / Mathf.Max(1f, _maxHealth);
+                damageAfterDefense *= CardModifierService.GetDevourerDamageMultiplier(currentHealthFraction);
+            }
 
             LastOverkillDamage = Mathf.Max(0f, damageAfterDefense - _currentHealth);
             float finalDamage = Mathf.Min(_currentHealth, damageAfterDefense);
@@ -511,6 +522,31 @@ namespace IdleDefenseSurvival.Enemy
             if (_currentHealth <= 0) Die();
 
             return finalDamage;
+        }
+
+        public float RemoveCurrentHealthFraction(float fraction, string source)
+        {
+            LastOverkillDamage = 0f;
+            if (fraction <= 0f || _currentHealth <= 0f) return 0f;
+
+            float removedHealth = _currentHealth * Mathf.Clamp01(fraction);
+            if (removedHealth <= 0f) return 0f;
+
+            _lastDamageSource = source;
+            _currentHealth -= removedHealth;
+            RecordDamage(source, removedHealth);
+            ShowDamagePopup(removedHealth, DamageType.TrueDamage, CriticalType.None);
+            RefreshHealthBarStatus();
+            EnemyStatisticsManager.Instance?.MarkDirty();
+
+            if (_currentHealth <= 0f) Die();
+            return removedHealth;
+        }
+
+        private static bool IsPlayerDamageSource(string source)
+        {
+            if (Enum.TryParse(source, true, out DamageSource _)) return true;
+            return source == "Overkill" || source == "ChainReactionExplosion";
         }
 
         /// <summary>

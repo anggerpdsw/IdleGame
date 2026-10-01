@@ -37,7 +37,7 @@ Before modifying ANY game system:
 |--------|------|-------|
 | **Player** | [Player_Design.md](./Player_Design.md) | Auto-attack, stat list, combat behavior |
 | **Projectile** | [Projectile_Design.md](./Projectile_Design.md) | Movement, collision, damage, bounce, pooling |
-| **Cards** | [Card_Design.md](./Card_Design.md) | Single-source `dataCard.json`, progression, pity, behaviors, runtime events |
+| **Cards** | [Card_Design.md](./Card_Design.md) | Single-source `dataCard.json`, progression, pity, five Divine effects, Apex mutations, runtime events |
 | **Ultimate** | [Ultimate_Design.md](./Ultimate_Design.md) | 8 handler types, factory, cooldowns |
 
 ### Enemy & Wave Systems

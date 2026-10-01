@@ -907,15 +907,17 @@ namespace IdleDefenseSurvival.Player
             // --------------------------------------------------
             if (finalDamage > 0f)
             {
+                float healthBeforeDamage = _currentHealth;
                 _currentHealth -= finalDamage;
                 _currentHealth = Mathf.Clamp(_currentHealth, 0, PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
+                float actualHealthLost = Mathf.Max(0f, healthBeforeDamage - _currentHealth);
                 _lastDamageSource = damageData.Source;
                 ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
                 OnHealthChanged?.Invoke();
 
                 // Notify card behaviors (GuardianInstinct, DeathReversal, Immortal)
                 float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-                CardRuntimeManager.Instance?.DispatchPlayerDamaged(finalDamage, _currentHealth, maxHealth);
+                CardRuntimeManager.Instance?.DispatchPlayerDamaged(actualHealthLost, _currentHealth, maxHealth);
             }
 
             // --------------------------------------------------

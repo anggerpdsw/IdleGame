@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Enemy;
+using IdleDefenseSurvival.Card.Behavior.Implementations;
 
 namespace IdleDefenseSurvival.Card.Behavior
 {
@@ -39,6 +41,8 @@ namespace IdleDefenseSurvival.Card.Behavior
         // Event subscriptions per event type (optimized dispatch)
         private readonly Dictionary<CardEventType, List<ICardBehavior>> _eventSubscriptions
             = new();
+
+        public event Action OnApexEvolutionChoicesUpdated;
 
         public void Initialize()
         {
@@ -160,15 +164,19 @@ namespace IdleDefenseSurvival.Card.Behavior
                 CardEffectType.DeathChain or
                 CardEffectType.SoulHarvester or 
                 CardEffectType.ChainReaction or 
-                CardEffectType.ApocalypseEngine 
+                CardEffectType.ApocalypseEngine or
+                CardEffectType.WorldBreaker
                     => new[] { CardEventType.OnEnemyKilled },
                 CardEffectType.VampiricFrenzy
                     => new[] { CardEventType.OnLifeSteal },
                 CardEffectType.BulletStorm or 
                 CardEffectType.InfiniteArsenal or 
-                CardEffectType.WarMachine 
+                CardEffectType.WarMachine or
+                CardEffectType.CelestialArsenal
                     => new[] { CardEventType.OnPlayerAttack },
                 CardEffectType.GuardianInstinct
+                    => new[] { CardEventType.OnPlayerDamaged },
+                CardEffectType.DivineRetribution
                     => new[] { CardEventType.OnPlayerDamaged },
                 CardEffectType.DeathReversal 
                     => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnWaveStart },
@@ -178,8 +186,10 @@ namespace IdleDefenseSurvival.Card.Behavior
                 CardEffectType.Immortal 
                     => new[] { CardEventType.OnWaveComplete, CardEventType.OnWaveStart },
                 CardEffectType.BatStalker or 
-                CardEffectType.HealOnKill 
+                CardEffectType.HealOnKill
                     => new[] { CardEventType.OnEnemyKilled },
+                CardEffectType.ApexEvolution
+                    => new[] { CardEventType.OnEnemyKilled, CardEventType.OnWaveStart },
                 _ => Array.Empty<CardEventType>(),
             };
 
@@ -210,6 +220,16 @@ namespace IdleDefenseSurvival.Card.Behavior
 
         public void DispatchWaveComplete(int waveNumber)
             => Dispatch(CardEventType.OnWaveComplete, b => b.OnWaveComplete(waveNumber));
+
+        public void NotifyApexEvolutionChoicesUpdated()
+            => OnApexEvolutionChoicesUpdated?.Invoke();
+
+        public IReadOnlyList<CardMutationDefinition> GetApexEvolutionChoices()
+            => (GetBehavior("apex_evolution") as ApexEvolutionCardBehavior)?.PendingChoices
+                ?? Array.Empty<CardMutationDefinition>();
+
+        public bool SelectApexEvolutionMutation(string mutationId)
+            => (GetBehavior("apex_evolution") as ApexEvolutionCardBehavior)?.SelectMutation(mutationId) ?? false;
 
         private void Dispatch(CardEventType eventType, Action<ICardBehavior> action)
         {

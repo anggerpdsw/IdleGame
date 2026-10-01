@@ -781,7 +781,9 @@ namespace IdleDefenseSurvival.Manager
                     {
                         CardId = card.CardId,
                         Level = card.Level,
-                        DuplicateCount = card.DuplicateCount
+                        DuplicateCount = card.DuplicateCount,
+                        WorldBreakerStacks = card.WorldBreakerStacks,
+                        WorldBreakerKillProgress = card.WorldBreakerKillProgress
                     };
                 }
                 cardInventory.equippedCards = CardEquipmentService.Instance?.GetSaveData() ?? new List<string>();
@@ -833,7 +835,9 @@ namespace IdleDefenseSurvival.Manager
                     {
                         CardId = kvp.Value.CardId,
                         Level = kvp.Value.Level,
-                        DuplicateCount = kvp.Value.DuplicateCount
+                        DuplicateCount = kvp.Value.DuplicateCount,
+                        WorldBreakerStacks = kvp.Value.WorldBreakerStacks,
+                        WorldBreakerKillProgress = kvp.Value.WorldBreakerKillProgress
                     };
                 }
                 CardInventory.Instance.LoadInventory(ownedCards);

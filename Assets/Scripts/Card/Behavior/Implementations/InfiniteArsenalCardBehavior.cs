@@ -31,7 +31,9 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnPlayerAttack()
         {
             _attackCounter++;
-            if (_attackCounter >= _triggerCount)
+            int triggerCount = Mathf.Max(1, Mathf.CeilToInt(
+                _triggerCount / CardModifierService.GetProjectileEffectTriggerRateMultiplier()));
+            if (_attackCounter >= triggerCount)
             {
                 _attackCounter = 0;
                 TriggerSpecialProjectile();

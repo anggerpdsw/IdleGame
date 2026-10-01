@@ -476,6 +476,8 @@ Card damage modifiers are defined in `Card/dataCard.json`; see [Card_Design.md](
 
 Death prevention order is Death Reversal on lethal damage, then Death Defy, then Angel/Immortal. Death Reversal and Angel are card behaviors; Death Defy remains the player stat mechanic.
 
+World Breaker is applied in `EnemyAi.TakeDamage` to player-owned damage sources before defense calculation; its milestone penetration scales the effective enemy defense down before normal penetration is applied. Apex Devourer adds its configured damage bonus only when the target's current HP is at/above its configured threshold. Divine Retribution counts actual player HP lost after shields and other mitigation, then deals its blast to all active enemies on trigger.
+
 ---
 
 ## Change Log

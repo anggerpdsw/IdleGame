@@ -49,6 +49,11 @@ namespace IdleDefenseSurvival.Card.Behavior
             Register<DeathReversalCardBehavior>(CardEffectType.DeathReversal);
             Register<VoidOverlordCardBehavior>(CardEffectType.VoidOverlord);
             Register<ChainReactionCardBehavior>(CardEffectType.ChainReaction);
+            Register<WorldBreakerCardBehavior>(CardEffectType.WorldBreaker);
+            Register<DivineRetributionCardBehavior>(CardEffectType.DivineRetribution);
+            Register<CelestialArsenalCardBehavior>(CardEffectType.CelestialArsenal);
+            Register<LawOfCollapseCardBehavior>(CardEffectType.LawOfCollapse);
+            Register<ApexEvolutionCardBehavior>(CardEffectType.ApexEvolution);
         }
 
         /// <summary>

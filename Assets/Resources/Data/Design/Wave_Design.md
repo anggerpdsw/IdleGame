@@ -460,6 +460,8 @@ WaveManager.Instance.OnWaveCompleted += HandleWaveComplete;
 
 `WaveManager` dispatches `OnWaveStart` and `OnWaveComplete` to `CardRuntimeManager`. Death Reversal resets its once-per-wave use on wave start; Angel tracks immunity until wave completion; Crazy Gambler and Desperados resolve once on wave completion after their configured activation wave. Void Overlord deliberately keeps its timer across wave transitions.
 
+Apex Evolution presents pending mutation choices through the canvas popup after its kill threshold. Chosen mutation modifiers and pending offers are battle-scoped and reset at `OnWaveStart`. World Breaker is the exception: its kill milestones are saved with the owned card and persist across waves and save/load. Celestial Arsenal's attack counter and used-weapon set persist across wave transitions while the card remains equipped.
+
 ---
 
 ## Change Log

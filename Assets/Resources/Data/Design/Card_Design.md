@@ -21,13 +21,13 @@
 
 ## 1. Source Of Truth
 
-`Assets/Resources/Data/Card/dataCard.json` is the single authored source for card definitions and card balance. Its current schema version is `2`.
+`Assets/Resources/Data/Card/dataCard.json` is the single authored source for card definitions and card balance. Its current schema version is `3`.
 
 The file owns:
 
 - `Progression`: starting/max slots, max level, roll costs, pity thresholds, slot expansion costs, and duplicate requirements.
 - `RarityConfig`: rarity weights.
-- `Cards`: card identity, display text, rarity, effect/stat identifier, level scaling, and custom `Parameters`.
+- `Cards`: card identity, display text, rarity, effect/stat identifier, level scaling, custom `Parameters`, and Apex `Mutations`.
 
 There is no separate card balance JSON. Card roll/level/slot values must not be copied into `GameConstants`, behavior fallbacks, or UI code. `GameConstants.KEY_PITY_*` remain persistence keys only; they are not balance values.
 
@@ -52,7 +52,7 @@ A definition uses exactly one of `EffectType` or `SkillType`:
 }
 ```
 
-Special behavior cards use `EffectType` and may have one `Parameters` object. Stat cards use `SkillType`. There is no supported multi-effect `Effects[]` schema; the unused DTO was removed so authoring matches runtime behavior.
+Special behavior cards use `EffectType` and may have one `Parameters` object. Stat cards use `SkillType`. Apex Evolution mutation definitions are nested under its `Mutations` property; each mutation has exactly one `SkillType` or mutation `EffectType`. There is no supported multi-effect `Effects[]` schema.
 
 The level value is:
 
@@ -98,9 +98,9 @@ A reward is marked pity-guaranteed only when the awarded card meets a currently 
 
 ## 5. Ownership, Leveling, And Equipment
 
-Owned card instances are keyed by stable card ID and store level plus remaining duplicate count. Card inventory and equipped IDs are part of the existing save data; runtime behavior state is not separately persisted.
+Owned card instances are keyed by stable card ID and store level plus remaining duplicate count. World Breaker stacks and partial kill progress persist on its owned card data, surviving unequip, scene changes, and save/load. Other temporary behavior state is not separately persisted.
 
-`CardUpgradeService` reads duplicate requirements and the level cap from `CardDatabase.Progression`. Batch rolls use `VirtualCardInventorySnapshot` to simulate acquisitions and upgrades before mutating real inventory. The snapshot delegates duplicate requirement lookup to the same upgrade service instead of maintaining a copied curve.
+`CardUpgradeService` reads duplicate requirements and the level cap from `CardDatabase.Progression`. Batch rolls use `VirtualCardInventorySnapshot` to simulate acquisitions and upgrades before mutating real inventory. `CardManager` injects the database's duplicate-requirement list into the snapshot; the simulation owns no copied progression curve or runtime singleton dependency.
 
 `CardEquipmentService` reads starting/max slots and expansion costs from the same progression object. Only equipped cards have active behaviors or affect stats. Equip/unequip/upgrade refreshes `CardRuntimeManager` and the modifier pipeline. The collection view reads `CardData.Description` directly and displays values using the definition's level formula.
 
@@ -147,6 +147,13 @@ Behavioral values are authored on the card that consumes them. The current custo
 - **Immortal (Angel):** triggers only after Death Defy fails, restores full HP, then grants immunity until the wave completes. Its existing card value drives the cooldown display/state.
 - **Void Overlord:** its timer continues across wave transitions. While active, player projectiles pierce unhit enemies in attack range, gain the card's percent damage bonus, and enemy healing is suppressed.
 - **Chain Reaction:** a player kill has the card's level-scaled chance to mark nearby enemies Volatile. A Volatile death explodes, damages nearby enemies, and can spread Volatile. Mark radius, duration, explosion radius, and damage multiplier are configured on the card.
+- **World Breaker (Divine):** every configured player-owned kill milestone adds the level-scaled percent to all player-owned damage sources and persists stacks/progress on the owned card. Every configured stack milestone ignores the configured percent of enemy defense, up to its configured cap.
+- **Divine Retribution (Divine):** actual HP lost after shields/mitigation is accumulated over a rolling configured window. Reaching the max-HP threshold triggers an Attack-Damage-based blast against every active enemy and starts the configured cooldown.
+- **Celestial Arsenal (Divine):** every configured player-attack count randomly summons a piercing beam, an orbital area strike centered on the highest-current-HP enemy, or chain lightning. Using each distinct weapon type permanently increases Celestial Weapon damage for the active battle.
+- **Law of Collapse (Divine):** on its configured interval, selects the active enemy with highest current HP and removes the configured fraction of current HP. Bosses use their separate fraction. Volatile is the game's marked status and applies the configured damage multiplier.
+- **Apex Evolution (Divine):** player-owned kills accumulate toward its level-scaled offer interval. The UI presents up to the configured number of distinct, unchosen mutations from `Mutations`; the player selects one. A mutation can be chosen once per active wave/battle, resetting on `OnWaveStart`. Stat mutations add Card-source modifiers; Devourer and Storm Heart are read by enemy/projectile damage owners.
+
+The six Apex mutations are data definitions: Fangs, Overclock, Void Skin, and Titan Core are stat modifiers; Devourer checks the target's current-HP fraction; Storm Heart accelerates configured projectile-effect triggers. New values belong in `dataCard.json`; a new executable mutation effect also requires validation/implementation in `ApexMutationEffectType`.
 
 ---
 
@@ -154,12 +161,12 @@ Behavioral values are authored on the card that consumes them. The current custo
 
 Event subscriptions are explicit in `CardRuntimeManager.GetEventsForEffect`:
 
-- Player attack: Bullet Storm, Infinite Arsenal, War Machine.
-- Player damage: Berserker, Guardian Instinct, Death Reversal.
+- Player attack: Bullet Storm, Infinite Arsenal, War Machine, Celestial Arsenal.
+- Player damage: Berserker, Guardian Instinct, Death Reversal, Divine Retribution.
 - Player heal: Berserker; Life Steal only: Vampiric Frenzy.
-- Enemy kill: Death Chain, Soul Harvester, Chain Reaction, Apocalypse Engine, Bat Stalker, Heal On Kill.
+- Enemy kill: Death Chain, Soul Harvester, Chain Reaction, Apocalypse Engine, World Breaker, Apex Evolution, Bat Stalker, Heal On Kill.
 - Wave complete: Crazy Gambler, Desperados, Angel.
-- Wave start: Death Reversal, Angel.
+- Wave start: Death Reversal, Angel, Apex Evolution.
 - Stat/query-only effects do not subscribe to unrelated wave events.
 
 Unequipping calls behavior cleanup, removes temporary modifiers, and unsubscribes events. Wave-scoped state resets only when the effect's documented rule requires it. Do not run card timer updates both in `Player.Update` and `CardRuntimeManager.Update`.
@@ -179,7 +186,7 @@ When adding a card:
 7. Verify equip/unequip cleanup, save/load ownership, pooled projectile reset, repeated triggers, and max-level roll filtering.
 8. Update this document and any affected domain docs.
 
-No SaveData schema change is required for the progression/configuration refactor; pity keys and owned-card persistence remain unchanged.
+No save-version migration is required. World Breaker adds two optional fields to the existing owned-card record (`WorldBreakerStacks` and `WorldBreakerKillProgress`); old saves deserialize these as zero. Other card progression/configuration remains runtime data in `dataCard.json`.
 
 ---
 
@@ -188,3 +195,4 @@ No SaveData schema change is required for the progression/configuration refactor
 | Date | Change | Reason |
 |------|--------|--------|
 | 2026-10-01 | Replaced legacy schema and behavior notes with current single-source JSON/runtime contract | Card data and behavior audit |
+| 2026-10-01 | Added five Divine effects, Apex mutations, and World Breaker persistence | Divine card implementation |

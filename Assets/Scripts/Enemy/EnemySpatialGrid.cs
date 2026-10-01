@@ -75,6 +75,23 @@ namespace IdleDefenseSurvival.Enemy
             return result;
         }
 
+        public static void CopyAllActiveEnemiesTo(List<EnemyAi> buffer)
+        {
+            if (buffer == null) return;
+            buffer.Clear();
+
+            foreach (var enemies in Grid.Values)
+            {
+                for (int i = 0; i < enemies.Count; i++)
+                {
+                    var enemy = enemies[i];
+                    if (enemy == null || !enemy.gameObject.activeInHierarchy || enemy.CurrentHealth <= 0f)
+                        continue;
+                    buffer.Add(enemy);
+                }
+            }
+        }
+
         /// <summary>
         /// Debug: get total enemy count across all grid cells.
         /// </summary>

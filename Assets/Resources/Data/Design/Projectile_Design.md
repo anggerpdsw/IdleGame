@@ -388,6 +388,9 @@ Player projectiles read card balance from the active card definitions in `dataCa
 - Infinite Arsenal marks the individual pooled projectile during initialization. It forces an Arsenal critical, uses the configured bounce count, and retargets unhit enemies within player attack range. The flag is cleared by `ResetState`; it is not a static cross-projectile flag.
 - Void Overlord uses a per-hit damage multiplier and continues to unhit enemies in attack range while active. Critical/void multipliers are calculated locally per hit, so bounces do not accumulate previous-hit modifiers.
 - Bullet Storm and Critical Cascade create pooled projectiles using their card parameters.
+- Celestial Arsenal's piercing beam, orbital strike, and chain lightning resolve against the active enemy snapshot; Storm Heart accelerates its attack interval and projectile-related proc checks.
+- World Breaker and Apex Devourer are applied centrally by `EnemyAi.TakeDamage`, so all player-owned hits receive their applicable bonuses rather than only standard player projectiles.
+- Storm Heart also accelerates Chain Reaction's projectile-caused Volatile proc chance; timed global effects such as Law of Collapse are not accelerated.
 - Execution Protocol reads normal and Boss/Special HP thresholds from its card parameters.
 - Overkill consumes `EnemyAi.LastOverkillDamage`, which is the final post-defense/post-reduction damage beyond the target's remaining HP. It transfers the configured fraction, capped by the configured multiplier of the triggering hit's final damage.
 

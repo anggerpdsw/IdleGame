@@ -1033,7 +1033,7 @@ All detailed system specifications (formerly §8-27 of this file) have been extr
 | **Progression** | | |
 | `Wave_Design.md` | Wave system | MAX_WAVE_PER_TIER=350, tier progression |
 | `Spawn_Design.md` | Spawn system | Weighted spawning, positioning, pooling |
-| `Card_Design.md` | Card system | single-source `dataCard.json`, progression, pity, leveling, runtime behaviors/events |
+| `Card_Design.md` | Card system | single-source `dataCard.json`, progression, pity, Divine mechanics, Apex mutations, runtime behaviors/events |
 | `Ultimate_Design.md` | Ultimate system | 8 handlers, cooldowns, special effects |
 | **Economy & Items** | | |
 | `Item_Design.md` | Item system | ItemId vs InstanceId, 7 categories, stackability |

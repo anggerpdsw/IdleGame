@@ -24,23 +24,10 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             if (player != null) player.SetBarrierEffect(false);
         }
 
-        public override void OnWaveStart(int waveNumber)
-        {
-            _cooldownRemaining = 0f;
-        }
-
-        public override void OnWaveComplete(int waveNumber)
-        {
-            if (_immunityWavesRemaining > 0)
-            {
-                _immunityWavesRemaining--;
-                if (_immunityWavesRemaining == 0)
-                {
-                    var player = PlayerClass.Instance;
-                    if (player != null) player.SetBarrierEffect(false);
-                }
-            }
-        }
+        // JANGAN reset _cooldownRemaining di sini
+        // Biarkan cooldown terus berjalan via Update()
+        public override void OnWaveStart(int waveNumber) => SetAngelCooldown();
+        public override void OnWaveComplete(int waveNumber) => SetAngelCooldown();
 
         public override void Update(float deltaTime)
         {
@@ -65,6 +52,19 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             player.SetBarrierEffect(true);
 
             return true;
+        }
+
+        private void SetAngelCooldown() 
+        {
+            if (_immunityWavesRemaining > 0)
+            {
+                _immunityWavesRemaining--;
+                if (_immunityWavesRemaining == 0)
+                {
+                    var player = PlayerClass.Instance;
+                    if (player != null) player.SetBarrierEffect(false);
+                }
+            }
         }
 
         public float GetCooldownRemaining() => Mathf.Max(_cooldownRemaining, 0f);

@@ -268,6 +268,8 @@ public void ApplyStatus(IStatusEffect effect)
 
 Contextual card listeners use the same kill dispatch: Bat Stalker/Heal On Kill read enemy max HP, Chain Reaction marks or detonates Volatile enemies, and kill-stack cards check damage source. `EnemyAi.Heal` blocks all enemy healing while Void Overlord is active. `EnemyAi.LastOverkillDamage` records only post-mitigation damage beyond remaining HP for the player projectile's Overkill transfer.
 
+World Breaker's defense-ignore milestone modifies effective defense before normal penetration. Law of Collapse periodically selects the active enemy with the highest current HP and directly removes the configured fraction of current HP; Bosses use their separate fraction and Volatile status doubles the loss. This current-HP removal still updates health UI, damage records, kill/reward flow, and enemy statistics.
+
 ---
 
 ## 10. Enemy Types

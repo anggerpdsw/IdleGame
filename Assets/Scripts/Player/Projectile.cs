@@ -501,7 +501,9 @@ namespace IdleDefenseSurvival.Player
                             float threshold = CardModifierService.GetCardParameter(
                                 "execution_protocol",
                                 isBossOrElite ? "BossExecutionThreshold" : "NormalExecutionThreshold");
-                            float chance = CardModifierService.GetEffectResult(CardEffectType.ExecutionProtocol, 0f);
+                            float chance = Mathf.Clamp01(
+                                CardModifierService.GetEffectResult(CardEffectType.ExecutionProtocol, 0f)
+                                * CardModifierService.GetProjectileEffectTriggerRateMultiplier());
                             if (enemy.CurrentHealth <= enemy.MaxHealth * threshold && Utilityku.Chance(chance * 100f))
                             {
                                 // Spawn sword execution effect
@@ -533,7 +535,9 @@ namespace IdleDefenseSurvival.Player
                         // CriticalCascade: spawn extra projectile on crit
                         if (critTier != CriticalType.None && CardModifierService.HasEffect(CardEffectType.CriticalCascade))
                         {
-                            float cascadeChance = CardModifierService.GetEffectResult(CardEffectType.CriticalCascade, 0f);
+                            float cascadeChance = Mathf.Clamp01(
+                                CardModifierService.GetEffectResult(CardEffectType.CriticalCascade, 0f)
+                                * CardModifierService.GetProjectileEffectTriggerRateMultiplier());
                             if (Utilityku.Chance(cascadeChance * 100f))
                             {
                                 Transform cascadeTarget = FindNearestUnhitEnemy(transform.position);

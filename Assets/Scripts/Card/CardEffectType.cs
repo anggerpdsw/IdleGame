@@ -34,7 +34,12 @@ namespace IdleDefenseSurvival.Card
         SoulHarvester,        // Each kill → +1 Soul, each Soul +0.5% DMG, every 100 Souls +50 max stack
         DeathReversal,        // First death → rewind 5s (HP/pos), restore 50% HP, reset projectiles (once/wave)
         VoidOverlord,         // Every 100s → 15s state (pierce, +100% DMG, no enemy heal)
-        ChainReaction         // Kill → 20% mark nearby Volatile 5s, Volatile death explodes + spreads (once per enemy)
+        ChainReaction,        // Kill → 20% mark nearby Volatile 5s, Volatile death explodes + spreads (once per enemy)
+        WorldBreaker,        // Persistent kill milestones: damage and defense ignore
+        DivineRetribution,   // Rolling HP-loss threshold triggers an all-enemy blast
+        CelestialArsenal,    // Attack milestones summon distinct stacking weapon types
+        LawOfCollapse,       // Periodic current-HP loss on the strongest enemy
+        ApexEvolution        // Player chooses a unique mutation at kill milestones
    
         // Stat Modifiers (handled via SkillType in Effects, not via this enum)
         // These are NOT used as EffectType - they use SkillType directly

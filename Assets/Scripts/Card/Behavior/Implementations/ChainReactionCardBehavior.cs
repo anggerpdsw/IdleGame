@@ -36,7 +36,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public void OnEnemyKilledChainReaction(EnemyAi deadEnemy)
         {
-            float chancePercent = GetCurrentValue();
+            float chancePercent = GetCurrentValue()
+                * CardModifierService.GetProjectileEffectTriggerRateMultiplier();
             if (!Utilityku.Chance(chancePercent)) return;
 
             float radius = GetParameter("MarkRadius");

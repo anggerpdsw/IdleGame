@@ -1,5 +1,5 @@
 {
-    "Version": 2,
+    "Version": 3,
     "Progression": {
         "StartingSlots": 1,
         "MaximumSlots": 19,
@@ -610,8 +610,121 @@
                 "IntervalSeconds": 100,
                 "DurationSeconds": 15
             }
+        }, {
+            "Id": "world_breaker",
+            "Name": "World Breaker",
+            "Description": "Every 500 kills permanently grants 2% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
+            "EffectType": "WorldBreaker",
+            "Mode": "Percent",
+            "BaseValue": 2,
+            "ValuePerLevel": 0.3,
+            "CardRarity": "Divine",
+            "Parameters": {
+                "KillsPerStack": 500,
+                "StacksPerDefenseIgnoreMilestone": 5,
+                "DefenseIgnorePercentPerMilestone": 10,
+                "MaximumDefenseIgnorePercent": 100
+            }
+        }, {
+            "Id": "divine_retribution",
+            "Name": "Divine Retribution",
+            "Description": "Losing 25% of max HP within 3 seconds triggers a blast against all enemies for 500% Attack Damage. Cooldown: 12 seconds. Damage scales with card level.",
+            "EffectType": "DivineRetribution",
+            "Mode": "Percent",
+            "BaseValue": 500,
+            "ValuePerLevel": 35,
+            "CardRarity": "Divine",
+            "Parameters": {
+                "DamageWindowSeconds": 3,
+                "DamageThresholdPercent": 25,
+                "CooldownSeconds": 12
+            }
+        }, {
+            "Id": "celestial_arsenal",
+            "Name": "Celestial Arsenal",
+            "Description": "Every 50 attacks summons a random piercing beam, orbital strike, or chain lightning. Each distinct weapon used permanently increases Celestial Weapon damage by 15%. Bonus scales with card level.",
+            "EffectType": "CelestialArsenal",
+            "Mode": "Percent",
+            "BaseValue": 15,
+            "ValuePerLevel": 2,
+            "CardRarity": "Divine",
+            "Parameters": {
+                "AttacksPerSummon": 50,
+                "BeamWidth": 0.75,
+                "OrbitalStrikeRadius": 3.5,
+                "ChainTargetCount": 5,
+                "ChainDamageRetentionPercent": 80
+            }
+        }, {
+            "Id": "law_of_collapse",
+            "Name": "Law of Collapse",
+            "Description": "Every 10 seconds, remove 8% of the highest-HP enemy's current HP, or 2% for Bosses. Volatile targets suffer double the loss. Damage scales with card level.",
+            "EffectType": "LawOfCollapse",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 0.75,
+            "CardRarity": "Divine",
+            "Parameters": {
+                "IntervalSeconds": 10,
+                "BossCurrentHealthLossPercent": 2,
+                "MarkedDamageMultiplier": 2
+            }
+        }, {
+            "Id": "apex_evolution",
+            "Name": "Apex Evolution",
+            "Description": "Every 1000 kills offers a choice of one random Evolution mutation. Each mutation can be chosen only once per battle; the offer interval scales with card level.",
+            "EffectType": "ApexEvolution",
+            "Mode": "Flat",
+            "BaseValue": 1000,
+            "ValuePerLevel": -50,
+            "CardRarity": "Divine",
+            "Parameters": {
+                "ChoicesPerOffer": 3
+            },
+            "Mutations": [{
+                "Id": "fangs",
+                "Name": "Fangs",
+                "Description": "Increase Life Steal by 50%.",
+                "SkillType": "LifeSteal",
+                "Mode": "Percent",
+                "Value": 50
+            }, {
+                "Id": "overclock",
+                "Name": "Overclock",
+                "Description": "Increase Attack Speed by 35%.",
+                "SkillType": "AttackSpeed",
+                "Mode": "Percent",
+                "Value": 35
+            }, {
+                "Id": "void_skin",
+                "Name": "Void Skin",
+                "Description": "Increase Evasion by 20 percentage points.",
+                "SkillType": "Evasion",
+                "Mode": "Flat",
+                "Value": 20
+            }, {
+                "Id": "titan_core",
+                "Name": "Titan Core",
+                "Description": "Increase max HP by 50%.",
+                "SkillType": "HealthPoint",
+                "Mode": "Percent",
+                "Value": 50
+            }, {
+                "Id": "devourer",
+                "Name": "Devourer",
+                "Description": "Deal 40% more damage to enemies above 70% current HP.",
+                "EffectType": "Devourer",
+                "Mode": "Percent",
+                "Value": 40,
+                "HealthThresholdPercent": 70
+            }, {
+                "Id": "storm_heart",
+                "Name": "Storm Heart",
+                "Description": "Projectile-triggered card effects activate 25% faster.",
+                "EffectType": "StormHeart",
+                "Mode": "Percent",
+                "Value": 25
+            }]
         }
-
-
     ]
 }

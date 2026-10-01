@@ -93,6 +93,26 @@ namespace IdleDefenseSurvival.Card
             return true;
         }
 
+        public bool SetWorldBreakerProgress(string cardId, int stacks, int killProgress)
+        {
+            if (!_owned.TryGetValue(cardId, out var card)) return false;
+
+            stacks = Math.Max(0, stacks);
+            killProgress = Math.Max(0, killProgress);
+            if (card.WorldBreakerStacks == stacks && card.WorldBreakerKillProgress == killProgress)
+                return false;
+
+            bool milestoneReached = card.WorldBreakerStacks != stacks;
+            card.WorldBreakerStacks = stacks;
+            card.WorldBreakerKillProgress = killProgress;
+            if (milestoneReached)
+            {
+                MarkDirty();
+                SaveManager.Instance?.MarkCardInventoryDirty();
+            }
+            return true;
+        }
+
         public string RefreshDuplicateProgress(string cardId)
         {
             if (!_owned.TryGetValue(cardId, out OwnedCardData ownedCard)) return "";

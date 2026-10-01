@@ -1,4 +1,5 @@
 using UnityEngine;
+using IdleDefenseSurvival.UI;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -15,6 +16,9 @@ namespace IdleDefenseSurvival.Manager
         {
             UIManager.Instance.
                 RegisterCanvas(canvas, popupRoot, ultimateRoot, toastRoot, dropRoot);
+
+            if (canvas != null && canvas.GetComponent<ApexEvolutionChoiceUIController>() == null)
+                canvas.gameObject.AddComponent<ApexEvolutionChoiceUIController>();
         }
     }
 }

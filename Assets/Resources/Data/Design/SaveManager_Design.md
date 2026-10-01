@@ -309,7 +309,7 @@ void InitializeNewSave()
 }
 ```
 
-Card save data contains owned card levels/duplicates, equipped card IDs, and the three pity counters in `CardInventoryData`. Slot counts, roll costs, pity thresholds, and duplicate requirements are runtime configuration from `Card/dataCard.json`; they are not duplicated in `SaveData` and do not require a save-version migration.
+Card save data contains owned card levels/duplicates, equipped card IDs, and the three pity counters in `CardInventoryData`. Owned-card records also contain optional World Breaker stack/kill-progress fields; older saves default these additive fields to zero. Slot counts, roll costs, pity thresholds, and duplicate requirements are runtime configuration from `Card/dataCard.json`. No save-version migration is required for these additive defaults.
 
 ---
 
