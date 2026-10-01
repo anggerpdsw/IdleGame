@@ -2,7 +2,7 @@
 
 **Purpose:** Central save/load orchestration, version management, migration, corruption handling.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -63,8 +63,6 @@ public class SaveData
     
     // Game state
     public GameStateData GameState = new();
-    
-    // Wave progress
     public int CurrentTier = 1;
     public int CurrentWave = 1;
     public int HighestTierReached = 1;
@@ -124,11 +122,8 @@ public void SaveAll()
         
         // 2. Serialize to JSON
         string json = JsonConvert.SerializeObject(data, Formatting.Indented);
-        
-        // 3. Write to file
-        string path = GetSavePath();
+
         File.WriteAllText(path, json);
-        
         // 4. Fire event
         OnSaveCompleted?.Invoke();
         
@@ -161,7 +156,7 @@ public bool LoadAll()
             InitializeNewSave();
             return false;
         }
-        
+
         // 2. Read file
         string json = File.ReadAllText(path);
         
@@ -288,8 +283,11 @@ void InitializeNewSave()
         
         CardInventory = new CardInventoryData
         {
-            OwnedCards = new Dictionary<string, CardInstance>(),
-            EquippedCards = new string[GameConstants.CARD_START_SLOT]
+            ownedCards = new Dictionary<string, OwnedCardData>(),
+            equippedCards = new List<string>(),
+            rollsSinceEpic = 0,
+            rollsSinceLegendary = 0,
+            rollsSinceMythic = 0
         },
         
         Pets = new List<PetInstance>(),
@@ -310,6 +308,8 @@ void InitializeNewSave()
     SaveAll();
 }
 ```
+
+Card save data contains owned card levels/duplicates, equipped card IDs, and the three pity counters in `CardInventoryData`. Slot counts, roll costs, pity thresholds, and duplicate requirements are runtime configuration from `Card/dataCard.json`; they are not duplicated in `SaveData` and do not require a save-version migration.
 
 ---
 

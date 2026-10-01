@@ -2,7 +2,7 @@
 
 **Purpose:** Master index for all gameplay/system design specifications.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -37,7 +37,7 @@ Before modifying ANY game system:
 |--------|------|-------|
 | **Player** | [Player_Design.md](./Player_Design.md) | Auto-attack, stat list, combat behavior |
 | **Projectile** | [Projectile_Design.md](./Projectile_Design.md) | Movement, collision, damage, bounce, pooling |
-| **Cards** | [Card_Design.md](./Card_Design.md) | Rarities, pity, leveling, slots, roll costs |
+| **Cards** | [Card_Design.md](./Card_Design.md) | Single-source `dataCard.json`, progression, pity, behaviors, runtime events |
 | **Ultimate** | [Ultimate_Design.md](./Ultimate_Design.md) | 8 handler types, factory, cooldowns |
 
 ### Enemy & Wave Systems
@@ -45,7 +45,7 @@ Before modifying ANY game system:
 | Domain | File | Scope |
 |--------|------|-------|
 | **Enemy** | [Enemy_Design.md](./Enemy_Design.md) | AI behavior, movement, attack, death |
-| **Status Effects** | [StatusEffect_Design.md](./StatusEffect_Design.md) | Slow/Stun/DefenseBreak/HeartBreak, stacking |
+| **Status Effects** | [StatusEffect_Design.md](./StatusEffect_Design.md) | Slow/Stun/DefenseBreak/HeartBreak/Volatile, stacking |
 | **Spawn** | [Spawn_Design.md](./Spawn_Design.md) | Spawn positions, weights, timing |
 | **Wave** | [Wave_Design.md](./Wave_Design.md) | InterWave/ActiveWave, tier progression, difficulty |
 

@@ -38,13 +38,14 @@ namespace IdleDefenseSurvival.Manager
 
         public IReadOnlyList<string> EquippedCards => _equipped;
         public int UnlockedSlotCount => _equipped.Count;
-        public int MaxSlots => GameConstants.CARD_MAX_SLOT;
+        public int MaxSlots => CardDatabase.Instance.Progression.MaximumSlots;
         public int NextSlotCostGem
         {
             get
             {
-                if (_equipped.Count >= GameConstants.CARD_MAX_SLOT) return 0;
-                return GameConstants.CARD_SLOT_EXPANSION_COSTS[_equipped.Count];
+                var progression = CardDatabase.Instance.Progression;
+                if (_equipped.Count >= progression.MaximumSlots) return 0;
+                return progression.SlotExpansionCosts[_equipped.Count];
             }
         }
         public int EquippedCardCount
@@ -61,14 +62,17 @@ namespace IdleDefenseSurvival.Manager
 
         private bool HasValidExpansionCost()
         {
-            return _equipped.Count >= 0
-                && _equipped.Count < GameConstants.CARD_SLOT_EXPANSION_COSTS.Length;
+            var progression = CardDatabase.Instance?.Progression;
+            return progression != null
+                && _equipped.Count >= 0
+                && _equipped.Count < progression.MaximumSlots
+                && _equipped.Count < progression.SlotExpansionCosts.Count;
         }
 
         public void Initialize()
         {
             _equipped.Clear();
-            for (int i = 0; i < GameConstants.CARD_START_SLOT; i++)
+            for (int i = 0; i < CardDatabase.Instance.Progression.StartingSlots; i++)
                 _equipped.Add(EmptySlot);
         }
 
@@ -108,7 +112,7 @@ namespace IdleDefenseSurvival.Manager
         /// </summary>
         public bool ExpandSlot()
         {
-            if (_equipped.Count >= GameConstants.CARD_MAX_SLOT) return false;
+            if (_equipped.Count >= CardDatabase.Instance.Progression.MaximumSlots) return false;
             if (!HasValidExpansionCost())
             {
                 Debug.LogError($"Missing card slot expansion cost for slot {_equipped.Count + 1}.");
@@ -174,11 +178,11 @@ namespace IdleDefenseSurvival.Manager
                         _equipped.Add(EmptySlot);
                     }
 
-                    if (_equipped.Count >= GameConstants.CARD_MAX_SLOT) break;
+                    if (_equipped.Count >= CardDatabase.Instance.Progression.MaximumSlots) break;
                 }
             }
 
-            while (_equipped.Count < GameConstants.CARD_START_SLOT) _equipped.Add(EmptySlot);
+            while (_equipped.Count < CardDatabase.Instance.Progression.StartingSlots) _equipped.Add(EmptySlot);
         }
 
         public List<string> GetSaveData() => new(_equipped);

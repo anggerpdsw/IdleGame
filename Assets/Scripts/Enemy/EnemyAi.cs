@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy.StatusEffects;
+using IdleDefenseSurvival.Card;
 
 /// <summary>
 /// Handles basic enemy AI for the auto‑shooter game.
@@ -79,6 +80,7 @@ namespace IdleDefenseSurvival.Enemy
         // -------------------------------------------------------------------
         private string _enemyId; // Enemy type ID for tracking kills
         private float _currentHealth;
+        public float LastOverkillDamage { get; private set; }
         private Transform _player;
         private Player.Player _playerComponent;
         private Rigidbody2D _rb;
@@ -428,6 +430,7 @@ namespace IdleDefenseSurvival.Enemy
 
         public float TakeDamage(DamageData damageData, bool canEvade = true)
         {
+            LastOverkillDamage = 0f;
             float hitRate = PlayerStatsManager.Instance != null
                 ? PlayerStatsManager.Instance.GetStat(SkillType.HitRate)
                 : 100f;
@@ -476,6 +479,7 @@ namespace IdleDefenseSurvival.Enemy
                 damageReductionMultiplier *= 0.5f;
             damageAfterDefense *= damageReductionMultiplier;
 
+            LastOverkillDamage = Mathf.Max(0f, damageAfterDefense - _currentHealth);
             float finalDamage = Mathf.Min(_currentHealth, damageAfterDefense);
             _currentHealth -= finalDamage;
 
@@ -685,6 +689,7 @@ namespace IdleDefenseSurvival.Enemy
         /// </summary>
         public void Heal(float amount)
         {
+            if (CardModifierService.IsVoidOverlordActive()) return;
             if (amount <= 0f) return;
             if (_currentHealth >= _maxHealth) return;
 

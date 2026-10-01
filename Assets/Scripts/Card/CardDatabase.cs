@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
@@ -40,12 +41,13 @@ namespace IdleDefenseSurvival.Manager
         private readonly Dictionary<Rarity, List<string>> _cardsByRarity = new();
         private bool _initialized = false;
         private float _totalRarityWeight;
+        public CardProgressionConfig Progression { get; private set; }
 
         public void Initialize()
         {
             if (_initialized) return;
             LoadFromResources();
-            _initialized = true;
+            _initialized = Progression != null && _cards.Count > 0 && _rarities.Count > 0;
         }
 
         private void LoadFromResources()
@@ -53,16 +55,23 @@ namespace IdleDefenseSurvival.Manager
             TextAsset jsonAsset = Resources.Load<TextAsset>("Data/Card/dataCard");
             if (jsonAsset == null)
             {
-                if (_debug) Debug.LogError("[CardDatabase] dataCard.json not found in Resources/Data/");
+                Debug.LogError("[CardDatabase] dataCard.json not found in Resources/Data/");
                 return;
             }
 
             CardDataContainer container = JsonConvert.DeserializeObject<CardDataContainer>(jsonAsset.text);
             if (container == null || container.Cards == null || container.RarityConfig == null)
             {
-                if (_debug) Debug.LogError("[CardDatabase] Failed to parse dataCard.json");
+                Debug.LogError("[CardDatabase] Failed to parse dataCard.json");
                 return;
             }
+
+            if (!IsProgressionConfigValid(container.Progression))
+            {
+                Debug.LogError("[CardDatabase] dataCard.json has invalid progression configuration.");
+                return;
+            }
+            Progression = container.Progression;
 
             // -----------------------------------------
             // Cards
@@ -70,8 +79,14 @@ namespace IdleDefenseSurvival.Manager
             _cards.Clear();
             foreach (CardData card in container.Cards)
             {
-                if (card == null || string.IsNullOrEmpty(card.Id)) continue;
-                _cards[card.Id] = card;
+                if (!IsCardDefinitionValid(card) || _cards.ContainsKey(card.Id))
+                {
+                    Debug.LogError($"[CardDatabase] Invalid or duplicate card definition: {card?.Id ?? "<null>"}.");
+                    _cards.Clear();
+                    Progression = null;
+                    return;
+                }
+                _cards.Add(card.Id, card);
             }
 
             // -----------------------------------------
@@ -137,7 +152,7 @@ namespace IdleDefenseSurvival.Manager
             foreach (var cardId in allCards)
             {
                 var ownedCard = inventory.GetOwnedCard(cardId);
-                if (ownedCard == null || ownedCard.Level < GameConstants.CARD_MAX_LEVEL)
+                if (ownedCard == null || ownedCard.Level < Progression.MaximumLevel)
                 {
                     available.Add(cardId);
                 }
@@ -151,6 +166,61 @@ namespace IdleDefenseSurvival.Manager
         public bool HasAvailableCards(Rarity rarity)
         {
             return GetAvailableCardsByRarity(rarity).Count > 0;
+        }
+
+        private static bool IsProgressionConfigValid(CardProgressionConfig config)
+        {
+            return config != null
+                && config.StartingSlots > 0
+                && config.MaximumSlots >= config.StartingSlots
+                && config.MaximumLevel > 1
+                && config.RollCosts != null
+                && config.RollCosts.Single >= 0
+                && config.RollCosts.Ten >= 0
+                && config.RollCosts.Hundred >= 0
+                && config.PityThresholds != null
+                && config.PityThresholds.Epic > 0
+                && config.PityThresholds.Legendary > 0
+                && config.PityThresholds.Mythic > 0
+                && config.SlotExpansionCosts != null
+                && config.SlotExpansionCosts.Count == config.MaximumSlots
+                && config.DuplicateRequirements != null
+                && config.DuplicateRequirements.Count == config.MaximumLevel - 1;
+        }
+
+        private static bool IsCardDefinitionValid(CardData card)
+        {
+            if (card == null || string.IsNullOrWhiteSpace(card.Id)) return false;
+            if (string.IsNullOrWhiteSpace(card.Mode)
+                || (!string.Equals(card.Mode, "Flat", StringComparison.OrdinalIgnoreCase)
+                    && !string.Equals(card.Mode, "Percent", StringComparison.OrdinalIgnoreCase)))
+                return false;
+            if (!Enum.IsDefined(typeof(Rarity), card.CardRarity) || card.CardRarity == Rarity.None)
+                return false;
+
+            bool hasEffectType = !string.IsNullOrWhiteSpace(card.EffectType);
+            bool hasSkillType = !string.IsNullOrWhiteSpace(card.SkillType);
+            if (hasEffectType == hasSkillType) return false;
+
+            if (hasEffectType
+                && (!Enum.TryParse(card.EffectType, true, out CardEffectType effectType)
+                    || !Enum.IsDefined(typeof(CardEffectType), effectType)
+                    || effectType == CardEffectType.None))
+                return false;
+
+            if (hasSkillType
+                && (!Enum.TryParse(card.SkillType, true, out Stats.SkillType skillType)
+                    || !Enum.IsDefined(typeof(Stats.SkillType), skillType)
+                    || skillType == Stats.SkillType.None))
+                return false;
+
+            if (card.Parameters != null)
+            {
+                foreach (float value in card.Parameters.Values)
+                    if (float.IsNaN(value) || float.IsInfinity(value)) return false;
+            }
+
+            return true;
         }
 
     }

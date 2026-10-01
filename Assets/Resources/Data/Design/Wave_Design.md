@@ -2,7 +2,7 @@
 
 **Purpose:** Wave progression, tier system, difficulty scaling, inter-wave/active-wave cycle.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -12,6 +12,7 @@
 - [Enemy_Design.md](./Enemy_Design.md) — enemy stats scaling
 - [Reward_Design.md](./Reward_Design.md) — wave completion rewards
 - [Combat_Design.md](./Combat_Design.md) — difficulty modifiers
+- [Card_Design.md](./Card_Design.md) — card-owned wave progression and wave event effects
 
 ---
 
@@ -450,6 +451,14 @@ WaveManager.Instance.OnWaveCompleted += HandleWaveComplete;
 
 ### Wave Selection
 - Replay specific waves for rewards
+
+---
+
+## 20. Card Integration
+
+`ProgressionSpeed` and Enemy Balance query their equipped card values through `CardModifierService`; their values and level scaling are defined only in `Card/dataCard.json`. ProgressionSpeed scales active/inter-wave durations and spawn intervals. Enemy Balance adjusts the tier-aware minimum spawn interval.
+
+`WaveManager` dispatches `OnWaveStart` and `OnWaveComplete` to `CardRuntimeManager`. Death Reversal resets its once-per-wave use on wave start; Angel tracks immunity until wave completion; Crazy Gambler and Desperados resolve once on wave completion after their configured activation wave. Void Overlord deliberately keeps its timer across wave transitions.
 
 ---
 

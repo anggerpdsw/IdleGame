@@ -70,6 +70,7 @@ namespace IdleDefenseSurvival.Player
         private int _bounceIndex = 0;  // Track bounce keberapa (0 = first hit)
         private bool _isMultiShoot = false;  // Track apakah projectile ini dari multi-shoot
         private bool _isEnemyDied = false;  // Track apakah enemy sudah Die
+        private bool _isInfiniteArsenal;
 
         // Track enemies yang sudah terkena oleh projectile ini (untuk bounce chain)
         private readonly HashSet<Transform> _hitEnemies = new();
@@ -81,16 +82,6 @@ namespace IdleDefenseSurvival.Player
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
         
-        // ------------------------------------------------------------------
-        // Balance values loaded from Resources/Data/Card/dataCardConfig.json
-        // ------------------------------------------------------------------
-        private static CardConfig CardConfig => DatabaseJSONCache.CardConfig;
-        private static float ExecutionProtocolNormal => CardConfig.ExecutionProtocolNormal;
-        private static float ExecutionProtocolBoss => CardConfig.ExecutionProtocolBoss;
-        private static int OverkillCap => CardConfig.OverkillCap;
-        private static float InfiniteArsenalMult => CardConfig.InfiniteArsenalMult;
-        private static float CriticalCascadeMult => CardConfig.CriticalCascadeMult;
-
         /// <summary>
         /// Reset projectile state for reuse from object pool.
         /// Called by ProjectilePool.Return() before the projectile is returned to the pool.
@@ -129,6 +120,7 @@ namespace IdleDefenseSurvival.Player
             transform.rotation = Quaternion.identity;
 
             _isEnemyDied = false;
+            _isInfiniteArsenal = false;
             EnemyDeathHandler.OnEnemyKilled -= OnEnemyKilledHandler;
         }
 
@@ -176,7 +168,12 @@ namespace IdleDefenseSurvival.Player
         /// <summary>
         /// Initialize the projectile with player stats.
         /// </summary>
-        public void Initialize(Transform target, Player player, float damageMultiplier, bool isMultiShoot = false)
+        public void Initialize(
+            Transform target,
+            Player player,
+            float damageMultiplier,
+            bool isMultiShoot = false,
+            bool isInfiniteArsenal = false)
         {
             _owner = ProjectileOwner.Player;
             SetProjectileSprite(_playerBulletSprite);
@@ -186,6 +183,7 @@ namespace IdleDefenseSurvival.Player
             _player = player;
             _damageMultiplier = damageMultiplier;
             _isMultiShoot = isMultiShoot;
+            _isInfiniteArsenal = isInfiniteArsenal;
             _startPosition = transform.position;
             _baseDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage);
             _baseKnockbackForce = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackForce);
@@ -193,7 +191,7 @@ namespace IdleDefenseSurvival.Player
             _baseStuntDuration = PlayerStatsManager.Instance.GetStat(SkillType.StuntDuration);
             _bounceChance = PlayerStatsManager.Instance.GetStat(SkillType.BounceChance);
             _bounceCount = 0; // Set when bounce is approved (see HitTarget)
-            _bounceRadius = 8f;
+            _bounceRadius = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
             _knockbackChance = PlayerStatsManager.Instance.GetStat(SkillType.KnockbackChance);
             _lifeSteal = PlayerStatsManager.Instance.GetStat(SkillType.LifeSteal);
             _stuntChance = PlayerStatsManager.Instance.GetStat(SkillType.StuntChance);
@@ -379,7 +377,9 @@ namespace IdleDefenseSurvival.Player
 
                     if (_player != null)  {
                         // Check if this is InfiniteArsenal special projectile
-                        bool isInfiniteArsenal = CardModifierService.IsInfiniteArsenalProjectile;
+                        bool isInfiniteArsenal = _isInfiniteArsenal;
+                        bool isVoidOverlord = CardModifierService.IsVoidOverlordActive();
+                        float hitDamageMultiplier = _damageMultiplier;
 
                         // --- Calculate critical tier (None, Critical, SuperCritical) ---
                         CriticalType critTier = CriticalType.None;
@@ -390,7 +390,8 @@ namespace IdleDefenseSurvival.Player
                         if (isInfiniteArsenal)
                         {
                             critTier = CriticalType.Arsenal;
-                            _damageMultiplier += critDMG * InfiniteArsenalMult;
+                            hitDamageMultiplier += critDMG * CardModifierService.GetCardParameter(
+                                "infinite_arsenal", "ProjectileDamageMultiplier");
                         }
                         else
                         {
@@ -398,29 +399,29 @@ namespace IdleDefenseSurvival.Player
                             if (Utilityku.Chance(crit))
                             {
                                 critTier = CriticalType.Critical;
-                                _damageMultiplier += critDMG;
+                                hitDamageMultiplier += critDMG;
 
                                 // SuperCritical roll - nested Chance as specified
                                 if (Utilityku.Chance(crit * 0.5f))
                                 {
                                     critTier = CriticalType.SuperCritical;
-                                    _damageMultiplier += critDMG * 1.05f;
+                                    hitDamageMultiplier += critDMG * 1.05f;
 
                                     // UltraCritical roll - nested Chance as specified
                                     if (Utilityku.Chance(crit * 0.125f))
                                     {
                                         critTier = CriticalType.UltraCritical;
-                                        _damageMultiplier += critDMG * 1.35f;
+                                        hitDamageMultiplier += critDMG * 1.35f;
                                     }
                                 }
                             }
                         }
 
                         // VoidOverlord bonus damage
-                        if (CardModifierService.IsVoidOverlordActive())
+                        if (isVoidOverlord)
                         {
                             float voidBonus = CardModifierService.GetEffectResult(CardEffectType.VoidOverlord, 0f);
-                            _damageMultiplier += voidBonus;
+                            hitDamageMultiplier += voidBonus;
                         }
 
                         currentDamage *= DamagePerRange(_player.transform.position);
@@ -433,7 +434,8 @@ namespace IdleDefenseSurvival.Player
                             if (isInfiniteArsenal)
                             {
                                 _bounceApproved = true;
-                                _bounceCount = 3;
+                                _bounceCount = Mathf.RoundToInt(CardModifierService.GetCardParameter(
+                                    "infinite_arsenal", "BounceCount"));
                             }
                             else
                             {
@@ -454,7 +456,7 @@ namespace IdleDefenseSurvival.Player
                             source: ProjectileOwner.Player.ToString()
                         )
                         {
-                            DamageMultiplier = _damageMultiplier,
+                            DamageMultiplier = hitDamageMultiplier,
                             Element = Utilityku.RandomElement(),
                             HasKnockback = Utilityku.Chance(_knockbackChance),
                             KnockbackForce = _baseKnockbackForce * Mathf.Pow(0.9f, _bounceIndex),
@@ -488,7 +490,7 @@ namespace IdleDefenseSurvival.Player
                         // Block lifesteal if Necromancer Unregeneration aura is active
                         if (_lifeSteal > 0f && !_player.IsUnregenerationActive()) {
                             float heal = Mathf.Max(0.51f, actualDamage * _lifeSteal * 0.01f);
-                            _player.Heal(heal);
+                            _player.Heal(heal, true);
                         }
 
                         // === Card Effects ===
@@ -496,7 +498,9 @@ namespace IdleDefenseSurvival.Player
                         if (!_isEnemyDied && CardModifierService.HasEffect(CardEffectType.ExecutionProtocol))
                         {
                             bool isBossOrElite = enemy.EnemyData != null && (enemy.EnemyData.IsBoss || enemy.EnemyData.IsSpecial);
-                            float threshold = isBossOrElite ? ExecutionProtocolBoss : ExecutionProtocolNormal;
+                            float threshold = CardModifierService.GetCardParameter(
+                                "execution_protocol",
+                                isBossOrElite ? "BossExecutionThreshold" : "NormalExecutionThreshold");
                             float chance = CardModifierService.GetEffectResult(CardEffectType.ExecutionProtocol, 0f);
                             if (enemy.CurrentHealth <= enemy.MaxHealth * threshold && Utilityku.Chance(chance * 100f))
                             {
@@ -510,10 +514,12 @@ namespace IdleDefenseSurvival.Player
                         // Overkill: transfer excess damage
                         if (_isEnemyDied && CardModifierService.HasEffect(CardEffectType.Overkill))
                         {
-                            float excessDamage = currentDamage - actualDamage;
+                            float excessDamage = enemy.LastOverkillDamage
+                                * CardModifierService.GetEffectResult(CardEffectType.Overkill);
                             if (excessDamage > 0f)
                             {
-                                float cap = currentDamage * OverkillCap;
+                                float cap = damageData.GetFinalDamage()
+                                    * CardModifierService.GetCardParameter("overkill", "MaximumTransferMultiplier");
                                 excessDamage = Mathf.Min(excessDamage, cap);
 
                                 Transform nearest = FindNearestUnhitEnemy(transform.position);
@@ -537,15 +543,13 @@ namespace IdleDefenseSurvival.Player
                                     if (cascade != null)
                                     {
                                         cascade.transform.position = transform.position;
-                                        cascade.Initialize(cascadeTarget, _player, CriticalCascadeMult, false);
+                                        cascade.Initialize(cascadeTarget, _player,
+                                            CardModifierService.GetCardParameter(
+                                                "critical_cascade", "ProjectileDamageMultiplier"), false);
                                     }
                                 }
                             }
                         }
-
-                        // DeathChain: notify kill
-                        if (_isEnemyDied)
-                            CardModifierService.OnEnemyKilledDeathChain();
 
                         // --- Implementasi Knockback ---
                         if (!_isEnemyDied && damageData.HasKnockback)
@@ -562,15 +566,22 @@ namespace IdleDefenseSurvival.Player
                         }
 
                         // --- Implementasi Bounce ---
-                        if (damageData.HasBounce && _bounceCount > 0)
+                        if ((damageData.HasBounce && _bounceCount > 0) || isInfiniteArsenal || isVoidOverlord)
                         {
                             Transform nextTarget = FindNearestUnhitEnemy(transform.position);
                             if (nextTarget != null)
                             {
                                 // OPTIMIZATION: Ubah target projectile yang sama (tidak instantiate baru)
                                 _target = nextTarget;
-                                _bounceCount--;
-                                _bounceIndex++;  // Increment bounce index untuk damage reduction
+                                if (damageData.HasBounce && _bounceCount > 0)
+                                {
+                                    _bounceCount--;
+                                    _bounceIndex++;
+                                }
+                                else if (isInfiniteArsenal)
+                                {
+                                    _bounceIndex++;
+                                }
                                 _hasHit = false;  // Reset agar projectile terus bergerak
                                 return;  // Jangan destroy!
                             }

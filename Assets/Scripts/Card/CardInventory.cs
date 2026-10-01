@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Manager;
 using UnityEngine;
 
 namespace IdleDefenseSurvival.Card
@@ -63,6 +64,12 @@ namespace IdleDefenseSurvival.Card
 
         public OwnedCardData GetOwnedCard(string cardId) => _owned.TryGetValue(cardId, out var c) ? c : null;
 
+        public int GetCardLevel(string cardId)
+        {
+            if (string.IsNullOrEmpty(cardId)) return 0;
+            return _owned.TryGetValue(cardId, out var data) ? data.Level : 0;
+        }
+
         public IReadOnlyDictionary<string, OwnedCardData> AllOwned => _owned;
 
         public bool AddNewCard(string cardId)
@@ -91,7 +98,7 @@ namespace IdleDefenseSurvival.Card
             if (!_owned.TryGetValue(cardId, out OwnedCardData ownedCard)) return "";
             if (ownedCard == null) return "";
 
-            if (ownedCard.Level >= GameConstants.CARD_MAX_LEVEL) return "MAX";
+            if (ownedCard.Level >= CardDatabase.Instance.Progression.MaximumLevel) return "MAX";
 
             int required = CardUpgradeService.GetRequiredDuplicates(ownedCard.Level);
 

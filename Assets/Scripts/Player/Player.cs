@@ -12,6 +12,7 @@ using System;
 using IdleDefenseSurvival.Stats;
 using TMPro;
 using IdleDefenseSurvival.Card;
+using IdleDefenseSurvival.Card.Behavior;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -112,14 +113,6 @@ namespace IdleDefenseSurvival.Player
 
         public float AttackRange;
 
-        // ------------------------------------------------------------------
-        // Balance values loaded from Resources/Data/Card/dataCardConfig.json
-        // ------------------------------------------------------------------
-        private static CardConfig CardConfig => DatabaseJSONCache.CardConfig;
-        private static int BulletStormAdditional => CardConfig.BulletStormAdditional;
-        private static float BulletStormMult => CardConfig.BulletStormMult;
-        private static float InfiniteArsenalMult => CardConfig.InfiniteArsenalMult;
-        
         private void Awake()
         {
             // Initialize singleton
@@ -202,8 +195,6 @@ namespace IdleDefenseSurvival.Player
 
             // Refresh card modifiers and visual effects (Berserker, Vampire Bite)
             CardModifierService.Refresh();
-            // Ensure Berserker card subscription after Player is ready
-            CardModifierService.EnsureBerserkerSubscription();
 
             CardModifierService.OnModifierChanged += UpdateGamblerUI;
             UpdateGamblerUI();
@@ -221,7 +212,6 @@ namespace IdleDefenseSurvival.Player
             // Aura effects now handled by AuraCollider trigger system
 
             // Update all card timers
-            CardModifierService.UpdateCardTimers(Time.deltaTime);
             UpdateAngelCooldownUI();
 
             _attackRangeRenderer.transform.Rotate(0, 0, _attackRangeSpeedRotate * Time.deltaTime);
@@ -305,10 +295,8 @@ namespace IdleDefenseSurvival.Player
 
             if (targets.Count == 0) return;
 
-            // Notify card systems: BulletStorm, WarMachine, InfiniteArsenal
-            CardModifierService.OnAttackBulletStorm();
-            CardModifierService.OnAttackWarMachine();
-            CardModifierService.OnAttackInfiniteArsenal();
+            // Notify card systems: OnPlayerAttack
+            CardRuntimeManager.Instance?.DispatchPlayerAttack();
 
             // Determine how many distinct targets to fire at based on multi‑shoot chance
             bool multiShoot = Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.MultiShootChance));
@@ -366,6 +354,12 @@ namespace IdleDefenseSurvival.Player
         /// </summary>
         public void SpawnBulletStormBurst()
         {
+            int additionalProjectiles = Mathf.Max(0, Mathf.RoundToInt(
+                CardModifierService.GetCardParameter("bullet_storm", "AdditionalProjectiles")));
+            float damageMultiplier = CardModifierService.GetCardParameter(
+                "bullet_storm", "ProjectileDamageMultiplier");
+            if (additionalProjectiles == 0) return;
+
             Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, PlayerStatsManager.Instance.GetStat(SkillType.AttackRange), _enemyLayerMask);
             if (hits.Length == 0) return;
 
@@ -373,7 +367,7 @@ namespace IdleDefenseSurvival.Player
                 .Where(hit => hit.TryGetComponent<EnemyAi>(out _))
                 .OrderBy(hit => Vector2.Distance(transform.position, hit.transform.position))
                 .Select(hit => hit.transform)
-                .Take(BulletStormAdditional)
+                .Take(additionalProjectiles)
                 .ToList();
 
             for (int i = 0; i < targets.Count; i++)
@@ -383,7 +377,7 @@ namespace IdleDefenseSurvival.Player
                 {
                     Vector3 spawnPos = GetSpawnPositionWithOffset(i);
                     projectile.transform.SetPositionAndRotation(spawnPos, Quaternion.identity);
-                    projectile.Initialize(targets[i], this, BulletStormMult, false);
+                    projectile.Initialize(targets[i], this, damageMultiplier, false);
                 }
             }
         }
@@ -408,9 +402,8 @@ namespace IdleDefenseSurvival.Player
             if (projectile != null)
             {
                 projectile.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
-                CardModifierService.IsInfiniteArsenalProjectile = true;
-                projectile.Initialize(target, this, InfiniteArsenalMult, false);
-                CardModifierService.IsInfiniteArsenalProjectile = false;
+                projectile.Initialize(target, this, CardModifierService.GetCardParameter(
+                    "infinite_arsenal", "ProjectileDamageMultiplier"), false, true);
             }
         }
 
@@ -662,9 +655,10 @@ namespace IdleDefenseSurvival.Player
         private void UpdateAngelCooldownUI()
         {
             if (_angelCooldownImage == null) return;
-
+                        
             // Hide UI if card not equipped
-            if (!CardModifierService.HasEffect(CardEffectType.Immortal))
+            bool hasAngel = CardModifierService.HasEffect(CardEffectType.Immortal);
+            if (!hasAngel)
             {
                 _angelCooldownImage.gameObject.SetActive(false);
                 return;
@@ -853,8 +847,8 @@ namespace IdleDefenseSurvival.Player
             bool evaded = canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.Evasion));
 
             // Check Angel immunity (wave-based)
-            bool angelImmune = CardModifierService.HasAngelImmunity();
-            if (_isImmune || angelImmune || evaded)
+            bool hasImmunity = CardModifierService.HasAngelImmunity();
+            if (_isImmune || hasImmunity || evaded)
             {
                 ShowDamagePopup(0f, DamageType.Miss, CriticalType.None);
                 return 0f;
@@ -919,9 +913,9 @@ namespace IdleDefenseSurvival.Player
                 ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
                 OnHealthChanged?.Invoke();
 
-                // Try trigger GuardianInstinct when HP drops
+                // Notify card behaviors (GuardianInstinct, DeathReversal, Immortal)
                 float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-                CardModifierService.TryTriggerGuardianInstinct(_currentHealth, maxHealth);
+                CardRuntimeManager.Instance?.DispatchPlayerDamaged(finalDamage, _currentHealth, maxHealth);
             }
 
             // --------------------------------------------------
@@ -969,7 +963,7 @@ namespace IdleDefenseSurvival.Player
             OnManaChanged?.Invoke();
         }
 
-        public void Heal(float heal)
+        public void Heal(float heal, bool isLifeSteal = false)
         {
             float health = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
             if (_currentHealth >= health) return;
@@ -980,9 +974,12 @@ namespace IdleDefenseSurvival.Player
             // Calculate actual heal received (clamped by max health)
             float actualHeal = _currentHealth - oldHealth;
 
-            // Notify VampiricFrenzy card if lifesteal heal
             if (actualHeal > 0f)
-                CardModifierService.OnLifeStealHealVampiricFrenzy(actualHeal);
+            {
+                CardRuntimeManager.Instance?.DispatchPlayerHealed(actualHeal, _currentHealth, health);
+                if (isLifeSteal)
+                    CardRuntimeManager.Instance?.DispatchPlayerLifeSteal(actualHeal, _currentHealth, health);
+            }
 
             if (!Mathf.Approximately(oldHealth, _currentHealth))
             {
@@ -1050,13 +1047,6 @@ namespace IdleDefenseSurvival.Player
 
         private void Die()
         {
-            // DeathReversal check first
-            if (CardModifierService.CanTriggerDeathReversal())
-            {
-                CardModifierService.TriggerDeathReversal();
-                return;
-            }
-
             // DeathDefy check second
             if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
             {
@@ -1071,22 +1061,16 @@ namespace IdleDefenseSurvival.Player
                 return;
             }
 
-            // Angel card (Immortal) check - triggers when DeathDefy fails
-            if (CardModifierService.CanTriggerAngel())
+            // Angel is the final death-prevention effect after Death Defy.
+            if (CardModifierService.TryTriggerAngel())
             {
-                // Full heal + wave-based immunity
+                // Full heal and immunity for the current wave.
                 float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
                 _currentHealth = maxHealth;
                 UpdateHealthUI();
                 OnHealthChanged?.Invoke();
-
-                // Trigger Angel effect (cooldown + immunity for 1 wave)
-                CardModifierService.TriggerAngel();
-
-                // Visual feedback
-                SetBarrierEffect(true);
+                // Heal feedback
                 ShowDamagePopup(maxHealth, DamageType.Heal, CriticalType.None, "⚕ ");
-
                 return;
             }
 

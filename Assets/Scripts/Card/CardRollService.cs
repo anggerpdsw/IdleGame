@@ -24,11 +24,12 @@ namespace IdleDefenseSurvival.Manager
 
             int tenRolls = remaining / 10;
             int singleRolls = remaining % 10;
+            var costs = CardDatabase.Instance.Progression.RollCosts;
 
             return
-                (hundredRolls * GameConstants.ROLL100X_GEM_COST) +
-                (tenRolls * GameConstants.ROLL10X_GEM_COST) +
-                (singleRolls * GameConstants.ROLL1X_GEM_COST);
+                (hundredRolls * costs.Hundred) +
+                (tenRolls * costs.Ten) +
+                (singleRolls * costs.Single);
         }
 
         /// <summary>
@@ -60,6 +61,7 @@ namespace IdleDefenseSurvival.Manager
         {
             var rewardMap = new Dictionary<string, CardReward>();
             int cost = CalculateRollGemCost(amount);
+            var progression = CardDatabase.Instance.Progression;
             int gemCostForOneRoll = amount > 0 ? cost / amount : 0;
 
             var result = new CardRollResult
@@ -85,9 +87,9 @@ namespace IdleDefenseSurvival.Manager
                 legendaryPity++;
                 mythicPity++;
 
-                bool guaranteedEpic = epicPity >= GameConstants.PITY_EPIC_THRESHOLD;
-                bool guaranteedLegendary = legendaryPity >= GameConstants.PITY_LEGENDARY_THRESHOLD;
-                bool guaranteedMythic = mythicPity >= GameConstants.PITY_MYTHIC_THRESHOLD;
+                bool guaranteedEpic = epicPity >= progression.PityThresholds.Epic;
+                bool guaranteedLegendary = legendaryPity >= progression.PityThresholds.Legendary;
+                bool guaranteedMythic = mythicPity >= progression.PityThresholds.Mythic;
 
                 Rarity chosenRarity = SelectRarity(guaranteedEpic, guaranteedLegendary, guaranteedMythic, virtualInventory);
                 string chosenCardId = PickRandomCard(chosenRarity, virtualInventory);
@@ -104,29 +106,32 @@ namespace IdleDefenseSurvival.Manager
                     continue;
                 }
 
-                // Reset pity counters when guaranteed rarity is awarded
-                if (guaranteedMythic)
+                CardData cardData = CardDatabase.Instance.GetCard(chosenCardId);
+                Rarity awardedRarity = cardData.CardRarity;
+
+                if (awardedRarity >= Rarity.Mythic)
                 {
                     mythicPity = 0;
                     legendaryPity = 0;
                     epicPity = 0;
                 }
-                else if (guaranteedLegendary)
+                else if (awardedRarity >= Rarity.Legendary)
                 {
                     legendaryPity = 0;
                     epicPity = 0;
                 }
-                else if (guaranteedEpic)
+                else if (awardedRarity >= Rarity.Epic)
                 {
                     epicPity = 0;
                 }
 
-                CardData cardData = CardDatabase.Instance.GetCard(chosenCardId);
-
                 // Use virtual inventory for duplicate/new card detection
                 bool isDuplicate = virtualInventory.HasCard(chosenCardId);
                 bool isNewCard = !isDuplicate;
-                bool isGuaranteed = guaranteedEpic || guaranteedLegendary || guaranteedMythic;
+                bool isGuaranteed =
+                    (guaranteedMythic && awardedRarity >= Rarity.Mythic)
+                    || (guaranteedLegendary && awardedRarity >= Rarity.Legendary)
+                    || (guaranteedEpic && awardedRarity >= Rarity.Epic);
 
                 if (!rewardMap.TryGetValue(chosenCardId, out var reward))
                 {
@@ -155,7 +160,7 @@ namespace IdleDefenseSurvival.Manager
                 if (isNewCard) result.HasNewCard = true;
 
                 // Update virtual inventory to reflect this acquisition
-                var (IsNewCard, IsDuplicate, NewLevel, NewDuplicateCount, ExcessCopiesRefunded) = virtualInventory.SimulateAcquire(chosenCardId, GameConstants.CARD_MAX_LEVEL);
+                var (IsNewCard, IsDuplicate, NewLevel, NewDuplicateCount, ExcessCopiesRefunded) = virtualInventory.SimulateAcquire(chosenCardId, progression.MaximumLevel);
 
                 // If excess copies were refunded (card at max level), refund gems
                 if (ExcessCopiesRefunded > 0)
@@ -242,7 +247,7 @@ namespace IdleDefenseSurvival.Manager
             foreach (var cardId in allCards)
             {
                 int level = virtualInventory.GetLevel(cardId);
-                if (level < GameConstants.CARD_MAX_LEVEL)
+                if (level < db.Progression.MaximumLevel)
                     return true;
             }
             return false;
@@ -261,7 +266,7 @@ namespace IdleDefenseSurvival.Manager
                 candidates.RemoveAll(cardId =>
                 {
                     int level = virtualInventory.GetLevel(cardId);
-                    return level >= GameConstants.CARD_MAX_LEVEL;
+                    return level >= CardDatabase.Instance.Progression.MaximumLevel;
                 });
 
                 if (candidates.Count > 0)

@@ -2,7 +2,7 @@
 
 **Purpose:** Damage delivery, collision handling, special effects (bounce, stun, life steal).
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -12,6 +12,7 @@
 - [Combat_Design.md](./Combat_Design.md) — damage calculation
 - [Enemy_Design.md](./Enemy_Design.md) — target handling
 - [StatusEffect_Design.md](./StatusEffect_Design.md) — status application
+- [Card_Design.md](./Card_Design.md) — card-owned projectile behaviors
 
 ---
 
@@ -347,6 +348,17 @@ public void ReturnToPool()
 
 ### Critical Projectile
 
+### Miss Indicator
+
+**Show a "MISS" popup at the hit location.**
+
+```csharp
+void ShowMissIndicator()
+{
+    DamagePopup.Spawn(transform.position, "MISS", Color.gray);
+}
+```
+
 **Indicator:** Larger size, different color, particle trail.
 
 ```csharp
@@ -367,20 +379,23 @@ void SetCriticalVisuals(bool isCritical)
 }
 ```
 
-### Miss Indicator
+---
 
-**Show "MISS" popup at hit location.**
+## 13. Card Integration
 
-```csharp
-void ShowMissIndicator()
-{
-    DamagePopup.Spawn(transform.position, "MISS", Color.gray);
-}
-```
+Player projectiles read card balance from the active card definitions in `dataCard.json` through `CardModifierService`. Runtime behavior state is owned by `CardRuntimeManager`.
+
+- Infinite Arsenal marks the individual pooled projectile during initialization. It forces an Arsenal critical, uses the configured bounce count, and retargets unhit enemies within player attack range. The flag is cleared by `ResetState`; it is not a static cross-projectile flag.
+- Void Overlord uses a per-hit damage multiplier and continues to unhit enemies in attack range while active. Critical/void multipliers are calculated locally per hit, so bounces do not accumulate previous-hit modifiers.
+- Bullet Storm and Critical Cascade create pooled projectiles using their card parameters.
+- Execution Protocol reads normal and Boss/Special HP thresholds from its card parameters.
+- Overkill consumes `EnemyAi.LastOverkillDamage`, which is the final post-defense/post-reduction damage beyond the target's remaining HP. It transfers the configured fraction, capped by the configured multiplier of the triggering hit's final damage.
+
+Keep card chances/thresholds and the projectile's data-source units documented in [Card_Design.md](./Card_Design.md). Do not add card tuning constants to `Projectile.cs` or a second config asset.
 
 ---
 
-## 13. Performance
+## 14. Performance
 
 **High-frequency system** — spawns every attack (multiple per second).
 
@@ -397,7 +412,7 @@ void ShowMissIndicator()
 
 ---
 
-## 14. Edge Cases
+## 15. Edge Cases
 
 ### Target dies mid-flight
 
@@ -434,7 +449,7 @@ if (nextTarget == null)
 
 ---
 
-## 15. Testing Checklist
+## 16. Testing Checklist
 
 ```
 [ ] Projectile spawns at player position
@@ -457,7 +472,7 @@ if (nextTarget == null)
 
 ---
 
-## 16. Common Issues
+## 17. Common Issues
 
 ### Issue: Projectiles miss target
 **Cause:** Movement speed too slow, or target moves out of range.
@@ -477,7 +492,7 @@ if (nextTarget == null)
 
 ---
 
-## 17. Future Extensions
+## 18. Future Extensions
 
 ### Homing Projectiles
 - Curve toward moving targets

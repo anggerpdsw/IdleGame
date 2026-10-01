@@ -2,7 +2,7 @@
 
 **Purpose:** Player character behavior, stats, auto-attack mechanics, positioning, aura.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -69,7 +69,7 @@ dataPlayer.json (base)
     ↓
 AttributeModifierManager (CON/STR/INT/DEX → secondary stats)
     ↓
-CardModifierService (equipped cards)
+CardRuntimeManager (equipped card behaviors from dataCard.json)
     ↓
 EquipmentModifierService (equipment + gems + sets + effects)
     ↓
@@ -290,6 +290,18 @@ bool RollDeathDefy()
 
 **Cooldown:** May have internal cooldown (verify implementation).
 
+### 8.4 Card healing and lethal-hit order
+
+Player healing dispatches a general healed event. Projectile Life Steal uses the explicit `Heal(amount, isLifeSteal: true)` path and dispatches a separate Life Steal event; Vampiric Frenzy listens only to that event.
+
+Lethal damage dispatches card damage behaviors before `Die()`:
+1. Death Reversal may restore a retained HP/position snapshot and prevent the death flow.
+2. If HP remains lethal, Death Defy is rolled.
+3. If Death Defy fails, Angel/Immortal may restore full HP and grant immunity through the current wave.
+4. Otherwise, WaveManager handles defeat.
+
+Angel is not activated by the generic damage event, so a successful Death Defy does not consume Angel's revive.
+
 ---
 
 ## 9. Mana System
@@ -319,7 +331,7 @@ void Update()
 
 **Death flow:**
 
-1. HP → 0 (DeathDefy failed)
+1. HP → 0 (Death Reversal and DeathDefy fail; Angel also fails or is unavailable)
 2. Stop all auto-attacks
 3. Disable movement (player is stationary anyway)
 4. Play death animation (if exists)

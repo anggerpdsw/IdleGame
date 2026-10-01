@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;

@@ -3,6 +3,7 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.UI;
+using IdleDefenseSurvival.Card.Behavior;
 
 namespace IdleDefenseSurvival.Enemy
 {
@@ -30,23 +31,9 @@ namespace IdleDefenseSurvival.Enemy
             // Step 1b: Notify card effects (HealOnKill, etc.)
             OnEnemyKilled?.Invoke(enemy, lastDamageSource);
 
-            // Step 1c: ApocalypseEngine and SoulHarvester (player kills only)
-            if (lastDamageSource == DamageSource.Player.ToString())
-            {
-                CardModifierService.OnEnemyKilledApocalypse();
-                CardModifierService.OnEnemyKilledSoulHarvester();
-            }
-
-            // Step 1d: ChainReaction Volatile check (player kills only)
-            if (lastDamageSource == DamageSource.Player.ToString())
-            {
-                var controller = enemy.GetComponent<EnemyStatusEffectController>();
-                if (controller != null && controller.HasEffect(StatusEffects.StatusEffectType.Volatile))
-                {
-                    CardModifierService.OnVolatileEnemyDeath(enemy);
-                }
-                CardModifierService.OnEnemyKilledChainReaction(enemy);
-            }
+            // Step 1c: Dispatch to CardRuntimeManager for behavior-driven card effects
+            // ApocalypseEngine, SoulHarvester, ChainReaction, BatStalker, HealOnKill all subscribe to OnEnemyKilled
+            CardRuntimeManager.Instance?.DispatchEnemyKilled(1, enemy?.EnemyData?.id ?? "unknown", lastDamageSource, enemy);
 
             // Step 2-3: Ultimate triggers (Lightning, Cloud)
             ProcessUltimateTriggers(enemy, lastDamageSource);

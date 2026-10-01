@@ -2,7 +2,7 @@
 
 **Purpose:** Core stat modification pipeline — foundation untuk semua bonus stat dari attributes, equipment, cards, buffs.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -12,6 +12,7 @@
 - [Card_Design.md](./Card_Design.md) — card effects
 - [Equipment_Design.md](./Equipment_Design.md) — equipment stat bonuses
 - [Combat_Design.md](./Combat_Design.md) — final damage calculation
+- [Card_Design.md](./Card_Design.md) — card stat data and runtime behavior
 
 ---
 
@@ -73,7 +74,7 @@ PercentTotal = 1 + (Σ(all percent modifiers) / 100)
 |--------|---------------------|-------|---------------------|
 | Base stats | `BaseStats` | `BaseStatLoader` | `dataPlayer.json` |
 | Attributes (CON/STR/INT/DEX) | `AccountLevel` | `AttributeModifierManager` | `AccountData.attributes` |
-| Cards | `Card` | `CardModifierService` | `CardInventory.EquippedCards` |
+| Cards | `Card` | `CardRuntimeManager` + card behavior | `CardDatabase` definitions in `Card/dataCard.json` + equipped card IDs |
 | Equipment (main stats) | `Equipment` | `EquipmentModifierService` | `EquipmentService.EquippedItems` |
 | Equipment (gems) | `Equipment` | `GemModifierService` | via `EquipmentModifierService` |
 | Equipment (set bonus) | `Equipment` | `EquipmentSetBonusService` | via `EquipmentModifierService` |
@@ -92,9 +93,9 @@ ModifierCalculator (core math)
     │       ↑
     │       └── AttributeStatLoader (loads dataMainAttribute.json)
     │
-    ├── CardModifierService (card effects → modifiers)
-    │       ↑
-    │       └── CardInventory (equipped cards)
+    ├── CardRuntimeManager (equipped card behaviors)
+    │       ├── CardDatabase (single source: Card/dataCard.json)
+    │       └── Default/custom card behaviors → ModifierManager
     │
     ├── EquipmentModifierService (equipment → modifiers)
     │       ↑
@@ -127,7 +128,9 @@ PlayerStatsManager.GetFinalStat(statType)
 | Core math | `ModifierCalculator.cs` | `Scripts/Modifier/` |
 | Effect registry | `EffectRegistry.cs` | `Scripts/Modifiers/` |
 | Attribute conversion | `AttributeModifierManager.cs` | `Scripts/Manager/` |
-| Card effects | `CardModifierService.cs` | `Scripts/Card/` |
+| Card runtime | `CardRuntimeManager.cs` + `CardBehaviorRegistry.cs` | `Scripts/Card/Behavior/` |
+| Card data | `CardDatabase.cs` + `CardData.cs` | `Scripts/Card/` + `Resources/Data/Card/dataCard.json` |
+| Card query facade | `CardModifierService.cs` | `Scripts/Card/` |
 | Equipment effects | `EquipmentModifierService.cs` | `Scripts/Equipment/` |
 | Final stat aggregation | `PlayerStatsManager.cs` | `Scripts/Manager/` |
 
@@ -193,7 +196,7 @@ public class ModifierEntry
 }
 ```
 
-### JSON Schema (example from cards/equipment)
+### Equipment Modifier JSON (example)
 
 ```json
 {
@@ -204,6 +207,10 @@ public class ModifierEntry
 ```
 
 **Important:** `percentValue: 5.0` means **5%**, not 0.05.
+
+### Card Stat Definition
+
+Card stat definitions use `SkillType`, `Mode`, `BaseValue`, and `ValuePerLevel` in `dataCard.json`. At level `L`, the value is `BaseValue + ValuePerLevel * (L - 1)`. `Percent` values passed into `StatModifier` remain percentage points; card query effects normalize percentages to fractions through `CardModifierService.GetEffectResult`. Do not add a second card modifier JSON or duplicate card balance in code.
 
 ---
 

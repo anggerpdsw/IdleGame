@@ -1,32 +1,30 @@
-namespace IdleDefenseSurvival.Card
+using System;
+using System.Collections.Generic;
+
+namespace IdleDefenseSurvival.Data
 {
-    /// <summary>
-    /// Card balance constants loaded from dataCardConfig.json.
-    /// </summary>
-    [System.Serializable]
-    public class CardConfig
+    [Serializable] public class CardProgressionConfig
     {
-        public float DeathChainWindow = 5f;
-        public int DeathChainMaxStack = 15;
-        public int BulletStormAdditional = 5;
-        public float BulletStormMult = 0.9f;
-        public float ExecutionProtocolNormal = 0.15f;
-        public float ExecutionProtocolBoss = 0.08f;
-        public int OverkillCap = 2;
-        public float VampiricFrenzyDuration = 5f;
-        public int VampiricFrenzyMaxStacks = 10;
-        public float GuardianHPDrop = 0.3f;
-        public float GuardianCooldownDuration = 30f;
-        public float WarMachineContinuityThreshold = 5f;
-        public float WarMachineIdleThreshold = 3f;
-        public float InfiniteArsenalMult = 0.9f;
-        public int GamblerMaxCount = 20;
-        public float GamblerPositiveValue = 25f;
-        public float GamblerNegativeValue = -15f;
-        public float ChainReactionRadius = 5f;
-        public float ChainReactionExplosionDamage = 0.5f;
-        public float ChainReactionExplosionRadius = 3.5f;
-        public float CriticalCascadeMult = 0.9f;
+        public int StartingSlots;
+        public int MaximumSlots;
+        public int MaximumLevel;
+        public CardRollCostConfig RollCosts;
+        public CardPityThresholdConfig PityThresholds;
+        public List<int> SlotExpansionCosts;
+        public List<int> DuplicateRequirements;
     }
 
+    [Serializable] public class CardRollCostConfig
+    {
+        public int Single;
+        public int Ten;
+        public int Hundred;
+    }
+
+    [Serializable] public class CardPityThresholdConfig
+    {
+        public int Epic;
+        public int Legendary;
+        public int Mythic;
+    }
 }

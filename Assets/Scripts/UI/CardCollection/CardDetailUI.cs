@@ -253,7 +253,7 @@ namespace IdleDefenseSurvival.UI
         {
             if (_levelValuePrefab == null || _levelValueContent == null) return;
             _levelItems.Clear();
-           for (int i = 0; i < GameConstants.CARD_MAX_LEVEL; i++)
+           for (int i = 0; i < CardDatabase.Instance.Progression.MaximumLevel; i++)
             {
                 var item = Instantiate(_levelValuePrefab, _levelValueContent);
                 _levelItems.Add(item);
@@ -267,7 +267,8 @@ namespace IdleDefenseSurvival.UI
             OwnedCardData owned = CardManager.Instance.Inventory.GetOwnedCard(_cardData.Id);
             if (owned != null) currentLevel = owned.Level;
 
-            for (int level = 1; level <= GameConstants.CARD_MAX_LEVEL; level++)
+            int maximumLevel = CardDatabase.Instance.Progression.MaximumLevel;
+            for (int level = 1; level <= maximumLevel; level++)
             {
                 float value = _cardData.CalculateValue(level);
                 Color color = Color.white;
@@ -278,7 +279,7 @@ namespace IdleDefenseSurvival.UI
                     color = GameColors.green;
                     levelText = $"▶ {levelText}";
                 }
-                else if (level == currentLevel + 1 && currentLevel < GameConstants.CARD_MAX_LEVEL)
+                else if (level == currentLevel + 1 && currentLevel < maximumLevel)
                 {
                     color = GameColors.yellow;
                 }
@@ -327,7 +328,7 @@ namespace IdleDefenseSurvival.UI
             if (_cardLevel != null)
                 _cardLevel.text = $"Lv. {level}";
 
-            if (level >= GameConstants.CARD_MAX_LEVEL)
+            if (level >= CardDatabase.Instance.Progression.MaximumLevel)
             {
                 SetMaxLevelProgression();
                 return;

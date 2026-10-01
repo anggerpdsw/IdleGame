@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Card
 {
@@ -7,33 +9,27 @@ namespace IdleDefenseSurvival.Card
     /// Virtual inventory snapshot for batch roll processing.
     /// Allows CardRollService to track inventory state (levels, duplicates)
     /// during a multi-roll without mutating real CardInventory.
-    /// Pure data - no Unity dependencies, easily testable.
+    /// Pure state simulation; progression requirements are injected from the card database.
     /// </summary>
     public sealed class VirtualCardInventorySnapshot
     {
         // cardId -> (level, duplicateCount)
         private readonly Dictionary<string, (int Level, int DuplicateCount)> _cards = new();
+        private readonly IReadOnlyList<int> _duplicateRequirements;
 
-        // Duplicate requirements per level (copied from CardUpgradeService for pure function)
-        private static readonly int[] DuplicateRequirements =
+        public VirtualCardInventorySnapshot(IReadOnlyList<int> duplicateRequirements)
         {
-            2,  // Lv 1 -> Lv 2
-            4,  // Lv 2 -> Lv 3
-            7,  // Lv 3 -> Lv 4
-            11, // Lv 4 -> Lv 5
-            19, // Lv 5 -> Lv 6
-            31, // Lv 6 -> Lv 7
-            47, // Lv 7 -> Lv 8
-            69, // Lv 8 -> Lv 9
-            99  // Lv 9 -> Lv 10
-        };
+            _duplicateRequirements = duplicateRequirements
+                ?? throw new ArgumentNullException(nameof(duplicateRequirements));
+        }
 
         /// <summary>
         /// Creates a snapshot from real CardInventory.
         /// </summary>
         public static VirtualCardInventorySnapshot FromInventory(CardInventory inventory)
         {
-            var snapshot = new VirtualCardInventorySnapshot();
+            var snapshot = new VirtualCardInventorySnapshot(
+                CardDatabase.Instance.Progression.DuplicateRequirements);
             if (inventory != null)
             {
                 foreach (var kvp in inventory.AllOwned)
@@ -111,11 +107,11 @@ namespace IdleDefenseSurvival.Card
         /// <summary>
         /// Gets required duplicates for next level (pure function, mirrors CardUpgradeService).
         /// </summary>
-        private static int GetRequiredDuplicates(int currentLevel)
+        private int GetRequiredDuplicates(int currentLevel)
         {
-            if (currentLevel < 1 || currentLevel >= GameConstants.CARD_MAX_LEVEL)
+            if (currentLevel < 1 || currentLevel > _duplicateRequirements.Count)
                 return 0;
-            return DuplicateRequirements[currentLevel - 1];
+            return _duplicateRequirements[currentLevel - 1];
         }
 
         /// <summary>

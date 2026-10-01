@@ -2,7 +2,7 @@
 
 **Purpose:** Enemy AI, spawning, movement, combat behavior, status effects, death handling.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -14,6 +14,7 @@
 - [StatusEffect_Design.md](./StatusEffect_Design.md) — status system
 - [Reward_Design.md](./Reward_Design.md) — drop rewards
 - [EnemyDrop_Design.md](./EnemyDrop_Design.md) — drop tables
+- [Card_Design.md](./Card_Design.md) — kill effects and Void Overlord healing suppression
 
 ---
 
@@ -252,19 +253,20 @@ public void ApplyStatus(IStatusEffect effect)
 **Death flow:**
 
 ```
-1. Stop movement
-2. Stop attacks
-3. Disable collider
-4. Play death animation
-5. Distribute rewards (gold, meat, materials)
-6. Fire OnEnemyKilled event
-7. Update statistics
-8. Remove from EnemySpatialGrid
-9. Wait for animation
-10. Return to pool or destroy
+1. Record the enemy kill
+2. Notify the legacy enemy-killed event
+3. Dispatch one contextual kill to CardRuntimeManager (count, enemy type, damage source, EnemyAi)
+4. Process Ultimate triggers
+5. Clean up registrations
+6. Distribute currency and material rewards
+7. Update missions
+8. Handle Necromancer grave/revive special case
+9. Destroy a regular enemy
 ```
 
 **Rewards:** `EnemyRewardDistributor.cs` handles currency + material drops (see `EnemyDrop_Design.md`).
+
+Contextual card listeners use the same kill dispatch: Bat Stalker/Heal On Kill read enemy max HP, Chain Reaction marks or detonates Volatile enemies, and kill-stack cards check damage source. `EnemyAi.Heal` blocks all enemy healing while Void Overlord is active. `EnemyAi.LastOverkillDamage` records only post-mitigation damage beyond remaining HP for the player projectile's Overkill transfer.
 
 ---
 

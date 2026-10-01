@@ -27,18 +27,12 @@ namespace IdleDefenseSurvival.Save
 
             foreach (var prop in obj.Properties())
             {
-                switch (prop.Name)
+                dict[prop.Name] = prop.Name switch
                 {
-                    case "SecondaryStats":
-                        dict[prop.Name] = prop.Value.ToObject<CombatStatEntry[]>(serializer);
-                        break;
-                    case "AttributeStats":
-                        dict[prop.Name] = prop.Value.ToObject<AttributeStatEntry[]>(serializer);
-                        break;
-                    default:
-                        dict[prop.Name] = prop.Value;
-                        break;
-                }
+                    "SecondaryStats" => prop.Value.ToObject<CombatStatEntry[]>(serializer),
+                    "AttributeStats" => prop.Value.ToObject<AttributeStatEntry[]>(serializer),
+                    _ => prop.Value,
+                };
             }
             return dict;
         }

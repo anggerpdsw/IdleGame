@@ -2,7 +2,7 @@
 
 **Purpose:** Enemy status effects (slow, defense break, stun, heartbreak), duration, stacking, removal.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -11,6 +11,7 @@
 - [Enemy_Design.md](./Enemy_Design.md) — enemy behavior
 - [Combat_Design.md](./Combat_Design.md) — damage pipeline
 - [Projectile_Design.md](./Projectile_Design.md) — status application
+- [Card_Design.md](./Card_Design.md) — Chain Reaction card source and tuning
 
 ---
 
@@ -36,6 +37,7 @@
 | **Defense Break** | Reduces Defense | Temporary/Aura/Permanent | Additive |
 | **Stun** | Freezes movement + attacks | Temporary | Extends duration |
 | **HeartBreak** | Reduces MaxHP | Temporary | Strongest wins |
+| **Volatile** | Explodes on enemy death; Chain Reaction may spread it | Temporary | One stack; refreshes duration |
 
 ---
 
@@ -416,6 +418,8 @@ enemy.StatusController.OnStatusAdded += HandleStatusAdded;
 3. **Equipment passive** — permanent effect while equipped
 4. **Card effect** — card-granted status
 5. **Ultimate ability** — skill applies status to area
+
+Chain Reaction is the current Volatile source. Its chance, mark radius/duration, explosion radius, and damage multiplier are read from the Chain Reaction card's `Parameters` in `dataCard.json`. `VolatileStatus.HasExploded` prevents a single marked enemy from detonating repeatedly; the card behavior owns explosion damage and spread.
 
 **Application flow:**
 

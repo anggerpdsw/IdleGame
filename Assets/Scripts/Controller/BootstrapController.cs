@@ -11,6 +11,7 @@ using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.SkillTree;
 using IdleDefenseSurvival.Upgrade;
 using IdleDefenseSurvival.Pet;
+using IdleDefenseSurvival.Card.Behavior;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -69,6 +70,7 @@ namespace IdleDefenseSurvival.Core
             EnsureSingleton<SkillTreeBonusManager>();
             EnsureSingleton<UpgradeManager>();
             EnsureSingleton<PetManager>();
+            EnsureSingleton<CardRuntimeManager>();
 
             // Right After SaveData Loaded do this
             if (SaveManager.Instance?.IsSaveLoaded == true) {

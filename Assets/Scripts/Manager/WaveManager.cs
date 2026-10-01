@@ -8,6 +8,8 @@ using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Card.Behavior;
+using IdleDefenseSurvival.Card;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -185,6 +187,9 @@ namespace IdleDefenseSurvival.Manager
             TimeRemaining = CurrentWaveDuration;
 
             ApplySpawnData();
+
+            // Dispatch wave start event to CardRuntimeManager
+            CardRuntimeManager.Instance?.DispatchWaveStart(CurrentWave);
         }
 
         /// <summary>
@@ -215,10 +220,12 @@ namespace IdleDefenseSurvival.Manager
             }
 
             // Decrement Angel immunity counter after InterWave ends
-            CardModifierService.OnWaveCompleted();
+            CardRuntimeManager.Instance?.DispatchWaveComplete(CurrentWave);
 
-            // Card After wave 150
-            if (CurrentWave > 150) CardModifierService.OnAfterWave150();
+            // Card After wave 150DispatchWaveComplete
+            if (CurrentWave > 150) 
+                // Dispatch wave start event to CardRuntimeManager
+                CardRuntimeManager.Instance?.DispatchWaveStart(CurrentWave);
 
             // Spawn Necromancer at wave multiples of 51
             // Guard: only spawn if spawner is ready and wave qualifies

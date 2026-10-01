@@ -1,5 +1,22 @@
 {
-    "Version": 1,
+    "Version": 2,
+    "Progression": {
+        "StartingSlots": 1,
+        "MaximumSlots": 19,
+        "MaximumLevel": 10,
+        "RollCosts": {
+            "Single": 20,
+            "Ten": 190,
+            "Hundred": 1800
+        },
+        "PityThresholds": {
+            "Epic": 1257,
+            "Legendary": 3769,
+            "Mythic": 7953
+        },
+        "SlotExpansionCosts": [0, 50, 100, 200, 300, 400, 500, 600, 750, 1000, 1200, 1400, 1600, 1800, 2500, 3500, 4500, 5500, 7500],
+        "DuplicateRequirements": [2, 4, 7, 11, 19, 31, 47, 69, 99]
+    },
     "RarityConfig": [
 
         {
@@ -108,7 +125,7 @@
         }, {
             "Id": "heavy_impact",
             "Name": "Heavy Impact",
-            "Description": "100% chance to ignore incorrect knockback, while knocking back distance",
+            "Description": "Increase the chance to knock enemies back.",
             "SkillType": "KnockbackChance",
             "Mode": "Flat",
             "BaseValue": 1.65,
@@ -315,7 +332,7 @@
         }, {
             "Id": "frost_aura",
             "Name": "Frost Aura",
-            "Description": "Enemies entering attack range are slowed by 26%",
+            "Description": "Slow enemies in attack range by 8% at level 1. Slow strength scales with card level.",
             "EffectType": "FrostAura",
             "Mode": "Percent",
             "BaseValue": 8,
@@ -324,7 +341,7 @@
         }, {
             "Id": "shield",
             "Name": "Shield",
-            "Description": "Can add shield until 51% of max HP when have max HP",
+            "Description": "At full HP, gain a shield equal to 15% of max HP. Shield capacity scales with card level.",
             "EffectType": "Shield",
             "Mode": "Percent",
             "BaseValue": 15,
@@ -338,7 +355,13 @@
             "Mode": "Percent",
             "BaseValue": 43,
             "ValuePerLevel": 1.4,
-            "CardRarity": "Rare"
+            "CardRarity": "Rare",
+            "Parameters": {
+                "ActivationWave": 150,
+                "MaxStacks": 20,
+                "PositiveBonusPercent": 25,
+                "NegativeBonusPercent": -15
+            }
         }, {
             "Id": "desperados",
             "Name": "Desperados",
@@ -347,12 +370,18 @@
             "Mode": "Percent",
             "BaseValue": 43,
             "ValuePerLevel": 1.4,
-            "CardRarity": "Rare"
+            "CardRarity": "Rare",
+            "Parameters": {
+                "ActivationWave": 150,
+                "MaxStacks": 20,
+                "PositiveBonusPercent": 25,
+                "NegativeBonusPercent": -15
+            }
         }, {
             "Id": "bat_stalker",
             "Name": "Bat Stalker",
-            "Description": "Recover health whenever an enemy is killed",
-            "EffectType": "HealOnKill",
+            "Description": "Heal for 3% of an enemy's max HP when you kill it. Healing scales with card level.",
+            "EffectType": "BatStalker",
             "Mode": "Percent",
             "BaseValue": 3,
             "ValuePerLevel": 1.5,
@@ -360,7 +389,7 @@
         }, {
             "Id": "time_fast",
             "Name": "Time Fast",
-            "Description": "Increase wave progression speed by 46%",
+            "Description": "Reduce wave and inter-wave durations by 28% at level 1. Duration reduction scales with card level.",
             "EffectType": "TimeFast",
             "Mode": "Percent",
             "BaseValue": 28,
@@ -369,7 +398,7 @@
         }, {
             "Id": "time_warp",
             "Name": "Time Warp",
-            "Description": "Make progression speed increase",
+            "Description": "Reduce Ultimate cooldown by 3% at level 1. Cooldown reduction scales with card level.",
             "SkillType": "CooldownReduction",
             "Mode": "Percent",
             "BaseValue": 3,
@@ -390,18 +419,22 @@
             "Description": "When Die, Revive and Immune to damage in 1x Wave",
             "EffectType": "Immortal",
             "Mode": "Flat",
-            "BaseValue": 880,
-            "ValuePerLevel": -25,
+            "BaseValue": 999,
+            "ValuePerLevel": -27,
             "CardRarity": "Epic"
         }, {
             "Id": "death_chain",
             "Name": "Death Chain",
-            "Description": "Each enemy killed within 5 seconds increases Attack Damage by 4%, stacking up to 15 times. The stack resets when no enemy is killed for 5 seconds.",
+            "Description": "Each enemy you kill adds 4% Attack Damage, up to 15 stacks. All stacks reset after 5 seconds without a kill.",
             "EffectType": "DeathChain",
             "Mode": "Percent",
             "BaseValue": 4,
             "ValuePerLevel": 0.8,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "WindowSeconds": 5,
+                "MaxStacks": 15
+            }
         }, {
             "Id": "chain_reaction",
             "Name": "Chain Reaction",
@@ -410,25 +443,39 @@
             "Mode": "Percent",
             "BaseValue": 20,
             "ValuePerLevel": 3,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "MarkRadius": 5,
+                "VolatileDurationSeconds": 5,
+                "ExplosionDamageMultiplier": 0.5,
+                "ExplosionRadius": 3.5
+            }
         }, {
             "Id": "bullet_storm",
             "Name": "Bullet Storm",
-            "Description": "Every 8 attacks automatically fires a burst of 5 additional projectiles at nearby enemies.",
+            "Description": "Every 8 attacks at level 1, fire 5 additional projectiles at nearby enemies. The attack interval scales with card level.",
             "EffectType": "BulletStorm",
             "Mode": "Flat",
             "BaseValue": 8,
             "ValuePerLevel": -0.3,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "AdditionalProjectiles": 5,
+                "ProjectileDamageMultiplier": 0.9
+            }
         }, {
             "Id": "execution_protocol",
             "Name": "Execution Protocol",
-            "Description": "Attacks against enemies below 15% HP have a chance to instantly execute them. Boss and Special enemies require them to be below 8% HP.",
+            "Description": "Attacks have an 18% chance at level 1 to execute normal enemies below 15% HP, or Boss and Special enemies below 8% HP. Chance scales with card level.",
             "EffectType": "ExecutionProtocol",
             "Mode": "Percent",
             "BaseValue": 18,
             "ValuePerLevel": 2,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "NormalExecutionThreshold": 0.15,
+                "BossExecutionThreshold": 0.08
+            }
         }, {
             "Id": "overkill",
             "Name": "Overkill",
@@ -437,52 +484,78 @@
             "Mode": "Percent",
             "BaseValue": 100,
             "ValuePerLevel": 25,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "MaximumTransferMultiplier": 3
+            }
         }, {
             "Id": "vampiric_frenzy",
             "Name": "Vampiric Frenzy",
-            "Description": "Every 10% HP recovered through Life Steal increases Attack Speed by 3% for 5 seconds, stacking up to 10 times.",
+            "Description": "Each 10% of max HP recovered through Life Steal grants 3% Attack Speed for 5 seconds, stacking up to 10 times. Bonus scales with card level.",
             "EffectType": "VampiricFrenzy",
             "Mode": "Percent",
             "BaseValue": 3,
             "ValuePerLevel": 0.5,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "HealPerStackPercent": 10,
+                "DurationSeconds": 5,
+                "MaximumStacks": 10
+            }
         }, {
             "Id": "guardian_instinct",
             "Name": "Guardian Instinct",
-            "Description": "When HP falls below 30%, gain a shield equal to 20% of max HP and increase Evasion by 15% for 6 seconds. Cooldown: 30 seconds.",
+            "Description": "Below 30% HP, gain a shield equal to 20% of max HP and +15 Evasion for 6 seconds. Cooldown: 30 seconds. Shield scales with card level.",
             "EffectType": "GuardianInstinct",
             "Mode": "Percent",
             "BaseValue": 20,
             "ValuePerLevel": 3,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "HealthThresholdPercent": 30,
+                "ShieldDurationSeconds": 6,
+                "CooldownSeconds": 30,
+                "EvasionBonusPercent": 15
+            }
         }, {
             "Id": "critical_cascade",
             "Name": "Critical Cascade",
-            "Description": "Every Critical Hit has a 25% chance to trigger another projectile toward the nearest enemy. This projectile can also critically strike.",
+            "Description": "Critical hits have a 25% chance at level 1 to fire another projectile at the nearest enemy. This projectile can critically strike; chance scales with card level.",
             "EffectType": "CriticalCascade",
             "Mode": "Percent",
             "BaseValue": 25,
             "ValuePerLevel": 3,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "ProjectileDamageMultiplier": 0.9
+            }
         }, {
             "Id": "war_machine",
             "Name": "War Machine",
-            "Description": "When attacking continuously without stopping for 5 seconds, gain 10% Attack Damage, 10% Attack Speed and 10% Critical Chance. The bonuses reset after 3 seconds without attacking.",
+            "Description": "After attacking continuously for 5 seconds, gain 10% Attack Damage, Attack Speed, and Critical Chance. Bonuses reset after 3 seconds without attacking; bonus scales with card level.",
             "EffectType": "WarMachine",
             "Mode": "Percent",
             "BaseValue": 10,
             "ValuePerLevel": 1.5,
-            "CardRarity": "Legendary"
+            "CardRarity": "Legendary",
+            "Parameters": {
+                "ContinuitySeconds": 5,
+                "IdleResetSeconds": 3
+            }
         }, {
             "Id": "apocalypse_engine",
             "Name": "Apocalypse Engine",
-            "Description": "Every 50 enemies killed, increases Attack Damage by 1%, Attack Speed by 0.5% and Critical Damage by 2% for the current battle.",
+            "Description": "Every 50 enemies you kill, gain 1% Attack Damage, 0.5% Attack Speed, and 2% Critical Damage for the current battle. Bonuses scale with card level.",
             "EffectType": "ApocalypseEngine",
             "Mode": "Percent",
             "BaseValue": 1,
             "ValuePerLevel": 0.2,
-            "CardRarity": "Mythic"
+            "CardRarity": "Mythic",
+            "Parameters": {
+                "KillsPerStack": 50,
+                "AttackSpeedPerAttackDamage": 0.5,
+                "CriticalDamagePerAttackDamage": 2
+            }
         }, {
             "Id": "infinite_arsenal",
             "Name": "Infinite Arsenal",
@@ -491,34 +564,52 @@
             "Mode": "Flat",
             "BaseValue": 12,
             "ValuePerLevel": -0.5,
-            "CardRarity": "Mythic"
+            "CardRarity": "Mythic",
+            "Parameters": {
+                "ProjectileDamageMultiplier": 0.9,
+                "BounceCount": 3
+            }
         }, {
             "Id": "soul_harvester",
             "Name": "Soul Harvester",
-            "Description": "Every enemy killed grants a Soul. Each Soul increases Damage by 0.5%. Every 100 Souls, increases the maximum Soul stack by 50.",
+            "Description": "Each enemy you kill grants a Soul. Each Soul adds 0.5% Attack Damage. Every 100 kills, the Soul cap increases by 50.",
             "EffectType": "SoulHarvester",
             "Mode": "Percent",
             "BaseValue": 0.5,
             "ValuePerLevel": 0.1,
-            "CardRarity": "Mythic"
+            "CardRarity": "Mythic",
+            "Parameters": {
+                "InitialSoulCap": 100,
+                "SoulsPerCapIncrease": 100,
+                "SoulCapIncrease": 50
+            }
         }, {
             "Id": "death_reversal",
             "Name": "Death Reversal",
-            "Description": "The first time you would die, rewind your HP and position to 5 seconds earlier, restore 50% HP and reset enemy projectiles around you. Can trigger once per wave.",
+            "Description": "Once per wave, prevent your first death and return to your position and HP from 5 seconds earlier, or 50% max HP if higher. Clear nearby enemy projectiles; restored HP scales with card level.",
             "EffectType": "DeathReversal",
             "Mode": "Percent",
             "BaseValue": 50,
             "ValuePerLevel": 5,
-            "CardRarity": "Mythic"
+            "CardRarity": "Mythic",
+            "Parameters": {
+                "RewindSeconds": 5,
+                "SnapshotIntervalSeconds": 0.5,
+                "ProjectileClearRadius": 8
+            }
         }, {
             "Id": "void_overlord",
             "Name": "Void Overlord",
-            "Description": "Every 100 seconds, enter Void Overlord state for 15 seconds. During this state, all attacks pierce enemies, projectiles deal 100% bonus damage and enemies cannot recover HP.",
+            "Description": "Every 100 seconds, enter Void Overlord state for 15 seconds. During this state, player projectiles pierce enemies, deal 100% bonus damage, and prevent enemies from healing. Damage bonus scales with card level.",
             "EffectType": "VoidOverlord",
             "Mode": "Percent",
             "BaseValue": 100,
             "ValuePerLevel": 15,
-            "CardRarity": "Mythic"
+            "CardRarity": "Mythic",
+            "Parameters": {
+                "IntervalSeconds": 100,
+                "DurationSeconds": 15
+            }
         }
 
 

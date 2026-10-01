@@ -1,513 +1,185 @@
 # Card System Design — IdleDefenseSurvival
 
-**Purpose:** Card collection, rolling, leveling, equipment, effects — major progression system.
+**Purpose:** Card definitions, progression, rolling, equipment, stat modifiers, and runtime effects.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
 ## Related Design Documents
 
-- [Modifier_Design.md](./Modifier_Design.md) — card effects → stat pipeline
-- [Player_Design.md](./Player_Design.md) — stat aggregation
-- [Economy_Design.md](./Economy_Design.md) — gem costs
+- [Modifier_Design.md](./Modifier_Design.md) — card stat modifiers and percent units
+- [Player_Design.md](./Player_Design.md) — player stat and combat integration
+- [Projectile_Design.md](./Projectile_Design.md) — projectile-triggered card effects
+- [Combat_Design.md](./Combat_Design.md) — damage, overkill, and death-prevention ordering
+- [Wave_Design.md](./Wave_Design.md) — wave-scoped card events and progression effects
+- [StatusEffect_Design.md](./StatusEffect_Design.md) — Chain Reaction's Volatile status
+- [Economy_Design.md](./Economy_Design.md) — gem/card-roll transactions
+- [SaveManager_Design.md](./SaveManager_Design.md) — card inventory and pity persistence
 
 ---
 
-## 1. Card Identity
+## 1. Source Of Truth
 
-**Owner files:**
-- `Scripts/Card/CardManager.cs` (UI façade)
-- `Scripts/Manager/CardManager.cs` (legacy, being phased out)
+`Assets/Resources/Data/Card/dataCard.json` is the single authored source for card definitions and card balance. Its current schema version is `2`.
 
-**Services (in `Scripts/Card/`):**
-- `CardDatabase` — loads `Card/dataCard.json`
-- `CardInventory` — owned cards, duplicates, pity counters
-- `CardUpgradeService` — duplicate → level conversion
-- `CardRollService` — gem-based rolling, pity, bundle pricing
-- `CardEquipmentService` — equip/unequip to slots (max 19)
-- `CardModifierService` — card effects → modifier pipeline
-- `VirtualCardInventorySnapshot` — UI snapshot for collection view
+The file owns:
 
-**Data source:** `Assets/Resources/Data/Card/dataCard.json`
+- `Progression`: starting/max slots, max level, roll costs, pity thresholds, slot expansion costs, and duplicate requirements.
+- `RarityConfig`: rarity weights.
+- `Cards`: card identity, display text, rarity, effect/stat identifier, level scaling, and custom `Parameters`.
+
+There is no separate card balance JSON. Card roll/level/slot values must not be copied into `GameConstants`, behavior fallbacks, or UI code. `GameConstants.KEY_PITY_*` remain persistence keys only; they are not balance values.
+
+`CardDatabase` loads this file with Newtonsoft.Json, validates each card's ID/mode/rarity/effect-or-stat identifier and progression array sizes, then exposes cached definitions. An invalid or duplicate definition is rejected and logged. Custom behavior parameters are read from the matching card definition by stable card ID.
 
 ---
 
-## 2. Card Rarities
+## 2. Card Definition Schema
 
-**6-tier system (verified from dataCard.json):**
+A definition uses exactly one of `EffectType` or `SkillType`:
 
-| Rarity | Weight Multiplier | Visual Color |
-|--------|-------------------|--------------|
-| Common | 1000.0 | White/Gray |
-| Rare | 300.0 | Blue |
-| Epic | 80.0 | Purple |
-| Legendary | 15.0 | Gold |
-| Mythic | 1.0 | Red |
-| **Divine** | **0.006** | Rainbow/Special |
-
-**Divine is extreme outlier** — multiplier 0.006 vs Mythic 1.0 = 166× rarer.
-
----
-
-## 3. Pity System
-
-**Pity thresholds (verified `Constantku.cs`):**
-
-| Rarity | Pity Count | Explanation |
-|--------|------------|-------------|
-| Epic | 51 | Guaranteed Epic after 51 non-Epic rolls |
-| Legendary | 153 | Guaranteed Legendary after 153 non-Legendary |
-| Mythic | 505 | Guaranteed Mythic after 505 non-Mythic |
-
-**Divine has NO pity** — base weight already extremely low.
-
-**Pity mechanics:**
-- Separate counter per rarity
-- Counter increments on every roll that DOESN'T get that rarity or higher
-- Counter resets when you pull that rarity or higher
-- Pity trigger guarantees that rarity (not higher)
-
-**Example:**
-- Roll 50× → no Epic → pityEpic = 50
-- Roll 51st → Epic guaranteed (pity triggered)
-- pityEpic reset to 0
-
----
-
-## 4. Card Roll Costs
-
-**Verified constants (`GameConstants.cs`):**
-
-```csharp
-ROLL1X_GEM_COST = 20
-ROLL10X_GEM_COST = 190
-ROLL100X_GEM_COST = 1800
-```
-
-**Bundle discount:**
-- 1× = 20 gems/card
-- 10× = 190 gems = **19 gems/card** (5% discount)
-- 100× = 1800 gems = **18 gems/card** (10% discount)
-
-**Bundle calculation (verified `CardRollService.CalculateRollGemCost`):**
-
-```csharp
-int CalculateRollGemCost(int amount)
-{
-    int hundreds = amount / 100;
-    int tens = (amount % 100) / 10;
-    int singles = amount % 10;
-    
-    return hundreds * 1800 + tens * 190 + singles * 20;
-}
-```
-
-**Example:**
-- 1 roll: 20 gems
-- 10 rolls: 190 gems (NOT 200)
-- 100 rolls: 1800 gems (NOT 2000)
-- 237 rolls: (2×1800) + (3×190) + (7×20) = 3600 + 570 + 140 = **4310 gems**
-
-**This is NOT simple multiplication** — preserves bundle tiers.
-
----
-
-## 5. Card Leveling
-
-**Duplicate → level conversion (verified `CardUpgradeService.cs`):**
-
-| Level | Duplicates Required | Cumulative Total |
-|-------|---------------------|------------------|
-| 1→2 | 2 | 2 |
-| 2→3 | 4 | 6 |
-| 3→4 | 7 | 13 |
-| 4→5 | 11 | 24 |
-| 5→6 | 19 | 43 |
-| 6→7 | 31 | 74 |
-| 7→8 | 47 | 121 |
-| 8→9 | 69 | 190 |
-| 9→10 | 99 | **289** |
-
-**289 total duplicates** required to max-level a card from level 1 → 10.
-
-**Stat scaling per level:**
-- Flat bonuses: `BaseFlat × Level`
-- Percent bonuses: `BasePercent × Level`
-
-**Example:**
-- Card base: +10 AttackDamage
-- Level 1: +10
-- Level 5: +50
-- Level 10: +100
-
----
-
-## 6. Card Equipment Slots
-
-**Slot progression (verified `GameConstants.cs`):**
-
-```csharp
-CARD_START_SLOT = 1          // Start with 1 slot
-CARD_MAX_SLOT = 19           // Maximum 19 slots
-CARD_SLOT_EXPANSION_COSTS[]  // Array of 18 costs (slots 2-19)
-```
-
-**Unlock costs:** Each slot costs gold (amount from `CARD_SLOT_EXPANSION_COSTS` array).
-
-**Example progression:**
-- Start: 1 slot
-- Unlock slot 2: X gold
-- Unlock slot 3: Y gold
-- ...
-- Unlock slot 19: Z gold
-
-**Equipped cards:** Only equipped cards contribute stats.
-
-**Unequipped cards:** Stored in collection, no effect.
-
----
-
-## 7. Card Effects
-
-**Effect types:**
-
-### 7.1 Stat Modifiers
-
-**Flat bonuses:**
 ```json
 {
-  "statType": "AttackDamage",
-  "flatValue": 10.0
+  "Id": "example_card",
+  "Name": "Example Card",
+  "Description": "Displayed in the card detail view.",
+  "SkillType": "AttackDamage",
+  "Mode": "Percent",
+  "BaseValue": 3,
+  "ValuePerLevel": 1,
+  "CardRarity": "Common"
 }
 ```
 
-**Percent bonuses:**
-```json
-{
-  "statType": "AttackSpeed",
-  "percentValue": 5.0
-}
+Special behavior cards use `EffectType` and may have one `Parameters` object. Stat cards use `SkillType`. There is no supported multi-effect `Effects[]` schema; the unused DTO was removed so authoring matches runtime behavior.
+
+The level value is:
+
+```text
+Value(level) = BaseValue + ValuePerLevel * (level - 1)
 ```
 
-**Multiple stats per card:**
-```json
-{
-  "effects": [
-    {"statType": "AttackDamage", "flatValue": 10.0},
-    {"statType": "CriticalChance", "percentValue": 3.0}
-  ]
-}
-```
-
-### 7.2 Special Effects
-
-**Verified special effects:**
-- **FrostAura** — slows enemies in range
-- **Shield** — absorbs damage
-- **TimeFast** — increases game speed
-- **Gold** — bonus gold per kill
-- **Meat** — bonus meat per kill
-
-**Implementation:** Special effects have dedicated handlers, not just stat modifiers.
+`Mode` is `Flat` or `Percent`. For stat modifiers, percent values are percentage points consumed by the modifier pipeline. For card query effects, `CardModifierService.GetEffectResult` converts `Percent` values into fractions; `GetCardParameter` returns a raw configured parameter. Parameter names should state their units (for example, `CooldownSeconds`, `EvasionBonusPercent`, or `ProjectileDamageMultiplier`).
 
 ---
 
-## 8. Card Data Schema
+## 3. Progression Configuration
 
-**File:** `Assets/Resources/Data/Card/dataCard.json`
+All progression values live under `Progression` in `dataCard.json`:
 
-**Schema example:**
-```json
-{
-  "id": "card_warrior_strength",
-  "name": "Warrior's Strength",
-  "rarity": "Epic",
-  "description": "Increases attack damage and critical chance",
-  "iconPath": "Cards/warrior_strength",
-  "effects": [
-    {
-      "statType": "AttackDamage",
-      "flatValue": 15.0,
-      "percentValue": 0.0
-    },
-    {
-      "statType": "CriticalChance",
-      "flatValue": 0.0,
-      "percentValue": 3.0
-    }
-  ]
-}
-```
+- `StartingSlots` and `MaximumSlots` define the initial and upper equipment slot counts.
+- `MaximumLevel` controls upgrade limits and card availability during rolls.
+- `RollCosts.Single`, `Ten`, and `Hundred` define bundle costs. `CardRollService.CalculateRollGemCost` decomposes any batch into hundred-, ten-, and single-roll bundles.
+- `PityThresholds` define the guarantee count for Epic, Legendary, and Mythic. Divine has no pity counter.
+- `SlotExpansionCosts` is indexed by current slot count; index zero is the initial free slot, and index `n` is the cost to unlock slot `n + 1`. Its length must equal `MaximumSlots`.
+- `DuplicateRequirements` is indexed by `currentLevel - 1`; its length must equal `MaximumLevel - 1`.
+
+Only `CardDatabase.Progression` is used by roll, inventory, upgrade, slot, and collection UI code. Do not introduce a second copy of these values.
 
 ---
 
-## 9. Card Rolling Algorithm
+## 4. Rolling And Pity
 
-**Weighted random (simplified):**
+`CardRollService` generates roll results without mutating real inventory, economy, or save state; it updates only the caller-provided virtual inventory snapshot. `CardManager` owns the transaction: spend gems or consume CardRoll items, load and save pity counters, apply the virtual inventory result, auto-upgrade, and notify UI.
 
-```csharp
-CardRarity RollCard()
-{
-    // 1. Check pity
-    if (_pityEpic >= 51) return CardRarity.Epic;
-    if (_pityLegendary >= 153) return CardRarity.Legendary;
-    if (_pityMythic >= 505) return CardRarity.Mythic;
-    
-    // 2. Calculate total weight
-    float totalWeight = 0f;
-    foreach (var rarity in rarities)
-        totalWeight += GetWeight(rarity);
-    
-    // 3. Roll
-    float roll = Random.Range(0f, totalWeight);
-    
-    // 4. Find rarity
-    float cumulative = 0f;
-    foreach (var rarity in rarities)
-    {
-        cumulative += GetWeight(rarity);
-        if (roll < cumulative)
-        {
-            UpdatePity(rarity);
-            return rarity;
-        }
-    }
-}
+Rarity weights come from `RarityConfig`. Selection excludes cards already at `MaximumLevel`; if a selected rarity has no available card, selection falls back to lower rarities. If no card is available, the roll is refunded.
 
-float GetWeight(CardRarity rarity)
-{
-    // From dataCard.json weight multiplier
-    switch (rarity)
-    {
-        case Common: return 1000.0f;
-        case Rare: return 300.0f;
-        case Epic: return 80.0f;
-        case Legendary: return 15.0f;
-        case Mythic: return 1.0f;
-        case Divine: return 0.006f;
-    }
-}
+Three independent pity counters are persisted with card inventory data. Each attempted roll increments the counters. When a card is awarded:
 
-void UpdatePity(CardRarity rolled)
-{
-    if (rolled < Epic) _pityEpic++;
-    else _pityEpic = 0;
-    
-    if (rolled < Legendary) _pityLegendary++;
-    else _pityLegendary = 0;
-    
-    if (rolled < Mythic) _pityMythic++;
-    else _pityMythic = 0;
-}
-```
+- Epic or higher resets Epic pity.
+- Legendary or higher resets Epic and Legendary pity.
+- Mythic or higher resets all three.
+- Divine is above Mythic and therefore resets all three, but is not itself guaranteed by a pity counter.
+
+A reward is marked pity-guaranteed only when the awarded card meets a currently triggered guarantee. Pity thresholds and roll weights/costs are read from `dataCard.json`, not repeated in code or documentation tables.
 
 ---
 
-## 10. Card Inventory
+## 5. Ownership, Leveling, And Equipment
 
-**Storage:**
-- `OwnedCards`: Dictionary<CardId, CardInstance>
-- `DuplicateCount`: int per card
-- `Level`: int (1-10)
-- `IsEquipped`: bool
+Owned card instances are keyed by stable card ID and store level plus remaining duplicate count. Card inventory and equipped IDs are part of the existing save data; runtime behavior state is not separately persisted.
 
-**Ownership:**
-- Each card has persistent `CardId`
-- Multiple copies tracked as `DuplicateCount`
-- Leveling consumes duplicates
+`CardUpgradeService` reads duplicate requirements and the level cap from `CardDatabase.Progression`. Batch rolls use `VirtualCardInventorySnapshot` to simulate acquisitions and upgrades before mutating real inventory. The snapshot delegates duplicate requirement lookup to the same upgrade service instead of maintaining a copied curve.
 
-**Persistence:** Saved in `SaveData.cardInventory`.
+`CardEquipmentService` reads starting/max slots and expansion costs from the same progression object. Only equipped cards have active behaviors or affect stats. Equip/unequip/upgrade refreshes `CardRuntimeManager` and the modifier pipeline. The collection view reads `CardData.Description` directly and displays values using the definition's level formula.
 
 ---
 
-## 11. Card Equipment
+## 6. Runtime Architecture
 
-**Equip flow:**
+- `CardBehaviorRegistry` maps special `CardEffectType` values to behavior implementations. Simple data-driven/query effects use `DefaultCardBehavior`.
+- `CardRuntimeManager` creates one state and behavior per equipped card, subscribes behaviors to required events, dispatches domain events, and calls behavior `Update` once per frame.
+- `CardModifierService` is the backward-compatible query/refresh facade. It does not own the balance or behavior state.
+- `EnemyDeathHandler` dispatches one kill event with enemy context and damage source. This supports both kill counters and effects based on enemy max HP without a second kill subscription.
+- `Player.Heal(amount, isLifeSteal)` separates genuine projectile Life Steal from unrelated healing for Vampiric Frenzy.
+- Projectile-only state such as Infinite Arsenal is stored on the pooled projectile instance and reset when returned to the pool.
 
-```csharp
-public bool EquipCard(string cardId, int slotIndex)
-{
-    // 1. Validate slot unlocked
-    if (slotIndex >= GetUnlockedSlotCount())
-        return false;
-    
-    // 2. Validate owns card
-    if (!_inventory.HasCard(cardId))
-        return false;
-    
-    // 3. Check if already equipped elsewhere
-    int currentSlot = GetEquippedSlot(cardId);
-    if (currentSlot >= 0)
-        UnequipCard(currentSlot);
-    
-    // 4. Unequip card in target slot
-    if (_equippedCards[slotIndex] != null)
-        UnequipCard(slotIndex);
-    
-    // 5. Equip new card
-    _equippedCards[slotIndex] = cardId;
-    
-    // 6. Invalidate stat cache
-    PlayerStatsManager.InvalidateCache();
-    
-    // 7. Save
-    SaveCardEquipment();
-    
-    return true;
-}
-```
-
-**Unequip:**
-```csharp
-public void UnequipCard(int slotIndex)
-{
-    _equippedCards[slotIndex] = null;
-    PlayerStatsManager.InvalidateCache();
-    SaveCardEquipment();
-}
-```
+Unknown data identifiers are rejected by `CardDatabase`; do not rely on a silent default behavior to hide a typo.
 
 ---
 
-## 12. Card Modifier Pipeline
+## 7. Effect Behavior Contract
 
-**Service:** `CardModifierService.cs`
+Behavioral values are authored on the card that consumes them. The current custom parameter keys are in `dataCard.json`; code should not repeat their balance defaults.
 
-**Flow:**
-
-```
-Equipped Cards
-    ↓
-CardModifierService.GetCardModifiers()
-    ↓
-For each equipped card:
-    - Load card data
-    - Get card level
-    - Calculate scaled effects
-    - Convert to ModifierEntry[]
-    ↓
-Return all modifiers
-    ↓
-PlayerStatsManager aggregates
-```
-
-**Scaling:**
-```csharp
-ModifierEntry ConvertToModifier(CardEffect effect, int level)
-{
-    return new ModifierEntry
-    {
-        StatType = effect.statType,
-        FlatValue = effect.flatValue * level,
-        PercentValue = effect.percentValue * level,
-        Source = ModifierSource.Card
-    };
-}
-```
+- **Gold / Meat:** multiply enemy currency rewards using the card's level-scaled percent value.
+- **Frost Aura:** slows enemies within player attack range using the level-scaled percent value.
+- **Shield:** grants the configured fraction of max HP while the player is at full HP.
+- **Time Fast:** scales wave and inter-wave durations through `WaveManager.ProgressionSpeed`.
+- **Enemy Balance:** modifies minimum spawn interval through `WaveManager`.
+- **Add Tank:** adds one Tank stack and applies the level-scaled duration multiplier.
+- **Crazy Gambler / Desperados:** after their configured activation wave, roll once per wave for the configured positive/negative stat change, bounded by configured stack count.
+- **Bat Stalker / Heal On Kill:** on a player-attributed kill, heal by the card's percent of that enemy's max HP. Bat Stalker is the current authored card; both identifiers share the same implementation.
+- **Berserker:** converts missing player HP into Attack Damage, capped by its level-scaled card value.
+- **Death Chain:** each player kill adds one Attack Damage stack; stacks cap at the configured maximum and all reset after the configured no-kill window.
+- **Bullet Storm:** fires the configured number of additional projectiles every `ceil(Value(level))` player attacks. Per-projectile damage multiplier is configured on the card.
+- **Execution Protocol:** on hit, checks its level-scaled chance against normal or Boss/Special HP thresholds from its parameters.
+- **Overkill:** transfers the configured fraction of damage in excess of the enemy's remaining HP after mitigation. Transfer is capped by `MaximumTransferMultiplier` times the triggering hit's final damage.
+- **Vampiric Frenzy:** each configured fraction of max HP actually recovered via Life Steal adds an Attack Speed stack. Stacks expire independently after their configured duration and are capped.
+- **Guardian Instinct:** when damage leaves HP at/below its configured threshold, grants a max-HP shield and flat Evasion bonus. Active duration and cooldown are separate configured values. It does not reset on wave start.
+- **Critical Cascade:** a critical hit rolls the configured chance and fires a normal critical-capable projectile with the configured damage multiplier.
+- **War Machine:** uses elapsed time between attacks; continuous attacks activate its level-scaled three-stat bonus, and the configured idle interval removes it.
+- **Apocalypse Engine:** player kills accumulate toward `KillsPerStack`; each stack applies Attack Damage and configured Attack Speed/Critical Damage ratios for the current wave.
+- **Infinite Arsenal:** every `ceil(Value(level))` player attacks creates a special per-projectile state: forced critical, configured bounce count, pierce through unhit enemies in attack range, and configured damage multiplier.
+- **Soul Harvester:** player kills grant souls and Attack Damage per soul, with its initial cap and cap growth controlled by card parameters.
+- **Death Reversal:** stores player HP/position snapshots at the configured interval, retains the configured rewind window, triggers once per wave on lethal damage, restores the higher of snapshot HP or the card's max-HP fraction, and clears enemy projectiles in its configured radius. It resolves before Death Defy.
+- **Immortal (Angel):** triggers only after Death Defy fails, restores full HP, then grants immunity until the wave completes. Its existing card value drives the cooldown display/state.
+- **Void Overlord:** its timer continues across wave transitions. While active, player projectiles pierce unhit enemies in attack range, gain the card's percent damage bonus, and enemy healing is suppressed.
+- **Chain Reaction:** a player kill has the card's level-scaled chance to mark nearby enemies Volatile. A Volatile death explodes, damages nearby enemies, and can spread Volatile. Mark radius, duration, explosion radius, and damage multiplier are configured on the card.
 
 ---
 
-## 13. CardRoll Item
+## 8. Event And Lifecycle Rules
 
-**Free roll item:** `CardRoll` consumable in inventory.
+Event subscriptions are explicit in `CardRuntimeManager.GetEventsForEffect`:
 
-**Usage:**
-1. Player uses `CardRoll` item
-2. Consume 1 from inventory
-3. Perform 1 card roll (no gem cost)
-4. Apply same pity/rarity logic
-5. Grant card to inventory
+- Player attack: Bullet Storm, Infinite Arsenal, War Machine.
+- Player damage: Berserker, Guardian Instinct, Death Reversal.
+- Player heal: Berserker; Life Steal only: Vampiric Frenzy.
+- Enemy kill: Death Chain, Soul Harvester, Chain Reaction, Apocalypse Engine, Bat Stalker, Heal On Kill.
+- Wave complete: Crazy Gambler, Desperados, Angel.
+- Wave start: Death Reversal, Angel.
+- Stat/query-only effects do not subscribe to unrelated wave events.
 
-**Refund on failure:**
-- If roll fails (e.g., inventory full), refund item
-- Do NOT substitute gem refund for item refund
-
----
-
-## 14. Card Collection View
-
-**UI:** `CardCollectionController.cs` + virtual inventory snapshot
-
-**Features:**
-- View all owned cards
-- Filter by rarity
-- Sort by level/name/rarity
-- Equip/unequip directly
-- Level up cards
-
-**Snapshot:** `VirtualCardInventorySnapshot` creates UI-friendly data structure from raw inventory.
+Unequipping calls behavior cleanup, removes temporary modifiers, and unsubscribes events. Wave-scoped state resets only when the effect's documented rule requires it. Do not run card timer updates both in `Player.Update` and `CardRuntimeManager.Update`.
 
 ---
 
-## 15. Performance
+## 9. Extension And Verification Checklist
 
-**Card system is NOT performance-critical:**
-- Rolling happens on user action (not per-frame)
-- Equipment changes are rare
-- Stat aggregation is cached
+When adding a card:
 
-**Do NOT:**
-- Recalculate card modifiers every frame (cached)
-- Duplicate card effect logic in UI
+1. Add one stable ID and exactly one `EffectType` or `SkillType` entry to `dataCard.json`.
+2. Define level scaling and custom parameters there; keep units explicit in parameter names.
+3. For stat cards, confirm `SkillType` exists and `Mode` is intentional.
+4. For behavior cards, register a behavior and subscribe only to required events.
+5. Connect effects at the domain owner (Player, Projectile, EnemyDeathHandler, WaveManager, or EnemyAi), not in UI.
+6. Update the description to match the actual level-one behavior and scaling.
+7. Verify equip/unequip cleanup, save/load ownership, pooled projectile reset, repeated triggers, and max-level roll filtering.
+8. Update this document and any affected domain docs.
 
----
-
-## 16. Testing Checklist
-
-```
-[ ] Card roll costs match constants (20/190/1800)
-[ ] Bundle discount applies correctly
-[ ] Pity triggers at correct thresholds (51/153/505)
-[ ] Pity resets after trigger
-[ ] Card leveling consumes duplicates correctly
-[ ] Level scaling applies (flat/percent × level)
-[ ] Slot unlock costs gold
-[ ] Max 19 slots enforced
-[ ] Equipped cards contribute stats
-[ ] Unequipped cards don't contribute
-[ ] Card effects apply through modifier pipeline
-[ ] Cache invalidates on equip/unequip
-[ ] CardRoll item consumes from inventory
-[ ] Save/load preserves card inventory
-[ ] Duplicate count tracks correctly
-```
-
----
-
-## 17. Common Issues
-
-### Issue: Pity never triggers
-**Cause:** Pity counter not incrementing, or threshold check wrong.
-**Fix:** Verify counter increments on non-Epic rolls, check threshold logic.
-
-### Issue: Card costs too high
-**Cause:** Bundle discount not applied, or cost calculation wrong.
-**Fix:** Use `CalculateRollGemCost` from `CardRollService`, not simple multiplication.
-
-### Issue: Equipped card has no effect
-**Cause:** Cache not invalidated, or modifier pipeline broken.
-**Fix:** Call `PlayerStatsManager.InvalidateCache()` after equip.
-
-### Issue: Level scaling wrong
-**Cause:** Scaling formula incorrect, or level not applied.
-**Fix:** Verify `flatValue × level` formula, check card level value.
-
----
-
-## 18. Future Extensions
-
-### Card Sets
-- Equip multiple cards from same set for bonus
-
-### Card Fusion
-- Combine cards for stronger version
-
-### Card Trading
-- Trade with other players
-
-### Card Skins
-- Visual variants of cards
+No SaveData schema change is required for the progression/configuration refactor; pity keys and owned-card persistence remain unchanged.
 
 ---
 
@@ -515,4 +187,4 @@ ModifierEntry ConvertToModifier(CardEffect effect, int level)
 
 | Date | Change | Reason |
 |------|--------|--------|
-| 2026-09-16 | Initial design doc | Documentation refactor |
+| 2026-10-01 | Replaced legacy schema and behavior notes with current single-source JSON/runtime contract | Card data and behavior audit |

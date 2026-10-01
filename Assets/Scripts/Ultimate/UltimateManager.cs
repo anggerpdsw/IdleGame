@@ -1,13 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
 using IdleDefenseSurvival.Data;
-using Newtonsoft.Json;
 using IdleDefenseSurvival.Controller;
 using System.Linq;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Card;
 
 namespace IdleDefenseSurvival.Ultimate
 {

@@ -656,7 +656,7 @@ Verified against `Assets/Scripts/` and `Assets/Resources/Data/`. Paths are repo-
 | Status | `Scripts/Enemy/EnemyStatusEffectController.cs`, `Scripts/Enemy/StatusEffects/IStatusEffect.cs`, `BaseStatusEffect.cs`, `ConcreteStatusEffects.cs` |
 | Projectile | `Scripts/Player/Projectile.cs`, `Scripts/Manager/ProjectilePool.cs` |
 | Wave | `Scripts/Manager/WaveManager.cs`, `Assets/Resources/Data/dataWave.json` |
-| Cards | `Scripts/Card/CardManager.cs` (UI façade), `Scripts/Manager/CardManager.cs`, services in `Scripts/Card/`: `CardDatabase`, `CardInventory`, `CardEquipmentService`, `CardRollService`, `CardUpgradeService`, `CardModifierService`, `VirtualCardInventorySnapshot` |
+| Cards | `Scripts/Card/CardManager.cs` (UI façade), `Scripts/Manager/CardManager.cs`; sole definition/balance source: `Assets/Resources/Data/Card/dataCard.json`; services: `CardDatabase`, `CardInventory`, `CardEquipmentService`, `CardRollService`, `CardUpgradeService`, `CardModifierService` (query façade); runtime: `Scripts/Card/Behavior/CardRuntimeManager.cs`, `CardBehaviorRegistry.cs`, `ICardBehavior.cs`, `Behavior/Implementations/*` |
 | Equipment | One entry-point: `Scripts/Equipment/IEquipmentService.cs` + `EquipmentService.cs`. Sub-services live in `Scripts/Equipment/`: `EquipmentSlotService`, `EquipmentPersistenceService`, `EquipmentDurabilityService`, `EquipmentAutoEquipService`, `EquipmentComparisonService`, `EquipmentComparer`, `EquipmentEffectService`, `EquipmentModifierService`, `EquipmentSetBonusService`, `EquipmentEventDispatcher`, `EquipmentVisualService`, `EquipmentStatCalculator`, `EquipmentAttributeData`, `AttributeWeightsConfig`, `RarityMechanicConfig`, `SlotIdentityService`, `EquipmentType` |
 | Inventory | `Scripts/Inventory/InventoryService.cs` + `IInventoryService`, `InventoryManager.cs`, `InventoryItem.cs`, `InventoryItemExtensions.cs`; category/state enums: `Scripts/Item/ItemCategory.cs`, `Scripts/Item/ItemState.cs` |
 | Items (gem/repair/drop/random) | `Scripts/Items/`: `DropTable.cs`, `AutoRepairService.cs`, `DurabilityService.cs`, `DurabilityColorTable.cs`, `RepairService.cs`, `RepairTransactionService.cs`, `IRepairCostProvider.cs`, `GemFactory.cs`, `GemExperienceService.cs`, `GemSocketService.cs`, `GemUpgradeService.cs`, `SocketValidationService.cs`, `SpecialEffectType.cs`, `Random/IRandomProvider.cs`, `Random/SeedRandomProvider.cs`, `Random/UnityRandomProvider.cs` |
@@ -758,7 +758,7 @@ Workflow:
    - percentage modifier;
    - special effect.
 3. For special effects, implement the effect in the correct domain.
-4. Register/parse the effect through `CardModifierService` where appropriate.
+4. Register custom behavior through `CardBehaviorRegistry`; route runtime events through `CardRuntimeManager`. `CardModifierService` is a query/refresh façade, not the behavior owner.
 5. Test level scaling.
 6. Test equipping/unequipping.
 7. Test save/load.
@@ -931,7 +931,7 @@ Start by reading the listed owner file, then the matching §39–§44 workflow, 
 | If you want to add… | Open first | Then read | Data file |
 |---|---|---|---|
 | a new ultimate | `Scripts/Ultimate/UltimateFactory.cs` | existing handler in `Scripts/Ultimate/Handler/` (e.g. `BombHandler.cs`) | `Resources/Data/Player/dataUltimate.json` |
-| a new card | `Scripts/Card/CardRollService.cs` | `CardModifierService` + `CardUpgradeService` | `Resources/Data/dataCard.json` |
+| a new card | `Scripts/Card/Behavior/CardBehaviorRegistry.cs` or `Scripts/Card/CardRollService.cs` | `CardRuntimeManager`, `CardModifierService`, `CardUpgradeService` | `Assets/Resources/Data/Card/dataCard.json` |
 | a new enemy | `Scripts/Enemy/EnemyAi.cs` | `EnemySpawner.cs` (spawn weights), `EnemyStatusEffectController.cs` | `Resources/Data/dataEnemy.json` |
 | a new equipment slot or piece | `Scripts/Equipment/IEquipmentService.cs` | `SlotIdentityService`, `AttributeWeightsConfig` | `Resources/Data/dataBaseEquipment.json` + per-slot JSON |
 | a new affix or set | `Scripts/Items/EquipmentSetBonusService` (or wherever affix roll lives) | equipment persistence path | `Resources/Data/dataAffixes.json` / `dataSets.json` |
@@ -1033,7 +1033,7 @@ All detailed system specifications (formerly §8-27 of this file) have been extr
 | **Progression** | | |
 | `Wave_Design.md` | Wave system | MAX_WAVE_PER_TIER=350, tier progression |
 | `Spawn_Design.md` | Spawn system | Weighted spawning, positioning, pooling |
-| `Card_Design.md` | Card system | 6 rarities, pity, leveling, roll costs |
+| `Card_Design.md` | Card system | single-source `dataCard.json`, progression, pity, leveling, runtime behaviors/events |
 | `Ultimate_Design.md` | Ultimate system | 8 handlers, cooldowns, special effects |
 | **Economy & Items** | | |
 | `Item_Design.md` | Item system | ItemId vs InstanceId, 7 categories, stackability |
@@ -1120,12 +1120,12 @@ New modifiers must register in `EffectRegistry` and feed through `ModifierCalcul
 
 | Concern | Owner | Sibling services | Data file |
 |---|---|---|---|
-| Roll cost | `Scripts/Card/CardRollService.cs` | `GameConstants.cs` (`ROLL1X/10X/100X_GEM_COST`) | `Card/dataCard.json` |
+| Roll cost | `Scripts/Card/CardRollService.cs` | `CardDatabase.Progression.RollCosts` | `Card/dataCard.json` |
 | Roll item vs gem | `CardRollService.cs` (gem path) | `Scripts/Inventory/InventoryService.cs` (`CardRoll` item path), `Scripts/Item/ItemCategory.cs` | `dataCard.json`, `dataConsumables.json` |
 | Inventory | `CardInventory.cs` | `VirtualCardInventorySnapshot.cs` (snapshot for UI) | none |
-| Duplicate → level | `CardUpgradeService.cs` | constants in `GameConstants.cs` | none — curve `[2,4,7,11,19,31,47,69,99]` |
-| Equip | `CardEquipmentService.cs` | `GameConstants.cs` (`CARD_MAX_SLOT=19`) | none |
-| Stat effect | `CardModifierService.cs` | `Scripts/Modifiers/EffectRegistry.cs` | `dataCard.json` |
+| Duplicate → level | `CardUpgradeService.cs` | `CardDatabase.Progression.DuplicateRequirements` and `MaximumLevel` | `Card/dataCard.json` |
+| Equip | `CardEquipmentService.cs` | `CardDatabase.Progression.StartingSlots`, `MaximumSlots`, `SlotExpansionCosts` | `Card/dataCard.json` |
+| Stat/special effects | `CardRuntimeManager.cs` + `CardBehaviorRegistry.cs` | `CardModifierService.cs` query façade, `ModifierManager` | `Card/dataCard.json` |
 | UI façade | `Scripts/Manager/CardManager.cs` | `Scripts/UI/CardCollection/CardCollectionUI.cs`, `CardRollButtonUI.cs`, `CardLevelValueItemUI.cs`, `Scripts/Controller/CardCollectionController.cs` | none |
 
 ## 55.5 Crafting (single domain, multi-stage pipeline)

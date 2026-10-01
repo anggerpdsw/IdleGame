@@ -2,7 +2,7 @@
 
 **Purpose:** Damage pipeline, defense formula, hit chance, combat flow.
 
-**Last Updated:** 2026-09-16
+**Last Updated:** 2026-10-01
 
 ---
 
@@ -14,6 +14,7 @@
 - [Enemy_Design.md](./Enemy_Design.md) — enemy combat behavior
 - [Projectile_Design.md](./Projectile_Design.md) — damage delivery
 - [StatusEffect_Design.md](./StatusEffect_Design.md) — combat effects
+- [Card_Design.md](./Card_Design.md) — card damage effects and death prevention
 
 ---
 
@@ -467,8 +468,19 @@ for (int i = 0; i < projectileCount; i++)
 
 ---
 
+## 18. Card Damage Interactions
+
+Card damage modifiers are defined in `Card/dataCard.json`; see [Card_Design.md](./Card_Design.md) for the card runtime/event contract.
+
+`EnemyAi.TakeDamage` exposes `LastOverkillDamage` as `max(0, post-mitigation damage - remaining HP before the hit)`. Overkill transfers only this true excess, multiplies it by the card's level-scaled transfer value, and applies the configured cap relative to the triggering hit's final damage. Defense or damage reduction that prevents a kill must never be counted as excess damage.
+
+Death prevention order is Death Reversal on lethal damage, then Death Defy, then Angel/Immortal. Death Reversal and Angel are card behaviors; Death Defy remains the player stat mechanic.
+
+---
+
 ## Change Log
 
 | Date | Change | Reason |
 |------|--------|--------|
 | 2026-09-16 | Initial design doc | Documentation refactor |
+| 2026-10-01 | Documented card damage interactions | Card behavior audit |
