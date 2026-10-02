@@ -213,8 +213,9 @@ namespace IdleDefenseSurvival.Player
             // Refresh card modifiers and visual effects (Berserker, Vampire Bite)
             CardModifierService.Refresh();
 
-            CardModifierService.OnModifierChanged += UpdateGamblerUI;
-            UpdateGamblerUI();
+            CardModifierService.OnModifierChanged += UpdateCardBonusUI;
+            CardRuntimeManager.Instance.OnBehaviorsUpdated += UpdateCardBonusUI;
+            UpdateCardBonusUI();
         }
 
         private void Update()
@@ -1141,12 +1142,13 @@ namespace IdleDefenseSurvival.Player
 
         private void OnDestroy()
         {
-            CardModifierService.OnModifierChanged -= UpdateGamblerUI;
+            CardModifierService.OnModifierChanged -= UpdateCardBonusUI;
+            CardRuntimeManager.Instance.OnBehaviorsUpdated -= UpdateCardBonusUI;
         }
 
-        private void UpdateGamblerUI()
+        private void UpdateCardBonusUI()
         {
-            // CrazyGambler: -300% to +500% range
+            // CrazyGambler: -300% to +500% range (stored as 0.5 = 50%)
             bool hasGambler = CardModifierService.HasEffect(CardEffectType.CrazyGambler);
             if (_crazyGambler != null) _crazyGambler.SetActive(hasGambler);
             if (hasGambler && _crazyGamblerText != null)
@@ -1154,8 +1156,12 @@ namespace IdleDefenseSurvival.Player
                 float bonus = CardModifierService.GetCrazyGamblerBonus();
                 _crazyGamblerText.text = $"{bonus:0}%";
             }
+            else if (_crazyGamblerText != null)
+            {
+                _crazyGamblerText.text = string.Empty;
+            }
 
-            // Desperados: -300% to +500% range
+            // Desperados: -300% to +500% range (stored as 0.5 = 50%)
             bool hasDesperados = CardModifierService.HasEffect(CardEffectType.Desperados);
             if (_desperados != null) _desperados.SetActive(hasDesperados);
             if (hasDesperados && _desperadosText != null)
@@ -1163,8 +1169,12 @@ namespace IdleDefenseSurvival.Player
                 float bonus = CardModifierService.GetDesperadosBonus();
                 _desperadosText.text = $"{bonus:0}%";
             }
+            else if (_desperadosText != null)
+            {
+                _desperadosText.text = string.Empty;
+            }
 
-            // Death Chain: 15stacks
+            // Death Chain: 15 stacks
             bool hasDeathChain = CardModifierService.HasEffect(CardEffectType.DeathChain);
             if (_deathChain != null) _deathChain.SetActive(hasDeathChain);
             if (hasDeathChain && _deathChainText != null)
@@ -1172,6 +1182,16 @@ namespace IdleDefenseSurvival.Player
                 float bonus = CardModifierService.GetDeathChainStack();
                 _deathChainText.text = $"s{bonus:0}";
             }
+            else if (_deathChainText != null)
+            {
+                _deathChainText.text = string.Empty;
+            }
+        }
+
+        private void OnDisable()
+        {
+            CardModifierService.OnModifierChanged -= UpdateCardBonusUI;
+            CardRuntimeManager.Instance.OnBehaviorsUpdated -= UpdateCardBonusUI;
         }
 
 #if UNITY_EDITOR

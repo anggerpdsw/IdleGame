@@ -222,7 +222,7 @@ namespace IdleDefenseSurvival.Manager
             // Decrement Angel immunity counter after InterWave ends
             CardRuntimeManager.Instance?.DispatchWaveComplete(CurrentWave);
 
-            // Card After wave 150DispatchWaveComplete
+            // Card After wave 150, DispatchWaveComplete
             if (CurrentWave > 150) 
                 // Dispatch wave start event to CardRuntimeManager
                 CardRuntimeManager.Instance?.DispatchWaveStart(CurrentWave);

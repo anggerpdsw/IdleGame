@@ -359,8 +359,8 @@
             "Parameters": {
                 "ActivationWave": 150,
                 "MaxStacks": 20,
-                "PositiveBonusPercent": 25,
-                "NegativeBonusPercent": -15
+                "PositiveBonus": 25,
+                "NegativeBonus": -15
             }
         }, {
             "Id": "desperados",
@@ -374,8 +374,8 @@
             "Parameters": {
                 "ActivationWave": 150,
                 "MaxStacks": 20,
-                "PositiveBonusPercent": 25,
-                "NegativeBonusPercent": -15
+                "PositiveBonus": 25,
+                "NegativeBonus": -15
             }
         }, {
             "Id": "bat_stalker",
@@ -766,14 +766,14 @@
         }, {
             "Id": "world_breaker",
             "Name": "World Breaker",
-            "Description": "Every 50A kills permanently grants 2% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
+            "Description": "Every 5A kills permanently grants 2% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
             "EffectType": "WorldBreaker",
             "Mode": "Percent",
             "BaseValue": 2,
             "ValuePerLevel": 0.3,
             "CardRarity": "Divine",
             "Parameters": {
-                "KillsPerStack": 50000,
+                "KillsPerStack": 5000,
                 "StacksPerDefenseIgnoreMilestone": 5,
                 "DefenseIgnorePercentPerMilestone": 10,
                 "MaximumDefenseIgnorePercent": 100

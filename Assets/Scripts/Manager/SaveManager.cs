@@ -611,11 +611,35 @@ namespace IdleDefenseSurvival.Manager
                 });
             string tempPath = SaveFile + ".tmp";
             File.WriteAllText(tempPath, json);
-            // Replace existing file atomically; fall back to Move if destination doesn't exist yet
+
+            // Robust atomic replace with fallback for locked files (Windows)
             if (File.Exists(SaveFile))
-                File.Replace(tempPath, SaveFile, null);
+            {
+                try
+                {
+                    File.Replace(tempPath, SaveFile, null);
+                }
+                catch (IOException)
+                {
+                    // File locked (antivirus/OneDrive/debugger) - fallback to delete + move
+                    Debug.LogWarning("[SaveManager] File.Replace failed (file locked). Falling back to Delete+Move.");
+                    try
+                    {
+                        File.Delete(SaveFile);
+                        File.Move(tempPath, SaveFile);
+                    }
+                    catch (Exception fallbackEx)
+                    {
+                        Debug.LogError($"[SaveManager] Fallback save failed: {fallbackEx.Message}");
+                        if (File.Exists(tempPath)) File.Delete(tempPath);
+                        throw;
+                    }
+                }
+            }
             else
+            {
                 File.Move(tempPath, SaveFile);
+            }
         }
 
         private SaveData LoadFromDisk()
@@ -781,9 +805,7 @@ namespace IdleDefenseSurvival.Manager
                     {
                         CardId = card.CardId,
                         Level = card.Level,
-                        DuplicateCount = card.DuplicateCount,
-                        WorldBreakerStacks = card.WorldBreakerStacks,
-                        WorldBreakerKillProgress = card.WorldBreakerKillProgress
+                        DuplicateCount = card.DuplicateCount
                     };
                 }
                 cardInventory.equippedCards = CardEquipmentService.Instance?.GetSaveData() ?? new List<string>();
@@ -835,9 +857,7 @@ namespace IdleDefenseSurvival.Manager
                     {
                         CardId = kvp.Value.CardId,
                         Level = kvp.Value.Level,
-                        DuplicateCount = kvp.Value.DuplicateCount,
-                        WorldBreakerStacks = kvp.Value.WorldBreakerStacks,
-                        WorldBreakerKillProgress = kvp.Value.WorldBreakerKillProgress
+                        DuplicateCount = kvp.Value.DuplicateCount
                     };
                 }
                 CardInventory.Instance.LoadInventory(ownedCards);

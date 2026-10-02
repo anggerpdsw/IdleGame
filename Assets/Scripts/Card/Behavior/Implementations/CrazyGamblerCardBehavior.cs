@@ -21,8 +21,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             base.OnEquip(state);
             _bonus = 0f;
             _maxStack = Mathf.RoundToInt(GetParameter("MaxStacks"));
-            _positiveValue = GetParameter("PositiveBonusPercent") * 0.01f;
-            _negativeValue = GetParameter("NegativeBonusPercent") * 0.01f;
+            _positiveValue = GetParameter("PositiveBonus");
+            _negativeValue = GetParameter("NegativeBonus");
         }
 
         public override void OnUnequip(CardRuntimeState state)
@@ -34,10 +34,10 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             if (waveNumber <= GetParameter("ActivationWave")) return;
 
-            float chancePercent = GetCurrentValue();
-            float bonusPercent = Utilityku.Chance(chancePercent) ? _positiveValue : _negativeValue;
+            float chance = GetCurrentValue();
+            float bonus = Utilityku.Chance(chance) ? _positiveValue : _negativeValue;
 
-            _bonus += bonusPercent;
+            _bonus += bonus;
             _bonus = Mathf.Clamp(_bonus, _negativeValue * _maxStack, _positiveValue * _maxStack);
 
             RefreshModifier();
@@ -54,7 +54,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 Source = ModifierSource.Card,
                 Stat = SkillType.AttackDamage,
                 Mode = ModifierMode.Percent,
-                Value = _bonus * 100f,
+                Value = _bonus,
                 Permanent = false
             };
             ModifierManager.Instance.AddModifier(modifier);

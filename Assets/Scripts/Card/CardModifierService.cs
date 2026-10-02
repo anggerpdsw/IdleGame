@@ -77,6 +77,12 @@ namespace IdleDefenseSurvival.Card
             return behavior?.GetDefenseIgnoreFraction() ?? 0f;
         }
 
+        public static int GetWorldBreakerStackCount()
+        {
+            var behavior = CardRuntimeManager.Instance?.GetBehavior("world_breaker") as WorldBreakerCardBehavior;
+            return behavior?.GetStackCount() ?? 0;
+        }
+
         public static float GetDevourerDamageMultiplier(float targetHealthFraction)
         {
             var behavior = CardRuntimeManager.Instance?.GetBehavior("apex_evolution") as ApexEvolutionCardBehavior;
@@ -87,12 +93,6 @@ namespace IdleDefenseSurvival.Card
         {
             var behavior = CardRuntimeManager.Instance?.GetBehavior("apex_evolution") as ApexEvolutionCardBehavior;
             return behavior?.GetProjectileEffectTriggerRateMultiplier() ?? 1f;
-        }
-
-        public static int GetWorldBreakerStackCount()
-        {
-            var behavior = CardRuntimeManager.Instance?.GetBehavior("world_breaker") as WorldBreakerCardBehavior;
-            return behavior?.GetStackCount() ?? 0;
         }
 
         public static bool HasCard(string cardId)

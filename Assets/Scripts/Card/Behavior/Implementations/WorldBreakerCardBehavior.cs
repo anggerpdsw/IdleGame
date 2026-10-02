@@ -1,6 +1,4 @@
 using System;
-using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Manager;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
@@ -14,9 +12,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            var ownedCard = CardInventory.Instance?.GetOwnedCard(state.CardId);
-            _stacks = ownedCard?.WorldBreakerStacks ?? 0;
-            _killProgress = ownedCard?.WorldBreakerKillProgress ?? 0;
+            _stacks = 0;
+            _killProgress = 0;
+        }
+
+        public override void OnUnequip(CardRuntimeState state)
+        {
+            base.OnUnequip(state);
+            _stacks = 0;
+            _killProgress = 0;
         }
 
         public override void OnEnemyKilled(int count, string enemyType, string damageSource)
@@ -29,8 +33,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             long totalProgress = (long)_killProgress + count;
             long stacksGained = totalProgress / killsPerStack;
             _killProgress = (int)(totalProgress % killsPerStack);
-            _stacks = (int)System.Math.Min(int.MaxValue, (long)_stacks + stacksGained);
-            CardInventory.Instance?.SetWorldBreakerProgress(CardId, _stacks, _killProgress);
+            _stacks = (int)Math.Min(int.MaxValue, (long)_stacks + stacksGained);
         }
 
         public float GetDamageMultiplier()
@@ -56,7 +59,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             return Enum.TryParse(damageSource, true, out DamageSource _)
                 || damageSource == "Overkill"
                 || damageSource == "ChainReactionExplosion"
-                || damageSource == "LawOfCollapse";
+                || damageSource == "LawOfCollapse"
+                || damageSource == "Player";
         }
     }
 }

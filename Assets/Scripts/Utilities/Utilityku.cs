@@ -8,8 +8,8 @@ using UnityEngine;
 
 public static class Utilityku
 {
-    public static bool Chance(float chancePercent) => Random.Range(0f, 100f) < chancePercent;
-    public static bool Chance01(float chance) => Random.value > chance;
+    public static bool Chance(float chance) => Random.Range(0f, 100f) < chance;
+    public static bool Chance01(float chancePercent) => Random.value > chancePercent;
     public static float DropRateIncrease(float value)
     {
         float dropRate = PlayerStatsManager.Instance.GetStat(SkillType.DropRate);

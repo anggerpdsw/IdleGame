@@ -29,8 +29,11 @@ namespace IdleDefenseSurvival
     public enum SlowSource { Card, Cloud, Enemy, Void, Lightning }
     public enum SlowType { Permanent, Temporary, Aura }
     
-    public enum DamageSource { Player, Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave }
-
+    public enum DamageSource { Player, 
+    // Ultimate
+    Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave,
+    // Card
+    Overkill, ChainReactionExplosion, LawOfCollapse }
 
     /// <summary>
     /// Runtime status of a mission instance

@@ -106,8 +106,6 @@ namespace IdleDefenseSurvival.Data
         public string CardId;
         public int Level = 1;
         public int DuplicateCount = 0;
-        public int WorldBreakerStacks;
-        public int WorldBreakerKillProgress;
     }
 
     [Serializable]

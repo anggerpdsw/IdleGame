@@ -43,6 +43,7 @@ namespace IdleDefenseSurvival.Card.Behavior
             = new();
 
         public event Action OnApexEvolutionChoicesUpdated;
+        public event Action OnBehaviorsUpdated;
 
         public void Initialize()
         {
@@ -253,9 +254,10 @@ namespace IdleDefenseSurvival.Card.Behavior
 
         private void Dispatch(CardEventType eventType, Action<ICardBehavior> action)
         {
-            if (!_eventSubscriptions.TryGetValue(eventType, out var list)) return;
-            foreach (var behavior in list)
-                action(behavior);
+            if (_eventSubscriptions.TryGetValue(eventType, out var list))
+                foreach (var behavior in list)
+                    action(behavior);
+            OnBehaviorsUpdated?.Invoke();
         }
 
         private void Update()
