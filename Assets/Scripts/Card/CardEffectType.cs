@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival.Card
     public enum CardEffectType
     {
         None,
-        Gold, Meat,
+        Gold, Meat, Exp,
         FrostAura,            // Slows enemies in attack range (aura)
         TimeFast,
         Shield,               // Grants shield up to % of max HP when at full HP

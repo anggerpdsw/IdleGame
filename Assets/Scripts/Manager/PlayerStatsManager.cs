@@ -7,6 +7,8 @@ using UnityEngine;
 
 namespace IdleDefenseSurvival.Manager
 {
+    public enum AccumulatedCountType { Bounce, Exp, Multi }
+
     public class PlayerStatsManager : MonoBehaviour
     {
         #region Singleton
@@ -46,6 +48,7 @@ namespace IdleDefenseSurvival.Manager
         // Persists across projectile pool resets because PlayerStatsManager
         // is a DontDestroyOnLoad singleton.
         private float _bounceFractionAccumulator = 0f;
+        private float _expFractionAccumulator = 0f;
         private float _multiShootFractionAccumulator = 0f;
 
         /// <summary>
@@ -73,12 +76,13 @@ namespace IdleDefenseSurvival.Manager
             {
                 AccumulatedCountType.Bounce =>
                     AccumulateFraction(wholeCount, fraction, ref _bounceFractionAccumulator),
+                AccumulatedCountType.Exp =>
+                    AccumulateFraction(wholeCount, fraction, ref _expFractionAccumulator),
                 AccumulatedCountType.Multi =>
                     AccumulateFraction(wholeCount, fraction, ref _multiShootFractionAccumulator),
                 _ => wholeCount,
             };
         }
-
         private int AccumulateFraction(int wholeCount, float fraction, ref float accumulator)
         {
             accumulator += fraction;
@@ -163,5 +167,4 @@ namespace IdleDefenseSurvival.Manager
             => ApplyTemporaryModifier(stats, multiplierPercent, sourceId, 1f);
     }
 
-    public enum AccumulatedCountType { Bounce, Multi }
 }

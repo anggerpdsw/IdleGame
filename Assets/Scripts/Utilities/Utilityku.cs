@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using IdleDefenseSurvival;
+using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Controller;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
@@ -21,6 +22,17 @@ public static class Utilityku
         float finalDamage = damage * (100f / (100f + effectiveDefense));
         // Damage minimal 2
         return Mathf.Max(2f, finalDamage);
+    }
+    /// <summary>
+    /// Returns final XP after applying card % modifiers.
+    /// Multiplication may produce fractional XP; round to nearest int to avoid loss.
+    /// </summary>
+    public static int FinalExperience(int baseExp)
+    {
+        float expMultiplier = CardModifierService.GetEffectResult(CardEffectType.Exp, 1f);
+        float result = baseExp * expMultiplier;
+        int accumulatedCount = PlayerStatsManager.Instance.GetAccumulatedCount(result, AccumulatedCountType.Exp);
+        return accumulatedCount;
     }
 
     public static int FinalDefense(Role role, float health)

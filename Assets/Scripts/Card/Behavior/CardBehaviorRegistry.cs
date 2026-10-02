@@ -22,6 +22,7 @@ namespace IdleDefenseSurvival.Card.Behavior
             // Register all stat-only effects (handled by DefaultCardBehavior)
             RegisterStatOnly(CardEffectType.Gold);
             RegisterStatOnly(CardEffectType.Meat);
+            RegisterStatOnly(CardEffectType.Exp);
             RegisterStatOnly(CardEffectType.FrostAura);
             RegisterStatOnly(CardEffectType.Shield);
             RegisterStatOnly(CardEffectType.TimeFast);

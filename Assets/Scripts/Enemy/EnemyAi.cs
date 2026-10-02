@@ -396,7 +396,7 @@ namespace IdleDefenseSurvival.Enemy
             _goldReward = goldReward;
             _gemReward  = gemReward;
             _meatReward = meatReward;
-            _expReward  = data.exp;
+            _expReward  = Utilityku.FinalExperience(data.exp);
 
             // Register dengan global health bar manager
             _enemyHealthBarManager.RegisterEnemy(this, _maxHealth);

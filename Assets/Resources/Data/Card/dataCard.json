@@ -60,6 +60,15 @@
             "ValuePerLevel": 20,
             "CardRarity": "Common"
         }, {
+            "Id": "exp",
+            "Name": "Experience",
+            "Description": "Get more exp when Enemy die",
+            "EffectType": "Exp",
+            "Mode": "Percent",
+            "BaseValue": 115,
+            "ValuePerLevel": 19,
+            "CardRarity": "Common"
+        }, {
             "Id": "long_reach",
             "Name": "Long Reach",
             "Description": "Extends character max attack range",
@@ -353,14 +362,14 @@
             "Description": "After wave 150, there a chance to increase ATK by 25% at the end of each wave, and a chance to decrease ATK by 15% (max 20 stack)",
             "EffectType": "CrazyGambler",
             "Mode": "Percent",
-            "BaseValue": 43,
+            "BaseValue": 47,
             "ValuePerLevel": 1.4,
             "CardRarity": "Rare",
             "Parameters": {
                 "ActivationWave": 150,
-                "MaxStacks": 20,
-                "PositiveBonus": 25,
-                "NegativeBonus": -15
+                "MaxStacks": 18,
+                "PositiveBonus": 15,
+                "NegativeBonus": -5
             }
         }, {
             "Id": "desperados",
@@ -368,14 +377,14 @@
             "Description": "After wave 150, there a chance to increase HP by 25% at the end of each wave, and a chance to decrease HP by 15% (max 20 stack)",
             "EffectType": "Desperados",
             "Mode": "Percent",
-            "BaseValue": 43,
+            "BaseValue": 47,
             "ValuePerLevel": 1.4,
             "CardRarity": "Rare",
             "Parameters": {
                 "ActivationWave": 150,
-                "MaxStacks": 20,
-                "PositiveBonus": 25,
-                "NegativeBonus": -15
+                "MaxStacks": 18,
+                "PositiveBonus": 15,
+                "NegativeBonus": -5
             }
         }, {
             "Id": "bat_stalker",
