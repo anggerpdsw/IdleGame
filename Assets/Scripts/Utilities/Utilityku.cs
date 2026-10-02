@@ -95,9 +95,17 @@ public static class Utilityku
     
     public static long WaveBonusInterest(CurrencyType type, long earned, float percent, int CurrentTier)
     {
-        long bonus = Mathf.RoundToInt(earned * (percent / 100f));
+        float rawBonus = earned * (percent / 100f);
         float baseMax = 100f;
         float tierIncrease = 25f;
+
+        AccumulatedCountType accType = type switch
+        {
+            CurrencyType.Gold => AccumulatedCountType.Gold,
+            CurrencyType.Meat => AccumulatedCountType.Meat,
+            _ => AccumulatedCountType.Gold
+        };
+
         switch(type)
         {
             case CurrencyType.Gold:
@@ -109,8 +117,11 @@ public static class Utilityku
                 tierIncrease = 25f;
                 break;
         }
-        baseMax =+ baseMax * (CurrentTier - 1) * tierIncrease;
-        return (long)Mathf.Min(bonus, baseMax);
+
+        baseMax += baseMax * (CurrentTier - 1) * tierIncrease;
+        float finalBonus = Mathf.Min(rawBonus, baseMax);
+
+        return PlayerStatsManager.Instance.GetAccumulatedCount(finalBonus, accType);
     }
 
     public static long WaveBonusVictory(long earned, int currentTier, int currentWave)

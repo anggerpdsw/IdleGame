@@ -29,10 +29,7 @@ namespace IdleDefenseSurvival.Enemy
         private readonly Dictionary<Role, Transform> _roleParents = new();
         private float _timer;
 
-        // Fractional reward accumulator.
-        // Pecahan reward tidak hilang dan dibawa ke enemy berikutnya.
-        private float _goldFraction;
-        private float _meatFraction;
+        // Fractional reward accumulator moved to PlayerStatsManager.GetAccumulatedCount
 
         // =========================================================
         // PUBLIC
@@ -341,11 +338,8 @@ namespace IdleDefenseSurvival.Enemy
             float equipGoldGain = PlayerStatsManager.Instance.GetStat(SkillType.GoldGain);
             rawGold *= 1f + equipGoldGain / 100f;
             rawGold *= Utilityku.DropRateIncrease(GameConstants.DROP_CHANCE_GOLD);
-            // Tambahkan pecahan dari enemy sebelumnya.
-            rawGold += _goldFraction;
-            long gold = (long)Mathf.Floor(rawGold);
-            // Simpan kembali bagian pecahannya.
-            _goldFraction = rawGold - gold;
+
+            int gold = PlayerStatsManager.Instance.GetAccumulatedCount(rawGold, AccumulatedCountType.Gold);
             return Math.Max(1, gold);
         }
 
@@ -382,11 +376,8 @@ namespace IdleDefenseSurvival.Enemy
             float rawMeat = 1f + tier * 0.35f + hpBonus;
             float meatDropMultiplier = CardModifierService.GetEffectResult(CardEffectType.Meat, 1f);
             rawMeat *= meatDropMultiplier;
-            // Tambahkan pecahan dari enemy sebelumnya.
-            rawMeat += _meatFraction;
-            long meat = (long)Mathf.Floor(rawMeat);
-            // Simpan kembali bagian pecahannya.
-            _meatFraction = rawMeat - meat;
+
+            int meat = PlayerStatsManager.Instance.GetAccumulatedCount(rawMeat, AccumulatedCountType.Meat);
             return Math.Max(1, meat);
         }
 
