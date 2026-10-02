@@ -124,7 +124,7 @@ namespace IdleDefenseSurvival.UI
 
                 // Update label text
                 TextMeshProUGUI label = labelTransform != null ? labelTransform.GetComponent<TextMeshProUGUI>() : null;
-                if (label != null) label.text = $"{source}: {damage:N0}";
+                if (label != null) label.text = $"{source}: {Utilityku.FormatNumber(damage)}";
 
                 // Update slider value
                 if (slider != null) slider.value = totalDamage > 0 ? (float)damage / totalDamage : 0;
