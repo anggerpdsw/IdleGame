@@ -42,7 +42,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             float maxMana = player.MaxMana;
             if (maxMana <= 0f) return;
 
-            float manaPercent = (currentMana / maxMana) * 100f;
+            float manaPercent = currentMana / maxMana * 100f;
 
             // High mana: grant attack speed
             bool isHighMana = manaPercent >= _highManaThresholdPercent;
@@ -131,7 +131,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 float maxMana = player.MaxMana;
                 if (maxMana > 0f)
                 {
-                    float manaPercent = (currentMana / maxMana) * 100f;
+                    float manaPercent = currentMana / maxMana * 100f;
                     bool isHighMana = manaPercent >= _highManaThresholdPercent;
                     UpdateAttackSpeedModifier(isHighMana);
 

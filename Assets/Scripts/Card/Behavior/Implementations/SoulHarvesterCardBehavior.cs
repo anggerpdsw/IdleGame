@@ -43,7 +43,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             if (soulsPerCapIncrease > 0 && capIncrease > 0)
             {
                 long expandedCap = _initialSoulCap
-                    + (_totalSoulsEarned / soulsPerCapIncrease) * capIncrease;
+                    + _totalSoulsEarned / soulsPerCapIncrease * capIncrease;
                 _maxStack = (int)Math.Min(expandedCap, int.MaxValue);
             }
             _soulCount = (int)Math.Min(_totalSoulsEarned, _maxStack);
