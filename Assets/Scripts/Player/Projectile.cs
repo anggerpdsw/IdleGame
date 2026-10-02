@@ -438,6 +438,12 @@ namespace IdleDefenseSurvival.Player
                             }
                         }
 
+                        // Dispatch critical hit event for card behaviors (Shrapnel, BleedingEdge)
+                        if (critTier != CriticalType.None)
+                        {
+                            CardRuntimeManager.Instance?.DispatchPlayerCriticalHit(true, currentDamage, transform.position);
+                        }
+
                         // VoidOverlord bonus damage
                         if (isVoidOverlord)
                         {

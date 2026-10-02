@@ -182,7 +182,7 @@ void Update()
 bool RollHit()
 {
     float hitChance = Mathf.Clamp(_hitRate - Player.Instance.GetEvasion(), 5f, 100f);
-    return Random.Range(0f, 100f) < hitChance;
+    return Utilityku.Chance(hitChance);
 }
 ```
 

@@ -66,6 +66,12 @@ namespace IdleDefenseSurvival.Card.Behavior
             Register<VolatileCoreCardBehavior>(CardEffectType.VolatileCore);
             Register<ArcaneResonanceCardBehavior>(CardEffectType.ArcaneResonance);
             Register<LastBulletCardBehavior>(CardEffectType.LastBullet);
+
+            Register<PredatorFocusCardBehavior>(CardEffectType.PredatorFocus);
+            Register<ShrapnelCardBehavior>(CardEffectType.Shrapnel);
+            Register<BleedingEdgeCardBehavior>(CardEffectType.BleedingEdge);
+            Register<StaggerMasterCardBehavior>(CardEffectType.StaggerMaster);
+            Register<OverchargeCardBehavior>(CardEffectType.Overcharge);
         }
 
         /// <summary>

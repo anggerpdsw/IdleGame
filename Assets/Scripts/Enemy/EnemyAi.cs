@@ -90,6 +90,16 @@ namespace IdleDefenseSurvival.Enemy
         private float _knockbackDuration;
         private float _evasion;
         private bool _isStunt = false;
+
+        /// <summary>
+        /// True while the enemy is currently knocked back (soft stun from knockback).
+        /// </summary>
+        public bool IsKnockedBack => Time.time < _knockbackEndTime;
+
+        /// <summary>
+        /// True while the enemy is currently stunned (from stun status effect or knockback soft stun).
+        /// </summary>
+        public bool IsStunned => Time.time < _stuntEndTime;
         private float _attackTimer = 0f;
         private string _lastDamageSource = DamageSource.Player.ToString();
 

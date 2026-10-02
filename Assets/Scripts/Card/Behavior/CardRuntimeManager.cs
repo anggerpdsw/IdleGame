@@ -163,15 +163,15 @@ namespace IdleDefenseSurvival.Card.Behavior
                 CardEffectType.Berserker
                     => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnPlayerHealed },
                 CardEffectType.DeathChain or
-                CardEffectType.SoulHarvester or 
-                CardEffectType.ChainReaction or 
+                CardEffectType.SoulHarvester or
+                CardEffectType.ChainReaction or
                 CardEffectType.ApocalypseEngine or
                 CardEffectType.WorldBreaker
                     => new[] { CardEventType.OnEnemyKilled },
                 CardEffectType.VampiricFrenzy
                     => new[] { CardEventType.OnLifeSteal },
-                CardEffectType.BulletStorm or 
-                CardEffectType.InfiniteArsenal or 
+                CardEffectType.BulletStorm or
+                CardEffectType.InfiniteArsenal or
                 CardEffectType.WarMachine or
                 CardEffectType.CelestialArsenal
                     => new[] { CardEventType.OnPlayerAttack },
@@ -179,14 +179,14 @@ namespace IdleDefenseSurvival.Card.Behavior
                     => new[] { CardEventType.OnPlayerDamaged },
                 CardEffectType.DivineRetribution
                     => new[] { CardEventType.OnPlayerDamaged },
-                CardEffectType.DeathReversal 
+                CardEffectType.DeathReversal
                     => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnWaveStart },
-                CardEffectType.CrazyGambler or 
-                CardEffectType.Desperados 
+                CardEffectType.CrazyGambler or
+                CardEffectType.Desperados
                     => new[] { CardEventType.OnWaveComplete },
-                CardEffectType.Immortal 
+                CardEffectType.Immortal
                     => new[] { CardEventType.OnWaveComplete, CardEventType.OnWaveStart },
-                CardEffectType.BatStalker or 
+                CardEffectType.BatStalker or
                 CardEffectType.HealOnKill
                     => new[] { CardEventType.OnEnemyKilled },
                 CardEffectType.ApexEvolution
@@ -210,6 +210,18 @@ namespace IdleDefenseSurvival.Card.Behavior
                     => new[] { CardEventType.OnPlayerAttack },
                 CardEffectType.GravityWell
                     => Array.Empty<CardEventType>(), // timer-driven, no event subscription
+
+                // New Rare cards
+                CardEffectType.PredatorFocus
+                    => new[] { CardEventType.OnPlayerAttack },
+                CardEffectType.Shrapnel
+                    => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit },
+                CardEffectType.BleedingEdge
+                    => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit },
+                CardEffectType.StaggerMaster
+                    => new[] { CardEventType.OnPlayerAttack },
+                CardEffectType.Overcharge
+                    => Array.Empty<CardEventType>(), // Uses Update loop for mana tracking
 
                 _ => Array.Empty<CardEventType>(),
             };
@@ -235,6 +247,9 @@ namespace IdleDefenseSurvival.Card.Behavior
 
         public void DispatchPlayerLifeSteal(float healAmount, float currentHp, float maxHp)
             => Dispatch(CardEventType.OnLifeSteal, b => b.OnPlayerLifeSteal(healAmount, currentHp, maxHp));
+
+        public void DispatchPlayerCriticalHit(bool isCriticalHit, float damage, Vector2 position)
+            => Dispatch(CardEventType.OnCriticalHit, b => b.OnCriticalHit(isCriticalHit, damage, position));
 
         public void DispatchWaveStart(int waveNumber)
             => Dispatch(CardEventType.OnWaveStart, b => b.OnWaveStart(waveNumber));

@@ -124,7 +124,7 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         private void TrySpreadPoison(EnemyAi source)
         {
-            if (UnityEngine.Random.Range(0f, 1f) > _spreadChance) return;
+            if (Utilityku.Chance01(_spreadChance)) return;
 
             Collider2D[] hits = Physics2D.OverlapCircleAll(source.transform.position, _spreadRadius, LayerMask.GetMask("Enemy"));
             foreach (var hit in hits)
@@ -215,17 +215,19 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
     public sealed class BleedStatus : BaseStatusEffect
     {
         public override StatusEffectType Type => StatusEffectType.Bleed;
-        public override int MaxStacks => 15;
+        public override int MaxStacks => _maxStacks;
         public override StackPolicy StackPolicy => StackPolicy.Additive;
 
         private readonly float _baseDamagePerSecond;
         private readonly float _missingHealthMultiplier;
+        private readonly int _maxStacks;
 
-        public BleedStatus(float baseDamagePerSecond, float duration, float missingHealthMultiplier = 0.5f)
+        public BleedStatus(float baseDamagePerSecond, float duration, float missingHealthMultiplier = 0.5f, int maxStacks = 15)
             : base(duration)
         {
             _baseDamagePerSecond = baseDamagePerSecond;
             _missingHealthMultiplier = missingHealthMultiplier;
+            _maxStacks = maxStacks;
         }
 
         public override float GetCurrentValue()

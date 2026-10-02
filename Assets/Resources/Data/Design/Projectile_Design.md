@@ -153,7 +153,7 @@ bool RollHit(EnemyAi enemy)
     
     float hitChance = Mathf.Clamp(playerHitRate - enemyEvasion, 5f, 100f);
     
-    return Random.Range(0f, 100f) < hitChance;
+    return Utilityku.Chance(hitChance);
 }
 ```
 
@@ -253,7 +253,7 @@ void ApplyLifeSteal(float damageDealt)
 void ApplyKnockback(EnemyAi enemy)
 {
     float knockbackChance = PlayerStatsManager.GetFinalStat(KnockbackChance);
-    if (Random.Range(0f, 100f) >= knockbackChance) return;
+    if (!Utilityku.Chance(knockbackChance)) return;
     
     float knockbackForce = PlayerStatsManager.GetFinalStat(KnockbackForce);
     Vector2 direction = (enemy.transform.position - Player.Instance.transform.position).normalized;
@@ -268,7 +268,7 @@ void ApplyKnockback(EnemyAi enemy)
 void ApplyStun(EnemyAi enemy)
 {
     float stunChance = PlayerStatsManager.GetFinalStat(StunChance);
-    if (Random.Range(0f, 100f) >= stunChance) return;
+    if (!Utilityku.Chance(stunChance)) return;
     
     float stunDuration = PlayerStatsManager.GetFinalStat(StunDuration);
     enemy.ApplyStun(stunDuration);
@@ -281,7 +281,7 @@ void ApplyStun(EnemyAi enemy)
 void ApplyDefenseBreak(EnemyAi enemy)
 {
     float defenseBreakChance = PlayerStatsManager.GetFinalStat(DefenseBreakChance);
-    if (Random.Range(0f, 100f) >= defenseBreakChance) return;
+    if (!Utilityku.Chance(defenseBreakChance)) return;
     
     float defenseBreakValue = PlayerStatsManager.GetFinalStat(DefenseBreakValue);
     float defenseBreakDuration = PlayerStatsManager.GetFinalStat(DefenseBreakDuration);

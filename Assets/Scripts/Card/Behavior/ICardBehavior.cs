@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
@@ -114,6 +115,11 @@ namespace IdleDefenseSurvival.Card.Behavior
         void OnPlayerAttack();
 
         /// <summary>
+        /// Called when the player lands a critical hit.
+        /// </summary>
+        void OnCriticalHit(bool isCriticalHit, float damage, Vector2 position);
+
+        /// <summary>
         /// Called every frame for time-based effects.
         /// </summary>
         void Update(float deltaTime);
@@ -159,6 +165,8 @@ namespace IdleDefenseSurvival.Card.Behavior
         public virtual void OnEnemyKilled(EnemyAi enemy, string damageSource) { }
         public virtual void OnPlayerLifeSteal(float healAmount, float currentHp, float maxHp) { }
         public virtual void OnPlayerAttack() { }
+
+        public virtual void OnCriticalHit(bool isCriticalHit, float damage, Vector2 position) { }
         public virtual void Update(float deltaTime) { }
 
         public virtual float GetCurrentValue() => _runtimeState?.CurrentValue ?? 0f;
@@ -247,17 +255,12 @@ namespace IdleDefenseSurvival.Card.Behavior
         None = 0,
         OnEnemyKilled,
         OnPlayerAttack,
-        OnPlayerHit,
         OnPlayerDamaged,
-        OnPlayerHeal,
         OnPlayerHealed,
         OnLifeSteal,
         OnCriticalHit,
-        OnWaveCompleted,
         OnWaveComplete,
         OnWaveStart,
-        OnBattleStart,
-        OnHealthChanged,
-        OnAttackPerformed
+        OnHealthChanged
     }
 }

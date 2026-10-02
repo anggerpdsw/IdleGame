@@ -73,7 +73,7 @@ void Update()
         _cooldownTimer = 0f;
         
         // Roll activation chance
-        if (Random.Range(0f, 100f) < _activationChance)
+        if (Utilityku.Chance(_activationChance))
         {
             TriggerRandomUltimate();
         }

@@ -609,7 +609,7 @@ namespace IdleDefenseSurvival.Modifiers.Effects
             if (enemy != null && enemy.Role != Role.BOSS)
             {
                 float chance = GetCurrentValue(context) * 0.01f;
-                if (UnityEngine.Random.Range(0f, 1f) < chance)
+                if (!Utilityku.Chance01(chance))
                 {
                     enemy.TakeDamage(new DamageData(enemy.CurrentHealth * 10f, DamageType.TrueDamage, CriticalType.None, "InstantKill"));
                     SetLastTriggerTime(context.CurrentTime);

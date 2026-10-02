@@ -183,7 +183,7 @@ Transform SelectTarget(Collider2D[] enemies)
 bool RollMultiShoot()
 {
     float chance = PlayerStatsManager.GetFinalStat(MultiShootChance);
-    return Random.Range(0f, 100f) < chance;
+    return Utilityku.Chance(chance);
 }
 ```
 
@@ -282,7 +282,7 @@ void Update()
 bool RollDeathDefy()
 {
     float chance = PlayerStatsManager.GetFinalStat(DeathDefy);
-    return Random.Range(0f, 100f) < chance;
+    return Utilityku.Chance(chance);
 }
 ```
 

@@ -396,6 +396,78 @@
             "ValuePerLevel": 1.5,
             "CardRarity": "Rare"
         }, {
+            "Id": "predator_focus",
+            "Name": "Predator Focus",
+            "Description": "When only a few enemies are within attack range, increase Attack Damage.",
+            "EffectType": "PredatorFocus",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 1.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "EnemyThreshold": 3
+            }
+        }, {
+            "Id": "shrapnel",
+            "Name": "Shrapnel",
+            "Description": "Critical hits have a chance to release shrapnel that damages nearby enemies.",
+            "EffectType": "Shrapnel",
+            "Mode": "Percent",
+            "BaseValue": 15,
+            "ValuePerLevel": 2,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "TriggerChancePercent": 15,
+                "DamageMultiplier": 0.35,
+                "Radius": 2.5,
+                "MaximumTargets": 4
+            }
+        }, {
+            "Id": "bleeding_edge",
+            "Name": "Bleeding Edge",
+            "Description": "Critical hits inflict Bleed, dealing damage over time.",
+            "EffectType": "BleedingEdge",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 1.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "BleedChancePercent": 25,
+                "DurationSeconds": 4,
+                "DamagePerSecondMultiplier": 0.12,
+                "MaximumStacks": 3
+            }
+        }, {
+            "Id": "stagger_master",
+            "Name": "Stagger Master",
+            "Description": "Enemies affected by Knockback or Stun take increased damage for a short duration.",
+            "EffectType": "StaggerMaster",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 1.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "DamageBonusPercent": 8,
+                "DurationSeconds": 2,
+                "MaximumStacks": 1
+            }
+        }, {
+            "Id": "overcharge",
+            "Name": "Overcharge",
+            "Description": "When Mana is above 80%, gain Attack Speed. When Mana drops below 20%, convert the remaining charge into a temporary Attack Damage bonus.",
+            "EffectType": "Overcharge",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 1.2,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "HighManaThresholdPercent": 80,
+                "LowManaThresholdPercent": 20,
+                "AttackSpeedBonusPercent": 8,
+                "AttackDamageBonusPercent": 15,
+                "DurationSeconds": 4
+            }
+        }, {
             "Id": "time_fast",
             "Name": "Time Fast",
             "Description": "Reduce wave and inter-wave durations by 28% at level 1. Duration reduction scales with card level.",

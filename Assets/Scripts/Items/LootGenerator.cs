@@ -229,10 +229,9 @@ namespace IdleDefenseSurvival.Items
         private bool ShouldDropEntry(DropEntry entry, float qualityMod)
         {
             if (entry == null) return false;
-
+            // Assuming weight is percentage-like
             float weight = entry.Weight * qualityMod;
-            float roll = UnityEngine.Random.Range(0f, 100f); // Assuming weight is percentage-like
-            return roll < weight;
+            return Utilityku.Chance(weight);
         }
 
         private InventoryItem GenerateEntryItem(DropEntry entry, int tier, int wave, float qualityMod)
@@ -301,7 +300,7 @@ namespace IdleDefenseSurvival.Items
             foreach (var item in loot)
             {
                 // Chance to upgrade rarity
-                if (UnityEngine.Random.Range(0f, 1f) < luckBonus * 0.1f)
+                if (!Utilityku.Chance01(luckBonus * 0.1f))
                 {
                     // This would require re-generating the item with higher rarity
                     // For now, mark as lucky via IsNew flag (already true for new items)

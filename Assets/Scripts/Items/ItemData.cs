@@ -346,11 +346,9 @@ namespace IdleDefenseSurvival.Items
         private bool ShouldDrop(DropEntry entry, float qualityMod)
         {
             if (entry == null) return false;
-
             // Weight-based roll (0-100 scale)
             float effectiveWeight = entry.Weight * qualityMod;
-            float roll = UnityEngine.Random.Range(0f, 100f);
-            return roll < effectiveWeight;
+            return Utilityku.Chance(effectiveWeight);
         }
 
         private InventoryItem GenerateItem(DropEntry entry, int tier, float qualityMod)

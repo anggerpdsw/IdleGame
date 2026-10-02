@@ -50,7 +50,14 @@ namespace IdleDefenseSurvival.Card
         AdrenalineLoop,      // Below 40% HP gain attack speed, kill restores HP
         VolatileCore,        // Every 12th kill leaves damaging core at death location
         ArcaneResonance,     // After Ultimate, next 8 attacks gain bonus damage and crit
-        LastBullet           // Every 7th attack is enhanced with bonus damage and guaranteed hit
+        LastBullet,          // Every 7th attack is enhanced with bonus damage and guaranteed hit
+
+        // New Rare cards
+        PredatorFocus,       // Single-target damage boost when few enemies nearby
+        Shrapnel,            // AoE damage on critical hits
+        BleedingEdge,        // DOT on critical hits
+        StaggerMaster,       // Damage bonus on knocked-back / stunned enemies
+        Overcharge           // Attack-speed / damage bonuses based on mana thresholds
 
         // Stat Modifiers (handled via SkillType in Effects, not via this enum)
         // These are NOT used as EffectType - they use SkillType directly

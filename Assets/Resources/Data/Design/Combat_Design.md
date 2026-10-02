@@ -176,7 +176,7 @@ HitChance = Clamp(AttackerHitRate - TargetEvasion, 5%, 100%)
 
 **Roll:**
 ```csharp
-bool hit = Random.Range(0f, 100f) < HitChance;
+bool hit = Utilityku.Chance(HitChance);
 ```
 
 **Minimum hit chance:** 5% (cannot fully avoid all attacks)
@@ -199,7 +199,7 @@ bool hit = Random.Range(0f, 100f) < HitChance;
 **Critical chance roll:**
 
 ```csharp
-bool isCrit = Random.Range(0f, 100f) < CriticalChance;
+bool isCrit = Utilityku.Chance(CriticalChance);
 ```
 
 **Critical tiers:**
@@ -346,7 +346,7 @@ enemyRb.AddForce(direction * KnockbackForce, ForceMode2D.Impulse);
 **Fire multiple projectiles per attack:**
 
 ```
-if (Random.Range(0f, 100f) < MultiShootChance)
+if (Utilityku.Chance(MultiShootChance))
     projectileCount = MultiShootCount;
 else
     projectileCount = 1;

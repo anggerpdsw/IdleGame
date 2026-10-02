@@ -553,6 +553,43 @@ namespace IdleDefenseSurvival.Enemy
             return true;
         }
 
+        /// <summary>
+        /// Adds a Bleed status effect to the enemy.
+        /// Used by card behaviors like BleedingEdge.
+        /// </summary>
+        public void AddBleed(float damagePerSecond, float duration, int maxStacks = 3)
+        {
+            var bleed = new BleedStatus(damagePerSecond, duration, 0.5f, maxStacks);
+            AddEffect(bleed);
+        }
+
+        /// <summary>
+        /// Refreshes duration of an existing Bleed effect.
+        /// </summary>
+        public void RefreshBleed(float duration, float damagePerSecond)
+        {
+            var existing = GetEffect(StatusEffectType.Bleed);
+            if (existing != null)
+            {
+                existing.Duration = duration;
+                // Update damage per second if needed (BleedStatus uses GetCurrentValue for DPS)
+                existing.ElapsedTime = 0f;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current stack count of the Bleed effect on this enemy.
+        /// </summary>
+        public int GetBleedStacks()
+        {
+            var existing = GetEffect(StatusEffectType.Bleed);
+            if (existing != null)
+            {
+                return existing.StackCount;
+            }
+            return 0;
+        }
+
         private void OnDisable()
         {
             // Clear all effects when disabled (for object pooling)

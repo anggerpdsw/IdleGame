@@ -264,7 +264,7 @@ namespace IdleDefenseSurvival.Modifiers
         public virtual bool CanTrigger(EquipmentContext context, EffectTriggerType trigger)
         {
             if (_config == null || !_config.IsActive) return false;
-            if (_config.Chance < 100f && UnityEngine.Random.Range(0f, 100f) > _config.Chance) return false;
+            if (_config.Chance < 100f && !Utilityku.Chance(_config.Chance)) return false;
             if (_config.Cooldown > 0f)
             {
                 float remaining = GetRemainingCooldown(context);
