@@ -468,6 +468,130 @@
                 "DurationSeconds": 4
             }
         }, {
+            "Id": "danger_zone",
+            "Name": "Danger Zone",
+            "Description": "Enemies within close range of the player take increased damage.",
+            "EffectType": "DangerZone",
+            "Mode": "Percent",
+            "BaseValue": 10,
+            "ValuePerLevel": 1.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "Radius": 3.5,
+                "DamageBonusPercent": 10
+            }
+        }, {
+            "Id": "panic_fire",
+            "Name": "Panic Fire",
+            "Description": "Gain Attack Speed based on the number of nearby enemies.",
+            "EffectType": "PanicFire",
+            "Mode": "Percent",
+            "BaseValue": 3,
+            "ValuePerLevel": 0.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "Radius": 6,
+                "EnemiesPerStack": 3,
+                "AttackSpeedPerStackPercent": 3,
+                "MaximumStacks": 8
+            }
+        }, {
+            "Id": "escape_velocity",
+            "Name": "Escape Velocity",
+            "Description": "Moving continuously builds Momentum. Momentum increases Attack Damage and gradually decays when the player stops.",
+            "EffectType": "EscapeVelocity",
+            "Mode": "Percent",
+            "BaseValue": 2,
+            "ValuePerLevel": 0.35,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "BuildTimeSeconds": 0.5,
+                "DamagePerStackPercent": 2,
+                "MaximumStacks": 8,
+                "DecayDelaySeconds": 1.5,
+                "DecayIntervalSeconds": 0.5
+            }
+        }, {
+            "Id": "blood_trail",
+            "Name": "Blood Trail",
+            "Description": "Moving continuously leaves a Blood Trail behind. Enemies touching the trail take damage and are slowed.",
+            "EffectType": "BloodTrail",
+            "Mode": "Percent",
+            "BaseValue": 18,
+            "ValuePerLevel": 2,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "TrailDamagePercent": 18,
+                "TrailRadius": 1.5,
+                "TrailDurationSeconds": 3,
+                "SlowPercent": 20,
+                "MinimumMovementDistance": 1.5,
+                "MaximumTrailSegments": 12
+            }
+        }, {
+            "Id": "death_momentum",
+            "Name": "Death Momentum",
+            "Description": "Killing enemies grants Momentum, increasing Movement Speed and Attack Damage. Momentum is lost when the player stops moving.",
+            "EffectType": "DeathMomentum",
+            "Mode": "Percent",
+            "BaseValue": 2,
+            "ValuePerLevel": 0.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "MovementSpeedPerStackPercent": 2,
+                "AttackDamagePerStackPercent": 1,
+                "MaximumStacks": 12,
+                "StackDurationSeconds": 4,
+                "StopLossPerSecond": 2
+            }
+        }, {
+            "Id": "returning_echo",
+            "Name": "Returning Echo",
+            "Description": "After traveling beyond a distance, certain projectiles return toward the player and deal bonus damage to enemies they pass through.",
+            "EffectType": "ReturningEcho",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 1,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "TriggerDistance": 8.0,
+                "ReturnDamagePercent": 50,
+                "ReturnChancePercent": 20,
+                "MaximumReturnTargets": 5,
+                "ReturnCooldownSeconds": 0.5
+            }
+        }, {
+            "Id": "overkill_conversion",
+            "Name": "Overkill Conversion",
+            "Description": "Excess damage dealt beyond an enemy's remaining HP is converted into temporary attack range.",
+            "EffectType": "OverkillConversion",
+            "Mode": "Percent",
+            "BaseValue": 3,
+            "ValuePerLevel": 0.5,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "ConversionRatioPercent": 3,
+                "MaximumRangeBonusPercent": 30,
+                "DurationSeconds": 4,
+                "MaximumStacks": 5
+            }
+        }, {
+            "Id": "feast_or_famine",
+            "Name": "Feast or Famine",
+            "Description": "Every completed wave randomly grants either a powerful temporary offensive bonus or a temporary defensive penalty.",
+            "EffectType": "FeastOrFamine",
+            "Mode": "Percent",
+            "BaseValue": 8,
+            "ValuePerLevel": 1,
+            "CardRarity": "Rare",
+            "Parameters": {
+                "FeastChancePercent": 50,
+                "AttackDamageBonusPercent": 8,
+                "DefensePenaltyPercent": 15,
+                "DurationWaves": 1,
+                "MaximumFeastStacks": 3
+            }
+        }, {
             "Id": "time_fast",
             "Name": "Time Fast",
             "Description": "Reduce wave and inter-wave durations by 28% at level 1. Duration reduction scales with card level.",

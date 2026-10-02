@@ -72,6 +72,15 @@ namespace IdleDefenseSurvival.Card.Behavior
             Register<BleedingEdgeCardBehavior>(CardEffectType.BleedingEdge);
             Register<StaggerMasterCardBehavior>(CardEffectType.StaggerMaster);
             Register<OverchargeCardBehavior>(CardEffectType.Overcharge);
+
+            Register<DangerZoneCardBehavior>(CardEffectType.DangerZone);
+            Register<PanicFireCardBehavior>(CardEffectType.PanicFire);
+            Register<EscapeVelocityCardBehavior>(CardEffectType.EscapeVelocity);
+            Register<BloodTrailCardBehavior>(CardEffectType.BloodTrail);
+            Register<DeathMomentumCardBehavior>(CardEffectType.DeathMomentum);
+            Register<ReturningEchoCardBehavior>(CardEffectType.ReturningEcho);
+            Register<OverkillConversionCardBehavior>(CardEffectType.OverkillConversion);
+            Register<FeastOrFamineCardBehavior>(CardEffectType.FeastOrFamine);
         }
 
         /// <summary>
