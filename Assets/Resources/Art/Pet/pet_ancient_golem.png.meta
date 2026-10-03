@@ -1,16 +1,10 @@
 fileFormatVersion: 2
-guid: e1c3d0eb9f28cfe42ba56ae8b92fd6da
+guid: 7de549c140fd517468af2baf22725d9b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1010366035760475911
-    second: pet_ember_fox_0
-  - first:
-      213: 8278421318922356407
-    second: pet_ember_fox_1
-  - first:
-      213: -4569034630769095610
-    second: pet_ember_fox_2
+      213: 2916306473227559295
+    second: pet_ancient_golem_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -119,12 +113,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pet_ember_fox_0
+      name: pet_ancient_golem_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1224
+        width: 1222
         height: 1254
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -134,52 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 70f6f9e6e8a850e00800000000000000
-      internalID: 1010366035760475911
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: pet_ember_fox_1
-      rect:
-        serializedVersion: 2
-        x: 1221
-        y: 534
-        width: 18
-        height: 27
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7b6436f145cd2e270800000000000000
-      internalID: 8278421318922356407
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: pet_ember_fox_2
-      rect:
-        serializedVersion: 2
-        x: 1093
-        y: 388
-        width: 136
-        height: 129
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 64ccc8a06378790c0800000000000000
-      internalID: -4569034630769095610
+      spriteID: f71a6e0494dc87820800000000000000
+      internalID: 2916306473227559295
       vertices: []
       indices: 
       edges: []
@@ -198,9 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pet_ember_fox_0: 1010366035760475911
-      pet_ember_fox_1: 8278421318922356407
-      pet_ember_fox_2: -4569034630769095610
+      pet_ancient_golem_0: 2916306473227559295
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

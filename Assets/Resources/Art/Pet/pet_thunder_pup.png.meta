@@ -3,8 +3,8 @@ guid: 9147640187f5ccb4bae1e22cd9b41e5d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 6611683608920556790
-    second: Frost Guardian_0
+      213: 7825023904789335058
+    second: pet_thunder_pup_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 530
+  spritePixelsToUnits: 650
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pet_thunder_pup
+      name: pet_thunder_pup_0
       rect:
         serializedVersion: 2
-        x: 94
-        y: 311
-        width: 826
-        height: 903
+        x: 40
+        y: 57
+        width: 1194
+        height: 1151
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6f48bfc463b61cb50800000000000000
-      internalID: 6611683608920556790
+      spriteID: 21c88eb58c1189c60800000000000000
+      internalID: 7825023904789335058
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: eebc52271e5017f4ba2a373bcb1b29da
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pet_thunder_pup: 6611683608920556790
+      pet_thunder_pup_0: 7825023904789335058
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

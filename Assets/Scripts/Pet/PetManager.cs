@@ -25,7 +25,7 @@ namespace IdleDefenseSurvival.Pet
         }
 
         [Header("Pet Configuration")]
-        [SerializeField] private GameObject _petPrefab; // Generic pet visual prefab
+        [SerializeField] private GameObject _petPrefab; // Generic pet visual prefab (auto-loaded from Resources/Art/Pet/Pet if null)
         [SerializeField] private Transform _petContainer; // Parent transform for pet instances
 
         [Header("Target Scan Settings")]
@@ -142,6 +142,13 @@ namespace IdleDefenseSurvival.Pet
                 _petContainer = _player.transform;
                 Debug.Log("[PetManager] Auto-assigned Player as pet container");
             }
+
+            // Auto-assign Prefab if not set in Inspector
+            if (_petPrefab == null)
+            {
+                _petPrefab = Resources.Load<GameObject>("Art/Pet/Pet");
+                if (_petPrefab == null) Debug.LogError("[PetManager] Failed to load Pet prefab from Resources/Art/Pet/Pet");
+            }
         }
 
         /// <summary>
@@ -172,7 +179,7 @@ namespace IdleDefenseSurvival.Pet
             // Create behavior context (shared data for behavior evaluation)
             var context = BehaviorContext.Create(pet, _player, _battleTime);
 
-            // Execute data-driven behaviors (NEW)
+            // Execute data-driven behaviors (NEW) - PRIMARY path
             bool behaviorExecuted = pet.ExecuteBehaviors(context, _sharedModifierData);
 
             if (_debugBehaviors && behaviorExecuted)
@@ -180,39 +187,42 @@ namespace IdleDefenseSurvival.Pet
                 Debug.Log($"[PetManager] {pet.PetId} executed behavior, target: {pet.Target?.name ?? "none"}");
             }
 
-            // Legacy state machine (preserve for orbit/follow behavior when no attacks fire)
-            switch (pet.CurrentState)
+            // Legacy state machine - FALLBACK only when no behavior executed
+            if (!behaviorExecuted)
             {
-                case PetState.Idle:
-                    TransitionToFollow(pet);
-                    break;
-
-                case PetState.Follow:
-                    UpdateFollowBehavior(pet, deltaTime);
-                    // Check if should search for target
-                    pet.TargetScanTimer += deltaTime;
-                    if (pet.TargetScanTimer >= _targetScanInterval)
-                    {
-                        pet.TargetScanTimer = 0f;
-                        TransitionToSearchTarget(pet);
-                    }
-                    break;
-
-                case PetState.SearchTarget:
-                    SearchForTarget(pet);
-                    if (pet.Target != null)
-                        TransitionToAttack(pet);
-                    else
+                switch (pet.CurrentState)
+                {
+                    case PetState.Idle:
                         TransitionToFollow(pet);
-                    break;
+                        break;
 
-                case PetState.Attack:
-                    UpdateAttackBehavior(pet, deltaTime);
-                    break;
+                    case PetState.Follow:
+                        UpdateFollowBehavior(pet, deltaTime);
+                        // Check if should search for target
+                        pet.TargetScanTimer += deltaTime;
+                        if (pet.TargetScanTimer >= _targetScanInterval)
+                        {
+                            pet.TargetScanTimer = 0f;
+                            TransitionToSearchTarget(pet);
+                        }
+                        break;
 
-                case PetState.Emergency:
-                    UpdateEmergencyBehavior(pet, deltaTime);
-                    break;
+                    case PetState.SearchTarget:
+                        SearchForTarget(pet);
+                        if (pet.Target != null)
+                            TransitionToAttack(pet);
+                        else
+                            TransitionToFollow(pet);
+                        break;
+
+                    case PetState.Attack:
+                        UpdateAttackBehavior(pet, deltaTime);
+                        break;
+
+                    case PetState.Emergency:
+                        UpdateEmergencyBehavior(pet, deltaTime);
+                        break;
+                }
             }
         }
 
@@ -320,7 +330,8 @@ namespace IdleDefenseSurvival.Pet
                 pet.Position,
                 _player.transform.position,
                 pet.Definition.baseStats.targetRange,
-                pet.Definition.targetPriority
+                pet.Definition.targetPriority,
+                pet  // Pass petRuntime for target lock/hysteresis
             );
         }
 
@@ -366,6 +377,8 @@ namespace IdleDefenseSurvival.Pet
 
         /// <summary>
         /// Check if player HP triggers emergency mode.
+        /// Sets IsEmergencyMode flag; behavior system reads this flag via BehaviorContext.
+        /// Legacy fallback still has PetState.Emergency case for backward compat.
         /// </summary>
         private void CheckEmergencyMode()
         {
@@ -379,9 +392,8 @@ namespace IdleDefenseSurvival.Pet
 
                 if (shouldBeEmergency && !pet.IsEmergencyMode)
                 {
-                    // Enter emergency mode
+                    // Enter emergency mode - set flag only
                     pet.IsEmergencyMode = true;
-                    pet.CurrentState = PetState.Emergency;
                     OnPetStateChanged?.Invoke(pet);
 
                     // Trigger passive emergency skill (LastHorizon for Voidling)
@@ -395,7 +407,7 @@ namespace IdleDefenseSurvival.Pet
                 {
                     // Exit emergency mode
                     pet.IsEmergencyMode = false;
-                    TransitionToFollow(pet);
+                    // Don't force state change - let behavior system decide
                 }
             }
         }

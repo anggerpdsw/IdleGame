@@ -107,6 +107,11 @@ namespace IdleDefenseSurvival.UI
             _equippedIndicator?.SetActive(equipped);
         }
 
+        public void HideEquippedIndicator()
+        {
+            _equippedIndicator?.SetActive(false);
+        }
+
         private void RefreshRarity()
         {
             if (_rarityBorder == null || string.IsNullOrEmpty(_rarity)) return;

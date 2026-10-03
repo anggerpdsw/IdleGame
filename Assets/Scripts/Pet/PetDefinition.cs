@@ -35,6 +35,12 @@ namespace IdleDefenseSurvival.Pet
         public float maxStamina = 100f;
         public float staminaRegen = 2f; // Per second
 
+        // Movement/Targeting config (backward compatible defaults)
+        public float targetSwitchThreshold = 1.15f;  // New target must score 15% higher
+        public float catchUpDistance = 8f;           // Snap distance
+        public float catchUpMultiplier = 2f;         // Speed boost when far
+        public float orbitSpeed = 30f;               // Degrees/sec for orbital motion
+
         // NEW: Data-driven behavior definitions
         public List<Behavior.PetBehaviorDefinition> behaviorDefinitions;
 

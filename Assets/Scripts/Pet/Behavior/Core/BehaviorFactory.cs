@@ -174,6 +174,7 @@ namespace IdleDefenseSurvival.Pet.Behavior
             _modifiers["DamageScaling"] = cfg => new DamageScalingModifier(cfg.value);
             _modifiers["Berserker"] = cfg => new BerserkerModifier(cfg.value, cfg.value);
             _modifiers["Splash"] = cfg => new SplashModifier(cfg.value);
+            _modifiers["Stun"] = cfg => new StunModifier(cfg.value);
         }
 
         public static IModifier CreateModifier(ModifierConfig config)

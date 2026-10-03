@@ -50,6 +50,11 @@ namespace IdleDefenseSurvival.Pet
         public bool IsEmergencyMode { get; set; }
         public float EmergencyModeTimer { get; set; }
 
+        // Target lock / hysteresis
+        public Transform LastTarget { get; set; }
+        public float TargetLockTimer { get; set; }
+        public float TargetSwitchThreshold { get; private set; }
+
         // NEW: Data-driven behaviors
         public List<Behavior.PetBehaviorRuntime> Behaviors { get; private set; }
 
@@ -74,6 +79,11 @@ namespace IdleDefenseSurvival.Pet
             // Initialize stamina
             MaxStamina = definition.maxStamina;
             CurrentStamina = MaxStamina;
+
+            // Initialize target lock threshold
+            TargetSwitchThreshold = definition.targetSwitchThreshold > 0f
+                ? definition.targetSwitchThreshold
+                : 1.15f;
         }
 
         /// <summary>

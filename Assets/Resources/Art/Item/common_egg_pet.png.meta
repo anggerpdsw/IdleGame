@@ -1,16 +1,10 @@
 fileFormatVersion: 2
-guid: e1c3d0eb9f28cfe42ba56ae8b92fd6da
+guid: 247107d96b8c88c4a84fa053075d6925
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1010366035760475911
-    second: pet_ember_fox_0
-  - first:
-      213: 8278421318922356407
-    second: pet_ember_fox_1
-  - first:
-      213: -4569034630769095610
-    second: pet_ember_fox_2
+      213: -4739412847751887214
+    second: common_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -52,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 650
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -119,67 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pet_ember_fox_0
+      name: common_egg_pet
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1224
-        height: 1254
+        x: 28
+        y: 37
+        width: 1221
+        height: 1600
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 70f6f9e6e8a850e00800000000000000
-      internalID: 1010366035760475911
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: pet_ember_fox_1
-      rect:
-        serializedVersion: 2
-        x: 1221
-        y: 534
-        width: 18
-        height: 27
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7b6436f145cd2e270800000000000000
-      internalID: 8278421318922356407
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: pet_ember_fox_2
-      rect:
-        serializedVersion: 2
-        x: 1093
-        y: 388
-        width: 136
-        height: 129
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 64ccc8a06378790c0800000000000000
-      internalID: -4569034630769095610
+      spriteID: 29683dd10293a3eb0800000000000000
+      internalID: -4739412847751887214
       vertices: []
       indices: 
       edges: []
@@ -188,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 72a9f9b9619faab40a558ed1b8583078
     internalID: 0
     vertices: []
     indices: 
@@ -198,9 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pet_ember_fox_0: 1010366035760475911
-      pet_ember_fox_1: 8278421318922356407
-      pet_ember_fox_2: -4569034630769095610
+      common_egg_pet: -4739412847751887214
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,8 +1,8 @@
 # Pet System Design Documentation
 
-**Version:** 1.0  
-**Last Updated:** 2026-09-16  
-**Status:** Implementation Complete — Core + Voidling
+**Version:** 1.1  
+**Last Updated:** 2026-10-03  
+**Status:** Implementation Complete — Refactored Hybrid Architecture
 
 ---
 
@@ -16,7 +16,7 @@ Pet System adds autonomous combat companions that fight alongside the player. Pe
 - **Event-Based:** Emergency mode triggered by `Player.OnHealthChanged` event (no polling)
 - **Pooled Resources:** Reuses existing `ProjectilePool`, `EnemyStatusEffectController`, damage pipeline
 - **Modular Skills:** Skills extend `PetSkill` base class with custom cast conditions
-- **State Machine:** Clean transitions (Idle → Follow → SearchTarget → Attack, interrupt to Emergency)
+- **Hybrid Architecture:** Data-driven behaviors (`ExecuteBehaviors`) are the primary path; legacy state machine runs only as fallback when no behavior executes. Movement/formation runs every frame independently.
 
 ---
 
@@ -28,26 +28,26 @@ Pet System adds autonomous combat companions that fight alongside the player. Pe
 |---|---|---|
 | `PetDefinition` | Static pet data (stats, skills, behavior config) | `Scripts/Pet/PetDefinition.cs` |
 | `PetRuntime` | Instance state (level, XP, cooldowns, target, position) | `Scripts/Pet/PetRuntime.cs` |
-| `PetManager` | Singleton manager (equip/unequip, state machine, target scanning) | `Scripts/Pet/PetManager.cs` |
+| `PetManager` | Singleton manager (equip/unequip, hybrid update loop, target scanning) | `Scripts/Pet/PetManager.cs` |
 | `PetState` | Enum (Idle, Follow, SearchTarget, Attack, Emergency, Dead) | `Scripts/Pet/PetState.cs` |
-| `PetTargeting` | Target scoring system (distance, elite, HP priorities) | `Scripts/Pet/PetTargeting.cs` |
+| `PetTargeting` | Target scoring system (distance, elite, HP priorities) with hysteresis | `Scripts/Pet/PetTargeting.cs` |
+| `BehaviorContext` | Shared context for data-driven behaviors | `Scripts/Pet/Behavior/Core/BehaviorContext.cs` |
 | `IPetService` | Service interface for `ServiceLocator` | `Scripts/Pet/IPetService.cs` |
 
-### 2.2 State Machine
+### 2.2 Hybrid State & Behavior Flow
 
 ```
-Idle → Follow → SearchTarget → Attack (loop)
-                    ↑                ↓
-                    └───── Emergency (interrupt) when player HP ≤ 30%
+Update() → Check Emergency Flag (IsEmergencyMode)
+         → ExecuteBehaviors() (Primary Data-Driven Path)
+         → Fallback Legacy State Machine (Idle/Follow/Search/Attack)
+         → UpdateFollowBehavior() (Always run per-frame for formation sync)
 ```
 
-**Transition rules:**
-- **Idle → Follow:** Always transition on first update
-- **Follow → SearchTarget:** Periodic (every 0.2s) when no target
-- **SearchTarget → Attack:** When valid target found
-- **Attack → Follow:** When target dies or becomes invalid
-- **Any → Emergency:** Player HP drops below `emergencyThreshold` (30% for Voidling)
-- **Emergency → Follow:** Player HP recovers above threshold
+**Transition & Execution Rules:**
+- **Primary Path:** Data-driven behaviors (`ExecuteBehaviors`) evaluated every frame via `BehaviorContext`.
+- **Fallback Path:** Legacy state machine runs only if no data-driven behavior executes.
+- **Movement (Formation):** `UpdateFollowBehavior` runs continuously per-frame, ensuring pets maintain formation anchor relative to player regardless of combat state.
+- **Emergency Flag:** `IsEmergencyMode` is an independent event-driven boolean flag set by `Player.OnHealthChanged`. It does not override state, but informs behavior evaluation (e.g., via `HealthBelowTrigger`).
 
 ### 2.3 Integration Points
 
@@ -200,23 +200,23 @@ Example (Player 1000 HP): 1000 × 0.08 = 80 HP shield
 ```csharp
 float hpPercent = Player.CurrentHealth / Player.MaxHealth;
 if (hpPercent <= pet.Definition.emergencyThreshold) // 0.3 for Voidling
-    EnterEmergencyMode();
+    pet.IsEmergencyMode = true; // Flag only, no state override
 ```
 
 ### 5.2 Behavior Changes
 
-**Normal Mode:**
+**Normal Mode (`IsEmergencyMode = false`):**
 - Orbit player at `orbitRadius`
 - Scan for targets every 0.2s
 - Attack closest target matching priority
-- Cast VoidPulse when conditions met
+- Cast VoidPulse when conditions met (enemy count ≥ 3, elite/boss present)
 
-**Emergency Mode:**
-- Same orbiting behavior
+**Emergency Mode (`IsEmergencyMode = true`):**
+- Same orbiting behavior (formation runs every frame independently)
 - Target selection prioritizes enemies **closest to player** (highest threat)
 - Force VoidPulse cast immediately if skill ready (ignore normal conditions)
 - Trigger LastHorizon passive if cooldown ready
-- Return to normal when player HP > 30%
+- Return to normal when player HP > 30% (flag cleared, no state transition forced)
 
 ### 5.3 Event Flow
 
@@ -225,16 +225,20 @@ Player.OnHealthChanged event fired
     ↓
 PetManager.CheckEmergencyMode()
     ↓
-HP ≤ 30%? → Enter Emergency
+HP ≤ 30%? → Set pet.IsEmergencyMode = true
     ↓
-Set pet.CurrentState = PetState.Emergency
+BehaviorContext.IsEmergencyMode = true (next frame)
     ↓
-Trigger LastHorizon passive (if ready)
+HealthBelowTrigger fires → LastHorizon passive executes
     ↓
-Force VoidPulse on next update (if ready)
+HealthBelowTrigger fires → VoidPulse forced cast (if ready)
     ↓
-HP > 30%? → Exit Emergency → Return to Follow
+HP > 30%? → Set pet.IsEmergencyMode = false
+    ↓
+BehaviorContext.IsEmergencyMode = false (next frame)
 ```
+
+**Key Implementation Detail:** Emergency is a **flag** (`IsEmergencyMode`), not a state override. `PetState.Emergency` exists in enum for legacy fallback only. Data-driven behaviors read `BehaviorContext.IsEmergencyMode` to modify execution (e.g., `HealthBelowTrigger`, forced skill casts).
 
 ---
 
@@ -280,11 +284,56 @@ Enemy B: Elite, 8 units from player, 100% HP
 → Enemy B (Elite) selected despite being farther
 ```
 
-### 6.3 Target Scan Frequency
+### 6.3 Target Lock / Hysteresis
+
+Prevents target flickering when multiple enemies have similar scores.
+
+**Implementation:**
+```csharp
+// PetTargeting.FindBestTarget(petPosition, playerPosition, targetRange, priorities, petRuntime)
+
+if (petRuntime != null && petRuntime.Target != null && petRuntime.IsTargetValid())
+{
+    float currentScore = ScoreTarget(petRuntime.Target, ...);
+    float lockBestScore = currentScore;
+    Transform lockBestTarget = petRuntime.Target;
+
+    foreach (var enemy in validEnemies)
+    {
+        if (enemy == petRuntime.Target) continue;
+        float score = ScoreTarget(enemy, ...);
+        if (score > lockBestScore * petRuntime.TargetSwitchThreshold) // default 1.15×
+        {
+            lockBestScore = score;
+            lockBestTarget = enemy;
+        }
+    }
+    return lockBestTarget;
+}
+```
+
+- **Threshold:** `TargetSwitchThreshold` (default 1.15 = 15% better score required to switch)
+- **Source:** `PetDefinition.targetSwitchThreshold` (fallback 1.15 if not set)
+- **Result:** Target only changes when new candidate is significantly better
+
+### 6.4 Target Scan Frequency & Unity 6 API
 
 - **Interval:** 0.2 seconds (5 times per second)
-- **Method:** `Physics2D.OverlapCircleAll(petPosition, targetRange, EnemyLayerMask)`
-- **Performance:** Single physics query per scan, result cached until next scan
+- **Method (Primary):** `EnemySpawner.GetActiveEnemies()` — zero-allocation spatial grid cache
+- **Method (Fallback):** `Physics2D.OverlapCircle` + `ContactFilter2D` + reusable `Collider2D[]` buffer
+- **Performance:** Single physics query per scan (fallback only), result cached until next scan
+
+**Unity 6 Migration Note:**
+```csharp
+// Old (deprecated in Unity 6)
+Physics2D.OverlapCircleNonAlloc(position, radius, buffer, layerMask);
+
+// New (Unity 6 compatible)
+ContactFilter2D filter = new ContactFilter2D();
+filter.SetLayerMask(EnemyLayerMask);
+filter.useLayerMask = true;
+Physics2D.OverlapCircle(position, radius, filter, buffer);
+```
 
 ---
 
@@ -302,6 +351,7 @@ public class PetSaveEntry
     public long experience;        // Current XP
     public int evolutionStage;     // 0 = base, 1 = evolved
     public bool isEquipped;        // Currently equipped?
+    public float currentStamina = -1f; // -1 = unset (v4 backward compat)
 }
 ```
 
@@ -317,7 +367,8 @@ public class PetSaveEntry
       "level": 5,
       "experience": 12500,
       "evolutionStage": 0,
-      "isEquipped": true
+      "isEquipped": true,
+      "currentStamina": 42.5
     }
   ]
 }
@@ -331,6 +382,38 @@ if (data.version < 4)
 {
     data.pets ??= new List<PetSaveEntry>();
 }
+
+// Backward compatibility: old saves without currentStamina default to -1
+// On load: if currentStamina >= 0, restore exact value; else start at full stamina
+```
+
+### 7.4 Save/Load Flow
+
+```csharp
+// Save (PetManager.GetSaveData)
+saveData.Add(new PetSaveEntry {
+    instanceId = pet.InstanceId,
+    petId = pet.PetId,
+    level = pet.Level,
+    experience = pet.Experience,
+    evolutionStage = pet.EvolutionStage,
+    isEquipped = _equippedPets.Contains(pet),
+    currentStamina = pet.CurrentStamina
+});
+
+// Load (PetManager.LoadSaveData)
+var pet = new PetRuntime(entry.instanceId, entry.petId, definition, entry.level) {
+    Experience = entry.experience,
+    EvolutionStage = entry.evolutionStage
+};
+
+if (entry.currentStamina >= 0f)
+    pet.RestoreStamina(entry.currentStamina - pet.CurrentStamina);
+
+pet.InitializeBehaviors(definition);
+_ownedPets[entry.instanceId] = pet;
+
+if (entry.isEquipped) EquipPet(entry.instanceId);
 ```
 
 ---

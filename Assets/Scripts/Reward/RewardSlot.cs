@@ -19,7 +19,7 @@ namespace IdleDefenseSurvival.Reward
                 
             // Set icon
             if (icon != null)
-                icon.sprite = RewardResources.GetRewardType(reward.Type.ToString());
+                icon.sprite = RewardResources.GetRewardType(reward.Type == RewardType.Item ? reward.Id : reward.Type.ToString());
         }
         
     }

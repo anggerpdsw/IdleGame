@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Enemy
   - Items
+  - Pet
   layers:
   - Default
   - TransparentFX
@@ -13,8 +14,8 @@ TagManager:
   - Items
   - Water
   - UI
+  - Pet
   - Enemy
-  - 
   - 
   - 
   - 

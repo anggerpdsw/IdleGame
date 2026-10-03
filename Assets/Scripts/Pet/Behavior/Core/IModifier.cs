@@ -37,6 +37,8 @@ namespace IdleDefenseSurvival.Pet.Behavior
         public bool EnableFinisher = false;
         public float BerserkerHPThreshold = 0f;
         public float BerserkerDamageBonus = 0f;
+        public bool ApplyStun = false;
+        public float StunDuration = 0f;
 
         public void Reset()
         {
@@ -55,6 +57,8 @@ namespace IdleDefenseSurvival.Pet.Behavior
             EnableFinisher = false;
             BerserkerHPThreshold = 0f;
             BerserkerDamageBonus = 0f;
+            ApplyStun = false;
+            StunDuration = 0f;
         }
     }
 }

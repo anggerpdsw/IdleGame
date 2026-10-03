@@ -77,16 +77,38 @@ namespace IdleDefenseSurvival.Pet.Behavior
             elites = 0;
             bosses = 0;
 
-            var enemies = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach (var enemyObj in enemies)
+            // Use EnemySpawner's active enemy cache for O(1) retrieval
+            var spawner = Enemy.EnemySpawner.Instance;
+            if (spawner != null)
             {
-                if (!enemyObj.activeInHierarchy) continue;
-                if (!enemyObj.TryGetComponent<EnemyAi>(out var enemy)) continue;
-                if (enemy.CurrentHealth <= 0) continue;
+                var activeEnemies = spawner.GetActiveEnemies();
+                if (activeEnemies != null)
+                {
+                    foreach (var enemy in activeEnemies)
+                    {
+                        if (enemy == null || !enemy.gameObject.activeInHierarchy) continue;
+                        if (enemy.CurrentHealth <= 0) continue;
 
-                total++;
-                if (enemy.Role == Role.BOSS) bosses++;
-                // Note: No Elite role in current enum - reserved for future
+                        total++;
+                        if (enemy.Role == Role.BOSS) bosses++;
+                        if (enemy.EnemyData.IsElite) elites++;
+                    }
+                }
+            }
+            else
+            {
+                // Fallback – should never hit in production
+                var enemies = GameObject.FindGameObjectsWithTag("Enemy");
+                foreach (var enemyObj in enemies)
+                {
+                    if (!enemyObj.activeInHierarchy) continue;
+                    if (!enemyObj.TryGetComponent<EnemyAi>(out var enemy)) continue;
+                    if (enemy.CurrentHealth <= 0) continue;
+
+                    total++;
+                    if (enemy.Role == Role.BOSS) bosses++;
+                    if (enemy.EnemyData.IsElite) elites++;
+                }
             }
         }
     }

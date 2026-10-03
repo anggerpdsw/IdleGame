@@ -37,6 +37,10 @@
       "emergencyThreshold": 0.3,
       "maxStamina": 100,
       "staminaRegen": 2.0,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
       "behaviorDefinitions": [{
           "id": "voidling_basic_attack",
           "priority": 40,
@@ -133,6 +137,10 @@
       "emergencyThreshold": 0.35,
       "maxStamina": 80,
       "staminaRegen": 3.0,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
       "behaviorDefinitions": [{
         "id": "vampiric_assault",
         "priority": 50,
@@ -195,6 +203,10 @@
       "emergencyThreshold": 0.3,
       "maxStamina": 110,
       "staminaRegen": 2.2,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
       "behaviorDefinitions": [{
         "id": "cluster_bomber",
         "priority": 70,
@@ -264,6 +276,10 @@
       "emergencyThreshold": 0.25,
       "maxStamina": 120,
       "staminaRegen": 2.5,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
       "behaviorDefinitions": [{
         "id": "executioner_attack",
         "priority": 80,
@@ -331,6 +347,10 @@
       "emergencyThreshold": 0.4,
       "maxStamina": 150,
       "staminaRegen": 1.5,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
       "behaviorDefinitions": [{
           "id": "guardian_shield",
           "priority": 90,
@@ -375,6 +395,543 @@
           },
           "modifiers": [],
           "cooldown": 1.0
+        }
+      ]
+    },
+    {
+      "id": "pet_rocky_mole",
+      "name": "Rocky Mole",
+      "description": "Sturdy mole that burrows and shields player when low HP. Taunts nearby enemies to protect player.",
+      "role": "Tank",
+      "rarity": "Common",
+      "baseStats": {
+        "attack": 9,
+        "attackSpeed": 1.2,
+        "skillDamage": 1.0,
+        "moveSpeed": 4,
+        "targetRange": 6,
+        "health": 110
+      },
+      "growth": {
+        "attackPerLevel": 1.5,
+        "skillDamagePerLevel": 0.08,
+        "healthPerLevel": 12
+      },
+      "behaviorType": "Guardian",
+      "targetPriority": [
+        "ClosestToPlayer",
+        "Boss"
+      ],
+      "skills": {
+        "basic": "rock_throw",
+        "active": "burrow_shield",
+        "passive": "stone_skin",
+        "evolution": "tectonic_shift"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.0,
+      "emergencyThreshold": 0.35,
+      "maxStamina": 110,
+      "staminaRegen": 2.2,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
+      "behaviorDefinitions": [{
+          "id": "rocky_basic_attack",
+          "priority": 30,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Priority",
+            "range": 6,
+            "priorities": ["ClosestToPlayer", "Boss"]
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.0
+          },
+          "modifiers": [],
+          "cooldown": 0.5
+        },
+        {
+          "id": "rocky_burrow_shield",
+          "priority": 70,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Nearest",
+            "range": 6
+          },
+          "trigger": {
+            "type": "CooldownReady",
+            "skillId": "burrow_shield"
+          },
+          "condition": {
+            "type": "PlayerHPBelow",
+            "value": 0.35
+          },
+          "action": {
+            "type": "HealPercent",
+            "damageMultiplier": 5.0
+          },
+          "modifiers": [],
+          "cooldown": 20
+        }
+      ]
+    },
+    {
+      "id": "pet_silver_hawk",
+      "name": "Silver Hawk",
+      "description": "Swift hawk that strikes multiple enemies with wind blades. Gains speed after each kill.",
+      "role": "DPS",
+      "rarity": "Rare",
+      "baseStats": {
+        "attack": 11,
+        "attackSpeed": 2.0,
+        "skillDamage": 1.4,
+        "moveSpeed": 7,
+        "targetRange": 9,
+        "health": 80
+      },
+      "growth": {
+        "attackPerLevel": 2.0,
+        "skillDamagePerLevel": 0.1,
+        "healthPerLevel": 8
+      },
+      "behaviorType": "Aggressive",
+      "targetPriority": [
+        "ClosestToPlayer",
+        "HighestHp"
+      ],
+      "skills": {
+        "basic": "wind_slash",
+        "active": "gale_burst",
+        "passive": "swift_wings",
+        "evolution": "storm_wrath"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.5,
+      "emergencyThreshold": 0.3,
+      "maxStamina": 100,
+      "staminaRegen": 2.5,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
+      "behaviorDefinitions": [{
+          "id": "hawk_basic_attack",
+          "priority": 40,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Priority",
+            "range": 9,
+            "priorities": ["ClosestToPlayer"]
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.0
+          },
+          "modifiers": [{
+            "type": "Chain",
+            "count": 2,
+            "value": 0.6
+          }],
+          "cooldown": 0.4
+        },
+        {
+          "id": "hawk_gale_burst",
+          "priority": 70,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Cluster",
+            "range": 9
+          },
+          "trigger": {
+            "type": "CooldownReady",
+            "skillId": "gale_burst"
+          },
+          "condition": {
+            "type": "EnemyCountAbove",
+            "value": 2
+          },
+          "action": {
+            "type": "AOEAttack",
+            "damageMultiplier": 1.2,
+            "radius": 3.0
+          },
+          "modifiers": [{
+            "type": "Splash",
+            "value": 2.0
+          }],
+          "cooldown": 12
+        }
+      ]
+    },
+    {
+      "id": "pet_crystal_wisp",
+      "name": "Crystal Wisp",
+      "description": "Ethereal wisp that refracts light into piercing crystal shards. Slows enemies and amplifies damage taken.",
+      "role": "Support",
+      "rarity": "Epic",
+      "baseStats": {
+        "attack": 9,
+        "attackSpeed": 1.8,
+        "skillDamage": 1.5,
+        "moveSpeed": 6,
+        "targetRange": 8,
+        "health": 90
+      },
+      "growth": {
+        "attackPerLevel": 1.8,
+        "skillDamagePerLevel": 0.09,
+        "healthPerLevel": 9
+      },
+      "behaviorType": "Aggressive",
+      "targetPriority": [
+        "Cluster",
+        "ClosestToPet"
+      ],
+      "skills": {
+        "basic": "prism_shard",
+        "active": "crystal_prison",
+        "passive": "refractive_aura",
+        "evolution": "diamond_maelstrom"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.8,
+      "emergencyThreshold": 0.3,
+      "maxStamina": 105,
+      "staminaRegen": 2.3,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
+      "behaviorDefinitions": [{
+          "id": "wisp_prism_attack",
+          "priority": 50,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Cluster",
+            "range": 8
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.1
+          },
+          "modifiers": [{
+              "type": "Splash",
+              "value": 2.5
+            },
+            {
+              "type": "DamageScaling",
+              "value": 1.15
+            }
+          ],
+          "cooldown": 0.5
+        },
+        {
+          "id": "wisp_crystal_prison",
+          "priority": 80,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "LowestHP",
+            "range": 8
+          },
+          "trigger": {
+            "type": "CooldownReady",
+            "skillId": "crystal_prison"
+          },
+          "condition": {
+            "type": "EnemyCountAbove",
+            "value": 3
+          },
+          "action": {
+            "type": "ApplyStatus",
+            "damageMultiplier": 1.3,
+            "radius": 3.5,
+            "statusType": "Slow",
+            "statusDuration": 4.0,
+            "statusValue": 0.5
+          },
+          "modifiers": [],
+          "cooldown": 18
+        }
+      ]
+    },
+    {
+      "id": "pet_phoenix_fury",
+      "name": "Phoenix Fury",
+      "description": "Flame phoenix that rebirths from ashes. Executes low-HP enemies and heals player on critical HP.",
+      "role": "DPS",
+      "rarity": "Legendary",
+      "baseStats": {
+        "attack": 14,
+        "attackSpeed": 2.2,
+        "skillDamage": 1.9,
+        "moveSpeed": 6.5,
+        "targetRange": 10,
+        "health": 85
+      },
+      "growth": {
+        "attackPerLevel": 2.5,
+        "skillDamagePerLevel": 0.14,
+        "healthPerLevel": 9
+      },
+      "behaviorType": "Aggressive",
+      "targetPriority": [
+        "LowestHp",
+        "ClosestToPet"
+      ],
+      "skills": {
+        "basic": "flame_bolt",
+        "active": "ashen_rebirth",
+        "passive": "eternal_flame",
+        "evolution": "solar_flare"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 3.0,
+      "emergencyThreshold": 0.25,
+      "maxStamina": 115,
+      "staminaRegen": 2.6,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
+      "behaviorDefinitions": [{
+          "id": "phoenix_executioner",
+          "priority": 60,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "LowestHP",
+            "range": 10
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 1.3
+          },
+          "modifiers": [{
+              "type": "Finisher",
+              "value": 0.4
+            },
+            {
+              "type": "Execute",
+              "value": 0.15
+            },
+            {
+              "type": "Leech",
+              "value": 15.0
+            }
+          ],
+          "cooldown": 0.45
+        },
+        {
+          "id": "phoenix_rebirth_heal",
+          "priority": 90,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Nearest",
+            "range": 6
+          },
+          "trigger": {
+            "type": "HealthBelow",
+            "value": 0.3
+          },
+          "condition": {
+            "type": "PlayerHPBelow",
+            "value": 0.3
+          },
+          "action": {
+            "type": "HealPercent",
+            "damageMultiplier": 10.0
+          },
+          "modifiers": [],
+          "cooldown": 30
+        },
+        {
+          "id": "phoenix_flare_burst",
+          "priority": 75,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Cluster",
+            "range": 10
+          },
+          "trigger": {
+            "type": "CooldownReady",
+            "skillId": "ashen_rebirth"
+          },
+          "condition": {
+            "type": "EnemyCountAbove",
+            "value": 2
+          },
+          "action": {
+            "type": "AOEAttack",
+            "damageMultiplier": 1.8,
+            "radius": 4.0
+          },
+          "modifiers": [{
+              "type": "Splash",
+              "value": 3.0
+            },
+            {
+              "type": "Berserker",
+              "value": 0.25
+            }
+          ],
+          "cooldown": 20
+        }
+      ]
+    },
+    {
+      "id": "pet_ancient_golem",
+      "name": "Ancient Golem",
+      "description": "Colossal golem that shakes the ground. Reflects damage, taunts bosses, and creates protective barriers.",
+      "role": "Tank",
+      "rarity": "Mythic",
+      "baseStats": {
+        "attack": 8,
+        "attackSpeed": 0.9,
+        "skillDamage": 1.2,
+        "moveSpeed": 3,
+        "targetRange": 7,
+        "health": 180
+      },
+      "growth": {
+        "attackPerLevel": 1.2,
+        "skillDamagePerLevel": 0.07,
+        "healthPerLevel": 18
+      },
+      "behaviorType": "Guardian",
+      "targetPriority": [
+        "ClosestToPlayer",
+        "Boss"
+      ],
+      "skills": {
+        "basic": "rock_throw",
+        "active": "seismic_slam",
+        "passive": "bedrock_barrier",
+        "evolution": "world_ender"
+      },
+      "evolutionRequirement": {
+        "level": 10
+      },
+      "orbitRadius": 2.0,
+      "emergencyThreshold": 0.4,
+      "maxStamina": 160,
+      "staminaRegen": 1.8,
+      "targetSwitchThreshold": 1.15,
+      "catchUpDistance": 8.0,
+      "catchUpMultiplier": 2.0,
+      "orbitSpeed": 30.0,
+      "behaviorDefinitions": [{
+          "id": "golem_taunt_attack",
+          "priority": 30,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Priority",
+            "range": 7,
+            "priorities": ["ClosestToPlayer", "Boss"]
+          },
+          "trigger": {
+            "type": "Always"
+          },
+          "condition": {
+            "type": "TargetExists"
+          },
+          "action": {
+            "type": "BasicAttack",
+            "damageMultiplier": 0.9
+          },
+          "modifiers": [{
+            "type": "DamageScaling",
+            "value": 1.1
+          }],
+          "cooldown": 1.0
+        },
+        {
+          "id": "golem_seismic_slam",
+          "priority": 80,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Nearest",
+            "range": 7
+          },
+          "trigger": {
+            "type": "CooldownReady",
+            "skillId": "seismic_slam"
+          },
+          "condition": {
+            "type": "EnemyCountAbove",
+            "value": 3
+          },
+          "action": {
+            "type": "AOEAttack",
+            "damageMultiplier": 1.8,
+            "radius": 4.5
+          },
+          "modifiers": [{
+              "type": "DamageScaling",
+              "value": 1.2
+            },
+            {
+              "type": "Stun",
+              "value": 1.5
+            }
+          ],
+          "cooldown": 25
+        },
+        {
+          "id": "golem_bedrock_barrier",
+          "priority": 90,
+          "executionMode": "Exclusive",
+          "targeter": {
+            "type": "Nearest",
+            "range": 6
+          },
+          "trigger": {
+            "type": "HealthBelow",
+            "value": 0.4
+          },
+          "condition": {
+            "type": "PlayerHPBelow",
+            "value": 0.4
+          },
+          "action": {
+            "type": "HealPercent",
+            "damageMultiplier": 8.0
+          },
+          "modifiers": [],
+          "cooldown": 30
         }
       ]
     }

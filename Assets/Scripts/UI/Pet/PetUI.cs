@@ -1,8 +1,8 @@
 using UnityEngine;
-using UnityEngine.UI;
 using IdleDefenseSurvival.Pet;
 using TMPro;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Enemy;
 
 namespace IdleDefenseSurvival.UI
 {
@@ -55,12 +55,22 @@ namespace IdleDefenseSurvival.UI
         private void Update()
         {
             if (!_isVisible || _currentPet == null) return;
-
+            // Update pet icon facing direction based on target
+            UpdateFacing();
             // Update skill cooldown overlay
             UpdateCooldownOverlay();
-
             // Update emergency indicator
             UpdateEmergencyIndicator();
+        }
+
+        private void UpdateFacing()
+        {
+            if (_petIcon == null || _currentPet == null) return;
+            Transform target = _currentPet.Target;
+            if (target == null) return;
+            bool shouldFaceLeft = EnemyMovementCalculator.ShouldFaceLeft(
+                _petIcon.transform.position, target.position);
+            if (_petIcon.flipX != shouldFaceLeft) _petIcon.flipX = shouldFaceLeft;
         }
 
         private void HandlePetEquipped(PetRuntime pet)

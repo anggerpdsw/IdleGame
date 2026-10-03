@@ -3,8 +3,8 @@ guid: 96b9fe814fb4b4448b4f284f15fd744e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2904457877120967500
-    second: Vampire_0
+      213: -2312202351759833130
+    second: pet_blood_bat_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 950
+  spritePixelsToUnits: 650
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: pet_blood_bat
+      name: pet_blood_bat_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 68
-        width: 1215
-        height: 1138
+        x: 0
+        y: 47
+        width: 1254
+        height: 1200
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4bc9e1103fa41b7d0800000000000000
-      internalID: -2904457877120967500
+      spriteID: 6d7488e263869efd0800000000000000
+      internalID: -2312202351759833130
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d9c63de91ff1e3e4a99e03897a8fff55
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      pet_blood_bat: -2904457877120967500
+      pet_blood_bat_0: -2312202351759833130
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -185,7 +185,13 @@ namespace IdleDefenseSurvival.Mission
                 currentCount = 0,
                 status = MissionStatus.Active,
                 createdAt = now.ToString("o"),
-                reward = new MissionReward { gold = scaledGold, gem = scaledGem, meat = scaledMeat },
+                reward = new MissionReward { 
+                    gold = scaledGold, 
+                    gem = scaledGem, 
+                    meat = scaledMeat,
+                    itemId = tmpl.reward.itemId,
+                    itemCount = tmpl.reward.itemCount
+                },
                 slotIndex = slot
             };
 
@@ -366,7 +372,7 @@ namespace IdleDefenseSurvival.Mission
 
             var rewardList = ToRewardData(m.reward);
             if (rewardList.Count > 0 && RewardManager.Instance != null)
-                RewardManager.Instance.Show(rewardList, () => NotifyClaimed(m));
+                RewardManager.Instance.Show(rewardList, () => { GiveReward(m.reward); NotifyClaimed(m); });
             else
             {
                 GiveReward(m.reward);

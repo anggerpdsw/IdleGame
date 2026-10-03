@@ -120,11 +120,10 @@ namespace IdleDefenseSurvival.Controller
                 PetDefinition def = pair.Value;
 
                 if (!PetManager.Instance.IsPetEquipped(petId)) continue;
-                if (!PetManager.Instance.HasPet(petId)) continue;
 
                 var slot = Instantiate(_petSlotPrefab, _equippedPetContent);
                 slot.Setup(petId, def, true, PetResources.GetPetIcon(petId), HandlePetSelected);
-                slot.RefreshEquipState();
+                slot.HideEquippedIndicator();
                 _equippedPetSlots.Add(slot);
             }
         }

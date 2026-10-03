@@ -11,6 +11,8 @@ namespace IdleDefenseSurvival.Enemy
 {
     public class EnemySpawner : MonoBehaviour
     {
+        public static EnemySpawner Instance { get; private set; }
+
         [Header("Debug")]
         [SerializeField] private bool _debug;
 
@@ -45,7 +47,14 @@ namespace IdleDefenseSurvival.Enemy
         // =========================================================
         private void Awake()
         {
+            Instance = this;
             CreateRoleParents();
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+                Instance = null;
         }
 
         private void Start()
@@ -393,6 +402,21 @@ namespace IdleDefenseSurvival.Enemy
                 _roleParents.Add(role, roleObject.transform);
             }
         }
+
+        /// <summary>
+        /// Returns all currently active enemies using the spatial grid (zero allocation if buffer reused).
+        /// Used by PetTargeting for O(1) enemy counting without FindGameObjectsWithTag.
+        /// </summary>
+        public List<EnemyAi> GetActiveEnemies()
+        {
+            var buffer = s_sharedEnemyBuffer;
+            buffer.Clear();
+            EnemySpatialGrid.CopyAllActiveEnemiesTo(buffer);
+            return buffer;
+        }
+
+        // Shared buffer for zero-allocation enemy list retrieval
+        private static readonly List<EnemyAi> s_sharedEnemyBuffer = new(512);
 
         // =========================================================
         // VALIDATION / STATE
