@@ -5,18 +5,18 @@
       "description": "Void creature that protects player in emergencies. Prioritizes enemies near player and provides shields when HP is critical.",
       "role": "Support",
       "element": "None",
-      "rarity": "Common",
+      "rarity": "Epic",
       "baseStats": {
-        "attack": 10,
+        "attack": 8,
         "skillDamage": 1.5,
         "moveSpeed": 5,
         "targetRange": 8,
         "health": 100
       },
       "growth": {
-        "attackPerLevel": 2,
-        "skillDamagePerLevel": 0.1,
-        "healthPerLevel": 10
+        "attackPerLevel": 1.5,
+        "skillDamagePerLevel": 0.08,
+        "healthPerLevel": 9
       },
       "behaviorType": "Guardian",
       "targetPriority": [
@@ -108,16 +108,16 @@
       "element": "Metal",
       "rarity": "Rare",
       "baseStats": {
-        "attack": 8,
+        "attack": 7,
         "skillDamage": 1.2,
         "moveSpeed": 7,
         "targetRange": 7,
         "health": 70
       },
       "growth": {
-        "attackPerLevel": 1.5,
-        "skillDamagePerLevel": 0.08,
-        "healthPerLevel": 7
+        "attackPerLevel": 1.3,
+        "skillDamagePerLevel": 0.07,
+        "healthPerLevel": 6
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
@@ -161,7 +161,7 @@
         },
         "modifiers": [{
           "type": "Leech",
-          "value": 25.0
+          "value": 22.0
         }],
         "cooldown": 0.4
       }]
@@ -174,16 +174,16 @@
       "element": "Lightning",
       "rarity": "Epic",
       "baseStats": {
-        "attack": 12,
+        "attack": 10,
         "skillDamage": 1.6,
         "moveSpeed": 5.5,
         "targetRange": 9,
         "health": 90
       },
       "growth": {
-        "attackPerLevel": 2.5,
-        "skillDamagePerLevel": 0.12,
-        "healthPerLevel": 9
+        "attackPerLevel": 2.0,
+        "skillDamagePerLevel": 0.1,
+        "healthPerLevel": 8
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
@@ -247,16 +247,16 @@
       "element": "Fire",
       "rarity": "Legendary",
       "baseStats": {
-        "attack": 15,
+        "attack": 12,
         "skillDamage": 1.8,
         "moveSpeed": 6,
         "targetRange": 10,
         "health": 80
       },
       "growth": {
-        "attackPerLevel": 3,
-        "skillDamagePerLevel": 0.15,
-        "healthPerLevel": 8
+        "attackPerLevel": 2.5,
+        "skillDamagePerLevel": 0.12,
+        "healthPerLevel": 7
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
@@ -318,16 +318,16 @@
       "element": "Wood",
       "rarity": "Mythic",
       "baseStats": {
-        "attack": 6,
+        "attack": 5,
         "skillDamage": 1.0,
         "moveSpeed": 3,
         "targetRange": 6,
         "health": 150
       },
       "growth": {
-        "attackPerLevel": 1,
-        "skillDamagePerLevel": 0.05,
-        "healthPerLevel": 15
+        "attackPerLevel": 0.8,
+        "skillDamagePerLevel": 0.04,
+        "healthPerLevel": 13
       },
       "behaviorType": "Guardian",
       "targetPriority": [
@@ -406,16 +406,16 @@
       "element": "Earth",
       "rarity": "Common",
       "baseStats": {
-        "attack": 9,
+        "attack": 6,
         "skillDamage": 1.0,
         "moveSpeed": 4,
         "targetRange": 6,
         "health": 110
       },
       "growth": {
-        "attackPerLevel": 1.5,
-        "skillDamagePerLevel": 0.08,
-        "healthPerLevel": 12
+        "attackPerLevel": 1.2,
+        "skillDamagePerLevel": 0.07,
+        "healthPerLevel": 11
       },
       "behaviorType": "Guardian",
       "targetPriority": [
@@ -494,16 +494,16 @@
       "element": "Wind",
       "rarity": "Rare",
       "baseStats": {
-        "attack": 11,
+        "attack": 8,
         "skillDamage": 1.4,
         "moveSpeed": 7,
         "targetRange": 9,
         "health": 80
       },
       "growth": {
-        "attackPerLevel": 2.0,
-        "skillDamagePerLevel": 0.1,
-        "healthPerLevel": 8
+        "attackPerLevel": 1.6,
+        "skillDamagePerLevel": 0.08,
+        "healthPerLevel": 7
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
@@ -590,16 +590,16 @@
       "element": "Water",
       "rarity": "Epic",
       "baseStats": {
-        "attack": 9,
+        "attack": 7,
         "skillDamage": 1.5,
         "moveSpeed": 6,
         "targetRange": 8,
         "health": 90
       },
       "growth": {
-        "attackPerLevel": 1.8,
-        "skillDamagePerLevel": 0.09,
-        "healthPerLevel": 9
+        "attackPerLevel": 1.5,
+        "skillDamagePerLevel": 0.08,
+        "healthPerLevel": 8
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
@@ -689,16 +689,16 @@
       "element": "Fire",
       "rarity": "Legendary",
       "baseStats": {
-        "attack": 14,
+        "attack": 11,
         "skillDamage": 1.9,
         "moveSpeed": 6.5,
         "targetRange": 10,
         "health": 85
       },
       "growth": {
-        "attackPerLevel": 2.5,
-        "skillDamagePerLevel": 0.14,
-        "healthPerLevel": 9
+        "attackPerLevel": 2.2,
+        "skillDamagePerLevel": 0.12,
+        "healthPerLevel": 8
       },
       "behaviorType": "Aggressive",
       "targetPriority": [
@@ -820,16 +820,16 @@
       "element": "Earth",
       "rarity": "Mythic",
       "baseStats": {
-        "attack": 8,
+        "attack": 6,
         "skillDamage": 1.2,
         "moveSpeed": 3,
         "targetRange": 7,
         "health": 180
       },
       "growth": {
-        "attackPerLevel": 1.2,
-        "skillDamagePerLevel": 0.07,
-        "healthPerLevel": 18
+        "attackPerLevel": 1.0,
+        "skillDamagePerLevel": 0.06,
+        "healthPerLevel": 16
       },
       "behaviorType": "Guardian",
       "targetPriority": [
