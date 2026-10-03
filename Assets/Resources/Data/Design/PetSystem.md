@@ -1,8 +1,8 @@
 # Pet System Design Documentation
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Last Updated:** 2026-10-03  
-**Status:** Implementation Complete — Refactored Hybrid Architecture
+**Status:** Implementation Complete — Refactored Hybrid Architecture + Power-Budget Rebalance
 
 ---
 
@@ -85,10 +85,39 @@ FinalStat = (BaseStat + (Level - 1) × GrowthPerLevel) × RarityMultiplier
 - Legendary: 1.5×
 - Mythic: 1.8×
 
-**Example (Voidling Level 5, Epic):**
+**Example (Voidling Level 5, Common):**
 ```
-Attack = (10 + (5-1) × 2) × 1.3 = 18 × 1.3 = 23.4
+Attack = (5.0 + (5-1) × 1.0) × 1.0 = 9.0 × 1.0 = 9.0
 ```
+
+### 3.3 Power-Budget Guide
+
+**Goal:** Keep each pet's contribution to player DPS within a controlled *budget* instead of letting rarity alone dictate raw damage.
+
+| Rarity      | Target DPS % of Player | Typical Role |
+|-------------|------------------------|--------------|
+| Common      | 8–12%                  | Early-game utility / crowd control |
+| Rare        | 12–18%                 | Specialist (single-target burst) |
+| Epic        | 18–25%                 | Strong specialization (AOE / high speed) |
+| Legendary   | 25–35%                 | Build-defining (primary DPS or unique mechanic) |
+| Mythic      | 30–40%                 | Powerful specialist (tank, support, or high DPS) |
+
+*Player DPS baseline: `attackDamage` 5.7 + all active modifiers at level 1.*
+
+**Mechanics**
+- **Attack** values are capped by the budget; additional power comes from **HP**, **utility effects** (Slow, Execute, Leech, Shield), **skill cooldowns**, or **unique mechanics**.
+- **AOE/Chain** modifiers count toward budget **once** (their damage-multiplier is part of the budget; extra hits are utility).
+- **Stamina** and **cooldown reduction** are also part of a pet's budget, encouraging diverse playstyles.
+
+**Implementation**
+- Attack numbers in `dataPet.json` follow the budget table (see JSON changes).
+- Rarity multipliers (`Common 1.0×`, `Rare 1.15×`, …, `Mythic 1.8×`) still apply, but *base* attack is already budget-aware, preventing legendary pets from overwhelming the player.
+- Role-specific tweaks (e.g., higher HP for tanks) are handled in `health` field, not by inflating `attack`.
+
+**Verification**
+- In-editor test at pet level 1 shows DPS ≈ 10–35% of player DPS depending on rarity.
+- Scaling (`attackPerLevel`) preserves budget proportionally across levels.
+- No rarity should double the player's DPS without additional scaling layers (cards, equipment, items).
 
 ---
 

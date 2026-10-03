@@ -172,6 +172,11 @@ namespace IdleDefenseSurvival.Pet
         }
 
         /// <summary>
+        /// Get pet element from definition.
+        /// </summary>
+        public string Element => Definition?.element ?? "None";
+
+        /// <summary>
         /// Check if skill is on cooldown.
         /// </summary>
         public bool IsSkillOnCooldown(string skillId)

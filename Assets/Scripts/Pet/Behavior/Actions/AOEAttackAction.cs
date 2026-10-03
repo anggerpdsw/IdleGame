@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
 
@@ -33,6 +34,13 @@ namespace IdleDefenseSurvival.Pet.Behavior
             float finalDamage = baseDamage * modifiers.DamageMultiplier;
             bool anyHit = false;
 
+            // Resolve pet element from definition
+            Element element = Element.None;
+            if (!string.IsNullOrEmpty(context.Pet.Element))
+            {
+                Enum.TryParse(context.Pet.Element, out element);
+            }
+
             foreach (var hit in hits)
             {
                 if (!hit.gameObject.activeInHierarchy) continue;
@@ -43,10 +51,10 @@ namespace IdleDefenseSurvival.Pet.Behavior
                     damage: finalDamage,
                     type: DamageType.Normal,
                     crit: CriticalType.None,
-                    source: "PetAOE"
+                    source: context.Pet.PetId
                 )
                 {
-                    Element = Element.None
+                    Element = element
                 };
 
                 enemy.TakeDamage(damageData);

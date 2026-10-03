@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3886506846421851418}
   - component: {fileID: 8351405496408694669}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: AuraPulseRenderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 1964997493147601399}
   - component: {fileID: 9192014135493018875}
   - component: {fileID: 1661522408349502964}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Dizzy Effect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -215,7 +215,7 @@ GameObject:
   m_Component:
   - component: {fileID: 365666117458513822}
   - component: {fileID: 2977224739219407189}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: -3365906772020504700}
   - component: {fileID: 8760648504213372293}
   - component: {fileID: 3404007754764270316}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Basic
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -491,7 +491,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6037527444039846177}
   - component: {fileID: 5943116777313866150}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EffectRange
   m_TagString: Untagged
   m_Icon: {fileID: 0}

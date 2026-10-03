@@ -16,6 +16,7 @@ namespace IdleDefenseSurvival.Pet
         public string name;
         public string description;
         public string role; // Support, DPS, Tank, Utility
+        public string element = "None"; // Element from Enumku.cs
         public string rarity; // Common, Rare, Epic, Legendary, Mythic
 
         public PetBaseStats baseStats;
@@ -65,10 +66,9 @@ namespace IdleDefenseSurvival.Pet
     public class PetBaseStats
     {
         public float attack = 10f;
-        public float attackSpeed = 1.5f;
         public float skillDamage = 1.5f;
         public float moveSpeed = 5f;
-        public float targetRange = 8f;
+        public float targetRange = 2f;
         public float health = 100f; // Optional, most pets invulnerable
     }
 

@@ -37,16 +37,31 @@ namespace IdleDefenseSurvival.UI
 
         [Header("Base Stats")]
         [SerializeField] private TextMeshProUGUI _attackText;
-        [SerializeField] private TextMeshProUGUI _attackSpeedText;
         [SerializeField] private TextMeshProUGUI _healthText;
         [SerializeField] private TextMeshProUGUI _moveSpeedText;
         [SerializeField] private TextMeshProUGUI _targetRangeText;
+        [SerializeField] private TextMeshProUGUI _skillDamageText;
+
+        [Header("Growth Per Level")]
+        [SerializeField] private TextMeshProUGUI _growthAttackText;
+        [SerializeField] private TextMeshProUGUI _growthSkillDamageText;
+        [SerializeField] private TextMeshProUGUI _growthHealthText;
 
         [Header("Skills")]
         [SerializeField] private TextMeshProUGUI _basicSkillText;
         [SerializeField] private TextMeshProUGUI _activeSkillText;
         [SerializeField] private TextMeshProUGUI _passiveSkillText;
         [SerializeField] private TextMeshProUGUI _evolutionSkillText;
+
+        [Header("Behavior & Movement")]
+        [SerializeField] private TextMeshProUGUI _behaviorTypeText;
+        [SerializeField] private TextMeshProUGUI _orbitRadiusText;
+        [SerializeField] private TextMeshProUGUI _orbitSpeedText;
+
+        [Header("Stamina & Emergency")]
+        [SerializeField] private TextMeshProUGUI _staminaText;
+        [SerializeField] private TextMeshProUGUI _staminaRegenText;
+        [SerializeField] private TextMeshProUGUI _emergencyThresholdText;
 
         [Header("State")]
         [SerializeField] private GameObject _equippedIndicator;
@@ -101,7 +116,10 @@ namespace IdleDefenseSurvival.UI
             RefreshRarity(definition.rarity);
             RefreshProgression(petId, isOwned);
             RefreshBaseStats(definition);
+            RefreshGrowth(definition);
             RefreshSkills(definition);
+            RefreshBehavior(definition);
+            RefreshStamina(definition);
             RefreshState(petId, isOwned);
         }
 
@@ -180,10 +198,32 @@ namespace IdleDefenseSurvival.UI
         {
             var stats = definition.baseStats;
             if (_attackText != null) _attackText.text = $"{stats.attack}";
-            if (_attackSpeedText != null) _attackSpeedText.text = $"{stats.attackSpeed:F1}";
             if (_healthText != null) _healthText.text = $"{stats.health}";
             if (_moveSpeedText != null) _moveSpeedText.text = $"{stats.moveSpeed}";
             if (_targetRangeText != null) _targetRangeText.text = $"{stats.targetRange}";
+            if (_skillDamageText != null) _skillDamageText.text = $"{stats.skillDamage}";
+        }
+
+        private void RefreshGrowth(PetDefinition definition)
+        {
+            var growth = definition.growth;
+            if (_growthAttackText != null) _growthAttackText.text = $"{growth.attackPerLevel}";
+            if (_growthSkillDamageText != null) _growthSkillDamageText.text = $"{growth.skillDamagePerLevel}";
+            if (_growthHealthText != null) _growthHealthText.text = $"{growth.healthPerLevel}";
+        }
+
+        private void RefreshBehavior(PetDefinition definition)
+        {
+            if (_behaviorTypeText != null) _behaviorTypeText.text = definition.behaviorType ?? "N/A";
+            if (_orbitRadiusText != null) _orbitRadiusText.text = $"{definition.orbitRadius}";
+            if (_orbitSpeedText != null) _orbitSpeedText.text = $"{definition.orbitSpeed}°/s";
+        }
+
+        private void RefreshStamina(PetDefinition definition)
+        {
+            if (_staminaText != null) _staminaText.text = $"{definition.maxStamina}";
+            if (_staminaRegenText != null) _staminaRegenText.text = $"{definition.staminaRegen}/s";
+            if (_emergencyThresholdText != null) _emergencyThresholdText.text = $"{definition.emergencyThreshold * 100f:F0}%";
         }
 
         private void RefreshSkills(PetDefinition definition)

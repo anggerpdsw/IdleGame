@@ -259,39 +259,17 @@ namespace IdleDefenseSurvival.Pet
             float distance = Vector3.Distance(pet.Transform.position, formationPos);
             float moveSpeed = pet.Definition.baseStats.moveSpeed;
 
-            // Distance-based catch-up behavior
-            if (distance > 8f)
-            {
-                // Safety snap - pet tertinggal terlalu jauh
-                pet.Transform.position = formationPos;
-            }
-            else if (distance > 5f)
-            {
-                // Aggressive return - speed boost 2x
-                pet.Transform.position = Vector3.MoveTowards(
-                    pet.Transform.position,
-                    formationPos,
-                    moveSpeed * 2f * deltaTime
-                );
-            }
-            else if (distance > 2f)
-            {
-                // Catch up - speed boost 1.5x
-                pet.Transform.position = Vector3.MoveTowards(
-                    pet.Transform.position,
-                    formationPos,
-                    moveSpeed * 1.5f * deltaTime
-                );
-            }
-            else
-            {
-                // Normal follow - base speed
-                pet.Transform.position = Vector3.MoveTowards(
-                    pet.Transform.position,
-                    formationPos,
-                    moveSpeed * deltaTime
-                );
-            }
+            // Distance-based catch-up behavior - smooth movement, no teleport
+            float speedMultiplier = 1f;
+            if (distance > 8f) speedMultiplier = 2.5f;
+            else if (distance > 5f) speedMultiplier = 1.8f;
+            else if (distance > 2f) speedMultiplier = 1.2f;
+
+            pet.Transform.position = Vector3.MoveTowards(
+                pet.Transform.position,
+                formationPos,
+                moveSpeed * speedMultiplier * deltaTime
+            );
 
             pet.Position = pet.Transform.position;
         }
