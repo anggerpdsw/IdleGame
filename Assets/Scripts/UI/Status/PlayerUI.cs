@@ -1,7 +1,6 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using UnityEngine.UI;
 using IdleDefenseSurvival.Manager;
 using System.Collections;
 using IdleDefenseSurvival.Stats;
@@ -18,19 +17,14 @@ namespace IdleDefenseSurvival.UI
         [SerializeField] private GameObject _statusPanel;
         [SerializeField] private Transform _content;
         [SerializeField] private PlayerStatRow _rowPrefab;
-        [SerializeField] private Button _statToggle;
 
         private Player.Player _player;
         private readonly Dictionary<SkillType, PlayerStatRow> _rows = new();
 
         private void Awake()
         {
-            // Setup toggle button listener
-            _statToggle?.onClick.AddListener(TogglePanel);
-
             // Start with panel hidden
             if (_statusPanel != null) _statusPanel.SetActive(false);
-
             BuildRows();
         }
 
@@ -68,7 +62,7 @@ namespace IdleDefenseSurvival.UI
         }
 
         // ================================================================
-        // PANEL SHOW / HIDE
+        // PUBLIC API — dipakai kode lain kalau perlu (mis. tutorial, deep link)
         // ================================================================
 
         /// <summary>
@@ -78,7 +72,6 @@ namespace IdleDefenseSurvival.UI
         {
             if (_statusPanel == null) return;
             _statusPanel.SetActive(true);
-            RefreshValues();
         }
 
         /// <summary>
@@ -87,19 +80,6 @@ namespace IdleDefenseSurvival.UI
         public void HidePanel()
         {
             if (_statusPanel != null) _statusPanel.SetActive(false);
-        }
-
-        /// <summary>
-        /// Toggle panel visibility. Attach this to the player click event.
-        /// </summary>
-        public void TogglePanel()
-        {
-            if (_statusPanel == null) return;
-
-            if (_statusPanel.activeSelf)
-                HidePanel();
-            else
-                ShowPanel();
         }
 
         // ================================================================
@@ -121,6 +101,8 @@ namespace IdleDefenseSurvival.UI
             }
         }
 
+        // PanelOpener akan memanggil ini via SetActive(true) → OnEnable
+        private void OnEnable() => RefreshValues();
         private void OnDisable()
             => PlayerStatsManager.Instance.OnStatsChanged -= RefreshValues;
     }
