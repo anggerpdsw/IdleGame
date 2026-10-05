@@ -60,6 +60,10 @@ namespace IdleDefenseSurvival.Stats
         DefenseBreak = 9,
         MultiShootChance = 10,
         MultiShootCount = 11,
+
+        // Projectile
+        PierceCount = 42,
+
         KnockbackChance = 12,
         KnockbackForce = 13,
         StuntChance = 14,
@@ -104,7 +108,7 @@ namespace IdleDefenseSurvival.Stats
 
         // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
         HitRate = 40,
-        Penetration = 41,
+        Penetration = 41
 
     }
 

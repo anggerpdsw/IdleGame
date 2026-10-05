@@ -163,6 +163,7 @@ namespace IdleDefenseSurvival.Core
         public void ResetGlobalState()
         {
             Time.timeScale = 1f;
+            Screen.sleepTimeout = SleepTimeout.SystemSetting;   // ← tambah ini
         }
 
         private void OnEnable() => Screen.sleepTimeout = SleepTimeout.SystemSetting;

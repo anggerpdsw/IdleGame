@@ -13,6 +13,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override CardEffectType EffectType => CardEffectType.PanicFire;
 
         private const string ModifierId = "Card:PanicFire";
+        private const string PierceModifierId = "Card:PanicFire_Pierce";
+
         private float _radius;
         private int _enemiesPerStack;
         private float _attackSpeedPerStackPercent;
@@ -40,8 +42,10 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             int enemyCount = CountEnemiesInRange(player.transform.position, _radius);
             int stacks = Mathf.Min(enemyCount / _enemiesPerStack, _maximumStacks);
             bool isActive = stacks > 0;
+            bool atMaxStacks = stacks >= _maximumStacks;
 
             ModifierManager.Instance.RemoveModifier(ModifierId);
+            ModifierManager.Instance.RemoveModifier(PierceModifierId);
 
             if (isActive)
             {
@@ -56,6 +60,21 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     Permanent = false
                 };
                 ModifierManager.Instance.AddModifier(modifier);
+            }
+
+            // At max stacks, grant 1 extra pierce
+            if (atMaxStacks)
+            {
+                var pierceMod = new StatModifier
+                {
+                    Id = PierceModifierId,
+                    Source = ModifierSource.Card,
+                    Stat = SkillType.PierceCount,
+                    Mode = ModifierMode.Flat,
+                    Value = 1f,
+                    Permanent = false
+                };
+                ModifierManager.Instance.AddModifier(pierceMod);
             }
         }
 
@@ -75,6 +94,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnUnequip(state);
             ModifierManager.Instance.RemoveModifier(ModifierId);
+            ModifierManager.Instance.RemoveModifier(PierceModifierId);
         }
 
         public override void OnUpgrade(CardRuntimeState state, int oldLevel, int newLevel)

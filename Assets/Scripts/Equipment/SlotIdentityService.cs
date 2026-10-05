@@ -74,6 +74,7 @@ namespace IdleDefenseSurvival.Equipment
                 SecondaryStat.BounceCount,
                 SecondaryStat.MultiShootChance,
                 SecondaryStat.MultiShootCount,
+                SecondaryStat.PierceCount,
                 SecondaryStat.KnockbackForce,
                 SecondaryStat.StuntChance,
                 SecondaryStat.StuntDuration,
@@ -87,6 +88,7 @@ namespace IdleDefenseSurvival.Equipment
                 SecondaryStat.MoveSpeed,
                 SecondaryStat.CooldownReduction,
                 SecondaryStat.HitRate,
+                SecondaryStat.Penetration,
                 SecondaryStat.BossDamage,
                 SecondaryStat.EliteDamage
             },

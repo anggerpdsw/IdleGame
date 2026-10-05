@@ -69,6 +69,7 @@ namespace IdleDefenseSurvival.Data
         public SkillData defenseBreak;
         public SkillData multiShootChance;
         public SkillData multiShootCount;
+        public SkillData pierceCount;
         public SkillData knockbackChance;
         public SkillData knockbackForce;
         public SkillData stuntChance;

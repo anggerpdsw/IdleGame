@@ -45,6 +45,7 @@ namespace IdleDefenseSurvival.Controller
         private void ShowPopup(VictoryData result)
         {
             _result = result;
+            Screen.sleepTimeout = SleepTimeout.SystemSetting;
             if (result.State == WaveState.Defeat) {
                 _posBG = -271f;
                 _defeat.SetActive(true);

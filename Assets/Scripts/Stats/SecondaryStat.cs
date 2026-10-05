@@ -116,6 +116,7 @@ namespace IdleDefenseSurvival.Stats
                 new(SecondaryStat.BounceCount, "Bounce Count", "Bounce #", StatCategory.Special, GameColors.statBounceCount, 1f),
                 new(SecondaryStat.DefenseBreak, "Defense Break", "Def Break", StatCategory.Special, GameColors.blue, 1f, canRollOnEquipment: false),
                 new(SecondaryStat.MultiShootCount, "Multi-Shot Count", "Multi #", StatCategory.Special, GameColors.statMultiShootCount, 1f),
+                new(SecondaryStat.PierceCount, "Pierce Count", "PCT", StatCategory.Special, GameColors.statPierceCount, 0f),
                 new(SecondaryStat.KnockbackForce, "Knockback Force", "KB Force", StatCategory.Special, GameColors.red, 1f, canRollOnEquipment: false),
                 new(SecondaryStat.StuntDuration, "Stun Duration", "Stun Dur", StatCategory.Special, GameColors.statStunDuration, 0.5f),
 
@@ -205,6 +206,7 @@ namespace IdleDefenseSurvival.Stats
             SecondaryStat.MoveSpeed => SkillType.MoveSpeed,
             SecondaryStat.MultiShootChance => SkillType.MultiShootChance,
             SecondaryStat.MultiShootCount => SkillType.MultiShootCount,
+            SecondaryStat.PierceCount => SkillType.PierceCount,
             SecondaryStat.StuntChance => SkillType.StuntChance,
             SecondaryStat.StuntDuration => SkillType.StuntDuration,
             SecondaryStat.WaterDamageBonus => SkillType.WaterDamageBonus,
@@ -227,6 +229,7 @@ namespace IdleDefenseSurvival.Stats
                 SkillType.DefenseBreak => SecondaryStat.DefenseBreak,
                 SkillType.MultiShootChance => SecondaryStat.MultiShootChance,
                 SkillType.MultiShootCount => SecondaryStat.MultiShootCount,
+                SkillType.PierceCount => SecondaryStat.PierceCount,
                 SkillType.KnockbackForce => SecondaryStat.KnockbackForce,
                 SkillType.StuntChance => SecondaryStat.StuntChance,
                 SkillType.StuntDuration => SecondaryStat.StuntDuration,
@@ -337,6 +340,7 @@ namespace IdleDefenseSurvival.Stats
         DefenseBreak = 9,
         MultiShootChance = 10,
         MultiShootCount = 11,
+        PierceCount = 42,
         KnockbackForce = 13,
         StuntChance = 14,
         StuntDuration = 15,
@@ -365,6 +369,6 @@ namespace IdleDefenseSurvival.Stats
         EliteDamage = 39,
 
         // Accuracy (specialization — from equipment/passive/buff/card, NOT main attributes)
-        HitRate = 40,
+        HitRate = 40
     }
 }

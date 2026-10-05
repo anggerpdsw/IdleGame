@@ -78,7 +78,7 @@ namespace IdleDefenseSurvival
         public static readonly Color statBounceCount        = new Color32(102, 179, 255, 255);
         public static readonly Color statMultiShootChance   = new Color32(204, 77, 255, 255);
         public static readonly Color statMultiShootCount    = new Color32(179, 51, 255, 255);
-        public static readonly Color statKnockbackChance    = new Color32(230, 102, 153, 255);
+        public static readonly Color statPierceCount    = new Color32(230, 102, 153, 255);
         public static readonly Color statStunChance         = new Color32(204, 77, 128, 255);
         public static readonly Color statStunDuration       = new Color32(179, 51, 102, 255);
 

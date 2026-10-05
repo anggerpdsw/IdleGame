@@ -389,11 +389,11 @@
         }, {
             "Id": "bat_stalker",
             "Name": "Bat Stalker",
-            "Description": "Heal for 3% of an enemy's max HP when you kill it. Healing scales with card level.",
+            "Description": "Heal for 5% of an enemy's max HP when you kill it. Healing scales with card level. Overhealing grants a temporary shield equal to 50% of excess heal for 4 seconds.",
             "EffectType": "BatStalker",
             "Mode": "Percent",
-            "BaseValue": 3,
-            "ValuePerLevel": 1.5,
+            "BaseValue": 5,
+            "ValuePerLevel": 2,
             "CardRarity": "Rare"
         }, {
             "Id": "predator_focus",
@@ -483,17 +483,17 @@
         }, {
             "Id": "panic_fire",
             "Name": "Panic Fire",
-            "Description": "Gain Attack Speed based on the number of nearby enemies.",
+            "Description": "Gain Attack Speed based on the number of nearby enemies. At max stacks, projectiles pierce 1 additional enemy.",
             "EffectType": "PanicFire",
             "Mode": "Percent",
-            "BaseValue": 3,
-            "ValuePerLevel": 0.5,
+            "BaseValue": 5,
+            "ValuePerLevel": 1,
             "CardRarity": "Rare",
             "Parameters": {
-                "Radius": 6,
-                "EnemiesPerStack": 3,
-                "AttackSpeedPerStackPercent": 3,
-                "MaximumStacks": 8
+                "Radius": 8,
+                "EnemiesPerStack": 2,
+                "AttackSpeedPerStackPercent": 5,
+                "MaximumStacks": 12
             }
         }, {
             "Id": "escape_velocity",
@@ -531,18 +531,20 @@
         }, {
             "Id": "death_momentum",
             "Name": "Death Momentum",
-            "Description": "Killing enemies grants Momentum, increasing Movement Speed and Attack Damage. Momentum is lost when the player stops moving.",
+            "Description": "Killing enemies grants Momentum, increasing Movement Speed, Attack Damage, and Attack Speed. Stacks persist briefly after stopping; refresh on kill.",
             "EffectType": "DeathMomentum",
             "Mode": "Percent",
-            "BaseValue": 2,
-            "ValuePerLevel": 0.5,
+            "BaseValue": 4,
+            "ValuePerLevel": 1,
             "CardRarity": "Rare",
             "Parameters": {
-                "MovementSpeedPerStackPercent": 2,
-                "AttackDamagePerStackPercent": 1,
-                "MaximumStacks": 12,
-                "StackDurationSeconds": 4,
-                "StopLossPerSecond": 2
+                "MovementSpeedPerStackPercent": 3,
+                "AttackDamagePerStackPercent": 2,
+                "AttackSpeedPerStackPercent": 1,
+                "MaximumStacks": 15,
+                "StackDurationSeconds": 6,
+                "StopLossPerSecond": 1,
+                "GraceDurationSeconds": 2
             }
         }, {
             "Id": "returning_echo",

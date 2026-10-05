@@ -81,6 +81,10 @@ namespace IdleDefenseSurvival.Player
         // lalu dipakai untuk semua bounce berikutnya tanpa re-roll
         private bool _bounceApproved = false;
 
+        // Pierce tracking: remaining pierces consumed per kill.
+        // Actual pierce count retrieved at kill time via GetAccumulatedCount.
+        private int _pierceCount;
+
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
         
@@ -123,6 +127,7 @@ namespace IdleDefenseSurvival.Player
 
             _isEnemyDied = false;
             _isInfiniteArsenal = false;
+            _pierceCount = 0; // reset pierce tracker
             EnemyDeathHandler.OnEnemyKilled -= OnEnemyKilledHandler;
         }
 
@@ -181,7 +186,7 @@ namespace IdleDefenseSurvival.Player
             SetProjectileSprite(_playerBulletSprite);
 
             _target = target;
-            GuardEventSub();            
+            GuardEventSub();
             _player = player;
             _damageMultiplier = damageMultiplier;
             _isMultiShoot = isMultiShoot;
@@ -201,6 +206,7 @@ namespace IdleDefenseSurvival.Player
             _defenseBreakType = DefenseBreakType.Permanent;
             _defenseBreak = PlayerStatsManager.Instance.GetStat(SkillType.DefenseBreak);
             _defenseBreakDuration = 0f;
+            _pierceCount = PlayerStatsManager.Instance.GetAccumulatedCount(PlayerStatsManager.Instance.GetStat(SkillType.PierceCount), AccumulatedCountType.Pierce);
         }
 
         public void InitializeFromTank(Transform target, TankInstance tank)
@@ -594,6 +600,24 @@ namespace IdleDefenseSurvival.Player
                         {
                             float currentStuntDuration = _baseStuntDuration * Mathf.Pow(0.9f, _bounceIndex);
                             enemy.ApplyStunt(currentStuntDuration);
+                        }
+
+                        // --- Pierce Logic (Panic Fire max stacks) ---
+                        // If enemy died and we have remaining pierces, find next target and continue
+                        if (_isEnemyDied)
+                        {
+                            if (_pierceCount > 0)
+                            {
+                                Transform nextTarget = FindNearestUnhitEnemy(transform.position);
+                                if (nextTarget != null)
+                                {
+                                    _target = nextTarget;
+                                    _pierceCount--; 
+                                    _bounceIndex++;
+                                    _hasHit = false;
+                                    return;
+                                }
+                            }
                         }
 
                         // --- Implementasi Bounce ---

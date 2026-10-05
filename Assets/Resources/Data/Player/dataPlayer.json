@@ -106,6 +106,15 @@
         "displayName": "Multi-Shot Count",
         "shortName": "MCT"
       },
+      "pierceCount": {
+        "baseValue": 0,
+        "bonusPerPoint": 0.035,
+        "ValuePerLevel": 0.125,
+        "ValuePerEnhance": 0.2,
+        "description": "Count pierce of projectiles shot when activates",
+        "displayName": "Pierce Count",
+        "shortName": "PCT"
+      },
       "knockbackChance": {
         "baseValue": 2.5,
         "bonusPerPoint": 0.1,

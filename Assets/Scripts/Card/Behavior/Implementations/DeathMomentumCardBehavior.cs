@@ -14,27 +14,34 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         private const string MoveSpeedModifierId = "Card:DeathMomentum_MoveSpeed";
         private const string AttackDamageModifierId = "Card:DeathMomentum_AttackDamage";
+        private const string AttackSpeedModifierId = "Card:DeathMomentum_AttackSpeed";
 
         private float _movementSpeedPerStackPercent;
         private float _attackDamagePerStackPercent;
+        private float _attackSpeedPerStackPercent;
         private int _maximumStacks;
         private float _stackDurationSeconds;
         private float _stopLossPerSecond;
+        private float _graceDurationSeconds;
 
         private int _currentStacks;
         private float _stackTimer;
         private float _stopTimer;
+        private float _graceTimer;
         private Vector3 _lastPosition;
         private bool _hasPosition;
+        private bool _inGracePeriod;
 
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            _movementSpeedPerStackPercent = GetParameter("MovementSpeedPerStackPercent", 2f);
-            _attackDamagePerStackPercent = GetParameter("AttackDamagePerStackPercent", 1f);
-            _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 12f));
-            _stackDurationSeconds = GetParameter("StackDurationSeconds", 4f);
-            _stopLossPerSecond = GetParameter("StopLossPerSecond", 2f);
+            _movementSpeedPerStackPercent = GetParameter("MovementSpeedPerStackPercent", 3f);
+            _attackDamagePerStackPercent = GetParameter("AttackDamagePerStackPercent", 2f);
+            _attackSpeedPerStackPercent = GetParameter("AttackSpeedPerStackPercent", 1f);
+            _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 15f));
+            _stackDurationSeconds = GetParameter("StackDurationSeconds", 6f);
+            _stopLossPerSecond = GetParameter("StopLossPerSecond", 1f);
+            _graceDurationSeconds = GetParameter("GraceDurationSeconds", 2f);
 
             var player = PlayerClass.Instance;
             if (player != null)
@@ -63,12 +70,16 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             {
                 _currentStacks++;
                 _stackTimer = _stackDurationSeconds;
+                _graceTimer = _graceDurationSeconds;
+                _inGracePeriod = true;
                 ApplyModifiers();
             }
             else
             {
                 // Refresh duration
                 _stackTimer = _stackDurationSeconds;
+                _graceTimer = _graceDurationSeconds;
+                _inGracePeriod = true;
             }
         }
 
@@ -80,20 +91,38 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             Vector3 currentPos = player.transform.position;
             float distanceMoved = Vector3.Distance(currentPos, _lastPosition);
 
-            if (_hasPosition && distanceMoved > 0.01f)
+            bool isMoving = _hasPosition && distanceMoved > 0.01f;
+
+            if (isMoving)
             {
-                // Player is moving - reset stop timer
+                // Player is moving - reset stop timer, tick grace timer
                 _stopTimer = 0f;
+                if (_inGracePeriod)
+                {
+                    _graceTimer -= deltaTime;
+                    if (_graceTimer <= 0f)
+                        _inGracePeriod = false;
+                }
             }
             else
             {
-                // Player is stopped - lose stacks over time
-                _stopTimer += deltaTime;
-                if (_stopTimer >= 1f / _stopLossPerSecond && _currentStacks > 0)
+                // Player is stopped
+                if (_inGracePeriod)
                 {
-                    _currentStacks = Mathf.Max(0, _currentStacks - 1);
-                    _stopTimer = 0f;
-                    ApplyModifiers();
+                    _graceTimer -= deltaTime;
+                    if (_graceTimer <= 0f)
+                        _inGracePeriod = false;
+                }
+                else
+                {
+                    // Grace period over - lose stacks over time
+                    _stopTimer += deltaTime;
+                    if (_stopTimer >= 1f / _stopLossPerSecond && _currentStacks > 0)
+                    {
+                        _currentStacks = Mathf.Max(0, _currentStacks - 1);
+                        _stopTimer = 0f;
+                        ApplyModifiers();
+                    }
                 }
             }
 
@@ -104,6 +133,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 if (_stackTimer <= 0f)
                 {
                     _currentStacks = 0;
+                    _inGracePeriod = false;
                     ApplyModifiers();
                 }
             }
@@ -116,11 +146,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             ModifierManager.Instance.RemoveModifier(MoveSpeedModifierId);
             ModifierManager.Instance.RemoveModifier(AttackDamageModifierId);
+            ModifierManager.Instance.RemoveModifier(AttackSpeedModifierId);
 
             if (_currentStacks > 0)
             {
                 float moveSpeedBonus = _currentStacks * _movementSpeedPerStackPercent;
                 float attackDamageBonus = _currentStacks * _attackDamagePerStackPercent;
+                float attackSpeedBonus = _currentStacks * _attackSpeedPerStackPercent;
 
                 var moveMod = new StatModifier
                 {
@@ -143,6 +175,17 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     Permanent = false
                 };
                 ModifierManager.Instance.AddModifier(dmgMod);
+
+                var speedMod = new StatModifier
+                {
+                    Id = AttackSpeedModifierId,
+                    Source = ModifierSource.Card,
+                    Stat = SkillType.AttackSpeed,
+                    Mode = ModifierMode.Percent,
+                    Value = attackSpeedBonus,
+                    Permanent = false
+                };
+                ModifierManager.Instance.AddModifier(speedMod);
             }
         }
 
@@ -151,7 +194,9 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             base.OnUnequip(state);
             ModifierManager.Instance.RemoveModifier(MoveSpeedModifierId);
             ModifierManager.Instance.RemoveModifier(AttackDamageModifierId);
+            ModifierManager.Instance.RemoveModifier(AttackSpeedModifierId);
             _currentStacks = 0;
+            _inGracePeriod = false;
         }
 
         public override void OnUpgrade(CardRuntimeState state, int oldLevel, int newLevel)

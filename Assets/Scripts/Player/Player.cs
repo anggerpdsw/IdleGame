@@ -1025,6 +1025,37 @@ namespace IdleDefenseSurvival.Player
             UpdateShieldVisual();
         }
 
+        /// <summary>
+        /// Add temporary shield that absorbs damage.
+        /// Called by BatStalker card on overheal and other effects.
+        /// </summary>
+        public void AddShield(float amount, float duration = 4f)
+        {
+            if (amount <= 0f) return;
+
+            _currentShield += amount;
+            _maxShield = _currentShield; // Track max for visual
+            _isShieldOnCooldown = false; // Card shields bypass cooldown
+            _shieldCooldownTimer = duration;
+            _shieldGranted = true;
+            UpdateShieldVisual();
+
+            // Start coroutine to expire shield
+            StartCoroutine(ExpireShieldRoutine(duration, amount));
+        }
+
+        private IEnumerator ExpireShieldRoutine(float duration, float amount)
+        {
+            yield return new WaitForSeconds(duration);
+            _currentShield = Mathf.Max(0f, _currentShield - amount);
+            if (_currentShield <= 0f)
+            {
+                _currentShield = 0f;
+                _shieldGranted = false;
+            }
+            UpdateShieldVisual();
+        }
+
         private void UpdateHealthUI()
         {
             if (healthBar == null) return;

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace IdleDefenseSurvival.Manager
 {
-    public enum AccumulatedCountType { Bounce, Exp, Gold, Meat, Multi }
+    public enum AccumulatedCountType { Bounce, Exp, Gold, Meat, Multi, Pierce }
 
     public class PlayerStatsManager : MonoBehaviour
     {
@@ -52,6 +52,7 @@ namespace IdleDefenseSurvival.Manager
         private float _goldFractionAccumulator = 0f;
         private float _meatFractionAccumulator = 0f;
         private float _multiShootFractionAccumulator = 0f;
+        private float _pierceFractionAccumulator = 0f;
 
         /// <summary>
         /// Returns an integer count for one approved action.
@@ -86,6 +87,8 @@ namespace IdleDefenseSurvival.Manager
                     AccumulateFraction(wholeCount, fraction, ref _meatFractionAccumulator),
                 AccumulatedCountType.Multi =>
                     AccumulateFraction(wholeCount, fraction, ref _multiShootFractionAccumulator),
+                AccumulatedCountType.Pierce =>
+                    AccumulateFraction(wholeCount, fraction, ref _pierceFractionAccumulator),
                 _ => wholeCount,
             };
         }
