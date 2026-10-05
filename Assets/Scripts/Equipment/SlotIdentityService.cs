@@ -88,7 +88,7 @@ namespace IdleDefenseSurvival.Equipment
                 SecondaryStat.MoveSpeed,
                 SecondaryStat.CooldownReduction,
                 SecondaryStat.HitRate,
-                SecondaryStat.Penetration,
+                SecondaryStat.PierceCount,
                 SecondaryStat.BossDamage,
                 SecondaryStat.EliteDamage
             },

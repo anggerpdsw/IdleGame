@@ -93,7 +93,7 @@ namespace IdleDefenseSurvival.UI
         private void RefreshValues()
         {
             if (_player == null) return;
-
+            
             foreach (var kvp in _rows)
             {
                 float value = PlayerStatsManager.Instance.GetStat(kvp.Key);
@@ -102,7 +102,7 @@ namespace IdleDefenseSurvival.UI
         }
 
         // PanelOpener akan memanggil ini via SetActive(true) → OnEnable
-        private void OnEnable() => RefreshValues();
+        private void OnEnable() => StartCoroutine(InitializeUI());
         private void OnDisable()
             => PlayerStatsManager.Instance.OnStatsChanged -= RefreshValues;
     }
