@@ -4135,6 +4135,13 @@ GameObject:
   - component: {fileID: 296059133}
   - component: {fileID: 296059135}
   - component: {fileID: 296059131}
+  - component: {fileID: 296059142}
+  - component: {fileID: 296059141}
+  - component: {fileID: 296059140}
+  - component: {fileID: 296059139}
+  - component: {fileID: 296059138}
+  - component: {fileID: 296059137}
+  - component: {fileID: 296059136}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -4177,34 +4184,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _visual: {fileID: 168363361}
-  healthBar: {fileID: 171425509}
-  fillHealth: {fileID: 1215140870}
-  manaBar: {fileID: 1373347276}
-  fillMana: {fileID: 1989693410}
-  _attackRangeRenderer: {fileID: 937093094}
   _projectileSpacingRadius: 0.25
   _projectileSpreadAngle: 15
-  _barrierRenderer: {fileID: 434727783}
-  _shieldRenderer: {fileID: 92404209}
-  _iceRenderer: {fileID: 1993558567}
-  _burnRenderer: {fileID: 1914683588}
-  _shieldCooldownImage: {fileID: 47163180}
-  _iceCooldownImage: {fileID: 1845378259}
-  _burnCooldownImage: {fileID: 229213081}
-  _unregenCooldownImage: {fileID: 822038307}
-  _berserkerImage: {fileID: 1677509724}
-  _vampireImage: {fileID: 1833215385}
-  _angelCooldownImage: {fileID: 1579703228}
-  _crazyGambler: {fileID: 67276144}
-  _crazyGamblerText: {fileID: 846505199}
-  _desperados: {fileID: 1444940338}
-  _desperadosText: {fileID: 111980107}
-  _deathChain: {fileID: 1996409950}
-  _deathChainText: {fileID: 583673739}
-  _currentShield: 0
-  _sfxSource: {fileID: 296059135}
-  _joyStick: {fileID: 12138146}
-  AttackRange: 0
 --- !u!70 &296059133
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -4366,6 +4347,115 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &296059136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c746824c4e1bc843a284a2b640abcdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerUIController
+  _sfxSource: {fileID: 296059135}
+  _attackRangeRenderer: {fileID: 937093094}
+  _attackRangeRotationSpeed: 2
+  _healthBar: {fileID: 171425509}
+  _fillHealth: {fileID: 1215140870}
+  _manaBar: {fileID: 1373347276}
+  _fillMana: {fileID: 1989693410}
+  _iceCooldown: {fileID: 1845378259}
+  _burnCooldown: {fileID: 229213081}
+  _unregenCooldown: {fileID: 822038307}
+  _shield: {fileID: 47163180}
+  _angel: {fileID: 1579703228}
+  _crazyGambler: {fileID: 67276144}
+  _crazyGamblerText: {fileID: 846505199}
+  _desperados: {fileID: 1444940338}
+  _desperadosText: {fileID: 111980107}
+  _deathChain: {fileID: 1996409950}
+  _deathChainText: {fileID: 583673739}
+--- !u!114 &296059137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fbd80a0c6c35fa44aaabe62ae0e4653, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerEffectsView
+  _barrierRenderer: {fileID: 434727783}
+  _iceRenderer: {fileID: 1993558567}
+  _burnRenderer: {fileID: 1914683588}
+  _berserkerImage: {fileID: 1677509724}
+  _vampireImage: {fileID: 1833215385}
+--- !u!114 &296059138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 679d80f88ea6ec14199eb9a31290676d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerUltimateController
+--- !u!114 &296059139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3fceff27c2099f44970f8119f05037b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerMovementController
+  _joystick: {fileID: 12138146}
+--- !u!114 &296059140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a18a74a415ddc54889d3d60e4acef56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerShieldController
+  _shieldRenderer: {fileID: 92404209}
+--- !u!114 &296059141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 589b189e2302494409c0bf47d0cce64f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerVitalsController
+--- !u!114 &296059142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 296059129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bed6c54af819ee4e8a8e818f156a821, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IdleDefenseSurvival.Player.PlayerCombatController
 --- !u!1 &306259774
 GameObject:
   m_ObjectHideFlags: 0
@@ -13405,7 +13495,7 @@ GameObject:
   - component: {fileID: 1215140871}
   - component: {fileID: 1215140870}
   m_Layer: 5
-  m_Name: Fill
+  m_Name: FillHealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20848,7 +20938,7 @@ GameObject:
   - component: {fileID: 1989693411}
   - component: {fileID: 1989693410}
   m_Layer: 5
-  m_Name: Fill
+  m_Name: FillManaBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

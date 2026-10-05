@@ -75,6 +75,7 @@ namespace IdleDefenseSurvival.Controller
 
         private void RefreshPlayer()
         {
+            if (_playerStats == null) return;
             _coinMultiplier.text = FormatValue(_playerStats.GetStat(SkillType.GoldGain));
             RefreshPlayerHealth();
             RefreshPlayerMana();
@@ -82,13 +83,23 @@ namespace IdleDefenseSurvival.Controller
             _defensePlayer.text = FormatValue(_playerStats.GetStat(SkillType.DefenseAmount));
             _regenPlayer.text = FormatValue(_playerStats.GetStat(SkillType.HealthRegen)) + "/s";
         }
+
         private void RefreshPlayerHealth()
         {
-            _healthPlayer.text = "HP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentHealth) + " / " + Utilityku.FormatNumber((long)PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
+            if (_healthPlayer == null || _player == null || _playerStats == null) return;
+
+            long cur = (long)_player.CurrentHealth;
+            long max = (long)_playerStats.GetStat(SkillType.HealthPoint);
+            _healthPlayer.text = $"HP {Utilityku.FormatNumber(cur)} / {Utilityku.FormatNumber(max)}";
         }
+
         private void RefreshPlayerMana()
         {
-            _manaPlayer.text = "MP " + Utilityku.FormatNumber((long)Player.Player.Instance.CurrentMana) + " / " + Utilityku.FormatNumber((long)PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint));
+            if (_manaPlayer == null || _player == null || _playerStats == null) return;
+
+            long cur = (long)_player.CurrentMana;
+            long max = (long)_playerStats.GetStat(SkillType.ManaPoint);
+            _manaPlayer.text = $"MP {Utilityku.FormatNumber(cur)} / {Utilityku.FormatNumber(max)}";
         }
         private void RefreshEnemy()
         {

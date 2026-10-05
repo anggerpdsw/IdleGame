@@ -1,1268 +1,189 @@
-using UnityEngine;
+using System;
 using System.Collections;
-using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Enemy;
-using IdleDefenseSurvival.Ultimate;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.UI;
+using UnityEngine;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Manager;
-using System;
-using IdleDefenseSurvival.Stats;
-using TMPro;
 using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Card.Behavior;
-using IdleDefenseSurvival.Card.Behavior.Implementations;
+using IdleDefenseSurvival.Data;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Player
 {
-    public class Player : MonoBehaviour
+    [DisallowMultipleComponent]
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(PlayerCombatController))]
+    [RequireComponent(typeof(PlayerVitalsController))]
+    [RequireComponent(typeof(PlayerShieldController))]
+    [RequireComponent(typeof(PlayerMovementController))]
+    [RequireComponent(typeof(PlayerUltimateController))]
+    [RequireComponent(typeof(PlayerEffectsView))]
+    [RequireComponent(typeof(PlayerUIController))]
+    public sealed class Player : MonoBehaviour
     {
-        // -------------------------------------------------------------------
-        // Singleton Pattern
-        // -------------------------------------------------------------------
         private static Player _instance;
         public static Player Instance => _instance;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void ResetStatic()
-        {
-            _instance = null;
-        }
-                
-        public event Action OnHealthChanged;
-        public event Action OnManaChanged;
+        private static void ResetStatic() => _instance = null;
 
-        [Header("Visualization")]
+        public event Action OnHealthChanged
+        {
+            add => Vitals.OnHealthChanged += value;
+            remove => Vitals.OnHealthChanged -= value;
+        }
+
+        public event Action OnManaChanged
+        {
+            add => Vitals.OnManaChanged += value;
+            remove => Vitals.OnManaChanged -= value;
+        }
+
+        [Header("Core")]
         [SerializeField] private Transform _visual;
-        [SerializeField] private Slider healthBar;
-        [SerializeField] private Image fillHealth;
-        [SerializeField] private Slider manaBar;
-        [SerializeField] private Image fillMana;
-        [SerializeField] private SpriteRenderer _attackRangeRenderer;
 
-        [Header("Projectile Spacing")]
-        [Tooltip("Radius offset untuk spawn projectile agar tidak menumpuk")]
-        [SerializeField] private float _projectileSpacingRadius = 0.25f;
-        [Tooltip("Sudut spread antar projectile dalam derajat")]
+        [Header("Projectile")]
+        [SerializeField] private float _projectileSpacingRadius = .25f;
         [SerializeField] private float _projectileSpreadAngle = 15f;
-        // Barrier visual – child GameObject with SpriteRenderer
-        [SerializeField] private SpriteRenderer _barrierRenderer;
-        [SerializeField] private SpriteRenderer _shieldRenderer;
-        [SerializeField] private SpriteRenderer _iceRenderer;
-        [SerializeField] private SpriteRenderer _burnRenderer;
-        // Shield visual - separate from barrier
-        // Radial fill image for cooldown effecy UI
-        [SerializeField] private Image _shieldCooldownImage;
-        [SerializeField] private Image _iceCooldownImage;
-        [SerializeField] private Image _burnCooldownImage;
-        [SerializeField] private Image _unregenCooldownImage;
-        // Card Effect
-        [SerializeField] private Image _berserkerImage;
-        [SerializeField] private Image _vampireImage;
-        [SerializeField] private Image _angelCooldownImage;
-        [SerializeField] private GameObject _crazyGambler;
-        [SerializeField] private TextMeshProUGUI _crazyGamblerText;
-        [SerializeField] private GameObject _desperados;
-        [SerializeField] private TextMeshProUGUI _desperadosText;
-        [SerializeField] private GameObject _deathChain;
-        [SerializeField] private TextMeshProUGUI _deathChainText;
-        
-        private float _attackRangeSpeedRotate = 2f;
-        // Immunity flag for DeathDefy
-        private bool _isImmune;
-        private string _lastDamageSource;
 
-        // Runtime state
-        private List<TankInstance> _activeTanks;
-        private float _attackTimer;
-        private float _regenTimer;
-        private float _currentHealth;
-        private float _currentMana;
-        private int _enemyLayerMask;
-        private Transform _currentTarget;
-        private UltimateManager _ultimateManager;
-        private int _shotIndex = 0; // Counter untuk radial offset pattern
+        public PlayerCombatController Combat { get; private set; }
+        public PlayerVitalsController Vitals { get; private set; }
+        public PlayerShieldController Shield { get; private set; }
+        public PlayerMovementController Movement { get; private set; }
+        public PlayerUltimateController Ultimate { get; private set; }
+        public PlayerEffectsView Effects { get; private set; }
+        public PlayerUIController UI { get; private set; }
 
-        // LastBullet card state
-        private bool _nextAttackGuaranteedHit;
-        private float _nextAttackDamageMultiplier = 1f;
-        private float _nextAttackCriticalChanceBonus;
-        public void SetNextProjectileAsLastBullet(bool guaranteed)
-        {
-            if (CardRuntimeManager.Instance?.GetBehavior("last_bullet") is not LastBulletCardBehavior behavior) return;
-            _nextAttackGuaranteedHit = guaranteed;
-            _nextAttackDamageMultiplier = behavior.GetDamageMultiplier();
-            _nextAttackCriticalChanceBonus = behavior.GetCriticalChanceBonus();
-        }
-
-        public bool GetNextAttackGuaranteedHit() => _nextAttackGuaranteedHit;
-        public float GetNextAttackDamageMultiplier() => _nextAttackDamageMultiplier;
-        public float GetNextAttackCriticalChanceBonus() => _nextAttackCriticalChanceBonus;
-
-        public float CurrentHealth => _currentHealth;
-        public float MaxHealth => PlayerStatsManager.Instance != null
-            ? PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint)
-            : 0f;
-        public float CurrentMana => _currentMana;
-        public float MaxMana => PlayerStatsManager.Instance != null
-            ? PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint)
-            : 0f;
-
-        // Shield system
-        [SerializeField] private float _currentShield = 0f;
-        private float _maxShield = 0f;
-        private bool _shieldGranted;
-        private float _shieldCooldownTimer = 0f;
-        private float ShieldCooldownDuration => CardModifierService.GetShieldCooldown();
-        private bool _isShieldOnCooldown = false;
-
-        // Guardian shield (separate from card shield)
-        private float _guardianShield = 0f;
-
-        [SerializeField] private AudioSource _sfxSource;
-        public AudioSource SfxSource => _sfxSource;
-
-        // Movement
-        [SerializeField] private Joystick _joyStick;
-        private Rigidbody2D rb;
-
-        public float AttackRange;
+        public float CurrentHealth => Vitals.CurrentHealth;
+        public float MaxHealth => Vitals.MaxHealth;
+        public float CurrentMana => Vitals.CurrentMana;
+        public float MaxMana => Vitals.MaxMana;
+        public float AttackRange { get; private set; }
+        public AudioSource SfxSource => UI.SfxSource;
 
         private void Awake()
         {
-            // Initialize singleton
             if (_instance != null && _instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
+
             _instance = this;
-            // Removed DontDestroyOnLoad - Player will be in Game scene
 
-            _enemyLayerMask = LayerMask.GetMask("Enemy");
-            _activeTanks = new List<TankInstance>();
+            Combat = GetComponent<PlayerCombatController>();
+            Vitals = GetComponent<PlayerVitalsController>();
+            Shield = GetComponent<PlayerShieldController>();
+            Movement = GetComponent<PlayerMovementController>();
+            Ultimate = GetComponent<PlayerUltimateController>();
+            Effects = GetComponent<PlayerEffectsView>();
+            UI = GetComponent<PlayerUIController>();
 
-            // Ensure effect renderer starts disabled
-            DisabledInitialImageEffect(false);
+            Combat.Configure(this, _projectileSpacingRadius, _projectileSpreadAngle);
+            Vitals.Configure(this);
+            Shield.Configure(this);
+            Movement.Configure(this);
+            Ultimate.Configure(this);
+            Effects.Configure(this);
+            UI.Configure(this);
+
+            Effects.DisableAll();
         }
 
-        private void DisabledInitialImageEffect(bool disabled)
-        {
-            SetBarrierEffect(disabled);
-            SetIceEffect(disabled);
-            SetBurnEffect(disabled);
-            SetBerserkerEffect(disabled);
-            SetVampireEffect(disabled);
-        }
-
-        /// <summary>
-        /// Reload player base stats from dataPlayer.json.
-        /// Skills have no levels — modifiers (Constitution/Strength/etc.) are
-        /// applied by ModifierManager on top of these base values.
-        /// </summary>
-        public void ReloadStats()
-        {
-            BaseStatLoader.Instance.LoadBaseStats();
-
-            // Update visuals
-            DrawAttackRange();
-
-            // Always start at full health and mana on game start
-            float health = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-            _currentHealth = health;
-            float mana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
-            _currentMana = mana;
-
-            UpdateHealthUI();
-            UpdateManaUI();
-            UpdateShieldVisual();
-            OnHealthChanged?.Invoke();
-            AttackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
-        }
-
-        private void Start()
-        {
-            rb = GetComponent<Rigidbody2D>();
-            // Use a coroutine to wait until essential singletons are initialized.
-            StartCoroutine(InitializePlayer());
-        }
+        private void Start() => StartCoroutine(InitializePlayer());
 
         private IEnumerator InitializePlayer()
         {
             yield return new WaitUntil(() => BootstrapController.IsInitialized);
             yield return new WaitUntil(() =>
                 PlayerStatsManager.Instance != null &&
-                BaseStatLoader.Instance != null
-            );
+                BaseStatLoader.Instance != null);
 
             if (SaveManager.Instance != null)
                 yield return new WaitUntil(() => SaveManager.Instance.IsSaveLoaded);
 
             ReloadStats();
 
-            UpdateHealthUI();
-            UpdateShieldVisual();
-            UpdateShieldCooldownUI();
+            Combat.Initialize();
+            Movement.Initialize();
+            Ultimate.Initialize();
+            Shield.Initialize();
 
-            DrawAttackRange();
-
-            _ultimateManager = UltimateManager.Instance;
-
-            // Refresh card modifiers and visual effects (Berserker, Vampire Bite)
             CardModifierService.Refresh();
+            CardModifierService.OnModifierChanged += UI.RefreshCardBonusUI;
+            if (CardRuntimeManager.Instance != null)
+                CardRuntimeManager.Instance.OnBehaviorsUpdated += UI.RefreshCardBonusUI;
 
-            CardModifierService.OnModifierChanged += UpdateCardBonusUI;
-            CardRuntimeManager.Instance.OnBehaviorsUpdated += UpdateCardBonusUI;
-            UpdateCardBonusUI();
+            UI.RefreshCardBonusUI();
         }
 
         private void Update()
         {
-            FaceTarget(_currentTarget);
-            TryAttack();
-            TryTriggerUltimateWithCooldown();
-            TryRegeneration();
-            UpdateShield(); // Shield system update
-            UpdateIceCooldownUI();
-            UpdateBurnCooldownUI();
-            // Aura effects now handled by AuraCollider trigger system
+            Combat.Tick();
+            Ultimate.Tick();
+            Vitals.TickRegeneration();
+            Shield.Tick();
+            UI.Tick();
 
-            // Update all card timers
-            UpdateAngelCooldownUI();
-
-            _attackRangeRenderer.transform.Rotate(0, 0, _attackRangeSpeedRotate * Time.deltaTime);
+            FaceTarget(Combat.CurrentTarget);
         }
 
-        private void FixedUpdate()
+        private void FixedUpdate() => Movement.FixedTick();
+
+        public void ReloadStats()
         {
-            if (_joyStick.joyStickVec.y != 0 || _joyStick.joyStickVec.x != 0)
-                MoveTo();
-            else
-                rb.linearVelocity = Vector2.zero;
-        }
-
-        private float _movementManaAccumulator;
-        private void MoveTo()
-        {
-            if (!UltimateManager.Instance.TryGetUltimate("Movement", out var ultimateData))
-                return;
-
-            Vector2 moveDirection = _joyStick.joyStickVec;
-
-            if (moveDirection.sqrMagnitude <= 0.001f)
-            {
-                rb.linearVelocity = Vector2.zero;
-                _movementManaAccumulator = 0f;
-                return;
-            }
-
-            float playerSpeed = PlayerStatsManager.Instance.GetStat(SkillType.MoveSpeed);
-
-            rb.linearVelocity = moveDirection * playerSpeed;
-
-            // Mana cost per second
-            _movementManaAccumulator += ultimateData.manaCost * Time.fixedDeltaTime;
-
-            int manaToSpend = Mathf.FloorToInt(_movementManaAccumulator);
-
-            if (manaToSpend <= 0) return;
-
-            if (!CanAfford(manaToSpend))
-            {
-                rb.linearVelocity = Vector2.zero;
-                _movementManaAccumulator = 0f;
-                return;
-            }
-
-            SpendMana(manaToSpend);
-            _movementManaAccumulator -= manaToSpend;
+            BaseStatLoader.Instance.LoadBaseStats();
+            AttackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
+            Vitals.ResetToMax();
+            UI.RefreshAll();
+            UI.DrawAttackRange(AttackRange);
         }
 
         private void FaceTarget(Transform target)
         {
-            if (target == null) return;
+            if (target == null || _visual == null) return;
             Vector3 scale = _visual.localScale;
             scale.x = target.position.x < transform.position.x ? -1f : 1f;
             _visual.localScale = scale;
         }
 
-        private void TryAttack()
-        {
-            _attackTimer -= Time.deltaTime;
-            if (_attackTimer <= 0)
-            {
-                Attack();
-                _attackTimer = 1f / PlayerStatsManager.Instance.GetStat(SkillType.AttackSpeed);
-            }
-        }
-
-        private void Attack()
-        {
-            // Find all enemies within attack range
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, PlayerStatsManager.Instance.GetStat(SkillType.AttackRange), _enemyLayerMask);
-            if (hits.Length == 0) return;
-
-            // Filter valid enemies and sort by distance (closest first)
-            List<Transform> targets = hits
-                .Where(hit => hit.TryGetComponent<EnemyAi>(out _))
-                .OrderBy(hit => Vector2.Distance(transform.position, hit.transform.position))
-                .Select(hit => hit.transform)
-                .ToList();
-
-            if (targets.Count == 0) return;
-
-            // Notify card systems: OnPlayerAttack
-            CardRuntimeManager.Instance?.DispatchPlayerAttack();
-
-            // Determine how many distinct targets to fire at based on multi‑shoot chance
-            bool multiShoot = Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.MultiShootChance));
-            int maxTargets = 1;
-            if (multiShoot)
-            {
-                float rawMultiShootCount = maxTargets + PlayerStatsManager.Instance.GetStat(SkillType.MultiShootCount);
-                int accumulatedCount = PlayerStatsManager.Instance.GetAccumulatedCount(rawMultiShootCount, AccumulatedCountType.Multi);
-                int potentialTargets = Mathf.Min(accumulatedCount, targets.Count);
-
-                // Check mana: if not enough, reduce target count or fallback to single shot
-                int availableMana = Mathf.FloorToInt(_currentMana);
-                if (availableMana < potentialTargets)
-                {
-                    // If mana < 1, fallback to single-shot (no mana cost)
-                    if (availableMana < 1)
-                    {
-                        multiShoot = false;
-                        maxTargets = 1;
-                    }
-                    else
-                    {
-                        // Use available mana
-                        maxTargets = availableMana;
-                    }
-                }
-                else
-                {
-                    maxTargets = potentialTargets;
-                }
-            }
-
-            // Get projectile from pool for each distinct target (no duplicate targeting)
-            for (int i = 0; i < maxTargets; i++)
-            {
-                Transform target = targets[i];
-                _currentTarget = target;
-
-                Projectile projectile = ProjectilePool.Instance.Get();
-                if (projectile != null)
-                {
-                    // Spawn dengan radial offset untuk spacing visual
-                    Vector3 spawnPos = GetSpawnPositionWithOffset(i);
-                    projectile.transform.SetPositionAndRotation(spawnPos, Quaternion.identity);
-
-                    // Projectile pertama = damage penuh
-                    float damageMultiplier = (i == 0) ? 1f : 0.77f;
-                    projectile.Initialize(target, this, damageMultiplier, multiShoot);
-                }
-            }
-            
-            _nextAttackGuaranteedHit = false;
-            _nextAttackDamageMultiplier = 1f;
-            _nextAttackCriticalChanceBonus = 0f;
-        }
-
-        /// <summary>
-        /// Spawn 5 burst projectiles for BulletStorm card effect.
-        /// </summary>
-        public void SpawnBulletStormBurst()
-        {
-            int additionalProjectiles = Mathf.Max(0, Mathf.RoundToInt(
-                CardModifierService.GetCardParameter("bullet_storm", "AdditionalProjectiles")));
-            float damageMultiplier = CardModifierService.GetCardParameter(
-                "bullet_storm", "ProjectileDamageMultiplier");
-            if (additionalProjectiles == 0) return;
-
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, PlayerStatsManager.Instance.GetStat(SkillType.AttackRange), _enemyLayerMask);
-            if (hits.Length == 0) return;
-
-            List<Transform> targets = hits
-                .Where(hit => hit.TryGetComponent<EnemyAi>(out _))
-                .OrderBy(hit => Vector2.Distance(transform.position, hit.transform.position))
-                .Select(hit => hit.transform)
-                .Take(additionalProjectiles)
-                .ToList();
-
-            for (int i = 0; i < targets.Count; i++)
-            {
-                Projectile projectile = ProjectilePool.Instance.Get();
-                if (projectile != null)
-                {
-                    Vector3 spawnPos = GetSpawnPositionWithOffset(i);
-                    projectile.transform.SetPositionAndRotation(spawnPos, Quaternion.identity);
-                    projectile.Initialize(targets[i], this, damageMultiplier, false);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Spawn special InfiniteArsenal projectile (pierce all, bounce 3x, 100% crit).
-        /// </summary>
-        public void SpawnInfiniteArsenalProjectile()
-        {
-            Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, PlayerStatsManager.Instance.GetStat(SkillType.AttackRange), _enemyLayerMask);
-            if (hits.Length == 0) return;
-
-            Transform target = hits
-                .Where(hit => hit.TryGetComponent<EnemyAi>(out _))
-                .OrderBy(hit => Vector2.Distance(transform.position, hit.transform.position))
-                .Select(hit => hit.transform)
-                .FirstOrDefault();
-
-            if (target == null) return;
-
-            Projectile projectile = ProjectilePool.Instance.Get();
-            if (projectile != null)
-            {
-                projectile.transform.SetPositionAndRotation(transform.position, Quaternion.identity);
-                projectile.Initialize(target, this, CardModifierService.GetCardParameter(
-                    "infinite_arsenal", "ProjectileDamageMultiplier"), false, true);
-            }
-        }
-
-        /// <summary>
-        /// Hitung posisi spawn projectile dengan radial offset untuk mencegah overlapping.
-        /// Menggunakan pattern circular distribution berdasarkan shot index.
-        /// </summary>
-        private Vector3 GetSpawnPositionWithOffset(int shotIndex)
-        {
-            // Kombinasi shot index dengan counter global untuk variasi pattern
-            float totalAngle = (shotIndex * _projectileSpreadAngle) + (_shotIndex * 7f);
-            float angleRad = totalAngle * Mathf.Deg2Rad;
-
-            Vector3 offset = new(
-                Mathf.Cos(angleRad) * _projectileSpacingRadius,
-                Mathf.Sin(angleRad) * _projectileSpacingRadius,
-                0f
-            );
-
-            _shotIndex++; // Increment untuk variasi pattern shot berikutnya
-            return transform.position + offset;
-        }
-
-        /// <summary>
-        /// Try to trigger ultimates using the new modular system.
-        /// Delegates to UltimateManager.TrySpawn() which handles cooldown and chance.
-        /// Only auto-casts when AutoCastUltimate setting is enabled.
-        /// </summary>
-        private void TryTriggerUltimateWithCooldown()
-        {
-            if (_ultimateManager == null) return;
-
-            // TrySpawn handles cooldown, active checks, chance, and mana cost
-            var pos = transform.position;
-            _ultimateManager.TrySpawn(DamageSource.Void.ToString(), pos, this);
-            _ultimateManager.TrySpawn(DamageSource.Root.ToString(), pos, this);
-            _ultimateManager.TrySpawn(DamageSource.Fountain.ToString(), pos, this);
-            _ultimateManager.TrySpawn(DamageSource.Shockwave.ToString(), pos, this);
-
-            // Lightning is triggered by kill count in EnemyAi, not cooldown/chance
-            // Do not call TrySpawn here - it's handled when enemies die
-        }
-
-        private void TryRegeneration()
-        {
-            // Block regeneration if Necromancer Unregeneration aura is active
-            if (IsUnregenerationActive()) return;
-
-            _regenTimer += Time.deltaTime;
-            if (_regenTimer < 1f) return;
-
-            float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-            float regen = PlayerStatsManager.Instance.GetStat(SkillType.HealthRegen);
-            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
-            float manaRegen = PlayerStatsManager.Instance.GetStat(SkillType.ManaRegen);
-
-            while (_regenTimer >= 1f)
-            {
-                _regenTimer -= 1f;
-                if (_currentHealth < maxHealth)
-                    Heal(Mathf.Min(regen, maxHealth - _currentHealth));
-                if (_currentMana < maxMana)
-                    GainMana(Mathf.Min(manaRegen, maxMana - _currentMana));
-            }
-        }
-
-        /// <summary>Checks bump; le than cost, false. Mana system gate.</summary>
-        public bool CanAfford(float manaCost) => _currentMana >= manaCost;
-
-        /// <summary>Consumes mana for an ultimate or mana-cost skill. Returns true when spent.</summary>
-        public bool SpendMana(float manaCost)
-        {
-            if (!CanAfford(manaCost)) return false;
-            _currentMana -= manaCost;
-            UpdateManaUI();
-            return true;
-        }
-
-        // ===== Heal / Mana Over Time (from potions) =====
-        private readonly List<Coroutine> _activeHoTs = new();
-        private readonly List<Coroutine> _activeMoTs = new();
-        private static readonly WaitForSeconds _oneSecond = new(1f);
-
-        /// <summary>
-        /// Starts a Heal-over-Time effect. Ticks every second for <paramref name="duration"/> seconds.
-        /// Each tick heals <paramref name="totalAmount"/> / <paramref name="duration"/>.
-        /// </summary>
-        public void StartHealOverTime(float totalAmount, float duration = 10f)
-        {
-            if (totalAmount <= 0f || duration <= 0f) return;
-            float tickAmount = totalAmount / duration;
-            var routine = StartCoroutine(HealOverTimeRoutine(tickAmount, duration));
-            _activeHoTs.Add(routine);
-        }
-
-        /// <summary>
-        /// Starts a Mana-over-Time effect. Ticks every second for <paramref name="duration"/> seconds.
-        /// Each tick restores <paramref name="totalAmount"/> / <paramref name="duration"/> mana.
-        /// </summary>
-        public void StartManaOverTime(float totalAmount, float duration = 10f)
-        {
-            if (totalAmount <= 0f || duration <= 0f) return;
-            float tickAmount = totalAmount / duration;
-            var routine = StartCoroutine(ManaOverTimeRoutine(tickAmount, duration));
-            _activeMoTs.Add(routine);
-        }
-
-        private IEnumerator HealOverTimeRoutine(float tickAmount, float duration)
-        {
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                yield return _oneSecond;
-                elapsed += 1f;
-
-                float maxHealth = PlayerStatsManager.Instance?.GetStat(SkillType.HealthPoint) ?? 0f;
-                if (_currentHealth < maxHealth)
-                {
-                    float before = _currentHealth;
-                    _currentHealth = Mathf.Min(_currentHealth + tickAmount, maxHealth);
-                    float actual = _currentHealth - before;
-                    if (actual >= 1f)
-                        UpdateHealthUI();
-                    OnHealthChanged?.Invoke();
-                }
-                // Show heal tick popup every second regardless of actual heal (visual feedback)
-                ShowDamagePopup(tickAmount, DamageType.Heal, CriticalType.None, "+");
-            }
-        }
-
-        private IEnumerator ManaOverTimeRoutine(float tickAmount, float duration)
-        {
-            float elapsed = 0f;
-            while (elapsed < duration)
-            {
-                yield return _oneSecond;
-                elapsed += 1f;
-
-                float maxMana = PlayerStatsManager.Instance?.GetStat(SkillType.ManaPoint) ?? 0f;
-                if (_currentMana < maxMana)
-                {
-                    float before = _currentMana;
-                    _currentMana = Mathf.Min(_currentMana + tickAmount, maxMana);
-                    float actual = _currentMana - before;
-                    if (actual >= 1f)
-                        UpdateManaUI();
-                }
-                // Show mana tick popup every second regardless of actual gain (visual feedback)
-                ShowDamagePopup(tickAmount, DamageType.Mana, CriticalType.None, "+");
-            }
-        }
-
-        /// <summary>
-        /// Update shield system - regenerate shield when at full HP.
-        /// </summary>
-        private void UpdateShield()
-        {
-            float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-
-            // Handle shield cooldown
-            if (_isShieldOnCooldown)
-            {
-                _shieldCooldownTimer -= Time.deltaTime;
-                UpdateShieldCooldownUI(); // Update radial fill
-
-                if (_shieldCooldownTimer <= 0f)
-                {
-                    _isShieldOnCooldown = false;
-                    UpdateShieldCooldownUI(); // Reset UI
-                }
-                return; // Don't grant shield while on cooldown
-            }
-
-            if (_currentHealth >= maxHealth)
-            {
-                if (!_shieldGranted)
-                {
-                    float shieldPercent = CardModifierService.GetEffectResult(CardEffectType.Shield, 0f);
-                    _maxShield = maxHealth * shieldPercent;
-
-                    _currentShield = _maxShield;
-                    _shieldGranted = true;
-                    UpdateShieldVisual();
-                }
-            }
-            else
-            {
-                _shieldGranted = false;
-            }
-        }
-
-        /// <summary>
-        /// Update the radial cooldown UI fill amount.
-        /// </summary>
-        private void UpdateShieldCooldownUI()
-        {
-            if (_shieldCooldownImage == null) return;
-
-            if (_isShieldOnCooldown)
-            {
-                // Fill amount: 0 = empty (cooldown done), 1 = full (cooldown just started)
-                // We want it to fill up as cooldown progresses, so invert
-                float fillAmount = 1f - (_shieldCooldownTimer / ShieldCooldownDuration);
-                _shieldCooldownImage.fillAmount = fillAmount;
-                _shieldCooldownImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                _shieldCooldownImage.gameObject.SetActive(false);
-                _shieldCooldownImage.fillAmount = 0f;
-            }
-        }
-
-        private void UpdateIceCooldownUI()
-        {
-            if (_iceCooldownImage == null) return;
-
-            float fillAmount = PlayerStatusEffectManager.Instance?.GetIceCooldownFill() ?? 0f;
-            if (fillAmount > 0f)
-            {
-                _iceCooldownImage.fillAmount = fillAmount;
-                _iceCooldownImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                _iceCooldownImage.gameObject.SetActive(false);
-                _iceCooldownImage.fillAmount = 0f;
-            }
-        }
-
-        private void UpdateBurnCooldownUI()
-        {
-            if (_burnCooldownImage == null) return;
-
-            float fillAmount = PlayerStatusEffectManager.Instance?.GetBurnCooldownFill() ?? 0f;
-            bool active = false;
-            if (fillAmount > 0f)
-            {
-                active = true;
-                _burnCooldownImage.fillAmount = fillAmount;
-            } else
-            {
-                _burnCooldownImage.fillAmount = 0f;
-            }
-            _burnCooldownImage.gameObject.SetActive(active);
-            SetBurnEffect(active);
-        }
-
-        private void UpdateAngelCooldownUI()
-        {
-            if (_angelCooldownImage == null) return;
-                        
-            // Hide UI if card not equipped
-            bool hasAngel = CardModifierService.HasEffect(CardEffectType.Immortal);
-            if (!hasAngel)
-            {
-                _angelCooldownImage.gameObject.SetActive(false);
-                return;
-            }
-
-            float maxCooldown = CardModifierService.GetAngelMaxCooldown();
-            float remaining = CardModifierService.GetAngelCooldownRemaining();
-
-            if (maxCooldown <= 0f)
-            {
-                _angelCooldownImage.gameObject.SetActive(false);
-                return;
-            }
-
-            // Ready state: fillAmount = 1 (full)
-            // Cooldown state: fillAmount starts at 0, fills up as timer counts down
-            float fillAmount = 1f - Mathf.Clamp01(remaining / maxCooldown);
-            _angelCooldownImage.fillAmount = fillAmount;
-            _angelCooldownImage.gameObject.SetActive(true);
-
-            // Sync barrier visual with immunity state
-            bool hasImmunity = CardModifierService.HasAngelImmunity();
-            if (!hasImmunity && _barrierRenderer != null && _barrierRenderer.enabled)
-                SetBarrierEffect(false);
-        }
-
-        public bool IsUnregenerationActive()
-        {
-            bool active = PlayerStatusEffectManager.Instance?.IsUnregenerationActive ?? false;
-            if (_unregenCooldownImage != null)
-                _unregenCooldownImage.gameObject.SetActive(active);
-            return active;
-        }
-
-        /// <summary>
-        /// Update shield visual effect.
-        /// </summary>
-        private void UpdateShieldVisual()
-        {
-            if (_shieldRenderer == null) return;
-
-            // Combine card shield + guardian shield
-            float totalShield = _currentShield + _guardianShield;
-            bool hasShield = totalShield > 0;
-            _shieldRenderer.gameObject.SetActive(hasShield);
-            if (!hasShield) return;
-
-            float totalMaxShield = _maxShield + _guardianShield;
-            float shieldPercent = totalMaxShield > 0 ? totalShield / totalMaxShield : 0f;
-
-            // Height (0 - 0.5)
-            float yScale = Mathf.Lerp(0f, 0.5f, shieldPercent);
-            _shieldRenderer.transform.localScale = new Vector3(1f, yScale, 1f);
-
-            Color color = GameColors.red;
-
-            if (shieldPercent > 0.75f)
-            {
-                // Yellow -> Green
-                float t = Mathf.InverseLerp(0.75f, 1f, shieldPercent);
-                color = Color.Lerp(GameColors.yellow, GameColors.green, t);
-            }
-            else if (shieldPercent > 0.3f)
-            {
-                // Red -> Yellow
-                float t = Mathf.InverseLerp(0.3f, 0.75f, shieldPercent);
-                color = Color.Lerp(GameColors.red, GameColors.yellow, t);
-            }
-
-            color.a = Mathf.Lerp(0.3f, 0.7f, shieldPercent);
-            _shieldRenderer.color = color;
-        }
-
-        /// <summary>
-        /// Manually casts an ultimate by ID.
-        /// Manual casting bypasses chance checks but still respects
-        /// cooldown and mana requirements through UltimateManager.
-        /// Called by UltimatePanelController when the user presses
-        /// an ultimate button.
-        /// </summary>
-        public bool ManualCastUltimate(string ultimateId)
-        {
-            if (_ultimateManager == null || string.IsNullOrEmpty(ultimateId)) 
-                return false;
-            return _ultimateManager.TryCastAllReadyStacks(ultimateId, this);
-        }
-
-        /// <summary>
-        /// Attempts to generate one Tank Ultimate stack via chance roll.
-        /// Tank's chance determines whether a new stack is generated.
-        /// Auto Cast only determines whether the generated stack is
-        /// immediately consumed and spawned.
-        /// </summary>
-        public void SpawnTank()
-        {
-            if (_ultimateManager == null) return;
-            string ultimateId = DamageSource.Tank.ToString();
-
-            if (!_ultimateManager.TryGetUltimate(ultimateId, out _))
-                return;
-
-            // Remove destroyed Tank references before checking positions.
-            _activeTanks.RemoveAll(tank => tank == null);
-
-            // Try to generate a stack via chance roll
-            if (!TryGetTankSpawnPosition(out Vector3 spawnPos)) return;
-            _ultimateManager.TryGenerateStack(ultimateId, this, spawnPos);
-
-            // Auto Cast: if enabled and mana permits, TryGenerateStack already handles auto-cast
-            // No additional logic needed here - UltimateManager handles it internally
-        }
-
-        /// <summary>
-        /// Attempts to find a valid spawn position for a Tank.
-        /// The player's AttackRange determines the distance of the Tank
-        /// from the player. The Tank's own AttackRange is only used to
-        /// determine the minimum spacing from existing Tanks.
-        /// </summary>
-        public bool TryGetTankSpawnPosition(out Vector3 spawnPos)
-        {
-            spawnPos = default;
-            if (PlayerStatsManager.Instance == null) return false;
-            float playerAR = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
-            if (playerAR <= 0f) return false;
-            // Tank AttackRange is used only for spacing between Tanks.
-            float tankAR = playerAR * 0.75f;
-            if (!TryFindValidSpawnPosition(playerAR, tankAR, out Vector2 position))
-                return false;
-            spawnPos = position;
-            return true;
-        }
-
-        /// <summary>
-        /// Attempts to find a valid Tank spawn position.
-        /// playerAR:
-        ///     Determines where the Tank is spawned around the player.
-        /// tankAR:
-        ///     Determines the minimum spacing between the new Tank
-        ///     and existing Tanks.
-        /// </summary>
-        private bool TryFindValidSpawnPosition(float playerAR, float tankAR, out Vector2 spawnPos)
-        {
-            const int MaxAttempts = 20;
-            spawnPos = default;
-            for (int attempt = 0; attempt < MaxAttempts; attempt++)
-            {
-                // Generate a random direction around the player.
-                Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
-                // Spawn exactly on the player's AttackRange boundary.
-                Vector2 candidatePosition = (Vector2)transform.position + randomDir * playerAR;
-                if (!IsValidTankSpawnPosition(candidatePosition, tankAR)) continue;
-                spawnPos = candidatePosition;
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Determines whether the specified position maintains sufficient
-        /// spacing from all active Tanks.
-        /// The minimum distance is the sum of the new Tank's AttackRange
-        /// and the existing Tank's AttackRange.
-        /// </summary>
-        private bool IsValidTankSpawnPosition(Vector2 candidatePosition, float tankAR)
-        {
-            foreach (TankInstance existingTank in _activeTanks)
-            {
-                if (existingTank == null) continue;
-                float distanceToExistingTank = Vector2.Distance(candidatePosition, (Vector2)existingTank.transform.position);
-                float minimumDistance = tankAR + existingTank.TankAttackRange;
-                // Attack ranges must not overlap.
-                if (distanceToExistingTank < minimumDistance) return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Apply damage to player.
-        /// Called by Enemy when it hits this player.
-        /// </summary>
-        public float TakeDamage(DamageData damageData, bool canEvade = true)
-        {
-            // --------------------------------------------------
-            // 1. Immunity / Evasion
-            // --------------------------------------------------
-            bool evaded = canEvade && Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.Evasion));
-
-            // Check Angel immunity (wave-based)
-            bool hasImmunity = CardModifierService.HasAngelImmunity();
-            if (_isImmune || hasImmunity || evaded)
-            {
-                ShowDamagePopup(0f, DamageType.Miss, CriticalType.None);
-                return 0f;
-            }
-
-            // --------------------------------------------------
-            // 2. Get damage
-            // --------------------------------------------------
-            float remainingDamage = Mathf.Max(0f, damageData.Damage);
-            if (remainingDamage <= 0f) return 0f;
-                
-            // --------------------------------------------------
-            // 3. Apply Defense FIRST
-            // --------------------------------------------------
-            float rawDamage = damageData.Damage;
-            float defense = PlayerStatsManager.Instance.GetStat(SkillType.DefenseAmount);
-            float finalDamage = Utilityku.FinalDamage(rawDamage, defense);
-            finalDamage = Mathf.Max(0f, finalDamage);
-                    
-            // --------------------------------------------------
-            // 4. Shield absorbs damage AFTER Defense
-            // --------------------------------------------------
-            if (_currentShield > 0f && finalDamage > 0f)
-            {
-                float shieldAbsorb = Mathf.Min(_currentShield, finalDamage);
-                _currentShield -= shieldAbsorb;
-                finalDamage -= shieldAbsorb;
-                if (shieldAbsorb > 0f)
-                    ShowDamagePopup(shieldAbsorb, DamageType.Miss, CriticalType.None, "⛨ ");
-                // Shield depleted - start cooldown
-                if (_currentShield <= 0f)
-                {
-                    _currentShield = 0f;
-                    _isShieldOnCooldown = true;
-                    _shieldCooldownTimer = ShieldCooldownDuration;
-                    _shieldGranted = false;
-                }
-                UpdateShieldVisual();
-            }
-
-            // --------------------------------------------------
-            // 4b. Guardian shield absorbs AFTER card shield
-            // --------------------------------------------------
-            if (_guardianShield > 0f && finalDamage > 0f)
-            {
-                float guardianAbsorb = Mathf.Min(_guardianShield, finalDamage);
-                _guardianShield -= guardianAbsorb;
-                finalDamage -= guardianAbsorb;
-                if (guardianAbsorb > 0f)
-                    ShowDamagePopup(guardianAbsorb, DamageType.Miss, CriticalType.None, "🛡 ");
-                UpdateShieldVisual();
-            }
-
-            // --------------------------------------------------
-            // 5. Apply remaining damage to HP
-            // --------------------------------------------------
-            if (finalDamage > 0f)
-            {
-                float healthBeforeDamage = _currentHealth;
-                _currentHealth -= finalDamage;
-                _currentHealth = Mathf.Clamp(_currentHealth, 0, PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint));
-                float actualHealthLost = Mathf.Max(0f, healthBeforeDamage - _currentHealth);
-                _lastDamageSource = damageData.Source;
-                ShowDamagePopup(finalDamage, DamageType.Normal, CriticalType.None);
-                OnHealthChanged?.Invoke();
-
-                // Notify card behaviors (GuardianInstinct, DeathReversal, Immortal)
-                float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-                CardRuntimeManager.Instance?.DispatchPlayerDamaged(actualHealthLost, _currentHealth, maxHealth);
-            }
-
-            // --------------------------------------------------
-            // 6. Update UI
-            // --------------------------------------------------
-            UpdateHealthUI();
-            UpdateShieldVisual();
-
-            // --------------------------------------------------
-            // 7. Death check
-            // --------------------------------------------------
-            if (_currentHealth <= 0) Die();
-
-            return finalDamage;
-        }
-
-        public void GainMana(float gainmana)
-        {
-            float mana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
-            if (_currentMana >= mana) return;
-
-            float oldMana = _currentMana;
-            _currentMana = Mathf.Min(_currentMana + gainmana, mana);
-
-            // Calculate actual gainmana received (clamped by max mana)
-            float actualGainMana = _currentMana - oldMana;
-
-            if (!Mathf.Approximately(oldMana, _currentMana))
-            {
-                UpdateManaUI();
-                // Show gainmana popup
-                if (actualGainMana >= 1f) ShowDamagePopup(actualGainMana, DamageType.Mana, CriticalType.None, "+");
-            }
-        }
-
-        private void UpdateManaUI()
-        {
-            if (manaBar == null) return;
-            float maxMana = PlayerStatsManager.Instance.GetStat(SkillType.ManaPoint);
-            manaBar.maxValue = maxMana;
-            manaBar.value = _currentMana;
-            
-            float percent = Mathf.Clamp01(_currentMana / maxMana);
-            fillMana.color = Color.Lerp(GameColors.empty, GameColors.blue, percent);
-            OnManaChanged?.Invoke();
-        }
-
-        public void Heal(float heal, bool isLifeSteal = false)
-        {
-            float health = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-            if (_currentHealth >= health) return;
-
-            float oldHealth = _currentHealth;
-            _currentHealth = Mathf.Min(_currentHealth + heal, health);
-
-            // Calculate actual heal received (clamped by max health)
-            float actualHeal = _currentHealth - oldHealth;
-
-            if (actualHeal > 0f)
-            {
-                CardRuntimeManager.Instance?.DispatchPlayerHealed(actualHeal, _currentHealth, health);
-                if (isLifeSteal)
-                    CardRuntimeManager.Instance?.DispatchPlayerLifeSteal(actualHeal, _currentHealth, health);
-            }
-
-            if (!Mathf.Approximately(oldHealth, _currentHealth))
-            {
-                UpdateHealthUI();
-                OnHealthChanged?.Invoke();
-
-                // Show heal popup
-                if (actualHeal >= 1f) ShowDamagePopup(actualHeal, DamageType.Heal, CriticalType.None, "+");
-            }
-        }
-
-        /// <summary>
-        /// Grant Guardian shield from GuardianInstinct card.
-        /// Called by CardModifierService when HP drops below 30%.
-        /// </summary>
-        public void GrantGuardianShield(float amount)
-        {
-            _guardianShield = amount;
-            UpdateShieldVisual();
-        }
-
-        /// <summary>
-        /// Add temporary shield that absorbs damage.
-        /// Called by BatStalker card on overheal and other effects.
-        /// </summary>
-        public void AddShield(float amount, float duration = 4f)
-        {
-            if (amount <= 0f) return;
-
-            _currentShield += amount;
-            _maxShield = _currentShield; // Track max for visual
-            _isShieldOnCooldown = false; // Card shields bypass cooldown
-            _shieldCooldownTimer = duration;
-            _shieldGranted = true;
-            UpdateShieldVisual();
-
-            // Start coroutine to expire shield
-            StartCoroutine(ExpireShieldRoutine(duration, amount));
-        }
-
-        private IEnumerator ExpireShieldRoutine(float duration, float amount)
-        {
-            yield return new WaitForSeconds(duration);
-            _currentShield = Mathf.Max(0f, _currentShield - amount);
-            if (_currentShield <= 0f)
-            {
-                _currentShield = 0f;
-                _shieldGranted = false;
-            }
-            UpdateShieldVisual();
-        }
-
-        private void UpdateHealthUI()
-        {
-            if (healthBar == null) return;
-            float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-            healthBar.maxValue = maxHealth;
-            healthBar.value = _currentHealth;
-            
-            float percent = Mathf.Clamp01(_currentHealth / maxHealth);
-            Color color;
-            if (percent > 0.75f)
-            {
-                float t = Mathf.InverseLerp(0.75f, 1f, percent);
-                color = Color.Lerp(GameColors.yellow, GameColors.green, t);
-            }
-            else
-            {
-                float t = Mathf.InverseLerp(0f, 0.75f, percent);
-                color = Color.Lerp(GameColors.red, GameColors.yellow, t);
-            }
-
-            fillHealth.color = color;
-            OnHealthChanged?.Invoke();
-        }
-
-        /// <summary>
-        /// Show damage popup at player position.
-        /// </summary>
-        private void ShowDamagePopup(float damage, DamageType type, CriticalType criticalType, string prefix = "")
-        {
-            if (DamagePopupManager.Instance == null) return;
-
-            // Position popup slightly above player center
-            Vector3 popupPosition = transform.position + Vector3.up * 0.5f;
-
-            DamagePopupData popupData = new(
-                damage,
-                type,
-                criticalType, // Langsung kirim CriticalType, bukan bool
-                prefix // Prefix with + for heal
-            );
-
-            DamagePopupManager.Instance.ShowDamage(popupPosition, popupData, transform);
-        }
-
-        private void Die()
-        {
-            // DeathDefy check second
-            if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
-            {
-                // Heal a small amount and grant temporary immunity with visual barrier.
-                float heal = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint) * 0.1f;
-                Heal(heal);
-
-                // Start immunity coroutine (15 seconds) and enable barrier visual.
-                // ensure we can start coroutine
-                if (gameObject.activeInHierarchy)
-                    StartCoroutine(ImmunityRoutine(15f));
-                return;
-            }
-
-            // Angel is the final death-prevention effect after Death Defy.
-            if (CardModifierService.TryTriggerAngel())
-            {
-                // Full heal and immunity for the current wave.
-                float maxHealth = PlayerStatsManager.Instance.GetStat(SkillType.HealthPoint);
-                _currentHealth = maxHealth;
-                UpdateHealthUI();
-                OnHealthChanged?.Invoke();
-                // Heal feedback
-                ShowDamagePopup(maxHealth, DamageType.Heal, CriticalType.None, "⚕ ");
-                return;
-            }
-
-            // Handle player death (e.g., trigger game over, respawn, etc.)
-            WaveManager.Instance.Defeat(_lastDamageSource);
-        }
-
-        // Coroutine that grants immunity and shows the barrier for the given duration.
-        private IEnumerator ImmunityRoutine(float duration)
-        {
-            _isImmune = true;
-            SetBarrierEffect(_isImmune);
-            yield return new WaitForSeconds(duration);
-            _isImmune = false;
-            SetBarrierEffect(_isImmune);
-        }
-                
-        public void SetBarrierEffect(bool enabled)
-        {
-            if (_barrierRenderer != null) _barrierRenderer.enabled = enabled;
-        }
-        public void SetIceEffect(bool enabled)
-        {
-            if (_iceRenderer != null) _iceRenderer.enabled = enabled;
-        }
-        public void SetBurnEffect(bool enabled)
-        {
-            if (_burnRenderer != null) _burnRenderer.enabled = enabled;
-        }
-        public void SetBerserkerEffect(bool enabled)
-        {
-            if (_berserkerImage != null) _berserkerImage.gameObject.SetActive(enabled);
-        }
-        public void SetVampireEffect(bool enabled)
-        {
-            if (_vampireImage != null) _vampireImage.gameObject.SetActive(enabled);
-        }
-
-        private void DrawAttackRange()
-        {
-            float diameter = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * 2f;
-            _attackRangeRenderer.transform.localScale = new Vector3(diameter, diameter, 1f);
-            _attackRangeRenderer.color = GameColors.debugAtkRangeCyan.WithAlpha(0.09f);
-        }
+        // Compatibility facade: existing callers do not need to know the new components.
+        public void SetNextProjectileAsLastBullet(bool value) => Combat.SetNextProjectileAsLastBullet(value);
+        public bool GetNextAttackGuaranteedHit() => Combat.NextAttackGuaranteedHit;
+        public float GetNextAttackDamageMultiplier() => Combat.NextAttackDamageMultiplier;
+        public float GetNextAttackCriticalChanceBonus() => Combat.NextAttackCriticalChanceBonus;
+        public void SpawnBulletStormBurst() => Combat.SpawnBulletStormBurst();
+        public void SpawnInfiniteArsenalProjectile() => Combat.SpawnInfiniteArsenalProjectile();
+
+        public bool CanAfford(float amount) => Vitals.CanAfford(amount);
+        public bool SpendMana(float amount) => Vitals.SpendMana(amount);
+        public void GainMana(float amount) => Vitals.GainMana(amount);
+        public void Heal(float amount, bool lifeSteal = false) => Vitals.Heal(amount, lifeSteal);
+        public void StartHealOverTime(float amount, float duration = 10f) => Vitals.StartHealOverTime(amount, duration);
+        public void StartManaOverTime(float amount, float duration = 10f) => Vitals.StartManaOverTime(amount, duration);
+
+        public float TakeDamage(DamageData data, bool canEvade = true) => Vitals.TakeDamage(data, canEvade);
+        public void GrantGuardianShield(float amount) => Shield.GrantGuardianShield(amount);
+        public void AddShield(float amount, float duration = 4f) => Shield.AddShield(amount, duration);
+        public bool IsUnregenerationActive() => Shield.IsUnregenerationActive();
+
+        public bool ManualCastUltimate(string id) => Ultimate.ManualCastUltimate(id);
+        public void SpawnTank() => Ultimate.SpawnTank();
+        public bool TryGetTankSpawnPosition(out Vector3 position) => Ultimate.TryGetTankSpawnPosition(out position);
+
+        public void SetBarrierEffect(bool enabled) => Effects.SetBarrier(enabled);
+        public void SetIceEffect(bool enabled) => Effects.SetIce(enabled);
+        public void SetBurnEffect(bool enabled) => Effects.SetBurn(enabled);
+        public void SetBerserkerEffect(bool enabled) => Effects.SetBerserker(enabled);
+        public void SetVampireEffect(bool enabled) => Effects.SetVampire(enabled);
 
         private void OnDestroy()
         {
-            CardModifierService.OnModifierChanged -= UpdateCardBonusUI;
-            CardRuntimeManager.Instance.OnBehaviorsUpdated -= UpdateCardBonusUI;
+            CardModifierService.OnModifierChanged -= UI.RefreshCardBonusUI;
+            if (CardRuntimeManager.Instance != null)
+                CardRuntimeManager.Instance.OnBehaviorsUpdated -= UI.RefreshCardBonusUI;
+
+            if (_instance == this) _instance = null;
         }
-
-        private void UpdateCardBonusUI()
-        {
-            // CrazyGambler: -300% to +500% range (stored as 0.5 = 50%)
-            bool hasGambler = CardModifierService.HasEffect(CardEffectType.CrazyGambler);
-            if (_crazyGambler != null) _crazyGambler.SetActive(hasGambler);
-            if (hasGambler && _crazyGamblerText != null)
-            {
-                float bonus = CardModifierService.GetCrazyGamblerBonus();
-                _crazyGamblerText.text = $"{bonus:0}%";
-            }
-            else if (_crazyGamblerText != null)
-            {
-                _crazyGamblerText.text = string.Empty;
-            }
-
-            // Desperados: -300% to +500% range (stored as 0.5 = 50%)
-            bool hasDesperados = CardModifierService.HasEffect(CardEffectType.Desperados);
-            if (_desperados != null) _desperados.SetActive(hasDesperados);
-            if (hasDesperados && _desperadosText != null)
-            {
-                float bonus = CardModifierService.GetDesperadosBonus();
-                _desperadosText.text = $"{bonus:0}%";
-            }
-            else if (_desperadosText != null)
-            {
-                _desperadosText.text = string.Empty;
-            }
-
-            // Death Chain: 15 stacks
-            bool hasDeathChain = CardModifierService.HasEffect(CardEffectType.DeathChain);
-            if (_deathChain != null) _deathChain.SetActive(hasDeathChain);
-            if (hasDeathChain && _deathChainText != null)
-            {
-                float bonus = CardModifierService.GetDeathChainStack();
-                _deathChainText.text = $"s{bonus:0}";
-            }
-            else if (_deathChainText != null)
-            {
-                _deathChainText.text = string.Empty;
-            }
-        }
-
-        private void OnDisable()
-        {
-            CardModifierService.OnModifierChanged -= UpdateCardBonusUI;
-            CardRuntimeManager.Instance.OnBehaviorsUpdated -= UpdateCardBonusUI;
-        }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmosSelected()
-        {
-            // Draw attack range as subtle cyan dashed circle in Scene view
-            Gizmos.color = GameColors.debugCyanGizmo.WithAlpha(0.5f); // Cyan with transparency
-            DrawCircleGizmo(transform.position, AttackRange, 64);
-            
-            if (Application.isPlaying)
-            {
-                float attackDamage = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage);
-                float attackSpeed= PlayerStatsManager.Instance.GetStat(SkillType.AttackSpeed);
-                float attackRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
-
-                Vector3 labelPos = transform.position + Vector3.up * 2f;
-                UnityEditor.Handles.Label(labelPos, $"AttackDamage {attackDamage}, AttackSpeed {attackSpeed}, AttackRange {attackRange}, ");
-            }
-        }
-
-        private static void DrawCircleGizmo(Vector3 center, float radius, int segments)
-        {
-            float angleStep = 360f / segments * Mathf.Deg2Rad;
-            Vector3 prevPos = center + new Vector3(radius, 0, 0);
-
-            for (int i = 1; i <= segments; i++)
-            {
-                float angle = i * angleStep;
-                Vector3 newPos = center + new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    Mathf.Sin(angle) * radius,
-                    0
-                );
-                Gizmos.DrawLine(prevPos, newPos);
-                prevPos = newPos;
-            }
-            // Close the circle
-            Gizmos.DrawLine(prevPos, center + new Vector3(radius, 0, 0));
-        }
-
-#endif
     }
 }

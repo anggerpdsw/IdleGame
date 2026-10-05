@@ -1,8 +1,8 @@
 # Player System Design — IdleDefenseSurvival
 
-**Purpose:** Player character behavior, stats, auto-attack mechanics, positioning, aura.
+**Purpose:** Player character behavior, stats, auto-attack, shielding, movement, ultimates, and UI façade.
 
-**Last Updated:** 2026-10-01
+**Last Updated:** 2026-10-06
 
 ---
 
@@ -18,19 +18,22 @@
 
 ---
 
-## 1. Player Identity
+## 1. Architecture Overview
 
-**Fixed position:** Player stays centered in arena. Enemies approach player.
+The player is now a thin façade (`Player.cs`) that composes a set of dedicated controllers. Each controller owns a single responsibility and exposes only the data needed by other systems.
 
-**Auto-combat:** Player attacks automatically. No manual aiming/shooting.
+| Component | Owner | Key Responsibilities |
+|---|---|---|
+| `PlayerCombatController` | Player | Auto-attack loop, target selection, projectile spawning, multi-shoot, special card attacks |
+| `PlayerVitalsController` | Player | Health / mana pools, regeneration, damage intake, healing, death/defy logic |
+| `PlayerShieldController` | Player | Shield / guardian shield values, absorption, cooldown, visual update |
+| `PlayerMovementController` | Player | Joystick-driven movement (used by Movement ultimate), mana cost handling |
+| `PlayerUltimateController` | Player | Ultimate spawning, tank management, manual casting API |
+| `PlayerUIController` | Player | HUD sync – health/mana bars, cooldown icons, attack-range ring |
+| `PlayerEffectsView` | Player | Visual effect toggles only – barrier, ice, burn, etc. |
+| `Player` (facade) | — | Provides singleton instance, forwards calls to the above controllers, ensures backward-compatible public API. |
 
-**Stats-driven:** All combat behavior determined by final stats from pipeline.
-
-**Key scripts:**
-- `Scripts/Player/Player.cs` — main MonoBehaviour, attack loop
-- `Scripts/Player/PlayerStats.cs` — stat container
-- `Scripts/Manager/PlayerStatsManager.cs` — stat aggregation + cache
-- `Scripts/Player/AuraCollider.cs` — visual aura ring
+All gameplay logic lives in these services; UI classes merely read state.
 
 ---
 
@@ -38,7 +41,6 @@
 
 **Source:** `Assets/Resources/Data/dataPlayer.json`
 
-**Schema example:**
 ```json
 {
   "baseAttackDamage": 20.0,
@@ -55,466 +57,207 @@
 }
 ```
 
-**Loading:** `BaseStatLoader.cs` reads JSON → stores in memory → feeds to `PlayerStatsManager`.
+**Loading:** `BaseStatLoader.cs` reads the JSON → populates `PlayerStatsManager`.
 
-**Do NOT hardcode base stats in Player.cs.**
-
----
-
-## 3. Final Stats
-
-**Pipeline:**
-```
-dataPlayer.json (base)
-    ↓
-AttributeModifierManager (CON/STR/INT/DEX → secondary stats)
-    ↓
-CardRuntimeManager (equipped card behaviors from dataCard.json)
-    ↓
-EquipmentModifierService (equipment + gems + sets + effects)
-    ↓
-BuffManager (temporary buffs)
-    ↓
-ModifierCalculator.Calculate()
-    ↓
-PlayerStatsManager.GetFinalStat(statType)
-    ↓
-Player.cs reads final values
-```
-
-**Never compute stats in Player.cs.** Always read from `PlayerStatsManager`.
+*Never hard-code base stats in any player script.*
 
 ---
 
-## 4. Auto-Attack Flow
+## 3. Final Stats Pipeline
 
-**Attack loop (simplified):**
+```
+dataPlayer.json (base)                     
+    ↓                                        
+AttributeModifierManager (CON/STR/INT/DEX → secondary) 
+    ↓                                        
+CardRuntimeManager (equipped card effects) 
+    ↓                                        
+EquipmentModifierService (equipment/gems/sets) 
+    ↓                                        
+BuffManager (temporary buffs)              
+    ↓                                        
+ModifierCalculator.Calculate()              
+    ↓                                        
+PlayerStatsManager.GetFinalStat(statType)   
+    ↓                                        
+Controllers read via PlayerStatsManager    
+```
+
+Never compute stats directly in any controller; always query `PlayerStatsManager`.
+
+---
+
+## 4. Auto-Attack Flow (PlayerCombatController)
 
 ```csharp
-void Update()
-{
+void Update() {
     _attackTimer += Time.deltaTime;
-    
-    if (_attackTimer >= GetAttackInterval())
-    {
+    if (_attackTimer >= GetAttackInterval()) {
         _attackTimer = 0f;
-        PerformAttack();
+        Attack();
     }
 }
 
-float GetAttackInterval()
-{
-    float attackSpeed = PlayerStatsManager.GetFinalStat(AttackSpeed);
-    return 1f / attackSpeed;  // seconds between attacks
-}
-
-void PerformAttack()
-{
-    // 1. Find enemies in range
-    Collider2D[] enemies = Physics2D.OverlapCircleAll(
-        transform.position,
-        GetAttackRange(),
-        _enemyLayerMask
-    );
-    
-    if (enemies.Length == 0) return;
-    
-    // 2. Select target (usually closest)
-    Transform target = SelectTarget(enemies);
-    
-    // 3. Roll MultiShoot
-    int projectileCount = RollMultiShoot() ? GetMultiShootCount() : 1;
-    
-    // 4. Spawn projectile(s)
-    for (int i = 0; i < projectileCount; i++)
-    {
-        SpawnProjectile(target);
-    }
+float GetAttackInterval() {
+    float attackSpeed = PlayerStatsManager.Instance.GetStat(SkillType.AttackSpeed);
+    return attackSpeed > 0f ? 1f / attackSpeed : float.MaxValue;
 }
 ```
 
-**Attack speed:**
-- AttackSpeed = 1.0 → 1 attack/second
-- AttackSpeed = 2.0 → 2 attacks/second
-- AttackSpeed = 0.5 → 0.5 attacks/second
-
-**Attack range:**
-- Radius around player position
-- Visualized by aura ring
+- Attack speed derived from final stat.
+- `Attack()` queries enemies via `Physics2D.OverlapCircleAll` using the `Enemy` layer mask.
+- Multi-shoot chance handled by `SkillType.MultiShootChance`.
+- Projectile count derived from `SkillType.MultiShootCount` and available mana.
+- Projectile spawning uses `ProjectilePool` (no per-frame `Instantiate`).
+- Card-specific modifiers (e.g., `last_bullet`, `bullet_storm`, `infinite_arsenal`) are applied through `CardRuntimeManager`.
 
 ---
 
-## 5. Target Selection
+## 5. Vitals (PlayerVitalsController)
 
-**Default:** Closest enemy within range.
+### 5.1 Health & Mana Pools
+
+- `CurrentHealth`, `CurrentMana` stored locally; max values fetched from `PlayerStatsManager` (`SkillType.HealthPoint`, `SkillType.ManaPoint`).
+- `ResetToMax()` sets both pools to their current maxima and notifies UI.
+
+### 5.2 Regeneration
 
 ```csharp
-Transform SelectTarget(Collider2D[] enemies)
-{
-    Transform closest = null;
-    float minDistance = float.MaxValue;
-    
-    foreach (var col in enemies)
-    {
-        float dist = Vector2.Distance(transform.position, col.transform.position);
-        if (dist < minDistance)
-        {
-            minDistance = dist;
-            closest = col.transform;
-        }
-    }
-    
-    return closest;
+while (_regenTimer >= 1f) {
+    _regenTimer -= 1f;
+    if (CurrentHealth < MaxHealth) Heal(PlayerStatsManager.Instance.GetStat(SkillType.HealthRegen));
+    if (CurrentMana   < MaxMana)   GainMana(PlayerStatsManager.Instance.GetStat(SkillType.ManaRegen));
 }
 ```
 
-**Future extensions:**
-- Prioritize low-HP enemies
-- Prioritize bosses
-- Prioritize nearest to player
+Regeneration halts when shield reports `IsUnregenerationActive()`.
+
+### 5.3 Damage Intake
+
+- Evade chance via `SkillType.Evasion`.
+- Immunity from Angel card or temporary barrier (`_immune`).
+- Defense reduction computed by `Utilityku.FinalDamage(raw, defense)`.
+- Shield and guardian shield absorption applied before health loss.
+- On lethal damage, `Die()` runs death-defy chance (`SkillType.DeathDefy`) and Angel revival before delegating defeat to `WaveManager`.
+
+### 5.4 Healing & HoT
+
+- `Heal(float amount, bool lifeSteal = false)` caps at `MaxHealth` and dispatches `CardRuntimeManager` events.
+- Over-time heals use coroutines (`HealRoutine`).
 
 ---
 
-## 6. MultiShoot
+## 6. Shield System (PlayerShieldController)
 
-**Roll chance each attack:**
-
-```csharp
-bool RollMultiShoot()
-{
-    float chance = PlayerStatsManager.GetFinalStat(MultiShootChance);
-    return Utilityku.Chance(chance);
-}
-```
-
-**If triggered:** spawn `MultiShootCount` projectiles instead of 1.
-
-**Example:**
-- MultiShootChance: 20%
-- MultiShootCount: 3
-- Result: 20% chance to fire 3 projectiles, 80% fire 1
-
-**Note:** Each projectile targets independently (may hit same or different enemies).
+- Tracks current shield (`_currentShield`) and guardian shield (`_guardianShield`).
+- Shield granted when `CurrentHealth >= MaxHealth` and not already granted; amount = `HealthPoint * CardModifierService.GetEffectResult(CardEffectType.Shield, 0f)`.
+- Absorption methods return amount absorbed and trigger cooldown when depleted.
+- Visual scaling and color interpolation handled in `RefreshVisual()`.
+- `IsUnregenerationActive()` proxies `PlayerStatusEffectManager.IsUnregenerationActive` to Vitals.
 
 ---
 
-## 7. Aura Visualization
+## 7. Movement (PlayerMovementController)
 
-**Purpose:** Show player's attack range.
+- Enabled only when a joystick asset is assigned (used for **Movement** ultimate).
+- Reads `Joystick.joyStickVec` each `FixedUpdate`.
+- Applies speed from `SkillType.MoveSpeed` to `Rigidbody2D.velocity`.
+- Ultimate movement costs mana per second (`UltimateManager.TryGetUltimate("Movement", out var ultimate)`).
+- Accumulates fractional mana cost; spends whole mana when enough accumulated.
+- Stops movement and resets accumulator when mana insufficient.
 
-**Component:** `Scripts/Player/AuraCollider.cs`
-
-**Behavior:**
-- Circle sprite scaled to match AttackRange
-- Follows player position
-- Semi-transparent ring
-- No gameplay collision (visual only)
-
-**Sync:**
-```csharp
-void UpdateAuraSize()
-{
-    float range = PlayerStatsManager.GetFinalStat(AttackRange);
-    transform.localScale = Vector3.one * (range * 2f);  // diameter = range * 2
-}
-```
-
-**Call when:**
-- Scene start
-- Equipment change
-- Card change
-- Attribute change
-- Any modifier source change
+*Note:* Standard idle-defense gameplay disables movement; this controller is activated solely by the **Movement** ultimate.
 
 ---
 
-## 8. Health System
+## 8. Ultimate Management (PlayerUltimateController)
 
-### 8.1 Health Pool
-
-**Max HP:**
-```
-MaxHP = BaseHP + (CON × BonusPerPoint) + EquipmentFlat + CardFlat + ...
-```
-
-**Current HP:** tracked in `PlayerStats.CurrentHP`.
-
-**Damage taken:**
-```csharp
-public void TakeDamage(float amount)
-{
-    CurrentHP -= amount;
-    
-    if (CurrentHP <= 0)
-    {
-        // Roll DeathDefy
-        if (RollDeathDefy())
-        {
-            CurrentHP = MaxHP * 0.1f;  // survive with 10% HP
-            return;
-        }
-        
-        Die();
-    }
-    
-    OnDamageTaken?.Invoke(amount);
-}
-```
-
-### 8.2 Health Regen
-
-**Passive regeneration:**
-
-```csharp
-void Update()
-{
-    float regenPerSecond = PlayerStatsManager.GetFinalStat(HealthRegen);
-    CurrentHP += regenPerSecond * Time.deltaTime;
-    CurrentHP = Mathf.Min(CurrentHP, MaxHP);  // cap at max
-}
-```
-
-### 8.3 DeathDefy
-
-**Last-chance survival mechanic:**
-
-```csharp
-bool RollDeathDefy()
-{
-    float chance = PlayerStatsManager.GetFinalStat(DeathDefy);
-    return Utilityku.Chance(chance);
-}
-```
-
-**Effect:** Survive lethal hit with 10% HP, consume DeathDefy proc.
-
-**Cooldown:** May have internal cooldown (verify implementation).
-
-### 8.4 Card healing and lethal-hit order
-
-Player healing dispatches a general healed event. Projectile Life Steal uses the explicit `Heal(amount, isLifeSteal: true)` path and dispatches a separate Life Steal event; Vampiric Frenzy listens only to that event.
-
-Lethal damage dispatches card damage behaviors before `Die()`:
-1. Death Reversal may restore a retained HP/position snapshot and prevent the death flow.
-2. If HP remains lethal, Death Defy is rolled.
-3. If Death Defy fails, Angel/Immortal may restore full HP and grant immunity through the current wave.
-4. Otherwise, WaveManager handles defeat.
-
-Angel is not activated by the generic damage event, so a successful Death Defy does not consume Angel's revive.
+- Auto-spawns non-manual ultimates each frame via `UltimateManager.TrySpawn` (Void, Root, Fountain, Shockwave).
+- Manual casting via `ManualCastUltimate(string id)`.
+- Tank spawning logic ensures new tanks do not overlap existing ones; uses `PlayerStatsManager.GetStat(SkillType.AttackRange)` for positioning.
 
 ---
 
-## 9. Mana System
+## 9. UI Synchronization (PlayerUIController)
 
-**Max Mana:**
-```
-MaxMana = BaseMana + (INT × BonusPerPoint) + EquipmentFlat + ...
-```
-
-**Current Mana:** tracked in `PlayerStats.CurrentMana`.
-
-**Mana Regen:**
-```csharp
-void Update()
-{
-    float regenPerSecond = PlayerStatsManager.GetFinalStat(ManaRegen);
-    CurrentMana += regenPerSecond * Time.deltaTime;
-    CurrentMana = Mathf.Min(CurrentMana, MaxMana);
-}
-```
-
-**Consumption:** Ultimate abilities consume mana (see `Ultimate_Design.md`).
+- Refreshes health/mana bars, shield cooldown, status effect icons, attack-range ring, and card-bonus UI.
+- `RefreshAll()` called after `Vitals.ResetToMax()` and on stat reload.
+- `DrawAttackRange(float range)` scales aura visual to match `SkillType.AttackRange`.
+- Card-bonus icons driven by `CardModifierService` queries.
+- All UI updates are **read-only**; no gameplay logic resides here.
 
 ---
 
-## 10. Player Death
+## 10. Visual Effects (PlayerEffectsView)
 
-**Death flow:**
-
-1. HP → 0 (Death Reversal and DeathDefy fail; Angel also fails or is unavailable)
-2. Stop all auto-attacks
-3. Disable movement (player is stationary anyway)
-4. Play death animation (if exists)
-5. Trigger `OnPlayerDeath` event
-6. WaveManager handles defeat
-7. Show defeat UI
-8. Offer restart/quit
-
-**No respawn in current design** — death ends the run.
+- Pure visual toggles – barrier, ice, burn, berserker, vampire.
+- No state changes; controllers call the appropriate `SetX(bool)` methods.
 
 ---
 
-## 11. Player Events
+## 11. Player Facade (`Player.cs`)
 
-**Events fired by Player:**
+- Enforces singleton pattern.
+- Instantiates and configures all sub-controllers in `Awake()`.
+- Provides backward-compatible public API (e.g., `TakeDamage`, `Heal`, `SpendMana`).
+- Orchestrates initialization sequence after save load:
+  1. Wait for `BootstrapController`.
+  2. Wait for `PlayerStatsManager` & `BaseStatLoader`.
+  3. Load base stats, compute `AttackRange`, reset vitals.
+  4. Initialize combat, movement, ultimate, shield.
+  5. Refresh card modifiers and UI.
+- Listens to `CardModifierService.OnModifierChanged` and `CardRuntimeManager.OnBehaviorsUpdated` to keep UI current.
 
-| Event | Trigger | Listeners |
-|-------|---------|-----------|
-| `OnDamageTaken` | Player takes damage | Health bar UI, damage popup |
-| `OnPlayerDeath` | HP → 0 | WaveManager, GameController |
-| `OnAttack` | Projectile spawned | Stats tracker (optional) |
-| `OnCriticalHit` | Critical projectile | Visual effects, stats |
+---
 
-**Subscribe pattern:**
-```csharp
-Player.Instance.OnDamageTaken += UpdateHealthBar;
+## 12. Performance Notes
+
+- Player is a singleton – one instance per scene.
+- No per-frame allocations: target list built with LINQ only in `FindTargets()` (acceptable as it runs per attack, not per frame).
+- Cached references to `PlayerStatsManager`, `ProjectilePool`, and layer masks.
+- Shield visual updates avoid allocation by reusing `Vector3` and `Color` structs.
+- Movement uses `Rigidbody2D.velocity` (no `AddForce`).
+
+---
+
+## 13. Testing Checklist (EditMode)
+
 ```
-
-**Unsubscribe on destroy:**
-```csharp
-void OnDestroy()
-{
-    if (Player.Instance != null)
-        Player.Instance.OnDamageTaken -= UpdateHealthBar;
-}
+[ ] Player spawns at arena centre
+[ ] Auto-attack interval matches AttackSpeed stat
+[ ] Attack range matches aura visual
+[ ] Damage reduces HP correctly
+[ ] Health regen restores HP over time
+[ ] DeathDefy chance works
+[ ] Mana regen restores Mana over time
+[ ] MultiShoot triggers per chance
+[ ] Shield grants, absorbs, and cools down correctly
+[ ] Movement ultimate consumes mana and respects joystick input
+[ ] UI updates reflect all state changes
+[ ] Save/load persists health, mana, shield, and position
+[ ] Events fire correctly (OnDamageTaken, OnPlayerDeath, etc.)
 ```
 
 ---
 
-## 12. Positioning
+## 14. Future Extensions
 
-**Player is always centered:**
-
-```csharp
-void Start()
-{
-    transform.position = Vector3.zero;  // arena center
-}
-```
-
-**Do NOT allow player movement** — this is an idle defense game, not a twin-stick shooter.
-
-**Camera follows player** (usually also centered).
+- **Player Movement:** expand joystick control to full avatar movement (requires redesign of idle-defense premise).
+- **Manual Aiming:** mouse-directed attacks, target lock-on.
+- **Active Skills:** expose non-ultimate abilities via UI.
+- **Weapon Switching:** multiple weapon types with distinct projectile behaviours.
 
 ---
 
-## 13. Layer and Physics
-
-**Player layer:** `Player`
-
-**Collision:**
-- Collider2D (typically CircleCollider2D)
-- Rigidbody2D (Kinematic, no gravity)
-- Layer mask filters what player detects
-
-**Physics queries:**
-- `OverlapCircleAll` for enemy detection
-- `LayerMask` to filter enemy layer only
-
----
-
-## 14. Stats Overview
-
-**Primary stats** (from attributes):
-- HealthPoint
-- ManaPoint
-- AttackDamage
-- AttackSpeed
-- AttackRange
-- DefenseAmount
-- HealthRegen
-- ManaRegen
-
-**Secondary combat stats:**
-- CriticalChance
-- CriticalDamage
-- HitRate
-- Evasion
-- Penetration
-- KnockbackChance
-- KnockbackForce
-- MultiShootChance
-- MultiShootCount
-- BounceCount
-- BounceRange
-- LifeSteal
-- ElementMastery
-
-**Special stats:**
-- DeathDefy
-- DamagePerRange
-- UltimateAttack
-
-**See:** `Attribute_Design.md` for attribute contributions, `Modifier_Design.md` for calculation.
-
----
-
-## 15. Performance Notes
-
-**Player is a singleton** — one instance per game scene.
-
-**Do NOT:**
-- Recalculate final stats every frame (use cached)
-- Use `GetComponent` every attack (cache references)
-- Allocate new arrays every attack (reuse `ContactFilter2D`)
-
-**DO:**
-- Cache final stats from `PlayerStatsManager`
-- Invalidate cache when modifiers change
-- Pool projectiles
-- Use layer masks for physics queries
-
----
-
-## 16. Testing Checklist
-
-```
-[ ] Player spawns at arena center
-[ ] Auto-attacks trigger at correct AttackSpeed interval
-[ ] Attack range matches aura visualization
-[ ] Damage taken reduces HP
-[ ] HealthRegen restores HP over time
-[ ] Death triggers at HP = 0
-[ ] DeathDefy procs at correct chance
-[ ] ManaRegen restores Mana over time
-[ ] MultiShoot triggers at correct chance
-[ ] Stats update when equipment/cards change
-[ ] Stats persist across scene transitions
-[ ] Events fire correctly (OnDamageTaken, OnPlayerDeath)
-```
-
----
-
-## 17. Common Issues
-
-### Issue: Player attacks too fast/slow
-**Cause:** AttackSpeed stat incorrect, or interval calculation wrong.
-**Fix:** Verify `1 / AttackSpeed` formula, check final AttackSpeed value.
-
-### Issue: Player attacks nothing
-**Cause:** No enemies in range, or layer mask incorrect.
-**Fix:** Verify enemy layer mask, check AttackRange value, debug enemy positions.
-
-### Issue: Stats not updating
-**Cause:** Cache not invalidated after modifier change.
-**Fix:** Call `PlayerStatsManager.InvalidateCache()` after equipment/card/attribute change.
-
-### Issue: Player dies instantly
-**Cause:** MaxHP too low, or defense not applied.
-**Fix:** Verify base HP, attribute contributions, defense calculation.
-
----
-
-## 18. Future Extensions
-
-### Player Movement
-- Allow limited dodge/dash
-- WASD movement (changes game from idle to active)
-
-### Manual Aiming
-- Mouse-directed attacks
-- Target lock-on
-
-### Active Skills
-- Player-triggered abilities (not just ultimates)
-
-### Weapon Switching
-- Multiple weapon types with different behaviors
-
----
-
-## Change Log
+## 15. Change Log
 
 | Date | Change | Reason |
 |------|--------|--------|
+| 2026-10-06 | Split player logic into dedicated controllers; added movement ultimate, shield cooldown, UI updates | Align with recent architecture refactor |
 | 2026-09-16 | Initial design doc | Documentation refactor |
+
+---
+
+## 16. Architectural Rule
+
+`Player` remains a thin façade; all gameplay rules live in the dedicated controller/services listed above.
