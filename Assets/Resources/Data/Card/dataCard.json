@@ -355,7 +355,10 @@
             "Mode": "Percent",
             "BaseValue": 15,
             "ValuePerLevel": 4,
-            "CardRarity": "Rare"
+            "CardRarity": "Rare",
+            "Parameters": {
+                "CooldownSeconds": 30
+            }
         }, {
             "Id": "crazy_gambler",
             "Name": "Crazy Gambler",

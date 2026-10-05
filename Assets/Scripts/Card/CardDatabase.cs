@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Newtonsoft.Json;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Card;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Manager
 {
@@ -52,20 +52,7 @@ namespace IdleDefenseSurvival.Manager
 
         private void LoadFromResources()
         {
-            TextAsset jsonAsset = Resources.Load<TextAsset>("Data/Card/dataCard");
-            if (jsonAsset == null)
-            {
-                Debug.LogError("[CardDatabase] dataCard.json not found in Resources/Data/");
-                return;
-            }
-
-            CardDataContainer container = JsonConvert.DeserializeObject<CardDataContainer>(jsonAsset.text);
-            if (container == null || container.Cards == null || container.RarityConfig == null)
-            {
-                Debug.LogError("[CardDatabase] Failed to parse dataCard.json");
-                return;
-            }
-
+            CardDataContainer container = DatabaseJSONCache.DatabaseCard;
             if (!IsProgressionConfigValid(container.Progression))
             {
                 Debug.LogError("[CardDatabase] dataCard.json has invalid progression configuration.");

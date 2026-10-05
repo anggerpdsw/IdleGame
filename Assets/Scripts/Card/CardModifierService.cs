@@ -180,5 +180,10 @@ namespace IdleDefenseSurvival.Card
         }
 
         #endregion
+
+        public static float GetShieldCooldown()
+        {
+            return GetCardParameter("shield", "CooldownSeconds", 30f);
+        }
     }
 }

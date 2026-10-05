@@ -238,6 +238,27 @@ namespace IdleDefenseSurvival.Core
             _databasePet = database;
         }
         
+        private const string DATA_CARD = "Data/Card/dataCard";
+        private static CardDataContainer _databaseCard;
+        public static CardDataContainer DatabaseCard
+        { get { if (_databaseCard == null) LoadCard(); return _databaseCard; }}
+        private static void LoadCard()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_CARD);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_CARD}.json");
+                return;
+            }
+            var database = JsonConvert.DeserializeObject<CardDataContainer>(jsonFile.text);
+            if (database == null || database.Cards == null)
+            {
+                Debug.LogError($"Pet database in {DATA_CARD} is empty or invalid.");
+                return;
+            }
+            _databaseCard = database;
+        }
+        
         public static void ClearAll()
         {
             _databaseEnemy = null;
@@ -245,6 +266,7 @@ namespace IdleDefenseSurvival.Core
             _databaseSecondaryStatAttribute = null;
             _databaseUltimate = null;
             _databasePet = null;
+            _databaseCard = null;
         }
     }
     

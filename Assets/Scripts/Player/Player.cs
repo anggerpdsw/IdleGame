@@ -115,7 +115,7 @@ namespace IdleDefenseSurvival.Player
         private float _maxShield = 0f;
         private bool _shieldGranted;
         private float _shieldCooldownTimer = 0f;
-        private const float ShieldCooldownDuration = 30f;
+        private float ShieldCooldownDuration => CardModifierService.GetShieldCooldown();
         private bool _isShieldOnCooldown = false;
 
         // Guardian shield (separate from card shield)
