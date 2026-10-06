@@ -11,7 +11,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class OverkillConversionCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.OverkillConversion;
-        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
+        // Listen for enemy-kill events to capture overkill damage.
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private const string RangeModifierId = "Card:OverkillConversion_Range";
 
@@ -60,21 +61,16 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             // Check if this kill had overkill damage
             if (enemy.LastOverkillDamage > 0f)
-            {
                 AddStackFromOverkill(enemy.LastOverkillDamage);
-            }
         }
 
         private void AddStackFromOverkill(float overkillDamage)
         {
             if (_currentStacks >= _maximumStacks) return;
+            if (overkillDamage <= 0f) return;
 
-            float rangeBonus = overkillDamage * _conversionRatioPercent;
-            // Convert to percentage of base attack range
-            float baseRange = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange);
-            float rangeBonusPercent = (rangeBonus / Mathf.Max(0.1f, baseRange)) * 100f;
-            rangeBonusPercent = Mathf.Min(rangeBonusPercent, _maximumRangeBonusPercent / _maximumStacks);
-
+            // Each overkill kill grants exactly 1 stack (capped at max stacks).
+            // Each stack provides an equal share of the maximum range bonus.
             _currentStacks++;
             _stackTimer = _durationSeconds;
             ApplyModifier();
