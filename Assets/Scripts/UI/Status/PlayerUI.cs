@@ -93,9 +93,11 @@ namespace IdleDefenseSurvival.UI
         private void RefreshValues()
         {
             if (_player == null) return;
-            
+
             foreach (var kvp in _rows)
             {
+                // Guard against destroyed rows (Unity's == operator returns true for destroyed objects)
+                if (kvp.Value == null) continue;
                 float value = PlayerStatsManager.Instance.GetStat(kvp.Key);
                 kvp.Value.SetValue(kvp.Key.GetSkillDisplayName(), value);
             }

@@ -140,11 +140,13 @@ namespace IdleDefenseSurvival.Card.Behavior
             // Require behavior-declared subscriptions
             var events = behavior.SubscribedEvents;
 
-            if (events == null || events.Length == 0)
+            // Log error only if events collection is null, not if empty. Empty is valid for stat-only cards.
+            if (events == null)
             {
-                Debug.LogError($"[CardRuntimeManager] Behavior {behavior.GetType().Name} missing SubscribedEvents for effect {effectType}.");
+                Debug.LogWarning($"[CardRuntimeManager] Behavior {behavior.GetType().Name} returned null for SubscribedEvents for effect {effectType}.");
                 return;
             }
+            // If events.Length is 0, it means no events to subscribe, which is a valid case (e.g., stat-only effects).
 
             foreach (var evt in events)
             {

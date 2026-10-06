@@ -20,9 +20,7 @@ namespace IdleDefenseSurvival.Camera
 
         [Header("Zoom Settings")]
         [Tooltip("Margin added around attack range for better visibility.")]
-        [SerializeField] private float _margin = 1f;
-        [Tooltip("Smoothing speed for orthographic size changes.")]
-        [SerializeField] private float _smoothSpeed = 4f;
+        [SerializeField] private float _margin = 2f;
         [Tooltip("Minimum camera size (zoom in limit).")]
         [SerializeField] private float _minSize = 2.5f;
         [Tooltip("Maximum camera size (zoom out limit).")]
@@ -30,6 +28,22 @@ namespace IdleDefenseSurvival.Camera
 
         private UnityEngine.Camera _camera;
         private float _targetSize;
+
+        // Cache last-seen attack range to avoid reacting to tiny fluctuations (e.g., OverkillConversion stacks)
+        private float _lastAttackRange = -1f;
+
+        // Hysteresis thresholds: larger threshold to COMMIT a new target, smaller to REVERT
+        // Prevents oscillation when range fluctuates around a boundary (e.g., 9.9 ↔ 10.1)
+        private const float RangeChangeThresholdUp = 1.0f;   // require +1.0 to zoom OUT
+        private const float RangeChangeThresholdDown = 0.7f; // require -0.7 to zoom IN
+
+        // Stability window: require N consecutive frames over threshold before committing
+        private const int StabilityFramesRequired = 3;
+        private int _stabilityCounter = 0;
+        private float _pendingTargetSize = -1f;
+
+        // orthographic size units / sec - slower for smoother feel
+        private const float MaxZoomDeltaPerSec = 3f; 
 
         private void Awake()
         {
@@ -89,22 +103,71 @@ namespace IdleDefenseSurvival.Camera
         /// </summary>
         private float CalculateTargetSize()
         {
-            float targetSize = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) + _margin;
+            float targetSize = PlayerStatsManager.Instance.GetBaseStat(SkillType.AttackRange) + _margin;
             return Mathf.Clamp(targetSize, _minSize, _maxSize);
         }
 
         /// <summary>
         /// Update orthographic size based on player attack range.
+        /// Uses hysteresis + frame-stability window to prevent oscillation.
         /// </summary>
         private void UpdateZoom()
         {
-            _targetSize = CalculateTargetSize();
+            float currentRange = PlayerStatsManager.Instance.GetBaseStat(SkillType.AttackRange);
 
-            // Smooth orthographic size
-            _camera.orthographicSize = Mathf.Lerp(
+            if (_lastAttackRange < 0f)
+            {
+                _lastAttackRange = currentRange;
+                _targetSize = Mathf.Clamp(currentRange + _margin, _minSize, _maxSize);
+                _camera.orthographicSize = _targetSize;
+                return;
+            }
+
+            float diff = currentRange - _lastAttackRange;
+            float absDiff = Mathf.Abs(diff);
+
+            // Choose threshold based on direction (hysteresis)
+            float threshold = diff > 0 ? RangeChangeThresholdUp : RangeChangeThresholdDown;
+
+            if (absDiff >= threshold)
+            {
+                // Potential target change detected — start stability counter
+                float newTarget = Mathf.Clamp(currentRange + _margin, _minSize, _maxSize);
+
+                if (Mathf.Abs(newTarget - _pendingTargetSize) < 0.01f)
+                {
+                    // Same pending target, increment stability
+                    _stabilityCounter++;
+                }
+                else
+                {
+                    // New pending target, reset counter
+                    _pendingTargetSize = newTarget;
+                    _stabilityCounter = 1;
+                }
+
+                // Commit after N consecutive frames over threshold
+                if (_stabilityCounter >= StabilityFramesRequired)
+                {
+                    _targetSize = _pendingTargetSize;
+                    _lastAttackRange = currentRange;
+                    _stabilityCounter = 0;
+                    _pendingTargetSize = -1f;
+                }
+            }
+            else
+            {
+                // Below threshold — reset stability
+                _stabilityCounter = 0;
+                _pendingTargetSize = -1f;
+            }
+
+            // Always animate toward committed target, capped per second
+            float maxDelta = MaxZoomDeltaPerSec * Time.deltaTime;
+            _camera.orthographicSize = Mathf.MoveTowards(
                 _camera.orthographicSize,
                 _targetSize,
-                _smoothSpeed * Time.deltaTime
+                maxDelta
             );
         }
 
@@ -133,8 +196,7 @@ namespace IdleDefenseSurvival.Camera
             }
 
             // Validate margins
-            if (_margin < 0f)
-                _margin = 0f;
+            if (_margin < 0f) _margin = 0f;
         }
 
         private void OnDrawGizmosSelected()

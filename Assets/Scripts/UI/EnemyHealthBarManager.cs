@@ -140,6 +140,7 @@ namespace IdleDefenseSurvival.UI
             bool active = type switch
             {
                 StatusEffectType.DamageReduction => enemy.HasActiveDamageReduction(),
+                StatusEffectType.Slow => enemy.HasActiveStatus(StatusEffectType.Slow),
                 StatusEffectType.HeartBreak => enemy.HasReducedMaxHealth(),
                 StatusEffectType.DefenseBreak => enemy.HasActiveDefenseBreak(),
                 StatusEffectType.Volatile => enemy.HasActiveStatus(StatusEffectType.Volatile),
@@ -253,8 +254,9 @@ namespace IdleDefenseSurvival.UI
 
             Transform healthBarTf = barTransform.Find("HealthBar");
 
-            var statusIcons = new Dictionary<StatusEffectType, Image>(4);
+            var statusIcons = new Dictionary<StatusEffectType, Image>(5);
             AddStatusIcon(barTransform, StatusEffectType.DamageReduction, statusIcons);
+            AddStatusIcon(barTransform, StatusEffectType.Slow, statusIcons);
             AddStatusIcon(barTransform, StatusEffectType.HeartBreak, statusIcons);
             AddStatusIcon(barTransform, StatusEffectType.DefenseBreak, statusIcons);
             AddStatusIcon(barTransform, StatusEffectType.Volatile, statusIcons);

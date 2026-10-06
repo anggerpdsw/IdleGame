@@ -164,8 +164,8 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         public override int MaxStacks => 1;
         public override StackPolicy StackPolicy => StackPolicy.RefreshDuration;
 
-        private float _originalMoveSpeed;
-        private float _originalAttackSpeed;
+        private float _baseMoveSpeed;
+        private float _baseAttackSpeed;
 
         public FreezeStatus(float duration) : base(duration) { }
 
@@ -173,8 +173,9 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         {
             base.OnApply(enemy);
 
-            _originalMoveSpeed = enemy.MoveSpeed;
-            _originalAttackSpeed = enemy.AttackSpeed;
+            // Store TRUE base speed from EnemyData, not current modified speed
+            _baseMoveSpeed = enemy.EnemyData != null ? enemy.EnemyData.moveSpeed : enemy.MoveSpeed;
+            _baseAttackSpeed = enemy.EnemyData != null ? enemy.EnemyData.attackSpeed : enemy.AttackSpeed;
 
             enemy.SetMoveSpeed(0f);
             enemy.SetAttackSpeed(0f);
@@ -192,8 +193,8 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
 
         public override void OnExpire(EnemyAi enemy)
         {
-            enemy.SetMoveSpeed(_originalMoveSpeed);
-            enemy.SetAttackSpeed(_originalAttackSpeed);
+            enemy.SetMoveSpeed(_baseMoveSpeed);
+            enemy.SetAttackSpeed(_baseAttackSpeed);
             base.OnExpire(enemy);
         }
 
@@ -201,7 +202,9 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         {
             var clone = new FreezeStatus(Duration)
             {
-                StackCount = StackCount
+                StackCount = StackCount,
+                _baseMoveSpeed = _baseMoveSpeed,
+                _baseAttackSpeed = _baseAttackSpeed
             };
             return clone;
         }
@@ -357,8 +360,8 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         public override StackPolicy StackPolicy => StackPolicy.Multiplicative;
 
         private readonly float _slowPercent; // 0.3 = 30% slow
-        private float _originalMoveSpeed;
-        private float _originalAttackSpeed;
+        private float _baseMoveSpeed;
+        private float _baseAttackSpeed;
 
         public SlowSource Source { get; set; } = SlowSource.Card;
 
@@ -378,8 +381,9 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         {
             base.OnApply(enemy);
 
-            _originalMoveSpeed = enemy.MoveSpeed;
-            _originalAttackSpeed = enemy.AttackSpeed;
+            // Store TRUE base speed from EnemyData, not current modified speed
+            _baseMoveSpeed = enemy.EnemyData != null ? enemy.EnemyData.moveSpeed : enemy.MoveSpeed;
+            _baseAttackSpeed = enemy.EnemyData != null ? enemy.EnemyData.attackSpeed : enemy.AttackSpeed;
 
             ApplySlow(enemy);
         }
@@ -393,14 +397,14 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
         private void ApplySlow(EnemyAi enemy)
         {
             float slow = GetCurrentValue();
-            enemy.SetMoveSpeed(_originalMoveSpeed * (1f - slow));
-            enemy.SetAttackSpeed(_originalAttackSpeed * (1f - slow));
+            enemy.SetMoveSpeed(_baseMoveSpeed * (1f - slow));
+            enemy.SetAttackSpeed(_baseAttackSpeed * (1f - slow));
         }
 
         public override void OnExpire(EnemyAi enemy)
         {
-            enemy.SetMoveSpeed(_originalMoveSpeed);
-            enemy.SetAttackSpeed(_originalAttackSpeed);
+            enemy.SetMoveSpeed(_baseMoveSpeed);
+            enemy.SetAttackSpeed(_baseAttackSpeed);
             base.OnExpire(enemy);
         }
 
@@ -415,7 +419,10 @@ namespace IdleDefenseSurvival.Enemy.StatusEffects
             var clone = new SlowStatus(_slowPercent, Duration)
             {
                 StackCount = StackCount,
-                MaxStacks = MaxStacks
+                MaxStacks = MaxStacks,
+                Source = Source,
+                _baseMoveSpeed = _baseMoveSpeed,
+                _baseAttackSpeed = _baseAttackSpeed
             };
             return clone;
         }

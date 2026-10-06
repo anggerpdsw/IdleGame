@@ -633,24 +633,36 @@ namespace IdleDefenseSurvival.Enemy
         /// <summary>
         /// Applies a slow effect to the enemy.
         /// </summary>
-        /// <param name="percent">Speed percent (e.g., 0.51 mean "slow sebesar 51%")</param>
+        /// <param name="source">Who caused the slow (Card, Ability, …).</param>
+        /// <param name="type">Aura vs. Direct.</param>
+        /// <param name="percent">Slow amount, 0 = no effect, 1 = full stop.</param>
         public void ApplySlow(SlowSource source, SlowType type, float percent)
         {
             if (_statusEffectController == null) return;
-            percent = Mathf.Clamp01(percent);
-            _statusEffectController.AddEffect(new SlowStatus(percent, type == SlowType.Permanent ? float.MaxValue : 30f)
+
+            // Clamp percent → never allow 100% slow (full stop). Max 90% slow.
+            // Enemy tetap bisa bergerak sedikit, tetap bisa di-pull/di-kill.
+            percent = Mathf.Clamp(percent, 0f, 0.9f);
+
+            // Preserve original "permanent" flag for aura-type slows.
+            float duration = (type == SlowType.Permanent || type == SlowType.Aura) ? float.MaxValue : 30f;
+
+            // Add or refresh slow effect.
+            _statusEffectController.AddEffect(new SlowStatus(percent, duration)
             {
                 Source = source
             });
         }
 
         /// <summary>
-        /// Removes the slow effect from the enemy for a specific source.
+        /// Removes ALL slow effects from the enemy for a specific source.
+        /// Uses immediate removal to prevent race condition when enemy exits/re-enters aura rapidly.
+        /// RemoveEffectImmediate with predicate removes all matching effects in one call.
         /// </summary>
         public void RemoveSlow(SlowSource source)
         {
             if (_statusEffectController == null) return;
-            _statusEffectController.RemoveEffect(StatusEffectType.Slow, e => e is SlowStatus s && s.Source == source);
+            _statusEffectController.RemoveEffectImmediate(StatusEffectType.Slow, e => e is SlowStatus s && s.Source == source);
         }
 
         /// <summary>

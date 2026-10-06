@@ -593,7 +593,32 @@ namespace IdleDefenseSurvival.Enemy
         private void OnDisable()
         {
             // Clear all effects when disabled (for object pooling)
-            ClearAllEffects();
+            // Process immediately since Update won't run on disabled objects
+            ClearAllEffectsImmediate();
+        }
+
+        /// <summary>
+        /// Immediately clears all effects by calling OnExpire on each.
+        /// Used when the object is disabled/pooled where Update doesn't run.
+        /// </summary>
+        private void ClearAllEffectsImmediate()
+        {
+            var toExpire = new List<IStatusEffect>(_effects);
+            _effects.Clear();
+            _effectsToAdd.Clear();
+            _effectsToRemove.Clear();
+
+            foreach (var effect in toExpire)
+            {
+                effect.OnExpire(Enemy);
+                OnEffectRemoved?.Invoke(effect);
+            }
+
+            if (toExpire.Count > 0)
+            {
+                _enemy?.RefreshEnemyStatus();
+                OnEffectsChanged?.Invoke();
+            }
         }
 
         /// <summary>

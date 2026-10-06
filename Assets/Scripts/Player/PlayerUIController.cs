@@ -2,6 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using IdleDefenseSurvival.Card;
+using IdleDefenseSurvival.Manager;
+using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -56,6 +58,24 @@ namespace IdleDefenseSurvival.Player
             if (_attackRangeRenderer != null)
                 _attackRangeRenderer.transform.Rotate(
                     0f, 0f, _attackRangeRotationSpeed * Time.deltaTime);
+        }
+
+        private void OnEnable()
+        {
+            if (PlayerStatsManager.Instance != null)
+                PlayerStatsManager.Instance.OnStatsChanged += HandleStatsChanged;
+        }
+
+        private void OnDisable()
+        {
+            if (PlayerStatsManager.Instance != null)
+                PlayerStatsManager.Instance.OnStatsChanged -= HandleStatsChanged;
+        }
+
+        private void HandleStatsChanged()
+        {
+            if (_player != null)
+                DrawAttackRange(PlayerStatsManager.Instance.GetStat(SkillType.AttackRange)); // GetStat = include temporary
         }
 
         public void RefreshAll()
