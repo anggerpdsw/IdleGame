@@ -7,6 +7,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class HunterInstinctCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.HunterInstinct;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         public float GetDamageMultiplier(EnemyAi target)
         {

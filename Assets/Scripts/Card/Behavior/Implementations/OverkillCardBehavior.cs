@@ -4,6 +4,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class OverkillCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.Overkill;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         public override void OnEquip(CardRuntimeState state)
         {

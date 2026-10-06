@@ -11,6 +11,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class PanicFireCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.PanicFire;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private const string ModifierId = "Card:PanicFire";
         private const string PierceModifierId = "Card:PanicFire_Pierce";

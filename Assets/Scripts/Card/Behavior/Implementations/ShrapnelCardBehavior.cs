@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class ShrapnelCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.Shrapnel;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit };
 
         private float _triggerChancePercent;
         private float _damageMultiplier;

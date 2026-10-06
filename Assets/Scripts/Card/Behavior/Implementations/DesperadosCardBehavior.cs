@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class DesperadosCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.Desperados;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete };
 
         private float _bonus;
         private int _maxStack;

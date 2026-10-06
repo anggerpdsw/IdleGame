@@ -4,6 +4,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class CriticalCascadeCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.CriticalCascade;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         public override void OnEquip(CardRuntimeState state)
         {

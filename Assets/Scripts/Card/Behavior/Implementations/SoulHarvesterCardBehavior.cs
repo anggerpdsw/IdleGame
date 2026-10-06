@@ -9,6 +9,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class SoulHarvesterCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.SoulHarvester;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private int _soulCount;
         private int _initialSoulCap;

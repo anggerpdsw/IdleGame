@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class VolatileCoreCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.VolatileCore;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private int _killCount;
         private int _killThreshold;

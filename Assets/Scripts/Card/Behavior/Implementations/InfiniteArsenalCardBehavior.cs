@@ -6,6 +6,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class InfiniteArsenalCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.InfiniteArsenal;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private int _attackCounter;
         private int _triggerCount;

@@ -6,6 +6,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public class HealOnKillCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.HealOnKill;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         public override void OnEquip(CardRuntimeState state)
         {

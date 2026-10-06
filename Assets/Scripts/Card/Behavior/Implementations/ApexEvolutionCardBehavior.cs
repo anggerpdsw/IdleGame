@@ -14,6 +14,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         private int _killsTowardOffer;
 
         public override CardEffectType EffectType => CardEffectType.ApexEvolution;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled, CardEventType.OnWaveStart };
         public IReadOnlyList<CardMutationDefinition> PendingChoices => _pendingChoices;
         public bool HasPendingChoices => _pendingChoices.Count > 0;
 

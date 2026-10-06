@@ -137,7 +137,15 @@ namespace IdleDefenseSurvival.Card.Behavior
 
         private void SubscribeToEvents(ICardBehavior behavior, CardEffectType effectType)
         {
-            var events = GetEventsForEffect(effectType);
+            // Require behavior-declared subscriptions
+            var events = behavior.SubscribedEvents;
+
+            if (events == null || events.Length == 0)
+            {
+                Debug.LogError($"[CardRuntimeManager] Behavior {behavior.GetType().Name} missing SubscribedEvents for effect {effectType}.");
+                return;
+            }
+
             foreach (var evt in events)
             {
                 if (!_eventSubscriptions.TryGetValue(evt, out var list))
@@ -154,78 +162,6 @@ namespace IdleDefenseSurvival.Card.Behavior
         {
             foreach (var list in _eventSubscriptions.Values)
                 list.Remove(behavior);
-        }
-
-        private static CardEventType[] GetEventsForEffect(CardEffectType effectType)
-        {
-            return effectType switch
-            {
-                CardEffectType.Berserker
-                    => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnPlayerHealed },
-                CardEffectType.DeathChain or
-                CardEffectType.SoulHarvester or
-                CardEffectType.ChainReaction or
-                CardEffectType.ApocalypseEngine or
-                CardEffectType.WorldBreaker
-                    => new[] { CardEventType.OnEnemyKilled },
-                CardEffectType.VampiricFrenzy
-                    => new[] { CardEventType.OnLifeSteal },
-                CardEffectType.BulletStorm or
-                CardEffectType.InfiniteArsenal or
-                CardEffectType.WarMachine or
-                CardEffectType.CelestialArsenal
-                    => new[] { CardEventType.OnPlayerAttack },
-                CardEffectType.GuardianInstinct
-                    => new[] { CardEventType.OnPlayerDamaged },
-                CardEffectType.DivineRetribution
-                    => new[] { CardEventType.OnPlayerDamaged },
-                CardEffectType.DeathReversal
-                    => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnWaveStart },
-                CardEffectType.CrazyGambler or
-                CardEffectType.Desperados
-                    => new[] { CardEventType.OnWaveComplete },
-                CardEffectType.Immortal
-                    => new[] { CardEventType.OnWaveComplete, CardEventType.OnWaveStart },
-                CardEffectType.BatStalker or
-                CardEffectType.HealOnKill
-                    => new[] { CardEventType.OnEnemyKilled },
-                CardEffectType.ApexEvolution
-                    => new[] { CardEventType.OnEnemyKilled, CardEventType.OnWaveStart },
-
-                // New Epic cards
-                CardEffectType.MomentumCore or
-                CardEffectType.FractureMark or
-                CardEffectType.VolatileCore
-                    => new[] { CardEventType.OnEnemyKilled },
-                CardEffectType.StormCharger or
-                CardEffectType.EchoShot or
-                CardEffectType.LastBullet or
-                CardEffectType.ArcaneResonance
-                    => new[] { CardEventType.OnPlayerAttack },
-                CardEffectType.BloodEngine
-                    => new[] { CardEventType.OnLifeSteal },
-                CardEffectType.AdrenalineLoop
-                    => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnEnemyKilled },
-                CardEffectType.HunterInstinct
-                    => new[] { CardEventType.OnPlayerAttack },
-                CardEffectType.GravityWell
-                    => Array.Empty<CardEventType>(), // timer-driven, no event subscription
-
-                // New Rare cards
-                CardEffectType.PredatorFocus
-                    => new[] { CardEventType.OnPlayerAttack },
-                CardEffectType.Shrapnel
-                    => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit },
-                CardEffectType.BleedingEdge
-                    => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit },
-                CardEffectType.StaggerMaster
-                    => new[] { CardEventType.OnPlayerAttack },
-                CardEffectType.Overcharge
-                    => Array.Empty<CardEventType>(), // Uses Update loop for mana tracking
-
-                _ => Array.Empty<CardEventType>(),
-            };
-
         }
 
         // Public event dispatch methods called by game systems

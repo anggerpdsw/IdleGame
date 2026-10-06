@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class DeathChainCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.DeathChain;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private int _currentStack;
         private float _lastKillTime;

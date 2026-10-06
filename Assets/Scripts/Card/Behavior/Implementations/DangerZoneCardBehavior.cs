@@ -11,6 +11,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class DangerZoneCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.DangerZone;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private float _radius;
         private float _damageBonusPercent;

@@ -9,6 +9,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class CrazyGamblerCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.CrazyGambler;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete };
 
         private float _bonus;
         private int _maxStack;

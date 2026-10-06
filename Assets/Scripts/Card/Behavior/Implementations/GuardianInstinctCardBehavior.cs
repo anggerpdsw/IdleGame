@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class GuardianInstinctCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.GuardianInstinct;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged };
 
         private float _cooldownRemaining;
         private float _activeRemaining;

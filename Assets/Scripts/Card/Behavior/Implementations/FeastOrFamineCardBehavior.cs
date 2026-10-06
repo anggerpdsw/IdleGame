@@ -2,13 +2,13 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
-using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
     public sealed class FeastOrFamineCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.FeastOrFamine;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete };
 
         private const string FeastModifierId = "Card:FeastOrFamine_Feast";
         private const string FamineModifierId = "Card:FeastOrFamine_Famine";

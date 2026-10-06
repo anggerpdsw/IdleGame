@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class ArcaneResonanceCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.ArcaneResonance;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private int _attacksRemaining;
         private float _bonusExpiry;

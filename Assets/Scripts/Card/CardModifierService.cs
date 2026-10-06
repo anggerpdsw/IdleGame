@@ -113,6 +113,31 @@ namespace IdleDefenseSurvival.Card
             var behavior = mgr.GetBehavior("void_overlord") as VoidOverlordCardBehavior;
             return behavior?.IsActive() ?? false;
         }
+        // ExecutionProtocol — query behavior accessors
+        public static float GetExecutionChance()
+        {
+            var mgr = CardRuntimeManager.Instance;
+            if (mgr == null) return 0f;
+            var behavior = mgr.GetBehavior("execution_protocol") as ExecutionProtocolCardBehavior;
+            return behavior?.GetExecutionChance() ?? 0f;
+        }
+
+        public static float GetBossExecutionThreshold()
+        {
+            var mgr = CardRuntimeManager.Instance;
+            if (mgr == null) return 0f;
+            var behavior = mgr.GetBehavior("execution_protocol") as ExecutionProtocolCardBehavior;
+            return behavior?.GetBossExecutionThreshold() ?? 0f;
+        }
+
+        public static float GetNormalExecutionThreshold()
+        {
+            var mgr = CardRuntimeManager.Instance;
+            if (mgr == null) return 0f;
+            var behavior = mgr.GetBehavior("execution_protocol") as ExecutionProtocolCardBehavior;
+            return behavior?.GetNormalExecutionThreshold() ?? 0f;
+        }
+
         // Angel (Immortal) — query behavior state
         public static float GetAngelMaxCooldown()
         {

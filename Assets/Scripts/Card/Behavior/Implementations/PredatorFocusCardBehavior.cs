@@ -11,6 +11,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class PredatorFocusCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.PredatorFocus;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private const string ModifierId = "Card:PredatorFocus";
         private int _enemyThreshold;

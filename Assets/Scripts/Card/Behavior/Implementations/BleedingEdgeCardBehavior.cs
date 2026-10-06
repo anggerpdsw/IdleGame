@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class BleedingEdgeCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.BleedingEdge;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit };
 
         private float _bleedChancePercent;
         private float _durationSeconds;

@@ -7,6 +7,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class LastBulletCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.LastBullet;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private int _attackCount;
         private int _bulletInterval;

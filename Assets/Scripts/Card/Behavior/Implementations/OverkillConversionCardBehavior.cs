@@ -3,13 +3,15 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy;
-using IdleDefenseSurvival.Player;
+
+using PlayerClass = IdleDefenseSurvival.Player.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
     public sealed class OverkillConversionCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.OverkillConversion;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private const string RangeModifierId = "Card:OverkillConversion_Range";
 
@@ -17,6 +19,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         private float _maximumRangeBonusPercent;
         private float _durationSeconds;
         private int _maximumStacks;
+        private float _detectionRadius;
 
         private int _currentStacks;
         private float _stackTimer;
@@ -28,6 +31,23 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             _maximumRangeBonusPercent = GetParameter("MaximumRangeBonusPercent", 30f);
             _durationSeconds = GetParameter("DurationSeconds", 4f);
             _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 5f));
+            _detectionRadius = GetParameter("DetectionRadius", 5f);
+
+            // Grant initial range bonus if enemies are nearby on equip
+            var player = PlayerClass.Instance;
+            if (player != null)
+            {
+                var nearby = Physics2D.OverlapCircleAll(
+                    player.transform.position,
+                    _detectionRadius,
+                    LayerMask.GetMask("Enemy"));
+                if (nearby.Length > 0 && _currentStacks < _maximumStacks)
+                {
+                    _currentStacks++;
+                    _stackTimer = _durationSeconds;
+                    ApplyModifier();
+                }
+            }
         }
 
         public override void OnEnemyKilled(int count, string enemyType, string damageSource)

@@ -9,6 +9,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class OverchargeCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.Overcharge;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private const string AttackSpeedModifierId = "Card:Overcharge_AttackSpeed";
         private const string AttackDamageModifierId = "Card:Overcharge_AttackDamage";

@@ -7,6 +7,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class GravityWellCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.GravityWell;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private float _nextTriggerTime;
         private float _wellExpiry;

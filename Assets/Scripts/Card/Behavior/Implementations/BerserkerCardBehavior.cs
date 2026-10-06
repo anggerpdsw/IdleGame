@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class BerserkerCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.Berserker;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnPlayerHealed };
 
         private float _maxPercent;
         private bool _subscribed;

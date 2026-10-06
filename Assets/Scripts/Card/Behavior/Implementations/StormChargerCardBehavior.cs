@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class StormChargerCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.StormCharger;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private int _attackCount;
         private int _chargePerAttack;

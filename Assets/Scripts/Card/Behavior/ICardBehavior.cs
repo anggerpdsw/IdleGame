@@ -128,6 +128,11 @@ namespace IdleDefenseSurvival.Card.Behavior
         /// Get the current computed value for this behavior (for stat modifiers)
         /// </summary>
         float GetCurrentValue();
+
+        /// <summary>
+        /// Events this behavior subscribes to. Override in concrete behaviors.
+        /// </summary>
+        CardEventType[] SubscribedEvents { get; }
     }
 
     /// <summary>
@@ -170,6 +175,8 @@ namespace IdleDefenseSurvival.Card.Behavior
         public virtual void Update(float deltaTime) { }
 
         public virtual float GetCurrentValue() => _runtimeState?.CurrentValue ?? 0f;
+
+        public virtual CardEventType[] SubscribedEvents => Array.Empty<CardEventType>();
 
         public virtual void Dispose() { }
 

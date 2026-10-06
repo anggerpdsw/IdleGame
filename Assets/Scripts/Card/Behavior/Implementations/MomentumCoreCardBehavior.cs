@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class MomentumCoreCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.MomentumCore;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private int _currentStack;
         private float _lastKillTime;

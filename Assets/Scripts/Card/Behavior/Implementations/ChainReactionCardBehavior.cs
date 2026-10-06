@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class ChainReactionCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.ChainReaction;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         public override void OnEquip(CardRuntimeState state)
         {

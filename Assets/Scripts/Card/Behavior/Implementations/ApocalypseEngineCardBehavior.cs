@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class ApocalypseEngineCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.ApocalypseEngine;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private int _killCount;
         private int _stacks;

@@ -9,6 +9,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class VampiricFrenzyCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.VampiricFrenzy;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnLifeSteal };
 
         private float _accumulator;
         private readonly Queue<float> _stackExpiryTimes = new();

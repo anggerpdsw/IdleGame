@@ -10,6 +10,9 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
     public sealed class CelestialArsenalCardBehavior : CardBehaviorBase
     {
+        public override CardEffectType EffectType => CardEffectType.CelestialArsenal;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
+
         private enum WeaponType
         {
             PiercingBeam,
@@ -22,8 +25,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         private readonly HashSet<WeaponType> _usedWeapons = new();
         private int _attackCount;
         private int _attacksPerSummon;
-
-        public override CardEffectType EffectType => CardEffectType.CelestialArsenal;
 
         public override void OnEquip(CardRuntimeState state)
         {

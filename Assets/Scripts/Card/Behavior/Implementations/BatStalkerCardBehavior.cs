@@ -7,6 +7,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class BatStalkerCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.BatStalker;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         public override void OnEquip(CardRuntimeState state)
         {

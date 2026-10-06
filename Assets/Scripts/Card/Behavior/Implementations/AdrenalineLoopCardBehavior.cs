@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class AdrenalineLoopCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.AdrenalineLoop;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnEnemyKilled };
 
         private bool _effectActive;
         private const string ModifierId = "Card:AdrenalineLoop";

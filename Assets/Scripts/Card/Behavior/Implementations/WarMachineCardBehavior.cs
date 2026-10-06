@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class WarMachineCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.WarMachine;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private float _continuousAttackStartTime;
         private float _lastAttackTime = float.NegativeInfinity;

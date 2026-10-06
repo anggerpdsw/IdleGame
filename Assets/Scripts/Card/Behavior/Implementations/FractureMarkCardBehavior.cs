@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class FractureMarkCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.FractureMark;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled, CardEventType.OnPlayerAttack };
 
         private class FractureMark
         {

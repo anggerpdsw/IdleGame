@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class EscapeVelocityCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.EscapeVelocity;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private const string ModifierId = "Card:EscapeVelocity";
         private float _buildTimeSeconds;

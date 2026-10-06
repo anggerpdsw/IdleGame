@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class DeathReversalCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.DeathReversal;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnWaveStart };
 
         private readonly Queue<PlayerSnapshot> _snapshots = new();
         private float _snapshotTimer;

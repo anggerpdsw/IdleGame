@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
-using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Enemy.StatusEffects;
 
@@ -12,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         private float _timer;
 
         public override CardEffectType EffectType => CardEffectType.LawOfCollapse;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         public override void OnEquip(CardRuntimeState state)
         {

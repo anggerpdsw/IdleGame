@@ -4,10 +4,11 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
     public sealed class WorldBreakerCardBehavior : CardBehaviorBase
     {
+        public override CardEffectType EffectType => CardEffectType.WorldBreaker;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
+
         private int _killProgress;
         private int _stacks;
-
-        public override CardEffectType EffectType => CardEffectType.WorldBreaker;
 
         public override void OnEquip(CardRuntimeState state)
         {

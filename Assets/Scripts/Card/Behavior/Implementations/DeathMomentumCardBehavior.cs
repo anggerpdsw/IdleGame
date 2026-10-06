@@ -11,6 +11,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class DeathMomentumCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.DeathMomentum;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private const string MoveSpeedModifierId = "Card:DeathMomentum_MoveSpeed";
         private const string AttackDamageModifierId = "Card:DeathMomentum_AttackDamage";

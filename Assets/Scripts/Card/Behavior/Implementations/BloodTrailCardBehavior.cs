@@ -13,6 +13,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class BloodTrailCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.BloodTrail;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private float _trailDamagePercent;
         private float _trailRadius;

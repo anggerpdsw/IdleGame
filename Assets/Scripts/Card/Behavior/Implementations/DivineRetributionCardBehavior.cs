@@ -16,6 +16,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         private float _cooldownRemaining;
 
         public override CardEffectType EffectType => CardEffectType.DivineRetribution;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged };
 
         public override void OnEquip(CardRuntimeState state)
         {

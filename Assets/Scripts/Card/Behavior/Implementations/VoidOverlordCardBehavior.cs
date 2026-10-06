@@ -4,6 +4,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class VoidOverlordCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.VoidOverlord;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private float _timer;
         private float _duration;

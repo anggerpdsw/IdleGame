@@ -531,15 +531,14 @@ namespace IdleDefenseSurvival.Player
                         if (!_isEnemyDied && CardModifierService.HasEffect(CardEffectType.ExecutionProtocol))
                         {
                             bool isBossOrElite = enemy.EnemyData != null && (enemy.EnemyData.IsBoss || enemy.EnemyData.IsSpecial);
-                            float threshold = CardModifierService.GetCardParameter(
-                                "execution_protocol",
-                                isBossOrElite ? "BossExecutionThreshold" : "NormalExecutionThreshold");
+                            float threshold = isBossOrElite 
+                                ? CardModifierService.GetBossExecutionThreshold()
+                                : CardModifierService.GetNormalExecutionThreshold();
                             float chance = Mathf.Clamp01(
-                                CardModifierService.GetEffectResult(CardEffectType.ExecutionProtocol, 0f)
+                                CardModifierService.GetExecutionChance()
                                 * CardModifierService.GetProjectileEffectTriggerRateMultiplier());
                             if (enemy.CurrentHealth <= enemy.MaxHealth * threshold && Utilityku.Chance(chance * 100f))
                             {
-                                // Spawn sword execution effect
                                 enemy.Die();
                                 _isEnemyDied = true;
                                 EffectPool.Instance?.Spawn("SwordEffect", lastEnemyPos);

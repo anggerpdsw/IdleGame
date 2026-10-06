@@ -7,6 +7,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class AngelCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.Immortal;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete, CardEventType.OnWaveStart };
 
         private float _cooldownRemaining;
         private int _immunityWavesRemaining;

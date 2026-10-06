@@ -10,6 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class EchoShotCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.EchoShot;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private int _attackCount;
 

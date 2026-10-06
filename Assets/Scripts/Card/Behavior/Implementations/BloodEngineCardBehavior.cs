@@ -8,6 +8,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class BloodEngineCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.BloodEngine;
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnLifeSteal };
 
         private float _bonusExpiry;
         private int _currentStacks;

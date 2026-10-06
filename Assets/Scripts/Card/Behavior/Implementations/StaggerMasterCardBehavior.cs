@@ -9,6 +9,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class StaggerMasterCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.StaggerMaster;
+        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
         private float _damageBonusPercent;
         private float _durationSeconds;
