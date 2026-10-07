@@ -272,8 +272,8 @@
             "Description": "Increase character mana regen",
             "SkillType": "ManaRegen",
             "Mode": "Flat",
-            "BaseValue": 8,
-            "ValuePerLevel": 13,
+            "BaseValue": 4,
+            "ValuePerLevel": 9,
             "CardRarity": "Common"
         }, {
             "Id": "lucky_hunter",
@@ -571,8 +571,8 @@
             "Description": "Excess damage dealt beyond an enemy's remaining HP is converted into temporary attack range.",
             "EffectType": "OverkillConversion",
             "Mode": "Percent",
-            "BaseValue": 3,
-            "ValuePerLevel": 0.5,
+            "BaseValue": 1.7,
+            "ValuePerLevel": 0.53,
             "CardRarity": "Rare",
             "Parameters": {
                 "ConversionRatioPercent": 3,

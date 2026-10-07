@@ -20,7 +20,7 @@ namespace IdleDefenseSurvival.Camera
 
         [Header("Zoom Settings")]
         [Tooltip("Margin added around attack range for better visibility.")]
-        [SerializeField] private float _margin = 2f;
+        [SerializeField] private float _margin = 2.3f;
         [Tooltip("Minimum camera size (zoom in limit).")]
         [SerializeField] private float _minSize = 2.5f;
         [Tooltip("Maximum camera size (zoom out limit).")]

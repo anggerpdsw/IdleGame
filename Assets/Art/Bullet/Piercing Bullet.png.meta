@@ -131,7 +131,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Piercing Bullet_1
+      name: Piercing Bullet
       rect:
         serializedVersion: 2
         x: 79
@@ -166,8 +166,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
+      Piercing Bullet: 3851063738768614782
       Piercing Bullet_0: -5208236059621945599
-      Piercing Bullet_1: 3851063738768614782
       Piercing Bullet_2: -6752128024458606085
       Piercing Bullet_3: 7565266032997335337
       Piercing Bullet_4: 6317757094015824735
