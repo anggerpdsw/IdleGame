@@ -58,15 +58,15 @@ namespace IdleDefenseSurvival.Manager
                 ((highestTier - 1) * GameConstants.MAX_WAVE_PER_TIER) + currentWave;
             
             double waveMultiplier = 1.0 + ((double)totalWaveProgress / GameConstants.MAX_WAVE_PER_TIER);
-            double tierMultiplier = Mathf.Pow(1.35f, highestTier - 1);
-            double goldPerMinute = 7 * tierMultiplier * waveMultiplier;
+            double tierMultiplier = Mathf.Pow(1.25f, highestTier - 1);
+            double goldPerMinute = 1.5 * tierMultiplier * waveMultiplier;
 
             return (long)Math.Round(goldPerMinute * minute * Data.rewardMultiplier);
         }
 
         public long CalculateMeatReward()
         {
-            return Mathf.RoundToInt(CalculateGoldReward() / 131f);
+            return Mathf.RoundToInt(CalculateGoldReward() / 131.7f);
         }
 
         public void ResetCount()

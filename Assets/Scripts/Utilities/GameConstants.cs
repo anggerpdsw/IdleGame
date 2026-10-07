@@ -48,16 +48,16 @@ namespace IdleDefenseSurvival
 
         // Upgrade cost equipment
         public const int BASE_CRAFT_EQUIPMENT_GOLD_COST = 52500;
-        public const int BASE_CRAFT_EQUIPMENT_MEAT_COST = 1125;
+        public const int BASE_CRAFT_EQUIPMENT_MEAT_COST = 21250;
         public const int BASE_CRAFT_EQUIPMENT_GEM_COST = 23;
-        public const int BASE_CRAFT_POTION_GOLD_COST = 1250;
-        public const int BASE_CRAFT_POTION_MEAT_COST = 213;
+        public const int BASE_CRAFT_POTION_GOLD_COST = 5150;
+        public const int BASE_CRAFT_POTION_MEAT_COST = 2130;
         public const int BASE_CRAFT_POTION_GEM_COST = 1;
         public const int BASE_CRAFT_PET_GOLD_COST = 25200;
-        public const int BASE_CRAFT_PET_MEAT_COST = 2250;
+        public const int BASE_CRAFT_PET_MEAT_COST = 12500;
         public const int BASE_CRAFT_PET_GEM_COST = 2;
-        public const int BASE_UPGRADE_GOLD_COST = 100000;
-        public const int BASE_UPGRADE_MEAT_COST = 925;
+        public const int BASE_UPGRADE_GOLD_COST = 130000;
+        public const int BASE_UPGRADE_MEAT_COST = 10250;
 
     }
 
