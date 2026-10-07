@@ -85,6 +85,7 @@ namespace IdleDefenseSurvival.Player
         // Pierce tracking: remaining pierces consumed per kill.
         // Actual pierce count retrieved at kill time via GetAccumulatedCount.
         private int _pierceCount;
+        private bool _isPiercing = false;
 
         // ReturningEcho tracking
         private bool _isReturning = false;
@@ -133,6 +134,7 @@ namespace IdleDefenseSurvival.Player
             _isEnemyDied = false;
             _isInfiniteArsenal = false;
             _pierceCount = 0; // reset pierce tracker
+            _isPiercing = false;
             _isReturning = false;
             _returnHitCount = 0;
             EnemyDeathHandler.OnEnemyKilled -= OnEnemyKilledHandler;
@@ -335,13 +337,11 @@ namespace IdleDefenseSurvival.Player
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (_hasHit && !_isReturning) return;
+            if (_hasHit && !_isReturning && !_isPiercing) return;
 
             switch (_owner)
             {
                 case ProjectileOwner.Player:
-                case ProjectileOwner.Tank:
-
                     if (_isReturning)
                     {
                         // Return path: hit any enemy
@@ -350,21 +350,36 @@ namespace IdleDefenseSurvival.Player
                             HitTargetOnReturn(returnEnemy);
                         }
                     }
+                    else if (_isPiercing)
+                    {
+                        // Pierce path: hit all enemies along the way
+                        if (collision.TryGetComponent(out EnemyAi pierceEnemy))
+                        {
+                            // Skip if already hit this enemy in current pierce chain
+                            if (!_hitEnemies.Contains(collision.transform))
+                            {
+                                _hitEnemies.Add(collision.transform);
+                                HitEnemyWhilePiercing(pierceEnemy);
+                            }
+
+                            // Check if we reached the target
+                            if (collision.transform == _target)
+                            {
+                                HitTarget();
+                            }
+                        }
+                    }
                     else
                     {
                         // Normal path
                         // Check if we collided with the target
-                        if (collision.transform == _target)
-                        {
-                            HitTarget();
-                        }
-                        // Also hit any enemy (e.g. if target died and another is in the way)
-                        else if (collision.TryGetComponent(out EnemyAi enemy))
-                        {
-                            _target = collision.transform;
-                            HitTarget();
-                        }
+                        SimpleHitTarget(collision);
                     }
+                    break;
+
+                case ProjectileOwner.Tank:
+                    // Tank projectiles: simple hit-only, no bounce/pierce/return
+                    SimpleHitTarget(collision);
                     break;
 
                 case ProjectileOwner.Enemy:
@@ -379,6 +394,40 @@ namespace IdleDefenseSurvival.Player
                     }
                     break;
             }
+        }
+
+        private void SimpleHitTarget(Collider2D collision)
+        {
+            if (collision.transform == _target || 
+                collision.TryGetComponent<EnemyAi>(out _))
+            {
+                _target = collision.transform;
+                HitTarget();
+            }
+        }
+
+        private void HitEnemyWhilePiercing(EnemyAi enemy)
+        {
+            if (enemy == null || _player == null) return;
+
+            float pierceDamage = _baseDamage * Mathf.Pow(0.9f, _bounceIndex);
+            pierceDamage *= DamagePerRange(_player.transform.position);
+
+            DamageData damageData = new(
+                damage: pierceDamage,
+                type: DamageType.Normal,
+                crit: CriticalType.None,
+                source: DamageSource.PiercingBullet.ToString()
+            )
+            {
+                Element = Utilityku.RandomElement(),
+                DefenseBreakSource = _defenseBreakSource,
+                DefenseBreakType = _defenseBreakType,
+                DefenseBreak = _defenseBreak,
+                DefenseBreakDuration = _defenseBreakDuration
+            };
+
+            enemy.TakeDamage(damageData);
         }
 
         private void HitTargetOnReturn(EnemyAi enemy)
@@ -404,7 +453,7 @@ namespace IdleDefenseSurvival.Player
                 damage: returnDamage,
                 type: DamageType.Normal,
                 crit: CriticalType.None,
-                source: "ReturningEcho"
+                source: DamageSource.ReturningEcho.ToString()
             )
             {
                 Element = Utilityku.RandomElement()
@@ -588,11 +637,12 @@ namespace IdleDefenseSurvival.Player
                         }
 
                         // Build DamageData with critical tier
+                        string damageSource = _isPiercing ? DamageSource.PiercingBullet.ToString() : ProjectileOwner.Player.ToString();
                         DamageData damageData = new(
                             damage: currentDamage,
                             type: DamageType.Normal,
                             crit: critTier,
-                            source: ProjectileOwner.Player.ToString()
+                            source: damageSource
                         )
                         {
                             DamageMultiplier = hitDamageMultiplier,
@@ -708,18 +758,22 @@ namespace IdleDefenseSurvival.Player
                         }
 
                         // --- Pierce Logic (Panic Fire max stacks) ---
-                        // If enemy died and we have remaining pierces, find next target and continue
+                        // If enemy died and we have remaining pierces, find farthest target and pierce through
                         if (_isEnemyDied)
                         {
                             if (_pierceCount > 0)
                             {
-                                Transform nextTarget = FindNearestUnhitEnemy(transform.position);
+                                Transform nextTarget = FindFarthestUnhitEnemy(transform.position);
                                 if (nextTarget != null)
                                 {
+                                    // Clear hit history so projectile can hit enemies in the path
+                                    _hitEnemies.Clear();
+
                                     _target = nextTarget;
                                     _pierceCount--;
                                     _bounceIndex++;
                                     _hasHit = false;
+                                    _isPiercing = true;
 
                                     // Visual feedback: swap to pierce sprite
                                     if (_pierceBulletSprite != null)
@@ -767,6 +821,32 @@ namespace IdleDefenseSurvival.Player
             // contoh: +2% damage setiap 1 unit jarak
             float rangeMultiplier = 1f + (distance * _basePerRange / 100f);
             return rangeMultiplier;
+        }
+
+        /// <summary>
+        /// Cari enemy terjauh dari posisi yang diberikan yang belum terkena projectile ini (untuk pierce).
+        /// </summary>
+        private Transform FindFarthestUnhitEnemy(Vector2 fromPosition)
+        {
+            Collider2D[] nearbyEnemies = Physics2D.OverlapCircleAll(fromPosition, _bounceRadius, _enemyLayerMask);
+
+            Transform farthest = null;
+            float maxDistance = 0f;
+
+            foreach (Collider2D col in nearbyEnemies)
+            {
+                if (_hitEnemies.Contains(col.transform)) continue;
+                if (!col.gameObject.activeInHierarchy) continue;
+
+                float sqrDistance = ((Vector2)col.transform.position - fromPosition).sqrMagnitude;
+                if (sqrDistance > maxDistance)
+                {
+                    maxDistance = sqrDistance;
+                    farthest = col.transform;
+                }
+            }
+
+            return farthest;
         }
 
         /// <summary>

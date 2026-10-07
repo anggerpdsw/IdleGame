@@ -32,6 +32,8 @@ namespace IdleDefenseSurvival
     public enum DamageSource { Player, 
     // Ultimate
     Void, Tank, Root, Bomb, Fountain, Cloud, Lightning, Shockwave,
+    // Projectile
+    ReturningEcho, PiercingBullet,
     // Card
     Overkill, ChainReactionExplosion, LawOfCollapse }
 
