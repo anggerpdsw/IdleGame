@@ -2,6 +2,8 @@ using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Core.Interfaces;
 using IdleDefenseSurvival.Pet;
+using IdleDefenseSurvival.Events;
+using IdleDefenseSurvival.Inventory;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -17,6 +19,8 @@ namespace IdleDefenseSurvival.Core
         public static IAdsService AdsService => AdvertisingManager.Instance;
         public static IAnalyticsService AnalyticsService => AnalyticsManager.Instance;
         public static IPetService PetService => PetManager.Instance;
+        public static IEventService EventService => Events.EventService.Instance;
+        public static IInventoryService InventoryService => Inventory.InventoryService.Instance;
         // GameManager does not have an interface; expose the concrete instance for direct use.
         public static GameManager Manager => GameManager.Instance;
     }

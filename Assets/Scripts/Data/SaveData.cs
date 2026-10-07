@@ -40,5 +40,8 @@ namespace IdleDefenseSurvival.Data
 
         // Pet System (v4)
         public List<Pet.PetSaveEntry> pets = new();
+
+        // Event System (v7)
+        public EventSaveData eventData;
     }
 }

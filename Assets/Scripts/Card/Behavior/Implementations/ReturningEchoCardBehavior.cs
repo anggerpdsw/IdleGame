@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class ReturningEchoCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.ReturningEcho;
-        public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
         private float _triggerDistance;
         private float _returnDamagePercent;

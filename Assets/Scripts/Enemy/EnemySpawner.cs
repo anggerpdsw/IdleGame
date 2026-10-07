@@ -244,7 +244,12 @@ namespace IdleDefenseSurvival.Enemy
             foreach (EnemyData enemy in EnemyDatabase.enemies)
             {
                 if (!IsEnemyEligible(enemy, currentWave, currentTier)) continue;
-                randomValue -= enemy.spawnWeight;
+
+                // Apply Event System spawn weight modifier
+                float eventMod = Core.ServiceLocator.EventService?.GetSpawnWeightModifier(enemy.id) ?? 1f;
+                float adjustedWeight = enemy.spawnWeight * eventMod;
+
+                randomValue -= adjustedWeight;
                 if (randomValue <= 0f) return enemy;
             }
 

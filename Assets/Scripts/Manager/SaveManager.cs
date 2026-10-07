@@ -335,6 +335,13 @@ namespace IdleDefenseSurvival.Manager
             data.inventory ??= new Dictionary<string, long>();
             data.missions ??= new List<MissionInstance>();
             data.pets ??= new List<Pet.PetSaveEntry>();
+
+            // v6 → v7 migration: Event System added
+            if (data.version < 7)
+            {
+                data.eventData ??= new EventSaveData();
+                data.version = 7;
+            }
         }
 
         public void DeleteAll()
@@ -737,6 +744,7 @@ namespace IdleDefenseSurvival.Manager
             var missions = MissionService.Instance != null ? MissionService.Instance.GetAllMissions().ToList() : new List<MissionInstance>();
             var skillTreeBonus = SkillTreeBonusManager.Instance != null ? SkillTreeBonusManager.Instance.GetSaveData() : null;
             var pets = Pet.PetManager.Instance != null ? Pet.PetManager.Instance.GetSaveData() : new List<Pet.PetSaveEntry>();
+            var eventData = Events.EventService.Instance != null ? Events.EventService.Instance.GetSaveData() : null;
 
             // Update account.maxPet before gathering
             if (account != null && Pet.PetManager.Instance != null)
@@ -761,7 +769,8 @@ namespace IdleDefenseSurvival.Manager
                 craftQueue = craftQueue,
                 missions = missions,
                 skillTreeBonus = skillTreeBonus,
-                pets = pets
+                pets = pets,
+                eventData = eventData
             };
         }
 
@@ -839,6 +848,9 @@ namespace IdleDefenseSurvival.Manager
             // Restore craft queue (after InventoryService loaded, for offline progress)
             if (CraftingManager.Instance != null && data.craftQueue != null)
                 CraftingManager.Instance.LoadQueueSaveData(data.craftQueue);
+
+            // Load Event System state
+            Events.EventService.Instance?.LoadState(data.eventData);
 
             AccountManager.Instance?.NotifyDataLoaded();
         }

@@ -28,6 +28,9 @@ namespace IdleDefenseSurvival.Enemy
             // Step 1: Record kill in save system
             RecordEnemyKill(enemy, lastDamageSource);
 
+            // Step 1a: Notify Event System
+            Core.ServiceLocator.EventService?.RegisterKill(enemy.EnemyData.IsElite, enemy.EnemyData.IsBoss, enemy?.EnemyData?.id ?? "unknown");
+
             // Step 1b: Notify card effects (HealOnKill, etc.)
             OnEnemyKilled?.Invoke(enemy, lastDamageSource);
 

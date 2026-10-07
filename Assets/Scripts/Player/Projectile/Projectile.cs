@@ -8,7 +8,6 @@ using IdleDefenseSurvival.Equipment;
 using IdleDefenseSurvival.Modifiers;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Card;
-using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Card.Behavior;
 using IdleDefenseSurvival.Card.Behavior.Implementations;
 
@@ -41,6 +40,8 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private Sprite _playerBulletSprite;
         [SerializeField] private Sprite _tankBulletSprite;
         [SerializeField] private Sprite _enemyBulletSprite;
+        [SerializeField] private Sprite _pierceBulletSprite;
+        [SerializeField] private Sprite _returnBulletSprite;
         [Tooltip("Target visual diameter in world units.")]
         [SerializeField] private float _visualSize = 0.67f;
 
@@ -85,6 +86,10 @@ namespace IdleDefenseSurvival.Player
         // Actual pierce count retrieved at kill time via GetAccumulatedCount.
         private int _pierceCount;
 
+        // ReturningEcho tracking
+        private bool _isReturning = false;
+        private int _returnHitCount = 0;
+
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
         
@@ -128,6 +133,8 @@ namespace IdleDefenseSurvival.Player
             _isEnemyDied = false;
             _isInfiniteArsenal = false;
             _pierceCount = 0; // reset pierce tracker
+            _isReturning = false;
+            _returnHitCount = 0;
             EnemyDeathHandler.OnEnemyKilled -= OnEnemyKilledHandler;
         }
 
@@ -243,7 +250,7 @@ namespace IdleDefenseSurvival.Player
         {
             if (_hasHit) return;
 
-            if (_target == null)
+            if (_target == null && !_isReturning)
             {
                 ReturnToPool();
                 return;
@@ -255,8 +262,23 @@ namespace IdleDefenseSurvival.Player
             float timeScaleCompensation = Mathf.Max(0.1f, Time.timeScale);
             float effectiveSpeed = _speed / timeScaleCompensation;
 
-            // Move towards target
-            Vector2 direction = ((Vector2)_target.position - _rb.position).normalized;
+            Vector2 direction;
+            if (_isReturning && _player != null)
+            {
+                // Return to player
+                direction = ((Vector2)_player.transform.position - _rb.position).normalized;
+            }
+            else if (_target != null)
+            {
+                // Move towards target
+                direction = ((Vector2)_target.position - _rb.position).normalized;
+            }
+            else
+            {
+                ReturnToPool();
+                return;
+            }
+
             _rb.linearVelocity = direction * effectiveSpeed;
 
             // Rotate to face direction of movement
@@ -267,34 +289,81 @@ namespace IdleDefenseSurvival.Player
         private void Update()
         {
             if (_hasHit) return;
-            // Check max distance
-            if (Vector3.Distance(_startPosition, transform.position) >= _maxDistance)
+
+            float distanceTraveled = Vector3.Distance(_startPosition, transform.position);
+
+            // ReturningEcho: trigger return if distance exceeded and not already returning
+            if (!_isReturning && _owner == ProjectileOwner.Player && _player != null)
+            {
+                if (CardRuntimeManager.Instance?.GetBehavior("returning_echo") is ReturningEchoCardBehavior behavior)
+                {
+                    float triggerDist = behavior.GetTriggerDistance();
+                    if (distanceTraveled >= triggerDist && behavior.CanTriggerReturn())
+                    {
+                        _isReturning = true;
+                        _returnHitCount = 0;
+                        behavior.TriggerReturnCooldown();
+                        _hitEnemies.Clear(); // Allow hitting same enemies on return
+
+                        // Visual feedback: swap to return sprite
+                        if (_returnBulletSprite != null)
+                            SetProjectileSprite(_returnBulletSprite);
+                    }
+                }
+            }
+
+            // Check max distance (extended for returning projectiles)
+            float maxDist = _isReturning ? _maxDistance * 2f : _maxDistance;
+            if (distanceTraveled >= maxDist)
             {
                 ReturnToPool();
                 return;
             }
+
+            // If returning and reached player, pool it
+            if (_isReturning && _player != null)
+            {
+                float distToPlayer = Vector3.Distance(transform.position, _player.transform.position);
+                if (distToPlayer <= _hitRadius)
+                {
+                    ReturnToPool();
+                }
+            }
+
             // Hit detection handled by OnTriggerEnter2D with Continuous collision detection
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (_hasHit) return;
+            if (_hasHit && !_isReturning) return;
 
             switch (_owner)
             {
                 case ProjectileOwner.Player:
                 case ProjectileOwner.Tank:
 
-                    // Check if we collided with the target
-                    if (collision.transform == _target)
+                    if (_isReturning)
                     {
-                        HitTarget();
+                        // Return path: hit any enemy
+                        if (collision.TryGetComponent(out EnemyAi returnEnemy))
+                        {
+                            HitTargetOnReturn(returnEnemy);
+                        }
                     }
-                    // Also hit any enemy (e.g. if target died and another is in the way)
-                    else if (collision.TryGetComponent(out EnemyAi enemy))
+                    else
                     {
-                        _target = collision.transform;
-                        HitTarget();
+                        // Normal path
+                        // Check if we collided with the target
+                        if (collision.transform == _target)
+                        {
+                            HitTarget();
+                        }
+                        // Also hit any enemy (e.g. if target died and another is in the way)
+                        else if (collision.TryGetComponent(out EnemyAi enemy))
+                        {
+                            _target = collision.transform;
+                            HitTarget();
+                        }
                     }
                     break;
 
@@ -309,6 +378,43 @@ namespace IdleDefenseSurvival.Player
                         EnemyHitPlayer(player);
                     }
                     break;
+            }
+        }
+
+        private void HitTargetOnReturn(EnemyAi enemy)
+        {
+            if (enemy == null || _player == null) return;
+            if (_hitEnemies.Contains(enemy.transform)) return;
+
+            if (CardRuntimeManager.Instance?.GetBehavior("returning_echo") is not ReturningEchoCardBehavior behavior) return;
+
+            int maxTargets = behavior.GetMaximumReturnTargets();
+            if (_returnHitCount >= maxTargets)
+            {
+                ReturnToPool();
+                return;
+            }
+
+            _hitEnemies.Add(enemy.transform);
+            _returnHitCount++;
+
+            float returnDamage = behavior.GetReturnDamageMultiplier(_baseDamage);
+
+            DamageData damageData = new(
+                damage: returnDamage,
+                type: DamageType.Normal,
+                crit: CriticalType.None,
+                source: "ReturningEcho"
+            )
+            {
+                Element = Utilityku.RandomElement()
+            };
+
+            enemy.TakeDamage(damageData);
+
+            if (_returnHitCount >= maxTargets)
+            {
+                ReturnToPool();
             }
         }
 
@@ -611,9 +717,14 @@ namespace IdleDefenseSurvival.Player
                                 if (nextTarget != null)
                                 {
                                     _target = nextTarget;
-                                    _pierceCount--; 
+                                    _pierceCount--;
                                     _bounceIndex++;
                                     _hasHit = false;
+
+                                    // Visual feedback: swap to pierce sprite
+                                    if (_pierceBulletSprite != null)
+                                        SetProjectileSprite(_pierceBulletSprite);
+
                                     return;
                                 }
                             }
