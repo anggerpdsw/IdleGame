@@ -146,8 +146,16 @@ public interface ICardHUDProvider
 
 public readonly struct CardHUDData
 {
-    public readonly bool Visible;
-    public readonly string Value;
+    public readonly Sprite Icon;       // optional icon for widget
+    public readonly string Value;      // formatted display ("12%" or "3/5")
+    public readonly float FillAmount;  // 0-1 radial cooldown/progress (default 1f)
+
+    public CardHUDData(Sprite icon, string value, float fillAmount = 1f)
+    {
+        Icon = icon;
+        Value = value;
+        FillAmount = fillAmount;
+    }
 }
 ```
 
@@ -168,7 +176,7 @@ public readonly struct CardHUDData
    
    public CardHUDData GetHUDData()
    {
-       return new CardHUDData(IsActive, $"{_value:0}%");
+       return new CardHUDData(GetCardIcon(), $"{_value:0}%", _cooldownFill);
    }
    ```
 
