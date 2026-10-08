@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -313,7 +313,53 @@ namespace IdleDefenseSurvival.UI
         private void RefreshDescription()
         {
             if (_cardDescription == null) return;
-            _cardDescription.text = _cardData.Description;
+
+            int currentLevel = 1;
+            OwnedCardData ownedCard = CardManager.Instance.Inventory.GetOwnedCard(_cardData.Id);
+            if (ownedCard != null)
+                currentLevel = ownedCard.Level;
+
+            float value = _cardData.CalculateValue(currentLevel);
+            string description = _cardData.Description;
+
+            var table = new DataTable();
+
+            // Replace {expression} or {expression|color} with evaluated colored values
+            description = System.Text.RegularExpressions.Regex.Replace(
+                description,
+                @"\{([^}|]+)(?:\|([^}]+))?\}",
+                match =>
+                {
+                    string expr = match.Groups[1].Value.Trim();
+                    expr = expr.Replace("CurrentValue", value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+                    // Parse optional color token (default = green)
+                    string colorToken = match.Groups[2].Success ? match.Groups[2].Value.Trim().ToLower() : "green";
+
+                    Color color = colorToken switch
+                    {
+                        "red" => GameColors.red,
+                        "green" => GameColors.green,
+                        "yellow" => GameColors.yellow,
+                        "blue" => GameColors.blue,
+                        _ => GameColors.green
+                    };
+
+                    string colorHex = ColorUtility.ToHtmlStringRGB(color);
+
+                    try
+                    {
+                        object result = table.Compute(expr, null);
+                        double numResult = Convert.ToDouble(result);
+                        return $"<color=#{colorHex}>{numResult:0.##}</color>";
+                    }
+                    catch
+                    {
+                        return $"<color=#{colorHex}>{value:0.##}</color>";
+                    }
+                });
+
+            _cardDescription.text = description;
         }
 
         #endregion

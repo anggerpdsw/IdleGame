@@ -95,6 +95,18 @@ namespace IdleDefenseSurvival.Card
             return behavior?.GetProjectileEffectTriggerRateMultiplier() ?? 1f;
         }
 
+        public static float GetStaggerMasterDamageMultiplier(Enemy.EnemyAi enemy)
+        {
+            var behavior = CardRuntimeManager.Instance?.GetBehavior("stagger_master") as StaggerMasterCardBehavior;
+            return behavior?.GetDamageMultiplier(enemy) ?? 1f;
+        }
+
+        public static float GetDangerZoneDamageMultiplier(Enemy.EnemyAi enemy)
+        {
+            var behavior = CardRuntimeManager.Instance?.GetBehavior("danger_zone") as DangerZoneCardBehavior;
+            return behavior?.GetDamageMultiplier(enemy) ?? 1f;
+        }
+
         public static bool HasCard(string cardId)
             => CardRuntimeManager.Instance?.IsCardActive(cardId) ?? false;
 
@@ -192,6 +204,18 @@ namespace IdleDefenseSurvival.Card
             if (mgr == null) return 0;
             var behavior = mgr.GetBehavior("death_chain") as DeathChainCardBehavior;
             return behavior?.GetStackCount() ?? 0;
+        }
+
+        public static int GetSoulHarvesterSoulCount()
+        {
+            var behavior = CardRuntimeManager.Instance?.GetBehavior("soul_harvester") as SoulHarvesterCardBehavior;
+            return behavior?.GetSoulCount() ?? 0;
+        }
+
+        public static int GetSoulHarvesterMaxStack()
+        {
+            var behavior = CardRuntimeManager.Instance?.GetBehavior("soul_harvester") as SoulHarvesterCardBehavior;
+            return behavior?.GetMaxStack() ?? 0;
         }
 
         // Aura effect detection — used by AuraCollider

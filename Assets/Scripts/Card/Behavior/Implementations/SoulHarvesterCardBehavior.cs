@@ -3,6 +3,7 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Enemy;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
@@ -21,7 +22,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnEquip(state);
             _soulCount = 0;
-            _initialSoulCap = Mathf.RoundToInt(GetParameter("InitialSoulCap"));
+            _initialSoulCap = Mathf.RoundToInt(GetParameter("InitialSoulCap", 666f));
             _maxStack = _initialSoulCap;
             _totalSoulsEarned = 0;
         }
@@ -36,20 +37,26 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnEnemyKilled(int count, string enemyType, string damageSource)
         {
             if (damageSource != DamageSource.Player.ToString()) return;
-            if (damageSource != DamageSource.Player.ToString()) return;
+
             _totalSoulsEarned += count;
-            int soulsPerCapIncrease = Mathf.RoundToInt(GetParameter("SoulsPerCapIncrease"));
-            int capIncrease = Mathf.RoundToInt(GetParameter("SoulCapIncrease"));
-            if (_maxStack <= 0) return;
+
+            // Calculate dynamic cap: InitialSoulCap + (totalKills / SoulsPerCapIncrease) * SoulCapIncrease
+            int soulsPerCapIncrease = Mathf.RoundToInt(GetParameter("SoulsPerCapIncrease", 666f));
+            int capIncrease = Mathf.RoundToInt(GetParameter("SoulCapIncrease", 66f));
+
             if (soulsPerCapIncrease > 0 && capIncrease > 0)
             {
-                long expandedCap = _initialSoulCap
-                    + _totalSoulsEarned / soulsPerCapIncrease * capIncrease;
+                long expandedCap = _initialSoulCap + _totalSoulsEarned / soulsPerCapIncrease * capIncrease;
                 _maxStack = (int)Math.Min(expandedCap, int.MaxValue);
             }
-            _soulCount = (int)Math.Min(_totalSoulsEarned, _maxStack);
 
+            _soulCount = (int)Math.Min(_totalSoulsEarned, _maxStack);
             RefreshModifier();
+        }
+
+        public override void OnEnemyKilled(EnemyAi enemy, string damageSource)
+        {
+            // No-op: soul counting happens in overload 1
         }
 
         private void RefreshModifier()

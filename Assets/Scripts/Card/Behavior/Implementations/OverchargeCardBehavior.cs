@@ -29,8 +29,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             base.OnEquip(state);
             _highManaThresholdPercent = GetParameter("HighManaThresholdPercent", 80f);
             _lowManaThresholdPercent = GetParameter("LowManaThresholdPercent", 20f);
-            _attackSpeedBonusPercent = GetParameter("AttackSpeedBonusPercent", 8f);
-            _attackDamageBonusPercent = GetParameter("AttackDamageBonusPercent", 15f);
+            _attackSpeedBonusPercent = GetCurrentValue();
+            _attackDamageBonusPercent = _attackSpeedBonusPercent * GetParameter("AttackDamageBonusPercent", 1.91f);
             _durationSeconds = GetParameter("DurationSeconds", 4f);
         }
 

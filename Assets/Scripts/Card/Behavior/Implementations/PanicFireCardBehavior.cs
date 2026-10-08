@@ -16,17 +16,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         private const string ModifierId = "Card:PanicFire";
         private const string PierceModifierId = "Card:PanicFire_Pierce";
 
-        private float _radius;
+        private float _radiusFactor;
         private int _enemiesPerStack;
-        private float _attackSpeedPerStackPercent;
         private int _maximumStacks;
 
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            _radius = GetParameter("Radius", 6f);
+            _radiusFactor = GetParameter("Radius", 1.51f);
             _enemiesPerStack = Mathf.RoundToInt(GetParameter("EnemiesPerStack", 3f));
-            _attackSpeedPerStackPercent = GetParameter("AttackSpeedPerStackPercent", 3f);
             _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 8f));
         }
 
@@ -40,7 +38,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             var player = PlayerClass.Instance;
             if (player == null) return;
 
-            int enemyCount = CountEnemiesInRange(player.transform.position, _radius);
+            float radius = PlayerStatsManager.Instance.GetStat(SkillType.AttackRange) * _radiusFactor;
+            int enemyCount = CountEnemiesInRange(player.transform.position, radius);
             int stacks = Mathf.Min(enemyCount / _enemiesPerStack, _maximumStacks);
             bool isActive = stacks > 0;
             bool atMaxStacks = stacks >= _maximumStacks;
@@ -50,7 +49,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
             if (isActive)
             {
-                float bonusPercent = stacks * _attackSpeedPerStackPercent;
+                float bonusPercent = stacks * GetCurrentValue();
                 var modifier = new StatModifier
                 {
                     Id = ModifierId,
@@ -66,13 +65,14 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             // At max stacks, grant 1 extra pierce
             if (atMaxStacks)
             {
+                float _projectilePierce = GetParameter("ProjectilePierce", 1.1f);
                 var pierceMod = new StatModifier
                 {
                     Id = PierceModifierId,
                     Source = ModifierSource.Card,
                     Stat = SkillType.PierceCount,
                     Mode = ModifierMode.Flat,
-                    Value = 1f,
+                    Value = _projectilePierce,
                     Permanent = false
                 };
                 ModifierManager.Instance.AddModifier(pierceMod);

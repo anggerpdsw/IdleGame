@@ -14,12 +14,20 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             base.OnEquip(state);
         }
 
+        public override void OnEnemyKilled(int count, string enemyType, string damageSource)
+        {
+            // No-op: needs EnemyAi instance for MaxHealth
+        }
+
         public override void OnEnemyKilled(EnemyAi enemy, string damageSource)
         {
             if (enemy == null || damageSource != DamageSource.Player.ToString()) return;
 
             var player = PlayerClass.Instance;
             if (player == null) return;
+
+            float overhealPercent = GetParameter("OverHealing", 50f) * 0.01f;
+            float duration = GetParameter("DurationSeconds", 4f);
 
             float healPercent = GetCurrentValue() * 0.01f;
             float healAmount = enemy.MaxHealth * healPercent;
@@ -34,8 +42,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             // Overheal grants temporary shield (50% of excess for 4s)
             if (overheal > 0f)
             {
-                float shieldAmount = overheal * 0.5f;
-                player.AddShield(shieldAmount, 4f);
+                float shieldAmount = overheal * overhealPercent;
+                player.AddShield(shieldAmount, duration);
             }
         }
 

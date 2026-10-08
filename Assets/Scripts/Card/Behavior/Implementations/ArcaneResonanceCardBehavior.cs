@@ -12,25 +12,34 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         private int _attacksRemaining;
         private float _bonusExpiry;
-        private const string ModifierId = "Card:ArcaneResonance";
+        private const string DamageModifierId = "Card:ArcaneResonance";
+        private const string CritModifierId = "Card:ArcaneResonance:Crit";
+
+        // UI accessors
+        public int AttacksRemaining => _attacksRemaining;
+        public float RemainingDuration => Mathf.Max(0f, _bonusExpiry - Time.time);
+        public bool IsActive => _attacksRemaining > 0 && Time.time < _bonusExpiry;
 
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
             _attacksRemaining = 0;
             _bonusExpiry = 0f;
-            ModifierManager.Instance.RemoveModifier(ModifierId);
+            ModifierManager.Instance.RemoveModifier(DamageModifierId);
+            ModifierManager.Instance.RemoveModifier(CritModifierId);
         }
 
         public override void OnUnequip(CardRuntimeState state)
         {
             _attacksRemaining = 0;
             _bonusExpiry = 0f;
-            ModifierManager.Instance.RemoveModifier(ModifierId);
+            ModifierManager.Instance.RemoveModifier(DamageModifierId);
+            ModifierManager.Instance.RemoveModifier(CritModifierId);
         }
 
         public void OnUltimateUsed()
         {
+            if (IsActive) return;
             _attacksRemaining = Mathf.RoundToInt(GetParameter("AttackCount", 8f));
             _bonusExpiry = Time.time + GetParameter("DurationSeconds", 6f);
             RefreshModifier();
@@ -61,14 +70,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         private void RefreshModifier()
         {
-            ModifierManager.Instance.RemoveModifier(ModifierId);
+            ModifierManager.Instance.RemoveModifier(DamageModifierId);
+            ModifierManager.Instance.RemoveModifier(CritModifierId);
             if (_attacksRemaining <= 0) return;
 
-            float damageBonus = GetParameter("AttackDamageBonusPercent", 18f);
-
+            // Use CurrentValue (BaseValue + ValuePerLevel scaling) for damage bonus
+            float damageBonus = GetCurrentValue();
             var modifier = new StatModifier
             {
-                Id = ModifierId,
+                Id = DamageModifierId,
                 Source = ModifierSource.Card,
                 Stat = SkillType.AttackDamage,
                 Mode = ModifierMode.Percent,
@@ -77,11 +87,11 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             };
             ModifierManager.Instance.AddModifier(modifier);
 
-            // Apply crit chance bonus
+            // Crit bonus from Parameters (static value)
             float critBonus = GetParameter("CriticalChanceBonusPercent", 8f);
             var critModifier = new StatModifier
             {
-                Id = ModifierId + ":Crit",
+                Id = CritModifierId,
                 Source = ModifierSource.Card,
                 Stat = SkillType.CriticalChance,
                 Mode = ModifierMode.Flat,

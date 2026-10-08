@@ -55,7 +55,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             ModifierManager.Instance.RemoveModifier(ModifierId);
             if (!_effectActive) return;
 
-            float bonusPercent = GetParameter("AttackSpeedBonusPercent", 20f);
+            float bonusPercent = GetCurrentValue();
 
             var modifier = new StatModifier
             {

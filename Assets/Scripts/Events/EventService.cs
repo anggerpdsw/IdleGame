@@ -5,7 +5,6 @@ using UnityEngine;
 using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Economy;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Inventory;
 
@@ -204,7 +203,7 @@ namespace IdleDefenseSurvival.Events
                     if (!DateTime.TryParse(evt.schedule.startUtc, out var anchor)) continue;
 
                     var daysSinceLaunch = (DateTime.UtcNow - anchor).Days;
-                    var index = (daysSinceLaunch / evt.schedule.durationDays) % evt.schedule.rotationPool.Count;
+                    var index = daysSinceLaunch / evt.schedule.durationDays % evt.schedule.rotationPool.Count;
                     return evt.schedule.rotationPool[index];
                 }
             }
@@ -487,7 +486,7 @@ namespace IdleDefenseSurvival.Events
                     {
                         if (mod.type == "spawnWeight")
                         {
-                            modifier *= (1f + mod.value);
+                            modifier *= 1f + mod.value;
                         }
                     }
                 }
@@ -510,7 +509,7 @@ namespace IdleDefenseSurvival.Events
                     {
                         if (mod.type == modifierType)
                         {
-                            modifier *= (1f + mod.value);
+                            modifier *= 1f + mod.value;
                         }
                     }
                 }

@@ -1,7 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
 using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
@@ -11,31 +10,50 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override CardEffectType EffectType => CardEffectType.StaggerMaster;
         public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
-        private float _damageBonusPercent;
         private float _durationSeconds;
-        private int _maximumStacks;
+
+        // Track bonus expiry per enemy
+        private readonly Dictionary<EnemyAi, float> _bonusExpires = new();
 
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            _damageBonusPercent = GetParameter("DamageBonusPercent", 8f);
-            _durationSeconds = GetParameter("DurationSeconds", 2f);
-            _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 1f));
+            _durationSeconds = GetParameter("DurationSeconds", 3f);
         }
 
-        public float GetDamageBonusMultiplier(EnemyAi enemy)
+        /// <summary>
+        /// Returns damage multiplier for staggered enemy.
+        /// Bonus persists for DurationSeconds after stagger ends.
+        /// Called per-hit from EnemyAi.TakeDamage pipeline.
+        /// </summary>
+        public float GetDamageMultiplier(EnemyAi enemy)
         {
             if (enemy == null) return 1f;
 
-            // Check if enemy has knockback or stun status
             bool isStaggered = enemy.IsKnockedBack || enemy.IsStunned;
 
+            // If currently staggered: refresh duration and apply bonus
             if (isStaggered)
             {
-                return 1f + (_damageBonusPercent * 0.01f);
+                _bonusExpires[enemy] = Time.time + _durationSeconds;
+                return 1f + (GetCurrentValue() * 0.01f);
             }
 
+            // If bonus duration still active: keep bonus
+            if (_bonusExpires.TryGetValue(enemy, out float expireTime) && Time.time < expireTime)
+            {
+                return 1f + (GetCurrentValue() * 0.01f);
+            }
+
+            // Duration expired: cleanup and return 1x
+            _bonusExpires.Remove(enemy);
             return 1f;
+        }
+
+        public override void OnUnequip(CardRuntimeState state)
+        {
+            base.OnUnequip(state);
+            _bonusExpires.Clear();
         }
     }
 }

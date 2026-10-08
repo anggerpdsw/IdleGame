@@ -170,11 +170,10 @@ namespace IdleDefenseSurvival.Player
 
         private void Die()
         {
-            if (Utilityku.Chance(
-                PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
+            if (Utilityku.Chance(PlayerStatsManager.Instance.GetStat(SkillType.DeathDefy)))
             {
-                Heal(MaxHealth * .1f);
-                StartCoroutine(ImmunityRoutine(15f));
+                Heal(MaxHealth * .12f);
+                StartCoroutine(ImmunityRoutine(22f));
                 return;
             }
 

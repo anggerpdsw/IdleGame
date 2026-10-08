@@ -1,9 +1,6 @@
 using UnityEngine;
 using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy;
-using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
@@ -12,7 +9,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override CardEffectType EffectType => CardEffectType.Shrapnel;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit };
 
-        private float _triggerChancePercent;
         private float _damageMultiplier;
         private float _radius;
         private int _maximumTargets;
@@ -20,7 +16,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            _triggerChancePercent = GetParameter("TriggerChancePercent", 15f);
             _damageMultiplier = GetParameter("DamageMultiplier", 0.35f);
             _radius = GetParameter("Radius", 2.5f);
             _maximumTargets = Mathf.RoundToInt(GetParameter("MaximumTargets", 4f));
@@ -29,7 +24,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnCriticalHit(bool isCriticalHit, float damage, Vector2 position)
         {
             if (!isCriticalHit) return;
-            if (!Utilityku.Chance(_triggerChancePercent)) return;
+            if (!Utilityku.Chance(GetCurrentValue())) return;
             SpawnShrapnel(position, damage);
         }
 

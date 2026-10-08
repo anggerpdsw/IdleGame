@@ -498,6 +498,10 @@ namespace IdleDefenseSurvival.Enemy
             {
                 float currentHealthFraction = _currentHealth / Mathf.Max(1f, _maxHealth);
                 damageAfterDefense *= CardModifierService.GetDevourerDamageMultiplier(currentHealthFraction);
+                // StaggerMaster: bonus damage vs staggered (knockback/stun) enemies
+                damageAfterDefense *= CardModifierService.GetStaggerMasterDamageMultiplier(this);
+                // DangerZone: bonus damage vs enemies in close range
+                damageAfterDefense *= CardModifierService.GetDangerZoneDamageMultiplier(this);
             }
 
             LastOverkillDamage = Mathf.Max(0f, damageAfterDefense - _currentHealth);

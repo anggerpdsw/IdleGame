@@ -197,11 +197,11 @@
         }, {
             "Id": "last_stand",
             "Name": "Last Stand",
-            "Description": "Chance to survive fatal damage with 10% HP",
+            "Description": "Add {CurrentValue}% Chance to survive fatal damage with 12% HP",
             "SkillType": "DeathDefy",
             "Mode": "Flat",
-            "BaseValue": 1,
-            "ValuePerLevel": 1,
+            "BaseValue": 1.5,
+            "ValuePerLevel": 1.2,
             "CardRarity": "Common"
         }, {
             "Id": "iron_wall",
@@ -224,7 +224,7 @@
         }, {
             "Id": "annihilation",
             "Name": "Annihilation",
-            "Description": "Increase penetration to defense enemy",
+            "Description": "Increase penetration to enemy defense",
             "SkillType": "Penetration",
             "Mode": "Percent",
             "BaseValue": 35,
@@ -287,7 +287,7 @@
         }, {
             "Id": "extra_tank",
             "Name": "Extra Tank",
-            "Description": "An additional tank to protect you. More duration on Tank",
+            "Description": "An additional tank to protect you. More {CurrentValue}% duration on Tank",
             "EffectType": "AddTank",
             "Mode": "Percent",
             "BaseValue": 27,
@@ -305,7 +305,7 @@
         }, {
             "Id": "enemy_balance",
             "Name": "Enemy Balance",
-            "Description": "Each wave spawns more enemies",
+            "Description": "Each wave spawns x{CurrentValue} more enemies",
             "EffectType": "EnemyBalance",
             "Mode": "Flat",
             "BaseValue": 1.1,
@@ -314,7 +314,7 @@
         }, {
             "Id": "elite_hunter",
             "Name": "Elite Hunter",
-            "Description": "Increase damage dealt to Elite enemies",
+            "Description": "Increase x{CurrentValue} damage dealt to Elite enemies",
             "SkillType": "EliteDamage",
             "Mode": "Flat",
             "BaseValue": 14,
@@ -323,7 +323,7 @@
         }, {
             "Id": "boss_hunter",
             "Name": "Boss Hunter",
-            "Description": "Increase damage dealt to Boss enemies",
+            "Description": "Increase x{CurrentValue} damage dealt to Boss enemies",
             "SkillType": "BossDamage",
             "Mode": "Flat",
             "BaseValue": 12,
@@ -332,7 +332,7 @@
         }, {
             "Id": "compound_interest",
             "Name": "Compound Interest",
-            "Description": "Increase Gold & Meat earned per wave",
+            "Description": "Increase Gold & Meat earned {CurrentValue}% per wave",
             "SkillType": "InterestWave",
             "Mode": "Percent",
             "BaseValue": 0.5,
@@ -341,7 +341,7 @@
         }, {
             "Id": "frost_aura",
             "Name": "Frost Aura",
-            "Description": "Slow enemies in attack range by 8% at level 1. Slow strength scales with card level.",
+            "Description": "Slow enemies movement in attack range by {CurrentValue}%.",
             "EffectType": "FrostAura",
             "Mode": "Percent",
             "BaseValue": 8,
@@ -350,7 +350,7 @@
         }, {
             "Id": "shield",
             "Name": "Shield",
-            "Description": "At full HP, gain a shield equal to 15% of max HP. Shield capacity scales with card level.",
+            "Description": "At full HP, gain a shield equal to {CurrentValue}% of max HP. Cooldown in 30s",
             "EffectType": "Shield",
             "Mode": "Percent",
             "BaseValue": 15,
@@ -362,7 +362,7 @@
         }, {
             "Id": "crazy_gambler",
             "Name": "Crazy Gambler",
-            "Description": "After wave 150, there a chance to increase ATK by 25% at the end of each wave, and a chance to decrease ATK by 15% (max 20 stack)",
+            "Description": "After wave 150, there {CurrentValue}% chance to increase ATK by 12.5% at the end of each wave, and {100 - CurrentValue|red}% chance to decrease ATK by 5% (max 20 stack)",
             "EffectType": "CrazyGambler",
             "Mode": "Percent",
             "BaseValue": 47,
@@ -371,13 +371,13 @@
             "Parameters": {
                 "ActivationWave": 150,
                 "MaxStacks": 18,
-                "PositiveBonus": 15,
+                "PositiveBonus": 12.5,
                 "NegativeBonus": -5
             }
         }, {
             "Id": "desperados",
             "Name": "Desperados",
-            "Description": "After wave 150, there a chance to increase HP by 25% at the end of each wave, and a chance to decrease HP by 15% (max 20 stack)",
+            "Description": "After wave 150, there {CurrentValue}% chance to increase HP by 12.5% at the end of each wave, and {100 - CurrentValue|red}% chance to decrease HP by 5% (max 20 stack)",
             "EffectType": "Desperados",
             "Mode": "Percent",
             "BaseValue": 47,
@@ -386,22 +386,26 @@
             "Parameters": {
                 "ActivationWave": 150,
                 "MaxStacks": 18,
-                "PositiveBonus": 15,
+                "PositiveBonus": 12.5,
                 "NegativeBonus": -5
             }
         }, {
             "Id": "bat_stalker",
             "Name": "Bat Stalker",
-            "Description": "Heal for 5% of an enemy's max HP when you kill it. Healing scales with card level. Overhealing grants a temporary shield equal to 50% of excess heal for 4 seconds.",
+            "Description": "Heal for {CurrentValue}% of an enemy's max HP when you kill it. Healing scales with card level. Overhealing grants a temporary shield equal to 50% of excess heal for 4 seconds.",
             "EffectType": "BatStalker",
             "Mode": "Percent",
             "BaseValue": 5,
             "ValuePerLevel": 2,
-            "CardRarity": "Rare"
+            "CardRarity": "Rare",
+            "Parameters": {
+                "OverHealing": 50,
+                "DurationSeconds": 4
+            }
         }, {
             "Id": "predator_focus",
             "Name": "Predator Focus",
-            "Description": "When only a few enemies are within attack range, increase Attack Damage.",
+            "Description": "When only a few enemies are within attack range, increase {CurrentValue}% Attack Damage.",
             "EffectType": "PredatorFocus",
             "Mode": "Percent",
             "BaseValue": 8,
@@ -413,14 +417,13 @@
         }, {
             "Id": "shrapnel",
             "Name": "Shrapnel",
-            "Description": "Critical hits have a chance to release shrapnel that damages nearby enemies.",
+            "Description": "Critical hits have {CurrentValue}% chance to release shrapnel that damages nearby enemies.",
             "EffectType": "Shrapnel",
             "Mode": "Percent",
             "BaseValue": 15,
             "ValuePerLevel": 2,
             "CardRarity": "Rare",
             "Parameters": {
-                "TriggerChancePercent": 15,
                 "DamageMultiplier": 0.35,
                 "Radius": 2.5,
                 "MaximumTargets": 4
@@ -428,7 +431,7 @@
         }, {
             "Id": "bleeding_edge",
             "Name": "Bleeding Edge",
-            "Description": "Critical hits inflict Bleed, dealing damage over time.",
+            "Description": "Critical hits inflict Bleed, dealing {CurrentValue}% damage over time.",
             "EffectType": "BleedingEdge",
             "Mode": "Percent",
             "BaseValue": 8,
@@ -443,21 +446,19 @@
         }, {
             "Id": "stagger_master",
             "Name": "Stagger Master",
-            "Description": "Enemies affected by Knockback or Stun take increased damage for a short duration.",
+            "Description": "Enemies affected by Knockback or Stun take increased {CurrentValue}% damage for a short duration.",
             "EffectType": "StaggerMaster",
             "Mode": "Percent",
             "BaseValue": 8,
             "ValuePerLevel": 1.5,
             "CardRarity": "Rare",
             "Parameters": {
-                "DamageBonusPercent": 8,
-                "DurationSeconds": 2,
-                "MaximumStacks": 1
+                "DurationSeconds": 3
             }
         }, {
             "Id": "overcharge",
             "Name": "Overcharge",
-            "Description": "When Mana is above 80%, gain Attack Speed. When Mana drops below 20%, convert the remaining charge into a temporary Attack Damage bonus.",
+            "Description": "When Mana is above 80%, gain {CurrentValue}% Attack Speed. When Mana drops below 20%, convert the remaining charge into a temporary {CurrentValue * 1.91}% Attack Damage bonus.",
             "EffectType": "Overcharge",
             "Mode": "Percent",
             "BaseValue": 8,
@@ -466,36 +467,34 @@
             "Parameters": {
                 "HighManaThresholdPercent": 80,
                 "LowManaThresholdPercent": 20,
-                "AttackSpeedBonusPercent": 8,
-                "AttackDamageBonusPercent": 15,
+                "AttackDamageBonusPercent": 1.91,
                 "DurationSeconds": 4
             }
         }, {
             "Id": "danger_zone",
             "Name": "Danger Zone",
-            "Description": "Enemies within close range of the player take increased damage.",
+            "Description": "Enemies within close range of the player take {CurrentValue}% increased damage.",
             "EffectType": "DangerZone",
             "Mode": "Percent",
             "BaseValue": 10,
             "ValuePerLevel": 1.5,
             "CardRarity": "Rare",
             "Parameters": {
-                "Radius": 3.5,
-                "DamageBonusPercent": 10
+                "Radius": 0.75
             }
         }, {
             "Id": "panic_fire",
             "Name": "Panic Fire",
-            "Description": "Gain Attack Speed based on the number of nearby enemies. At max stacks, projectiles pierce 1 additional enemy.",
+            "Description": "Gain Stackx{CurrentValue}% Attack Speed based on the number of nearby enemies. At max stacks, projectiles pierce 1.1 additional enemy.",
             "EffectType": "PanicFire",
             "Mode": "Percent",
             "BaseValue": 5,
             "ValuePerLevel": 1,
             "CardRarity": "Rare",
             "Parameters": {
-                "Radius": 8,
+                "Radius": 1.51,
                 "EnemiesPerStack": 2,
-                "AttackSpeedPerStackPercent": 5,
+                "ProjectilesPierce": 1.1,
                 "MaximumStacks": 12
             }
         }, {
@@ -868,7 +867,7 @@
         }, {
             "Id": "guardian_instinct",
             "Name": "Guardian Instinct",
-            "Description": "Below 30% HP, gain a shield equal to 20% of max HP and +15 Evasion for 6 seconds. Cooldown: 30 seconds. Shield scales with card level.",
+            "Description": "Below 30% HP, gain a shield equal to {CurrentValue}% of max HP and +15 Evasion for 6 seconds. Cooldown: 30 seconds.",
             "EffectType": "GuardianInstinct",
             "Mode": "Percent",
             "BaseValue": 20,
@@ -876,7 +875,7 @@
             "CardRarity": "Legendary",
             "Parameters": {
                 "HealthThresholdPercent": 30,
-                "ShieldDurationSeconds": 6,
+                "DurationSeconds": 6,
                 "CooldownSeconds": 30,
                 "EvasionBonusPercent": 15
             }
@@ -935,16 +934,16 @@
         }, {
             "Id": "soul_harvester",
             "Name": "Soul Harvester",
-            "Description": "Each enemy you kill grants a Soul. Each Soul adds 0.5% Attack Damage. Every 100 kills, the Soul cap increases by 50.",
+            "Description": "Each enemy you kill grants a Soul. Each Soul adds {CurrentValue}% Attack Damage. Every 666 kills, the Soul cap increases by 66.",
             "EffectType": "SoulHarvester",
             "Mode": "Percent",
             "BaseValue": 0.5,
             "ValuePerLevel": 0.1,
             "CardRarity": "Mythic",
             "Parameters": {
-                "InitialSoulCap": 100,
-                "SoulsPerCapIncrease": 100,
-                "SoulCapIncrease": 50
+                "InitialSoulCap": 666,
+                "SoulsPerCapIncrease": 666,
+                "SoulCapIncrease": 66
             }
         }, {
             "Id": "death_reversal",
@@ -1021,7 +1020,7 @@
         }, {
             "Id": "law_of_collapse",
             "Name": "Law of Collapse",
-            "Description": "Every 10 seconds, remove 8% of the highest-HP enemy's current HP, or 2% for Bosses. Volatile targets suffer double the loss. Damage scales with card level.",
+            "Description": "Every 10 seconds, remove {CurrentValue}% of the highest-HP enemy's current HP, or {CurrentValue * 0.25}% for Bosses. Volatile targets suffer double the loss. Damage scales with card level.",
             "EffectType": "LawOfCollapse",
             "Mode": "Percent",
             "BaseValue": 8,
@@ -1029,7 +1028,7 @@
             "CardRarity": "Divine",
             "Parameters": {
                 "IntervalSeconds": 10,
-                "BossCurrentHealthLossPercent": 2,
+                "BossCurrentHealthLossPercent": 0.25,
                 "MarkedDamageMultiplier": 2
             }
         }, {
@@ -1039,7 +1038,7 @@
             "EffectType": "ApexEvolution",
             "Mode": "Flat",
             "BaseValue": 10000,
-            "ValuePerLevel": -50,
+            "ValuePerLevel": -500,
             "CardRarity": "Divine",
             "Parameters": {
                 "ChoicesPerOffer": 3

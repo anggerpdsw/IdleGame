@@ -53,7 +53,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             if (target != null)
             {
                 float lossPercent = target.EnemyData != null && target.EnemyData.IsBoss
-                    ? GetParameter("BossCurrentHealthLossPercent")
+                    ? GetCurrentValue() * GetParameter("BossCurrentHealthLossPercent")
                     : GetCurrentValue();
 
                 if (target.EnemyStatusEffect != null

@@ -2,6 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using IdleDefenseSurvival.Card;
+using IdleDefenseSurvival.Card.Behavior;
+using IdleDefenseSurvival.Card.Behavior.Implementations;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 
@@ -38,6 +40,10 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private TextMeshProUGUI _desperadosText;
         [SerializeField] private GameObject _deathChain;
         [SerializeField] private TextMeshProUGUI _deathChainText;
+        [SerializeField] private GameObject _arcaneResonance;
+        [SerializeField] private TextMeshProUGUI _arcaneResonanceText;
+        [SerializeField] private GameObject _soulHarvester;
+        [SerializeField] private TextMeshProUGUI _soulHarvesterText;
 
         private Player _player;
 
@@ -54,6 +60,7 @@ namespace IdleDefenseSurvival.Player
             _player.Effects.SetBurn(_burnCooldown != null && _burnCooldown.gameObject.activeSelf);
 
             UpdateAngelCooldown();
+            UpdateArcaneResonance();
 
             if (_attackRangeRenderer != null)
                 _attackRangeRenderer.transform.Rotate(
@@ -172,6 +179,24 @@ namespace IdleDefenseSurvival.Player
                 _player.Effects.SetBarrier(false);
         }
 
+        private void UpdateArcaneResonance()
+        {
+            if (_arcaneResonance == null) return;
+
+            var behavior = CardRuntimeManager.Instance?.GetBehavior("arcane_resonance")
+                as ArcaneResonanceCardBehavior;
+
+            bool active = behavior != null && behavior.IsActive;
+            _arcaneResonance.SetActive(active);
+
+            if (active && _arcaneResonanceText != null)
+            {
+                int attacks = behavior.AttacksRemaining;
+                float seconds = behavior.RemainingDuration;
+                _arcaneResonanceText.text = $"{attacks} \r\n {seconds:0.1}s";
+            }
+        }
+
         public void RefreshCardBonusUI()
         {
             bool gambler = CardModifierService.HasEffect(CardEffectType.CrazyGambler);
@@ -185,6 +210,10 @@ namespace IdleDefenseSurvival.Player
             bool chain = CardModifierService.HasEffect(CardEffectType.DeathChain);
             SetBonus(_deathChain, _deathChainText, chain,
                 $"s{CardModifierService.GetDeathChainStack():0}");
+
+            bool soulHarvester = CardModifierService.HasEffect(CardEffectType.SoulHarvester);
+            SetBonus(_soulHarvester, _soulHarvesterText, soulHarvester,
+                $"{CardModifierService.GetSoulHarvesterSoulCount()} \r\n {CardModifierService.GetSoulHarvesterMaxStack()}");
         }
 
         private static void SetBonus(

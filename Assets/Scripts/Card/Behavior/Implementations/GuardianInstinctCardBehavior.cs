@@ -72,7 +72,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             ModifierManager.Instance.AddModifier(evasionModifier);
 
             _cooldownRemaining = GetParameter("CooldownSeconds");
-            _activeRemaining = GetParameter("ShieldDurationSeconds");
+            _activeRemaining = GetParameter("DurationSeconds");
             _active = true;
 
             return true;

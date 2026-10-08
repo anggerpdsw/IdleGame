@@ -10,7 +10,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
     public sealed class BleedingEdgeCardBehavior : CardBehaviorBase
     {
         public override CardEffectType EffectType => CardEffectType.BleedingEdge;
-        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack, CardEventType.OnCriticalHit };
+        public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnCriticalHit };
 
         private float _bleedChancePercent;
         private float _durationSeconds;
@@ -26,23 +26,31 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 3f));
         }
 
-        public void TryApplyBleed(EnemyAi enemy, float attackDamage, bool isCriticalHit)
+        public override void OnCriticalHit(bool isCriticalHit, float damage, Vector2 position)
         {
-            if (!isCriticalHit || enemy == null) return;
+            if (!isCriticalHit) return;
             if (!Utilityku.Chance(_bleedChancePercent)) return;
-            ApplyBleed(enemy, attackDamage);
+            
+            float finalDamage = damage * GetCurrentValue() * 0.01f;
+            // Find enemy at hit position
+            var colliders = Physics2D.OverlapCircleAll(position, 0.5f, LayerMask.GetMask("Enemy"));
+            foreach (var col in colliders)
+            {
+                if (col == null) continue;
+                if (col.TryGetComponent<EnemyAi>(out var enemy)) 
+                    ApplyBleed(enemy, finalDamage);
+            }
         }
 
-        private void ApplyBleed(EnemyAi enemy, float baseDamage)
+        private void ApplyBleed(EnemyAi enemy, float finalDamage)
         {
             if (!enemy.TryGetComponent<EnemyStatusEffectController>(out var statusController)) return;
 
-            float dps = baseDamage * _damagePerSecondMultiplier;
+            float dps = finalDamage * _damagePerSecondMultiplier;
             int currentStacks = statusController.GetBleedStacks();
 
             if (currentStacks >= _maximumStacks)
             {
-                // Refresh duration instead of adding new stack
                 statusController.RefreshBleed(_durationSeconds, dps);
             }
             else

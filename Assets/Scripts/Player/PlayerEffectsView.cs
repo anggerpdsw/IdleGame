@@ -9,6 +9,8 @@ namespace IdleDefenseSurvival.Player
         [SerializeField] private SpriteRenderer _barrierRenderer;
         [SerializeField] private SpriteRenderer _iceRenderer;
         [SerializeField] private SpriteRenderer _burnRenderer;
+        
+        [Header("Card Bonus")]
         [SerializeField] private Image _berserkerImage;
         [SerializeField] private Image _vampireImage;
 
