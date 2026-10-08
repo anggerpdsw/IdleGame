@@ -198,6 +198,17 @@ namespace IdleDefenseSurvival.Card.Behavior
         public void NotifyApexEvolutionChoicesUpdated()
             => OnApexEvolutionChoicesUpdated?.Invoke();
 
+        /// <summary>
+        /// Get all active behaviors that implement ICardHUDProvider.
+        /// Used by CardBonusUI to display card effects without knowing specific card types.
+        /// </summary>
+        public IEnumerable<ICardHUDProvider> GetHUDProviders()
+        {
+            foreach (var behavior in _activeBehaviors.Values)
+                if (behavior is ICardHUDProvider provider)
+                    yield return provider;
+        }
+
         public IReadOnlyList<CardMutationDefinition> GetApexEvolutionChoices()
             => (GetBehavior("apex_evolution") as ApexEvolutionCardBehavior)?.PendingChoices
                 ?? Array.Empty<CardMutationDefinition>();

@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior
 {
@@ -175,6 +176,7 @@ namespace IdleDefenseSurvival.Card.Behavior
         public virtual void Update(float deltaTime) { }
 
         public virtual float GetCurrentValue() => _runtimeState?.CurrentValue ?? 0f;
+        public virtual Sprite GetCardIcon() => CardResources.GetIcon(_runtimeState?.CardId) ?? null;
 
         public virtual CardEventType[] SubscribedEvents => Array.Empty<CardEventType>();
 

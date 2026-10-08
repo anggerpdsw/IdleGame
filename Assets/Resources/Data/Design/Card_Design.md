@@ -117,6 +117,71 @@ Owned card instances are keyed by stable card ID and store level plus remaining 
 
 Unknown data identifiers are rejected by `CardDatabase`; do not rely on a silent default behavior to hide a typo.
 
+### 6.1 HUD Provider Pattern
+
+**Purpose:** Decouple card effect presentation from `PlayerUIController`, enabling scalable card HUD without modifying UI code for each new card effect.
+
+**Architecture:**
+
+```
+CardRuntimeManager
+    ↓
+ICardHUDProvider[]
+    ↓
+CardBonusUI
+    ↓
+CardBonusWidget[]
+```
+
+**Implementation:**
+
+Behaviors implementing `ICardHUDProvider` expose HUD state via `GetHUDData()`:
+
+```csharp
+public interface ICardHUDProvider
+{
+    CardEffectType EffectType { get; }
+    CardHUDData GetHUDData();
+}
+
+public readonly struct CardHUDData
+{
+    public readonly bool Visible;
+    public readonly string Value;
+}
+```
+
+`CardRuntimeManager.GetHUDProviders()` returns all active behaviors implementing `ICardHUDProvider`. `CardBonusUI` iterates providers and routes `CardHUDData` to matching widgets via `CardEffectType`.
+
+**Current implementations:**
+- `ArcaneResonanceCardBehavior` — attack count + remaining duration
+- `CrazyGamblerCardBehavior` — current bonus percentage
+- `DesperadosCardBehavior` — current bonus percentage
+- `DeathChainCardBehavior` — current stack count
+- `SoulHarvesterCardBehavior` — soul count + max stack
+
+**Adding new card HUD:**
+
+1. Implement `ICardHUDProvider` on behavior:
+   ```csharp
+   CardEffectType ICardHUDProvider.EffectType => CardEffectType.NewCard;
+   
+   public CardHUDData GetHUDData()
+   {
+       return new CardHUDData(IsActive, $"{_value:0}%");
+   }
+   ```
+
+2. Add `CardBonusWidget` prefab in Inspector with `Effect Type` assigned to `NewCard`.
+
+3. No changes to `CardBonusUI`, `PlayerUIController`, or `CardRuntimeManager` needed.
+
+**Benefits:**
+- Zero coupling between UI and specific card behaviors
+- New card effects require no UI code changes
+- UI queries generic provider interface, not concrete implementations
+- Widget assignment is data-driven via Inspector
+
 ---
 
 ## 7. Effect Behavior Contract

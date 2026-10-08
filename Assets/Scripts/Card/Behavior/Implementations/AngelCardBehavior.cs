@@ -1,10 +1,11 @@
 using UnityEngine;
+using IdleDefenseSurvival.Core;
 
 using PlayerClass = IdleDefenseSurvival.Player.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class AngelCardBehavior : CardBehaviorBase
+    public sealed class AngelCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.Immortal;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete, CardEventType.OnWaveStart };
@@ -70,5 +71,21 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public float GetCooldownRemaining() => Mathf.Max(_cooldownRemaining, 0f);
         public bool HasImmunity() => _immunityWavesRemaining > 0;
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.Immortal;
+
+        public CardHUDData GetHUDData()
+        {
+            // Ready state: show icon only (no text)
+            // Cooldown state: show icon + remaining time
+            string value = _cooldownRemaining > 0f
+                ? $"{_cooldownRemaining:F1}s"
+                : string.Empty;
+
+            float maxCooldown = GetCurrentValue();
+            float fillAmount = maxCooldown > 0f ? 1f - (_cooldownRemaining / maxCooldown) : 1f;
+
+            return new CardHUDData(GetCardIcon(), value, fillAmount);
+        }
     }
 }

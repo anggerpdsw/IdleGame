@@ -2,10 +2,11 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class ArcaneResonanceCardBehavior : CardBehaviorBase
+    public sealed class ArcaneResonanceCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.ArcaneResonance;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
@@ -99,6 +100,14 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 Permanent = false
             };
             ModifierManager.Instance.AddModifier(critModifier);
+        }
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.ArcaneResonance;
+
+        public CardHUDData GetHUDData()
+        {
+            if (!IsActive) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), $"{_attacksRemaining} \r\n {RemainingDuration:0.1}s");
         }
     }
 }

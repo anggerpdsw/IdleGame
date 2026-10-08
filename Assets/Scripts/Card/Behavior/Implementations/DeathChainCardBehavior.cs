@@ -2,10 +2,11 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class DeathChainCardBehavior : CardBehaviorBase
+    public sealed class DeathChainCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.DeathChain;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
@@ -72,5 +73,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         }
 
         public int GetStackCount() => _currentStack;
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.DeathChain;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_currentStack <= 0) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), $"s{_currentStack:0}");
+        }
     }
 }

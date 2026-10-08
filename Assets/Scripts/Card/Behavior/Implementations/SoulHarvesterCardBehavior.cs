@@ -4,10 +4,11 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class SoulHarvesterCardBehavior : CardBehaviorBase
+    public sealed class SoulHarvesterCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.SoulHarvester;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
@@ -81,5 +82,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public int GetSoulCount() => _soulCount;
         public int GetMaxStack() => _maxStack;
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.SoulHarvester;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_soulCount <= 0) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), $"{_soulCount} \r\n {_maxStack}");
+        }
     }
 }

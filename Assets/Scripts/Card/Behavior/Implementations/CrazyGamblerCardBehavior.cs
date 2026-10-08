@@ -3,10 +3,11 @@ using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class CrazyGamblerCardBehavior : CardBehaviorBase
+    public sealed class CrazyGamblerCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.CrazyGambler;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete };
@@ -62,5 +63,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         }
 
         public float GetBonus() => _bonus;
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.CrazyGambler;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_bonus == 0f) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), $"{_bonus:0}%");
+        }
     }
 }
