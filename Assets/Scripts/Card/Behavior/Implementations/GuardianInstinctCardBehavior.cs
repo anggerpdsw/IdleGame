@@ -7,7 +7,7 @@ using PlayerClass = IdleDefenseSurvival.Player.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class GuardianInstinctCardBehavior : CardBehaviorBase
+    public sealed class GuardianInstinctCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.GuardianInstinct;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged };
@@ -45,7 +45,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public bool CanTrigger()
         {
-            return _cooldownRemaining <= 0f && !_active;
+            return _cooldownRemaining <= 0f && !IsActive();
         }
 
         public bool Trigger()
@@ -80,7 +80,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public override void Update(float deltaTime)
         {
-            if (_active)
+            if (IsActive())
             {
                 _activeRemaining -= deltaTime;
                 if (_activeRemaining <= 0f)
@@ -105,5 +105,29 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public float GetCooldownRemaining() => Mathf.Max(_cooldownRemaining, 0f);
         public bool IsActive() => _active;
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.GuardianInstinct;
+
+        public CardHUDData GetHUDData()
+        {
+            // Active (shield) state: show remaining active time, fill drains as duration expires
+            if (IsActive())
+            {
+                float maxDuration = GetParameter("DurationSeconds");
+                float fillAmount = maxDuration > 0f ? _activeRemaining / maxDuration : 1f;
+                return new CardHUDData(GetCardIcon(), $"{_activeRemaining:F1}s", fillAmount);
+            }
+
+            // Cooldown state: show remaining cooldown, fill grows as cooldown completes
+            if (_cooldownRemaining > 0f)
+            {
+                float maxCooldown = GetParameter("CooldownSeconds");
+                float fillAmount = maxCooldown > 0f ? 1f - (_cooldownRemaining / maxCooldown) : 1f;
+                return new CardHUDData(GetCardIcon(), $"{_cooldownRemaining:F1}s", fillAmount);
+            }
+
+            // Ready state: icon shown, no text, full fill
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
+        }
     }
 }

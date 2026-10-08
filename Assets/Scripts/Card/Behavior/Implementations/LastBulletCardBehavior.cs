@@ -4,7 +4,7 @@ using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class LastBulletCardBehavior : CardBehaviorBase
+    public sealed class LastBulletCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.LastBullet;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
@@ -56,5 +56,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public bool IsGuaranteedHit()
             => GetParameter("GuaranteedHit", 1f) > 0.5f;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_bulletInterval > 0)
+            {
+                float fill = (float)_attackCount / _bulletInterval;
+                return new CardHUDData(GetCardIcon(), $"{_attackCount}/{_bulletInterval}", fill);
+            }
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
+        }
     }
 }

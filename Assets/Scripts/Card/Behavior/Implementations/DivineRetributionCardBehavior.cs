@@ -8,7 +8,7 @@ using PlayerClass = IdleDefenseSurvival.Player.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class DivineRetributionCardBehavior : CardBehaviorBase
+    public sealed class DivineRetributionCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         private readonly Queue<(float Time, float Damage)> _recentDamage = new();
         private readonly List<EnemyAi> _enemyBuffer = new();
@@ -86,6 +86,16 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     enemy.TakeDamage(damageData);
             }
             _enemyBuffer.Clear();
+        }
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.DivineRetribution;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_cooldownRemaining <= 0f) return new CardHUDData(null, string.Empty);
+            float maxCooldown = GetParameter("CooldownSeconds");
+            float fillAmount = maxCooldown > 0f ? 1f - (_cooldownRemaining / maxCooldown) : 1f;
+            return new CardHUDData(GetCardIcon(), $"{_cooldownRemaining:F1}s", fillAmount);
         }
     }
 }

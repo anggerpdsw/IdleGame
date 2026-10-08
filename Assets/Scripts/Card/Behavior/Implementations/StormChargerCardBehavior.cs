@@ -2,12 +2,11 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Enemy;
-using IdleDefenseSurvival.Player;
 using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class StormChargerCardBehavior : CardBehaviorBase
+    public sealed class StormChargerCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.StormCharger;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
@@ -69,6 +68,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     enemy.TakeDamage(damageData);
                 }
             }
+        }
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.StormCharger;
+
+        public CardHUDData GetHUDData()
+        {
+            int remaining = _chargePerAttack - _attackCount;
+            if (remaining <= 0) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), remaining.ToString());
         }
     }
 }

@@ -5,7 +5,7 @@ using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class FeastOrFamineCardBehavior : CardBehaviorBase
+    public sealed class FeastOrFamineCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.FeastOrFamine;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnWaveComplete };
@@ -144,6 +144,18 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnUpgrade(state, oldLevel, newLevel);
             ApplyModifiers();
+        }
+
+        public CardHUDData GetHUDData()
+        {
+            if (_hasActiveEffect)
+            {
+                int remaining = Mathf.Max(_remainingFeastWaves, _remainingFamineWaves);
+                string label = _currentFeastStacks > 0 ? $"Feast x{_currentFeastStacks}" : "Famine";
+                float fill = _durationWaves > 0 ? (float)remaining / _durationWaves : 1f;
+                return new CardHUDData(GetCardIcon(), label, fill);
+            }
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
         }
     }
 }

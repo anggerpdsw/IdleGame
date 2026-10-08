@@ -5,7 +5,7 @@ using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class ApocalypseEngineCardBehavior : CardBehaviorBase
+    public sealed class ApocalypseEngineCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.ApocalypseEngine;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
@@ -87,5 +87,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         }
 
         public int GetStacks() => _stacks;
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.ApocalypseEngine;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_stacks <= 0) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), _stacks.ToString());
+        }
     }
 }

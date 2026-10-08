@@ -174,7 +174,6 @@ namespace IdleDefenseSurvival.Player
         public void SetBarrierEffect(bool enabled) => Effects.SetBarrier(enabled);
         public void SetIceEffect(bool enabled) => Effects.SetIce(enabled);
         public void SetBurnEffect(bool enabled) => Effects.SetBurn(enabled);
-        public void SetBerserkerEffect(bool enabled) => Effects.SetBerserker(enabled);
         public void SetVampireEffect(bool enabled) => Effects.SetVampire(enabled);
 
         private void OnDestroy()

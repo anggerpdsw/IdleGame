@@ -6,7 +6,7 @@ using PlayerClass = IdleDefenseSurvival.Player.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class OverchargeCardBehavior : CardBehaviorBase
+    public sealed class OverchargeCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.Overcharge;
         public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
@@ -143,6 +143,18 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     }
                 }
             }
+        }
+
+        public CardHUDData GetHUDData()
+        {
+            if (_lowManaEffectActive)
+            {
+                float fill = _durationSeconds > 0f ? _lowManaEffectTimer / _durationSeconds : 1f;
+                return new CardHUDData(GetCardIcon(), $"{_lowManaEffectTimer:F1}s", fill);
+            }
+            if (_wasHighMana)
+                return new CardHUDData(GetCardIcon(), "⚡", 1f);
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
         }
     }
 }

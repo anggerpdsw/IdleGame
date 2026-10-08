@@ -6,7 +6,7 @@ using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class VampiricFrenzyCardBehavior : CardBehaviorBase
+    public sealed class VampiricFrenzyCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.VampiricFrenzy;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnLifeSteal };
@@ -91,6 +91,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 Permanent = false
             };
             ModifierManager.Instance.AddModifier(modifier);
+        }
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.VampiricFrenzy;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_stackExpiryTimes.Count <= 0) return new CardHUDData(null, string.Empty);
+            int maxStacks = Mathf.RoundToInt(GetParameter("MaximumStacks"));
+            return new CardHUDData(GetCardIcon(), $"{_stackExpiryTimes.Count} \r\n {maxStacks}");
         }
     }
 }

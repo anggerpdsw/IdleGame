@@ -7,7 +7,7 @@ using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class ReturningEchoCardBehavior : CardBehaviorBase
+    public sealed class ReturningEchoCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.ReturningEcho;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
@@ -63,5 +63,15 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public int GetMaximumReturnTargets() => _maximumReturnTargets;
 
         public float GetTriggerDistance() => _triggerDistance;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_cooldownTimer > 0f)
+            {
+                float fill = _returnCooldownSeconds > 0f ? 1f - (_cooldownTimer / _returnCooldownSeconds) : 1f;
+                return new CardHUDData(GetCardIcon(), $"{_cooldownTimer:F1}s", fill);
+            }
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
+        }
     }
 }

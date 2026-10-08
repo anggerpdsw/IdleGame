@@ -8,7 +8,7 @@ using PlayerClass = IdleDefenseSurvival.Player.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class OverkillConversionCardBehavior : CardBehaviorBase
+    public sealed class OverkillConversionCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.OverkillConversion;
         // Listen for enemy-kill events to capture overkill damage.
@@ -121,6 +121,14 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnUpgrade(state, oldLevel, newLevel);
             ApplyModifier();
+        }
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.OverkillConversion;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_currentStacks <= 0) return new CardHUDData(null, string.Empty);
+            return new CardHUDData(GetCardIcon(), $"s{_currentStacks}");
         }
     }
 }

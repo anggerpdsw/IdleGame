@@ -1,11 +1,10 @@
-using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class AdrenalineLoopCardBehavior : CardBehaviorBase
+    public sealed class AdrenalineLoopCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.AdrenalineLoop;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnEnemyKilled };
@@ -67,6 +66,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 Permanent = false
             };
             ModifierManager.Instance.AddModifier(modifier);
+        }
+
+        public CardHUDData GetHUDData()
+        {
+            if (_effectActive)
+                return new CardHUDData(GetCardIcon(), "Active", 1f);
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
         }
     }
 }

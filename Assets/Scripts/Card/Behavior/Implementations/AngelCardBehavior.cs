@@ -1,5 +1,4 @@
 using UnityEngine;
-using IdleDefenseSurvival.Core;
 
 using PlayerClass = IdleDefenseSurvival.Player.Player;
 

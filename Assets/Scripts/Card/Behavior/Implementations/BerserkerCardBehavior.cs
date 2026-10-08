@@ -7,7 +7,7 @@ using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class BerserkerCardBehavior : CardBehaviorBase
+    public sealed class BerserkerCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.Berserker;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerDamaged, CardEventType.OnPlayerHealed };
@@ -66,7 +66,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             if (player == null || _maxPercent <= 0f)
             {
                 ModifierManager.Instance.RemoveModifier(ModifierId);
-                player?.SetBerserkerEffect(false);
                 return;
             }
 
@@ -93,7 +92,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 };
                 ModifierManager.Instance.AddModifier(modifier);
             }
-            player.SetBerserkerEffect(isActive);
         }
 
         private void Cleanup()
@@ -109,5 +107,20 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         }
 
         public override void Dispose() => Cleanup();
+
+        public CardHUDData GetHUDData()
+        {
+            var player = PlayerClass.Instance;
+            if (player == null || _maxPercent <= 0f || player.MaxHealth <= 0f)
+                return new CardHUDData(null, string.Empty, 0f);
+
+            float missingPercent = (player.MaxHealth - player.CurrentHealth) / player.MaxHealth * 100f;
+            float bonusPercent = Mathf.Min(missingPercent, _maxPercent);
+
+            if (bonusPercent <= 0f)
+                return new CardHUDData(null, string.Empty, 0f);
+
+            return new CardHUDData(GetCardIcon(), $"+{bonusPercent:F0}%", bonusPercent / _maxPercent);
+        }
     }
 }

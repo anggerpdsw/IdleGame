@@ -5,7 +5,7 @@ using IdleDefenseSurvival.Stats;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class MomentumCoreCardBehavior : CardBehaviorBase
+    public sealed class MomentumCoreCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.MomentumCore;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
@@ -78,5 +78,18 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         }
 
         public int GetStackCount() => _currentStack;
+
+        public CardHUDData GetHUDData()
+        {
+            if (_currentStack > 0)
+            {
+                float elapsed = Time.time - _lastKillTime;
+                float window = GetParameter("StackDurationSeconds");
+                float remaining = Mathf.Max(0f, window - elapsed);
+                float fill = window > 0f ? remaining / window : 1f;
+                return new CardHUDData(GetCardIcon(), $"x{_currentStack}", fill);
+            }
+            return new CardHUDData(GetCardIcon(), string.Empty, 1f);
+        }
     }
 }
