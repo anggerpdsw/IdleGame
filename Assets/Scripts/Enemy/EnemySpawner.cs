@@ -244,12 +244,8 @@ namespace IdleDefenseSurvival.Enemy
             foreach (EnemyData enemy in EnemyDatabase.enemies)
             {
                 if (!IsEnemyEligible(enemy, currentWave, currentTier)) continue;
-
-                // Apply Event System spawn weight modifier
-                float eventMod = Core.ServiceLocator.EventService?.GetSpawnWeightModifier(enemy.id) ?? 1f;
-                float adjustedWeight = enemy.spawnWeight * eventMod;
-
-                randomValue -= adjustedWeight;
+                // Apply Event Hook Enemy Spawn → Escalation modifier
+                randomValue -= enemy.spawnWeight * GetSpawnWeightModifier(enemy);
                 if (randomValue <= 0f) return enemy;
             }
 
@@ -262,10 +258,13 @@ namespace IdleDefenseSurvival.Enemy
             foreach (EnemyData enemy in EnemyDatabase.enemies)
             {
                 if (!IsEnemyEligible(enemy, currentWave, currentTier)) continue;
-                totalWeight += enemy.spawnWeight;
+                totalWeight += enemy.spawnWeight * GetSpawnWeightModifier(enemy);
             }
             return totalWeight;
         }
+
+        private float GetSpawnWeightModifier (EnemyData enemy)
+            => ServiceLocator.EventService?.GetSpawnWeightModifier(enemy.id) ?? 1f;
 
         private bool IsEnemyEligible(EnemyData enemy, int currentWave, int currentTier)
         {

@@ -4,6 +4,7 @@ using IdleDefenseSurvival.Mission;
 using IdleDefenseSurvival.Ultimate;
 using IdleDefenseSurvival.UI;
 using IdleDefenseSurvival.Card.Behavior;
+using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Enemy
 {
@@ -28,29 +29,29 @@ namespace IdleDefenseSurvival.Enemy
             // Step 1: Record kill in save system
             RecordEnemyKill(enemy, lastDamageSource);
 
-            // Step 1a: Notify Event System
-            Core.ServiceLocator.EventService?.RegisterKill(enemy.EnemyData.IsElite, enemy.EnemyData.IsBoss, enemy?.EnemyData?.id ?? "unknown");
+            // Step 2: Notify Event System
+            RegisterKillEvent(enemy);
 
-            // Step 1b: Notify card effects (HealOnKill, etc.)
+            // Step 3: Notify card effects (HealOnKill, etc.)
             OnEnemyKilled?.Invoke(enemy, lastDamageSource);
 
-            // Step 1c: Dispatch to CardRuntimeManager for behavior-driven card effects
+            // Step 4: Dispatch to CardRuntimeManager for behavior-driven card effects
             // ApocalypseEngine, SoulHarvester, ChainReaction, BatStalker, HealOnKill all subscribe to OnEnemyKilled
             CardRuntimeManager.Instance?.DispatchEnemyKilled(1, enemy?.EnemyData?.id ?? "unknown", lastDamageSource, enemy);
 
-            // Step 2-3: Ultimate triggers (Lightning, Cloud)
+            // Step 5: Ultimate triggers (Lightning, Cloud)
             ProcessUltimateTriggers(enemy, lastDamageSource);
 
-            // Step 4-6: Cleanup registrations
+            // Step 6: Cleanup registrations
             CleanupRegistrations(enemy);
 
-            // Step 7-8: Drop rewards and materials
+            // Step 7: Drop rewards and materials
             DropAllRewards(enemy);
 
-            // Step 9: Update missions
+            // Step 8: Update missions
             UpdateMissions(enemy);
 
-            // Step 9b: Necromancer special death handling
+            // Step 9: Necromancer special death handling
             if (enemy.EnemyData?.id == Behavior.Necromancer.ToString() &&
                 enemy.TryGetComponent<NecromancerBehavior>(out var necroBehavior))
             {
@@ -160,6 +161,18 @@ namespace IdleDefenseSurvival.Enemy
 
             // Material drops
             EnemyRewardDistributor.DropMaterialItems(enemy.EnemyData);
+        }
+
+        /// <summary>
+        // Hook Enemy Death → Threat naik
+        /// </summary>
+        private static void RegisterKillEvent(EnemyAi enemy)
+        {
+            ServiceLocator.EventService?.RegisterKill(
+                enemy.EnemyData.IsElite,
+                enemy.EnemyData.IsBoss,
+                enemy?.EnemyData?.id ?? "unknown"
+            );
         }
 
         /// <summary>

@@ -1,6 +1,8 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Events;
 
 namespace IdleDefenseSurvival.UI.Event
 {
@@ -26,7 +28,7 @@ namespace IdleDefenseSurvival.UI.Event
 
         private void OnEnable()
         {
-            var eventService = Core.ServiceLocator.EventService as Events.EventService;
+            var eventService = ServiceLocator.EventService as EventService;
             if (eventService != null)
             {
                 eventService.OnIncidentTriggered += ShowIncident;
@@ -35,7 +37,7 @@ namespace IdleDefenseSurvival.UI.Event
 
         private void OnDisable()
         {
-            var eventService = Core.ServiceLocator.EventService as Events.EventService;
+            var eventService = ServiceLocator.EventService as EventService;
             if (eventService != null)
             {
                 eventService.OnIncidentTriggered -= ShowIncident;

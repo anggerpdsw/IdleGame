@@ -321,9 +321,12 @@ namespace IdleDefenseSurvival.Manager
         private void CompleteWave()
         {
             // =====================================================
-            // 1 WAVE COMPLETED
+            // 1. WAVE COMPLETED
             MissionService.Instance?.UpdateProgress(MissionEventType.WaveCompleted, null, 1);
+
             // =====================================================
+            // 2. Hook Wave Complete → Event Objective progress
+            ServiceLocator.EventService?.RegisterWaveCompleted();
 
             // Record progress before transitioning to inter‑wave
             SaveManager.Instance.UpdateHighestWave(CurrentTier, CurrentWave);

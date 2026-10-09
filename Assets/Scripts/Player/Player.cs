@@ -7,6 +7,7 @@ using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Card.Behavior;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Stats;
+using IdleDefenseSurvival.Card.Behavior.Implementations;
 
 namespace IdleDefenseSurvival.Player
 {
@@ -112,9 +113,13 @@ namespace IdleDefenseSurvival.Player
             CardModifierService.Refresh();
             CardModifierService.OnModifierChanged += UI.RefreshCardBonusUI;
             if (CardRuntimeManager.Instance != null)
+            {
                 CardRuntimeManager.Instance.OnBehaviorsUpdated += UI.RefreshCardBonusUI;
+                CardRuntimeManager.Instance.OnBehaviorsUpdated += RefreshVampireVisual;
+            }
 
             UI.RefreshCardBonusUI();
+            RefreshVampireVisual();
         }
 
         private void Update()
@@ -175,12 +180,34 @@ namespace IdleDefenseSurvival.Player
         public void SetIceEffect(bool enabled) => Effects.SetIce(enabled);
         public void SetBurnEffect(bool enabled) => Effects.SetBurn(enabled);
         public void SetVampireEffect(bool enabled) => Effects.SetVampire(enabled);
+        private void RefreshVampireVisual()
+        {
+            bool hasVampire = false;
+            var mgr = CardRuntimeManager.Instance;
+            if (mgr != null)
+            {
+                foreach (var behavior in mgr.ActiveBehaviors.Values)
+                {
+                    if (behavior is HealOnKillCardBehavior ||
+                        behavior is VampiricFrenzyCardBehavior ||
+                        behavior is BatStalkerCardBehavior)
+                    {
+                        hasVampire = true;
+                        break;
+                    }
+                }
+            }
+            SetVampireEffect(hasVampire);
+        }
 
         private void OnDestroy()
         {
             CardModifierService.OnModifierChanged -= UI.RefreshCardBonusUI;
             if (CardRuntimeManager.Instance != null)
+            {
                 CardRuntimeManager.Instance.OnBehaviorsUpdated -= UI.RefreshCardBonusUI;
+                CardRuntimeManager.Instance.OnBehaviorsUpdated -= RefreshVampireVisual;
+            }
 
             if (_instance == this) _instance = null;
         }

@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Events;
 using IdleDefenseSurvival.Core;
@@ -7,45 +7,49 @@ using IdleDefenseSurvival.Core;
 namespace IdleDefenseSurvival.UI.Event
 {
     /// <summary>
-    /// Choice dialog (Seal / Harvest / Feed).
-    /// Displays threat delta and reward multiplier per choice.
+    /// Dynamic choice dialog. Instantiates EventChoiceItemUI based on event definition.
+    /// Scalable: supports 2-10+ choices without code changes.
     /// </summary>
-    public class EventChoiceUI : MonoBehaviour
+    public sealed class EventChoiceUI : MonoBehaviour
     {
         [Header("References")]
         [SerializeField] private GameObject _dialogRoot;
         [SerializeField] private TextMeshProUGUI _titleText;
-        [SerializeField] private Button[] _choiceButtons = new Button[3];
-        [SerializeField] private TextMeshProUGUI[] _choiceLabels = new TextMeshProUGUI[3];
-        [SerializeField] private TextMeshProUGUI[] _choiceDescriptions = new TextMeshProUGUI[3];
+        [SerializeField] private Transform _choicesContainer;
+        [SerializeField] private EventChoiceItemUI _choicePrefab;
 
+        private readonly List<EventChoiceItemUI> _activeItems = new();
         private IEventService _eventService;
         private EventDefinition _currentEvent;
 
         private void Awake()
         {
             _eventService = ServiceLocator.EventService;
-            if (_dialogRoot != null) _dialogRoot.SetActive(false);
-
-            for (int i = 0; i < _choiceButtons.Length; i++)
-            {
-                int index = i;
-                if (_choiceButtons[i] != null)
-                    _choiceButtons[i].onClick.AddListener(() => OnChoiceClicked(index));
-            }
+            if (_dialogRoot != null)
+                _dialogRoot.SetActive(false);
         }
 
         public void Show()
         {
+            _eventService ??= ServiceLocator.EventService;
             if (_eventService == null) return;
 
             _currentEvent = _eventService.GetActiveEvent();
-            if (_currentEvent == null) return;
+            if (_currentEvent?.choices == null) return;
+
+            ClearChoices();
 
             if (_dialogRoot != null) _dialogRoot.SetActive(true);
             if (_titleText != null) _titleText.text = "Rift Detected - Choose Your Path";
 
-            PopulateChoices();
+            foreach (var choice in _currentEvent.choices)
+            {
+                if (choice == null) continue;
+
+                var item = Instantiate(_choicePrefab, _choicesContainer);
+                item.Initialize(choice, OnChoiceSelected);
+                _activeItems.Add(item);
+            }
         }
 
         public void Hide()
@@ -53,37 +57,26 @@ namespace IdleDefenseSurvival.UI.Event
             if (_dialogRoot != null) _dialogRoot.SetActive(false);
         }
 
-        private void PopulateChoices()
+        private void OnChoiceSelected(EventChoice choice)
         {
-            if (_currentEvent?.choices == null) return;
+            if (_currentEvent == null || choice == null) return;
 
-            for (int i = 0; i < Mathf.Min(_currentEvent.choices.Length, _choiceButtons.Length); i++)
-            {
-                var choice = _currentEvent.choices[i];
-                if (_choiceLabels[i] != null)
-                    _choiceLabels[i].text = choice.displayName;
-
-                if (_choiceDescriptions[i] != null)
-                {
-                    string threatText = choice.threatDelta > 0 ? $"+{choice.threatDelta}" : choice.threatDelta.ToString();
-                    string rewardText = $"{choice.rewardMultiplier:P0}";
-                    _choiceDescriptions[i].text = $"Threat: {threatText} | Rewards: {rewardText}";
-                }
-            }
+            if (_eventService.MakeChoice(choice.choiceId))
+                Hide();
         }
 
-        private void OnChoiceClicked(int index)
+        private void ClearChoices()
         {
-            if (_currentEvent == null || _currentEvent.choices == null) return;
-            if (index < 0 || index >= _currentEvent.choices.Length) return;
-
-            var choice = _currentEvent.choices[index];
-            bool success = _eventService.MakeChoice(choice.choiceId);
-
-            if (success)
+            foreach (var item in _activeItems)
             {
-                Hide();
+                if (item != null) Destroy(item.gameObject);
             }
+            _activeItems.Clear();
+        }
+
+        private void OnDestroy()
+        {
+            ClearChoices();
         }
     }
 }

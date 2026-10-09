@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using IdleDefenseSurvival.Events;
 using IdleDefenseSurvival.Core;
@@ -23,13 +22,26 @@ namespace IdleDefenseSurvival.UI.Event
 
         private void Awake()
         {
-            _eventService = ServiceLocator.EventService;
             if (_hudRoot != null) _hudRoot.SetActive(false);
+        }
+
+        private void Start()
+        {
+            _eventService = ServiceLocator.EventService;
+
+            // Sync awal jika event sudah aktif sebelum HUD ready
+            if (_eventService != null && _eventService.IsEventActive())
+            {
+                if (_hudRoot != null) _hudRoot.SetActive(true);
+                UpdateThreat(_eventService.CurrentThreat);
+            }
         }
 
         private void OnEnable()
         {
+            _eventService ??= ServiceLocator.EventService;
             if (_eventService == null) return;
+
             _eventService.OnEventStarted += HandleEventStarted;
             _eventService.OnEventEnded += HandleEventEnded;
             _eventService.OnThreatChanged += HandleThreatChanged;
@@ -77,7 +89,9 @@ namespace IdleDefenseSurvival.UI.Event
 
         private void UpdateThreat(int threat)
         {
-            if (_threatBar != null) _threatBar.SetThreat(threat, 100);
+            var evt = _eventService?.GetActiveEvent();
+            int max = evt?.threat?.max ?? 100; // Fallback 100
+            if (_threatBar != null) _threatBar.SetThreat(threat, max);
         }
 
         private void UpdateTimer(EventDefinition evt)

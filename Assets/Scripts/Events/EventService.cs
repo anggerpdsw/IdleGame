@@ -59,7 +59,7 @@ namespace IdleDefenseSurvival.Events
         // -------------------------------------------------------------------
         private Dictionary<string, EventDefinition> _eventDefinitions = new();
         private EventRuntimeState _runtimeState = new();
-        private HashSet<int> _appliedEscalations = new HashSet<int>();
+        private HashSet<int> _appliedEscalations = new();
 
         public string ActiveEventId => _runtimeState.EventId;
         public int CurrentThreat => _runtimeState.Threat;
@@ -321,9 +321,7 @@ namespace IdleDefenseSurvival.Events
             foreach (var obj in evt.objectives)
             {
                 if (obj.type == "SurviveWaves")
-                {
                     IncrementObjective(obj.id, 1);
-                }
             }
 
             // Check wave-based incidents

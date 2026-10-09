@@ -159,6 +159,10 @@ namespace IdleDefenseSurvival.Player
                 _activeBurnEffects.Remove(key);
             }
 
+            // Sync burn visual
+            bool hasBurn = _activeBurnEffects.Count > 0;
+            _player?.SetBurnEffect(hasBurn);
+
             // Burn tick for damage application
             _burnTickTimer += Time.deltaTime;
             if (_burnTickTimer >= BURN_TICK_INTERVAL)
@@ -359,14 +363,7 @@ namespace IdleDefenseSurvival.Player
             CachePlayerReferences();
             if (_player == null) return;
 
-            float totalBurnDamage = 0f;
-
-            foreach (var burn in _activeBurnEffects.Values)
-            {
-                float damagePerSecond = burn.MaxHealthAtApplication * burn.Percent / Mathf.Max(0.1f, burn.Duration);
-                float tickDamage = damagePerSecond * BURN_TICK_INTERVAL;
-                totalBurnDamage += tickDamage;
-            }
+            float totalBurnDamage = GetTotalBurnDamagePerSecond() * BURN_TICK_INTERVAL;
 
             if (totalBurnDamage > 0f)
             {
