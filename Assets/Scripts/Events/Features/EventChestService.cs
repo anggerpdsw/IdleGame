@@ -2,8 +2,9 @@ using System;
 using UnityEngine;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Economy;
+using IdleDefenseSurvival.Events.Domain;
 
-namespace IdleDefenseSurvival.Events
+namespace IdleDefenseSurvival.Events.Features
 {
     /// <summary>
     /// Event chest gacha service with pity system.
@@ -134,8 +135,8 @@ namespace IdleDefenseSurvival.Events
     [Serializable]
     public class ChestReward
     {
-        public string type; // EventRelic, Gold, Gem, EventCurrency
-        public string itemId; // For EventRelic
+        public string type;
+        public string itemId;
         public long amount;
     }
 }

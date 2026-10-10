@@ -2,7 +2,7 @@ using UnityEngine;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.UI.Event;
 
-namespace IdleDefenseSurvival.Events
+namespace IdleDefenseSurvival.Events.Infrastructure
 {
     /// <summary>
     /// Rift collision handler.
@@ -15,7 +15,6 @@ namespace IdleDefenseSurvival.Events
 
         public void Initialize()
         {
-            // Setup collider as trigger
             var collider = GetComponent<Collider2D>();
             if (collider != null)
             {
@@ -27,7 +26,6 @@ namespace IdleDefenseSurvival.Events
         {
             if (_triggered) return;
 
-            // Check player collision
             if (!other.CompareTag("Player") && other.GetComponent<Player.Player>() == null)
                 return;
 
@@ -42,7 +40,6 @@ namespace IdleDefenseSurvival.Events
             {
                 choiceUI.Show();
 
-                // Subscribe to choice made event to destroy rift
                 var eventService = ServiceLocator.EventService;
                 if (eventService != null)
                 {

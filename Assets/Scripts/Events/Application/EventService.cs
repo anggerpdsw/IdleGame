@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Newtonsoft.Json;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Enemy;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Events.Domain;
 
 namespace IdleDefenseSurvival.Events
 {
@@ -53,6 +53,7 @@ namespace IdleDefenseSurvival.Events
         public event Action<int, int> OnThreatChanged;
         public event Action<string> OnChoiceMade;
         public event Action<string> OnIncidentTriggered;
+        public event Action<EventState, EventState> OnStateChanged;
 
         // -------------------------------------------------------------------
         // State
@@ -64,26 +65,57 @@ namespace IdleDefenseSurvival.Events
         public string ActiveEventId => _runtimeState.EventId;
         public int CurrentThreat => _runtimeState.Threat;
         public long EventScore => _runtimeState.Score;
+        public EventState CurrentState => _runtimeState.State;
+
+        // -------------------------------------------------------------------
+        // State Machine Validation
+        // -------------------------------------------------------------------
+        private bool TransitionTo(EventState newState)
+        {
+            var current = _runtimeState.State;
+            if (current == newState) return true;
+
+            bool valid = (current, newState) switch
+            {
+                (EventState.Idle, EventState.Active) => true,
+                (EventState.Active, EventState.AwaitingChoice) => true,
+                (EventState.AwaitingChoice, EventState.Active) => true,
+                (EventState.Active, EventState.Resolving) => true,
+                (EventState.Resolving, EventState.Completed) => true,
+                (EventState.Resolving, EventState.Failed) => true,
+                (EventState.Completed, EventState.Cooldown) => true,
+                (EventState.Failed, EventState.Cooldown) => true,
+                (EventState.Cooldown, EventState.Idle) => true,
+                (_, EventState.Idle) => true, // emergency reset
+                _ => false
+            };
+
+            if (!valid)
+            {
+                if (_debug) Debug.LogWarning($"[EventService] Illegal state transition: {current} → {newState}");
+                return false;
+            }
+
+            var previousState = _runtimeState.State;
+            _runtimeState.State = newState;
+            OnStateChanged?.Invoke(previousState, newState);
+
+            if (_debug) Debug.Log($"[EventService] State transition: {previousState} → {newState}");
+            return true;
+        }
 
         // -------------------------------------------------------------------
         // Initialization
         // -------------------------------------------------------------------
         private void LoadEventDefinitions()
         {
-            var asset = Resources.Load<TextAsset>("Data/Event/dataEvent");
-            if (asset == null)
-            {
-                if (_debug) Debug.LogWarning("[EventService] dataEvent.json not found.");
-                return;
-            }
-
             try
             {
-                var wrapper = JsonConvert.DeserializeObject<EventDefinitionWrapper>(asset.text);
-                if (wrapper?.events == null) return;
+                var database = DatabaseJSONCache.DatabaseEvent;
+                if (database?.events == null) return;
 
                 _eventDefinitions.Clear();
-                foreach (var evt in wrapper.events)
+                foreach (var evt in database.events)
                 {
                     _eventDefinitions[evt.eventId] = evt;
                 }
@@ -100,7 +132,7 @@ namespace IdleDefenseSurvival.Events
         /// Load runtime state from save data.
         /// Called by SaveManager after load.
         /// </summary>
-        public void LoadState(Data.EventSaveData save)
+        public void LoadState(EventSaveData save)
         {
             if (save == null)
             {
@@ -115,6 +147,15 @@ namespace IdleDefenseSurvival.Events
             {
                 if (_debug) Debug.LogWarning($"[EventService] Active event '{_runtimeState.EventId}' no longer exists. Clearing.");
                 _runtimeState.Reset();
+                return;
+            }
+
+            // RECOVERY: restore boss encounter listener if collapsed but not rewarded
+            if (_runtimeState.IsCollapsed && !_runtimeState.RewardsGranted)
+            {
+                EnemyDeathHandler.OnEnemyKilled -= HandleBossDeath;
+                EnemyDeathHandler.OnEnemyKilled += HandleBossDeath;
+                if (_debug) Debug.Log("[EventService] Restored boss death listener on load.");
             }
 
             if (_debug) Debug.Log($"[EventService] State loaded. Active: {_runtimeState.EventId ?? "none"}");
@@ -125,7 +166,7 @@ namespace IdleDefenseSurvival.Events
         /// Called by SaveManager before save.
         /// Also exposed via IEventService for shop/chest/codex services.
         /// </summary>
-        public Data.EventSaveData GetSaveData()
+        public EventSaveData GetSaveData()
         {
             return _runtimeState.ToSaveData();
         }
@@ -142,17 +183,6 @@ namespace IdleDefenseSurvival.Events
 
         public bool StartEvent(string eventId)
         {
-            // Rotation: resolve actual event from pool
-            if (string.IsNullOrEmpty(eventId) || eventId == "auto")
-            {
-                eventId = GetRotatedEventId();
-                if (eventId == null)
-                {
-                    if (_debug) Debug.LogWarning("[EventService] No rotated event available.");
-                    return false;
-                }
-            }
-
             if (!_eventDefinitions.TryGetValue(eventId, out var evt))
             {
                 if (_debug) Debug.LogWarning($"[EventService] Event '{eventId}' not found.");
@@ -165,16 +195,19 @@ namespace IdleDefenseSurvival.Events
                 return false;
             }
 
+            // Check cooldown
+            if (_runtimeState.NextEventStartAt > 0 && DateTime.UtcNow.Ticks < _runtimeState.NextEventStartAt)
+            {
+                if (_debug) Debug.LogWarning($"[EventService] Event still in cooldown. Next start: {new DateTime(_runtimeState.NextEventStartAt):yyyy-MM-dd HH:mm:ss}");
+                return false;
+            }
+
             _runtimeState.Reset();
             _runtimeState.EventId = eventId;
             _runtimeState.Threat = evt.threat.initial;
 
-            // Set end time based on schedule type
-            if (evt.schedule.type == ScheduleType.OneTime && DateTime.TryParse(evt.schedule.endUtc, out var endTime))
-            {
-                _runtimeState.EventEndsAt = endTime.Ticks;
-            }
-            else if (evt.schedule.durationDays > 0)
+            // Set end time
+            if (evt.schedule.durationDays > 0)
             {
                 _runtimeState.EventEndsAt = DateTime.UtcNow.AddDays(evt.schedule.durationDays).Ticks;
             }
@@ -183,31 +216,11 @@ namespace IdleDefenseSurvival.Events
                 _runtimeState.EventEndsAt = DateTime.UtcNow.AddHours(24).Ticks;
             }
 
+            TransitionTo(EventState.Active);
             OnEventStarted?.Invoke(eventId);
-            if (_debug) Debug.Log($"[EventService] Event started: {eventId}");
+            if (_debug) Debug.Log($"[EventService] Event started: {eventId}, ends at: {new DateTime(_runtimeState.EventEndsAt):yyyy-MM-dd HH:mm:ss}");
 
             return true;
-        }
-
-        /// <summary>
-        /// Get current event from rotation pool.
-        /// Returns null if no rotation event defined.
-        /// ponytail: supports only Rotation type. Add Weekly/Monthly when needed.
-        /// </summary>
-        private string GetRotatedEventId()
-        {
-            foreach (var evt in _eventDefinitions.Values)
-            {
-                if (evt.schedule.type == ScheduleType.Rotation && evt.schedule.rotationPool?.Count > 0)
-                {
-                    if (!DateTime.TryParse(evt.schedule.startUtc, out var anchor)) continue;
-
-                    var daysSinceLaunch = (DateTime.UtcNow - anchor).Days;
-                    var index = daysSinceLaunch / evt.schedule.durationDays % evt.schedule.rotationPool.Count;
-                    return evt.schedule.rotationPool[index];
-                }
-            }
-            return null;
         }
 
         public void EndEvent(bool success)
@@ -215,6 +228,7 @@ namespace IdleDefenseSurvival.Events
             if (string.IsNullOrEmpty(_runtimeState.EventId)) return;
 
             var eventId = _runtimeState.EventId;
+            var evt = GetActiveEvent();
 
             // Unsubscribe from boss death handler if still subscribed
             EnemyDeathHandler.OnEnemyKilled -= HandleBossDeath;
@@ -225,18 +239,37 @@ namespace IdleDefenseSurvival.Events
                 DistributeEventRewards();
             }
 
+            // Calculate next event start time
+            if (evt?.schedule != null && !string.IsNullOrEmpty(evt.schedule.rotationId))
+            {
+                var parts = evt.schedule.rotationId.Split('_');
+                if (parts.Length == 2 && int.TryParse(parts[1], out int cooldownDays))
+                {
+                    _runtimeState.NextEventStartAt = DateTime.UtcNow.AddDays(cooldownDays).Ticks;
+                    if (_debug) Debug.Log($"[EventService] Next event can start at: {new DateTime(_runtimeState.NextEventStartAt):yyyy-MM-dd HH:mm:ss} (cooldown: {cooldownDays} days)");
+                }
+            }
+
             OnEventEnded?.Invoke(eventId, success);
             if (_debug) Debug.Log($"[EventService] Event ended: {eventId}, success={success}");
 
+            // Track completed event before reset
+            if (!string.IsNullOrEmpty(eventId))
+                _runtimeState.CompletedEventIds.Add(eventId);
+
+            var nextStart = _runtimeState.NextEventStartAt;
             _runtimeState.Reset();
+            _runtimeState.NextEventStartAt = nextStart;
+            _runtimeState.RewardsGranted = false;
             _appliedEscalations.Clear();
+
+            TransitionTo(EventState.Idle);
         }
 
         public bool IsEventActive()
         {
             if (string.IsNullOrEmpty(_runtimeState.EventId)) return false;
 
-            // Check expiry
             if (_runtimeState.EventEndsAt > 0)
             {
                 var now = DateTime.UtcNow.Ticks;
@@ -256,7 +289,11 @@ namespace IdleDefenseSurvival.Events
         public void RegisterKill(bool isElite, bool isBoss, string enemyId)
         {
             var evt = GetActiveEvent();
-            if (evt == null) return;
+            if (evt == null)
+            {
+                if (_debug) Debug.LogWarning($"[EventService] RegisterKill failed: No active event. State={_runtimeState.State}");
+                return;
+            }
 
             int delta = 0;
             if (isBoss)
@@ -266,30 +303,29 @@ namespace IdleDefenseSurvival.Events
             else
                 delta = evt.threat.rates.voidKill;
 
-            AddThreat(delta);
+            if (_debug) Debug.Log($"[EventService] RegisterKill: {enemyId} (elite={isElite}, boss={isBoss}) → threat +{delta}");
 
-            // Codex discovery
+            AddThreat(delta);
             RegisterEnemyDiscovered(enemyId);
 
-            // Update kill objectives
             foreach (var obj in evt.objectives)
             {
                 if (obj.type == "KillEnemies" && obj.targetId == enemyId)
                 {
                     IncrementObjective(obj.id, 1);
+                    if (obj.claimPolicy == "auto")
+                    {
+                        TryAutoClaimObjective(obj);
+                    }
                 }
             }
         }
 
-        /// <summary>
-        /// Register enemy discovery for codex unlock.
-        /// </summary>
         private void RegisterEnemyDiscovered(string enemyId)
         {
             var evt = GetActiveEvent();
             if (evt?.codex?.entries == null) return;
 
-            // Check if enemy is in codex entries
             bool isCodexEnemy = false;
             foreach (var entryId in evt.codex.entries)
             {
@@ -300,14 +336,10 @@ namespace IdleDefenseSurvival.Events
                 }
             }
 
-            if (!isCodexEnemy) return;
+            if (!isCodexEnemy || _runtimeState.CodexEntries.Contains(enemyId)) return;
 
-            // Check if already unlocked
-            if (_runtimeState.CodexEntries.Contains(enemyId)) return;
-
-            // Unlock codex entry
             _runtimeState.CodexEntries.Add(enemyId);
-            AddEventCurrency(100); // Discovery reward
+            AddEventCurrency(100);
 
             if (_debug) Debug.Log($"[EventService] Codex entry unlocked: {enemyId}");
         }
@@ -317,21 +349,28 @@ namespace IdleDefenseSurvival.Events
             var evt = GetActiveEvent();
             if (evt == null) return;
 
-            // Update wave-based objectives
             foreach (var obj in evt.objectives)
             {
                 if (obj.type == "SurviveWaves")
+                {
                     IncrementObjective(obj.id, 1);
+                    if (obj.claimPolicy == "auto")
+                    {
+                        TryAutoClaimObjective(obj);
+                    }
+                }
             }
 
-            // Check wave-based incidents
             if (evt.incidents != null)
             {
                 int currentWave = Manager.WaveManager.Instance?.CurrentWave ?? 0;
                 foreach (var incident in evt.incidents)
                 {
-                    if (incident.trigger == "wave" && currentWave % incident.conditions.waveCount == 0)
+                    if (_runtimeState.TriggeredIncidents.Contains(incident.id)) continue;
+
+                    if (incident.trigger == "wave" && currentWave >= incident.conditions.minWave)
                     {
+                        _runtimeState.TriggeredIncidents.Add(incident.id);
                         OnIncidentTriggered?.Invoke(incident.description);
                     }
                 }
@@ -348,29 +387,63 @@ namespace IdleDefenseSurvival.Events
             int oldThreat = _runtimeState.Threat;
             _runtimeState.Threat = Mathf.Clamp(_runtimeState.Threat + delta, evt.threat.min, evt.threat.max);
 
-            if (_runtimeState.Threat != oldThreat)
+            if (_runtimeState.Threat == oldThreat) return;
+
+            OnThreatChanged?.Invoke(oldThreat, _runtimeState.Threat);
+
+            // Apply ALL crossed escalation thresholds (fixes jump from 40 → 80 skipping 50 & 75)
+            if (evt.escalation != null)
             {
-                OnThreatChanged?.Invoke(oldThreat, _runtimeState.Threat);
-
-                // Check catastrophic threshold
-                if (_runtimeState.Threat >= 90 && !_runtimeState.CatastrophicTriggered)
+                foreach (var level in evt.escalation)
                 {
-                    _runtimeState.CatastrophicTriggered = true;
-                    OnIncidentTriggered?.Invoke("catastrophic");
+                    if (oldThreat < level.threshold && _runtimeState.Threat >= level.threshold)
+                    {
+                        if (!_appliedEscalations.Contains(level.threshold))
+                        {
+                            _appliedEscalations.Add(level.threshold);
+                            if (_debug) Debug.Log($"[EventService] Escalation threshold {level.threshold} triggered");
+                        }
+                    }
                 }
+            }
 
-                // Check for collapse → trigger boss spawn
-                if (_runtimeState.Threat >= 100 && !_runtimeState.IsCollapsed)
+            // Threat-based incidents
+            if (evt.incidents != null)
+            {
+                foreach (var incident in evt.incidents)
                 {
-                    _runtimeState.IsCollapsed = true;
-                    TriggerBossSpawn();
+                    if (_runtimeState.TriggeredIncidents.Contains(incident.id)) continue;
+
+                    if (incident.trigger == "threat" && _runtimeState.Threat >= incident.conditions.minThreat)
+                    {
+                        _runtimeState.TriggeredIncidents.Add(incident.id);
+                        OnIncidentTriggered?.Invoke(incident.description);
+                    }
                 }
+            }
+
+            // Use configurable thresholds instead of hardcoded 90/100
+            int catastrophicThreshold = evt.threat.catastrophicThreshold > 0
+                ? evt.threat.catastrophicThreshold
+                : (int)(evt.threat.max * 0.9f); // fallback: 90% of max
+
+            int collapseThreshold = evt.threat.collapseThreshold > 0
+                ? evt.threat.collapseThreshold
+                : evt.threat.max; // fallback: 100% of max
+
+            if (_runtimeState.Threat >= catastrophicThreshold && !_runtimeState.CatastrophicTriggered)
+            {
+                _runtimeState.CatastrophicTriggered = true;
+                OnIncidentTriggered?.Invoke("catastrophic");
+            }
+
+            if (_runtimeState.Threat >= collapseThreshold && !_runtimeState.IsCollapsed)
+            {
+                _runtimeState.IsCollapsed = true;
+                TriggerBossSpawn();
             }
         }
 
-        /// <summary>
-        /// Spawn event boss when threat reaches 100.
-        /// </summary>
         private void TriggerBossSpawn()
         {
             var evt = GetActiveEvent();
@@ -381,7 +454,6 @@ namespace IdleDefenseSurvival.Events
                 return;
             }
 
-            // Get boss data from database
             var database = DatabaseJSONCache.DatabaseEnemy;
             if (database?.enemies == null)
             {
@@ -406,14 +478,11 @@ namespace IdleDefenseSurvival.Events
                 return;
             }
 
-            // Spawn boss via EnemySpawner
             var spawner = EnemySpawner.Instance;
             if (spawner != null)
             {
                 EnemyData scaledBoss = Utilityku.CreateScaledEnemy(bossData);
                 spawner.SpawnSpecificEnemy(scaledBoss);
-
-                // Subscribe to boss death
                 EnemyDeathHandler.OnEnemyKilled += HandleBossDeath;
 
                 if (_debug) Debug.Log($"[EventService] Boss '{evt.boss.enemyId}' spawned. Threat collapsed.");
@@ -424,16 +493,12 @@ namespace IdleDefenseSurvival.Events
             }
         }
 
-        /// <summary>
-        /// Handle event boss death.
-        /// </summary>
         private void HandleBossDeath(EnemyAi enemy, string source)
         {
             var evt = GetActiveEvent();
             if (evt?.boss?.enemyId == null) return;
             if (enemy?.EnemyData?.id != evt.boss.enemyId) return;
 
-            // Boss defeated - event success
             EnemyDeathHandler.OnEnemyKilled -= HandleBossDeath;
 
             if (_debug) Debug.Log($"[EventService] Boss defeated. Event success.");
@@ -445,6 +510,12 @@ namespace IdleDefenseSurvival.Events
         // -------------------------------------------------------------------
         public bool MakeChoice(string choiceId)
         {
+            if (_runtimeState.State != EventState.AwaitingChoice)
+            {
+                if (_debug) Debug.LogWarning("[EventService] MakeChoice called outside AwaitingChoice state");
+                return false;
+            }
+
             var evt = GetActiveEvent();
             if (evt == null) return false;
 
@@ -458,12 +529,10 @@ namespace IdleDefenseSurvival.Events
             AddThreat(choice.threatDelta);
             _runtimeState.ChoiceHistory.Add(choiceId);
 
-            // Apply reward multiplier to next rewards
-            // (Implementation detail: stored in runtime state, applied in DistributeEventRewards)
-
             OnChoiceMade?.Invoke(choiceId);
             if (_debug) Debug.Log($"[EventService] Choice made: {choiceId}, threat delta={choice.threatDelta}");
 
+            TransitionTo(EventState.Active);
             return true;
         }
 
@@ -529,6 +598,21 @@ namespace IdleDefenseSurvival.Events
             _runtimeState.ObjectiveProgress[objectiveId] += amount;
         }
 
+        private void TryAutoClaimObjective(EventObjective obj)
+        {
+            if (_runtimeState.ObjectiveClaimed.Contains(obj.id)) return;
+
+            var progress = _runtimeState.ObjectiveProgress.ContainsKey(obj.id)
+                ? _runtimeState.ObjectiveProgress[obj.id]
+                : 0;
+
+            if (progress >= obj.target)
+            {
+                GrantObjectiveReward(obj);
+                _runtimeState.ObjectiveClaimed.Add(obj.id);
+            }
+        }
+
         public bool ClaimObjective(string objectiveId)
         {
             if (_runtimeState.ObjectiveClaimed.Contains(objectiveId)) return false;
@@ -539,14 +623,19 @@ namespace IdleDefenseSurvival.Events
             var obj = evt.objectives.FirstOrDefault(o => o.id == objectiveId);
             if (obj == null) return false;
 
-            // Check progress
             var progress = _runtimeState.ObjectiveProgress.ContainsKey(objectiveId)
                 ? _runtimeState.ObjectiveProgress[objectiveId]
                 : 0;
 
             if (progress < obj.target) return false;
 
-            // Grant rewards
+            GrantObjectiveReward(obj);
+            _runtimeState.ObjectiveClaimed.Add(objectiveId);
+            return true;
+        }
+
+        private void GrantObjectiveReward(EventObjective obj)
+        {
             if (obj.reward.eventCurrency > 0)
                 AddEventCurrency(obj.reward.eventCurrency);
             if (obj.reward.gold > 0)
@@ -555,9 +644,6 @@ namespace IdleDefenseSurvival.Events
                 ServiceLocator.EconomyService?.AddCurrency(CurrencyType.Gem, obj.reward.gem, "EventObjective");
             if (obj.reward.meat > 0)
                 ServiceLocator.EconomyService?.AddCurrency(CurrencyType.Meat, obj.reward.meat, "EventObjective");
-
-            _runtimeState.ObjectiveClaimed.Add(objectiveId);
-            return true;
         }
 
         // -------------------------------------------------------------------
@@ -581,14 +667,14 @@ namespace IdleDefenseSurvival.Events
         // -------------------------------------------------------------------
         private void DistributeEventRewards()
         {
+            if (_runtimeState.RewardsGranted) return;
+
             var evt = GetActiveEvent();
             if (evt == null) return;
 
-            // 1. Grant event currency based on score (example formula)
             long currencyReward = _runtimeState.Score / 10;
             AddEventCurrency(currencyReward);
 
-            // 2. Grant relics (add to inventory)
             if (evt.rewards?.relics != null && InventoryService.Instance != null)
             {
                 foreach (var relicId in evt.rewards.relics)
@@ -597,25 +683,21 @@ namespace IdleDefenseSurvival.Events
                 }
             }
 
-            // 3. Pet unlock/duplicate handling
             if (!string.IsNullOrEmpty(evt.pet?.petId))
             {
                 GrantEventPet(evt.pet.petId);
             }
 
             if (_debug) Debug.Log($"[EventService] Rewards distributed: {currencyReward} currency, {evt.rewards?.relics?.Length ?? 0} relics");
+
+            _runtimeState.RewardsGranted = true;
         }
 
-        /// <summary>
-        /// Grant event pet via PetService.
-        /// If already owned, grant duplicate currency.
-        /// </summary>
         private void GrantEventPet(string petId)
         {
             var petService = Core.ServiceLocator.PetService;
             if (petService == null) return;
 
-            // Check if pet already owned
             var activePets = petService.GetActivePets();
             bool alreadyOwned = false;
 
@@ -633,13 +715,11 @@ namespace IdleDefenseSurvival.Events
 
             if (!alreadyOwned)
             {
-                // Unlock new pet
                 petService.GrantPet(petId);
                 if (_debug) Debug.Log($"[EventService] Pet unlocked: {petId}");
             }
             else
             {
-                // Duplicate → grant event currency instead
                 AddEventCurrency(5000);
                 if (_debug) Debug.Log($"[EventService] Pet duplicate converted to 5000 event currency");
             }
@@ -649,7 +729,7 @@ namespace IdleDefenseSurvival.Events
         // Helpers
         // -------------------------------------------------------------------
         [Serializable]
-        private class EventDefinitionWrapper
+        public class EventDefinitionWrapper
         {
             public EventDefinition[] events;
         }

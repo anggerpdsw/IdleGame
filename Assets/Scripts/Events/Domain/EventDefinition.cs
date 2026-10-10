@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace IdleDefenseSurvival.Events
+namespace IdleDefenseSurvival.Events.Domain
 {
-    public enum ScheduleType { OneTime, Weekly, Monthly, Rotation, Recurring }
-
     /// <summary>
     /// Event definition loaded from dataEvent.json.
     /// Single source of truth for event configuration.
@@ -32,12 +30,9 @@ namespace IdleDefenseSurvival.Events
     [Serializable]
     public class EventSchedule
     {
-        public ScheduleType type;
-        public string startUtc;  // for OneTime/Recurring/Rotation anchor
-        public string endUtc;    // for OneTime
-        public List<string> rotationPool;  // for Rotation
-        public int durationDays;           // for Rotation/Weekly/Monthly
-        public string rotationId;          // legacy, optional
+        public int durationDays;
+        public string rotationId;
+        public List<string> rotationPool;
     }
 
     [Serializable]
@@ -46,6 +41,8 @@ namespace IdleDefenseSurvival.Events
         public int initial;
         public int min;
         public int max;
+        public int catastrophicThreshold;  // Boss warning trigger (default: 90% of max)
+        public int collapseThreshold;      // Boss spawn trigger (default: 100% of max)
         public ThreatRates rates;
     }
 
@@ -79,7 +76,7 @@ namespace IdleDefenseSurvival.Events
     [Serializable]
     public class EventModifier
     {
-        public string type; // voidActivity, spawnWeight, mutatedElite, catastrophic
+        public string type;
         public float value;
     }
 
@@ -87,9 +84,10 @@ namespace IdleDefenseSurvival.Events
     public class EventObjective
     {
         public string id;
-        public string type; // SurviveWaves, KillEnemies, CollectCurrency, MakeChoices
-        public string targetId; // enemy ID for KillEnemies
+        public string type;
+        public string targetId;
         public int target;
+        public string claimPolicy;
         public EventObjectiveReward reward;
     }
 
@@ -106,7 +104,7 @@ namespace IdleDefenseSurvival.Events
     public class EventIncident
     {
         public string id;
-        public string trigger; // wave, threat, time
+        public string trigger;
         public EventIncidentConditions conditions;
         public string description;
     }
@@ -114,21 +112,21 @@ namespace IdleDefenseSurvival.Events
     [Serializable]
     public class EventIncidentConditions
     {
-        public int waveCount;
-        public int threatLevel;
+        public int minWave;
+        public int minThreat;
     }
 
     [Serializable]
     public class EventBoss
     {
         public string enemyId;
-        public Dictionary<string, string> stateMap; // threat range → boss state
+        public Dictionary<string, string> stateMap;
     }
 
     [Serializable]
     public class EventRewards
     {
-        public string eventCurrency; // AbyssEssence, VoidFragment, etc.
+        public string eventCurrency;
         public string[] relics;
     }
 
@@ -142,13 +140,13 @@ namespace IdleDefenseSurvival.Events
     public class EventShopItem
     {
         public string itemId;
-        public long price; // event currency
+        public long price;
     }
 
     [Serializable]
     public class EventCodex
     {
-        public string[] entries; // enemy IDs to unlock in codex
+        public string[] entries;
     }
 
     [Serializable]
@@ -161,6 +159,6 @@ namespace IdleDefenseSurvival.Events
     [Serializable]
     public class EventPet
     {
-        public string petId; // pet unlocked on event completion
+        public string petId;
     }
 }

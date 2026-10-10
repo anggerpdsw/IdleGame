@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using IdleDefenseSurvival.Events;
+using IdleDefenseSurvival.Events.Features;
 
 namespace IdleDefenseSurvival.UI.Event
 {

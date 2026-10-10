@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using IdleDefenseSurvival.Card;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Pet;
 using Newtonsoft.Json;
 using UnityEngine;
+using static IdleDefenseSurvival.Events.EventService;
 
 namespace IdleDefenseSurvival.Core
 {
@@ -253,10 +253,31 @@ namespace IdleDefenseSurvival.Core
             var database = JsonConvert.DeserializeObject<CardDataContainer>(jsonFile.text);
             if (database == null || database.Cards == null)
             {
-                Debug.LogError($"Pet database in {DATA_CARD} is empty or invalid.");
+                Debug.LogError($"Card database in {DATA_CARD} is empty or invalid.");
                 return;
             }
             _databaseCard = database;
+        }
+        
+        private const string DATA_EVENT = "Data/Event/dataEvent";
+        private static EventDefinitionWrapper _databaseEvent;
+        public static EventDefinitionWrapper DatabaseEvent
+        { get { if (_databaseEvent == null) LoadEvent(); return _databaseEvent; }}
+        private static void LoadEvent()
+        {
+            TextAsset jsonFile = ResourceCache.Load<TextAsset>(DATA_EVENT);
+            if (jsonFile == null)
+            {
+                Debug.LogError($"Failed to load Resources/{DATA_EVENT}.json");
+                return;
+            }
+            var database = JsonConvert.DeserializeObject<EventDefinitionWrapper>(jsonFile.text);
+            if (database == null || database.events == null)
+            {
+                Debug.LogError($"Event database in {DATA_EVENT} is empty or invalid.");
+                return;
+            }
+            _databaseEvent = database;
         }
         
         public static void ClearAll()
@@ -267,6 +288,7 @@ namespace IdleDefenseSurvival.Core
             _databaseUltimate = null;
             _databasePet = null;
             _databaseCard = null;
+            _databaseEvent = null;
         }
     }
     

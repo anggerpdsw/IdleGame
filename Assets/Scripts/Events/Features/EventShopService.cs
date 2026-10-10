@@ -1,8 +1,9 @@
 using UnityEngine;
 using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Inventory;
+using IdleDefenseSurvival.Events.Domain;
 
-namespace IdleDefenseSurvival.Events
+namespace IdleDefenseSurvival.Events.Features
 {
     /// <summary>
     /// Event Shop transaction service.

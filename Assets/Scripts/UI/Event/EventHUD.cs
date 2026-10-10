@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using IdleDefenseSurvival.Events;
+using IdleDefenseSurvival.Events.Domain;
 using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.UI.Event

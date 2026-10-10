@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using IdleDefenseSurvival.Events.Domain;
 
 namespace IdleDefenseSurvival.Events
 {
@@ -35,6 +36,12 @@ namespace IdleDefenseSurvival.Events
         event Action<string> OnIncidentTriggered;
 
         /// <summary>
+        /// Fired when event state changes. Args: (oldState, newState).
+        /// UI subscribes to this instead of SetActive checks.
+        /// </summary>
+        event Action<EventState, EventState> OnStateChanged;
+
+        /// <summary>
         /// Current active event ID, null if none.
         /// </summary>
         string ActiveEventId { get; }
@@ -48,6 +55,11 @@ namespace IdleDefenseSurvival.Events
         /// Current event score.
         /// </summary>
         long EventScore { get; }
+
+        /// <summary>
+        /// Current event state machine state.
+        /// </summary>
+        EventState CurrentState { get; }
 
         /// <summary>
         /// Get active event definition, null if none.

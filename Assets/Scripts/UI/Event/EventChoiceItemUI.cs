@@ -2,7 +2,7 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using IdleDefenseSurvival.Events;
+using IdleDefenseSurvival.Events.Domain;
 
 namespace IdleDefenseSurvival.UI.Event
 {

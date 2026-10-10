@@ -1,7 +1,8 @@
 using UnityEngine;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.Events.Domain;
 
-namespace IdleDefenseSurvival.Events
+namespace IdleDefenseSurvival.Events.Infrastructure
 {
     /// <summary>
     /// Spawns Rift when incident triggers.
@@ -42,7 +43,6 @@ namespace IdleDefenseSurvival.Events
 
         private void OnIncident(string description)
         {
-            // Trigger on "Rift detected" incident
             if (description != null && description.ToLower().Contains("rift"))
             {
                 SpawnRift();
@@ -53,7 +53,6 @@ namespace IdleDefenseSurvival.Events
         {
             if (_riftPrefab == null || _player == null) return;
 
-            // Random position around player
             Vector2 offset = Random.insideUnitCircle * _spawnRadius;
             Vector3 spawnPos = _player.position + (Vector3)offset;
 

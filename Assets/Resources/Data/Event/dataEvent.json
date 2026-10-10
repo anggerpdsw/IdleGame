@@ -1,217 +1,175 @@
 {
   "events": [{
-      "eventId": "abyss_awakens",
-      "displayName": "Abyss Awakens",
-      "description": "Void energy surges. Ancient rifts tear through reality.",
-      "schedule": {
-        "type": "OneTime",
-        "startUtc": "2026-10-15T00:00:00Z",
-        "endUtc": "2026-10-29T23:59:59Z",
-        "rotationId": "monthly_1"
-      },
-      "threat": {
-        "initial": 0,
-        "min": 0,
-        "max": 100000,
-        "rates": {
-          "voidKill": 1,
-          "eliteKill": 5,
-          "bossKill": 15,
-          "sealRift": -20,
-          "harvestRift": 10,
-          "feedRift": 25
-        }
-      },
-      "choices": [{
-          "choiceId": "seal",
-          "displayName": "Seal Rift",
-          "threatDelta": -20,
-          "rewardMultiplier": 0.8
-        },
-        {
-          "choiceId": "harvest",
-          "displayName": "Harvest Energy",
-          "threatDelta": 10,
-          "rewardMultiplier": 1.5
-        },
-        {
-          "choiceId": "feed",
-          "displayName": "Feed Void",
-          "threatDelta": 25,
-          "rewardMultiplier": 2.0
-        }
-      ],
-      "escalation": [{
-          "threshold": 25,
-          "modifiers": [{
-            "type": "voidActivity",
-            "value": 0.1
-          }]
-        },
-        {
-          "threshold": 50,
-          "modifiers": [{
-            "type": "spawnWeight",
-            "value": 0.2
-          }]
-        },
-        {
-          "threshold": 75,
-          "modifiers": [{
-            "type": "mutatedElite",
-            "value": 1.0
-          }]
-        },
-        {
-          "threshold": 90,
-          "modifiers": [{
-            "type": "catastrophic",
-            "value": 1.0
-          }]
-        }
-      ],
-      "objectives": [{
-          "id": "survive_10",
-          "type": "SurviveWaves",
-          "target": 10,
-          "targetId": "",
-          "reward": {
-            "eventCurrency": 500,
-            "gold": 0,
-            "gem": 0,
-            "meat": 0
-          }
-        },
-        {
-          "id": "kill_100_void",
-          "type": "KillEnemies",
-          "target": 100,
-          "targetId": "void_stalker",
-          "reward": {
-            "eventCurrency": 1000,
-            "gold": 50000,
-            "gem": 10,
-            "meat": 5000
-          }
-        },
-        {
-          "id": "collect_essence",
-          "type": "CollectCurrency",
-          "target": 10000,
-          "targetId": "AbyssEssence",
-          "reward": {
-            "eventCurrency": 2000,
-            "gold": 100000,
-            "gem": 25,
-            "meat": 10000
-          }
-        }
-      ],
-      "incidents": [{
-          "id": "rift_detected",
-          "trigger": "wave",
-          "conditions": {
-            "waveCount": 3,
-            "threatLevel": 0
-          },
-          "description": "Rift detected! Make your choice in 3 waves."
-        },
-        {
-          "id": "void_surge",
-          "trigger": "threat",
-          "conditions": {
-            "waveCount": 0,
-            "threatLevel": 50
-          },
-          "description": "Void energy surges! Spawn rate increased."
-        }
-      ],
-      "boss": {
-        "enemyId": "abyss_devourer",
-        "stateMap": {
-          "0-49": "Normal",
-          "50-74": "Empowered",
-          "75-89": "Mutated",
-          "90-99": "Ascended",
-          "100": "Collapse"
-        }
-      },
-      "rewards": {
-        "eventCurrency": "AbyssEssence",
-        "relics": [
-          "abyss_fang",
-          "void_heart",
-          "rift_eye"
-        ]
-      },
-      "shop": {
-        "items": [{
-            "itemId": "abyss_fang",
-            "price": 5000
-          },
-          {
-            "itemId": "void_heart",
-            "price": 10000
-          },
-          {
-            "itemId": "rift_eye",
-            "price": 15000
-          }
-        ]
-      },
-      "codex": {
-        "entries": [
-          "abyss_stalker",
-          "void_brute",
-          "rift_mage"
-        ]
-      },
-      "chest": {
-        "pity": 20,
-        "rewards": [
-          "Gold",
-          "Gem",
-          "EventRelic",
-          "PetFragment"
-        ]
-      },
-      "pet": {
-        "petId": "riftling"
+    "eventId": "abyss_awakens",
+    "displayName": "Abyss Awakens",
+    "description": "Void energy surges. Ancient rifts tear through reality.",
+    "schedule": {
+      "durationDays": 4,
+      "rotationId": "day_3"
+    },
+    "threat": {
+      "initial": 0,
+      "min": 0,
+      "max": 100000,
+      "catastrophicThreshold": 90000,
+      "collapseThreshold": 100000,
+      "rates": {
+        "voidKill": 1,
+        "eliteKill": 5,
+        "bossKill": 15
       }
     },
-    {
-      "eventId": "rotation_master",
-      "displayName": "Event Rotation",
-      "description": "Cycles through limited-time events every 3 days.",
-      "schedule": {
-        "type": "Rotation",
-        "startUtc": "2026-10-01T00:00:00Z",
-        "durationDays": 3,
-        "rotationPool": ["abyss_awakens", "blood_moon", "predator_night"]
+    "choices": [{
+        "choiceId": "seal",
+        "displayName": "Seal Rift",
+        "threatDelta": -5000,
+        "rewardMultiplier": 0.8
       },
-      "threat": {
-        "initial": 0,
-        "min": 0,
-        "max": 100,
-        "rates": {
-          "voidKill": 1,
-          "eliteKill": 5,
-          "bossKill": 15,
-          "sealRift": -20,
-          "harvestRift": 10,
-          "feedRift": 25
+      {
+        "choiceId": "harvest",
+        "displayName": "Harvest Energy",
+        "threatDelta": 2500,
+        "rewardMultiplier": 1.5
+      },
+      {
+        "choiceId": "feed",
+        "displayName": "Feed Void",
+        "threatDelta": 8000,
+        "rewardMultiplier": 2.0
+      }
+    ],
+    "escalation": [{
+        "threshold": 25000,
+        "modifiers": [{
+          "type": "voidActivity",
+          "value": 0.1
+        }]
+      },
+      {
+        "threshold": 50000,
+        "modifiers": [{
+          "type": "spawnWeight",
+          "value": 0.2
+        }]
+      },
+      {
+        "threshold": 75000,
+        "modifiers": [{
+          "type": "mutatedElite",
+          "value": 1.0
+        }]
+      }
+    ],
+    "objectives": [{
+        "id": "survive_10",
+        "type": "SurviveWaves",
+        "target": 10,
+        "targetId": "",
+        "claimPolicy": "manual",
+        "reward": {
+          "eventCurrency": 500,
+          "gold": 0,
+          "gem": 0,
+          "meat": 0
         }
       },
-      "choices": [],
-      "escalation": [],
-      "objectives": [],
-      "incidents": [],
-      "boss": {},
-      "rewards": {},
-      "shop": {},
-      "codex": {},
-      "chest": {},
-      "pet": {}
+      {
+        "id": "kill_100_void",
+        "type": "KillEnemies",
+        "target": 100,
+        "targetId": "void_stalker",
+        "claimPolicy": "auto",
+        "reward": {
+          "eventCurrency": 1000,
+          "gold": 50000,
+          "gem": 10,
+          "meat": 5000
+        }
+      },
+      {
+        "id": "collect_essence",
+        "type": "CollectCurrency",
+        "target": 10000,
+        "targetId": "AbyssEssence",
+        "claimPolicy": "manual",
+        "reward": {
+          "eventCurrency": 2000,
+          "gold": 100000,
+          "gem": 25,
+          "meat": 10000
+        }
+      }
+    ],
+    "incidents": [{
+        "id": "rift_detected",
+        "trigger": "wave",
+        "conditions": {
+          "minWave": 10,
+          "minThreat": 0
+        },
+        "description": "Rift detected! Make your choice in 3 waves."
+      },
+      {
+        "id": "void_surge",
+        "trigger": "threat",
+        "conditions": {
+          "minWave": 0,
+          "minThreat": 50000
+        },
+        "description": "Void energy surges! Spawn rate increased."
+      }
+    ],
+    "boss": {
+      "enemyId": "abyss_devourer",
+      "stateMap": {
+        "0-49": "Normal",
+        "50-74": "Empowered",
+        "75-89": "Mutated",
+        "90-99": "Ascended",
+        "100": "Collapse"
+      }
+    },
+    "rewards": {
+      "eventCurrency": "AbyssEssence",
+      "relics": [
+        "abyss_fang",
+        "void_heart",
+        "rift_eye"
+      ]
+    },
+    "shop": {
+      "items": [{
+          "itemId": "abyss_fang",
+          "price": 5000
+        },
+        {
+          "itemId": "void_heart",
+          "price": 10000
+        },
+        {
+          "itemId": "rift_eye",
+          "price": 15000
+        }
+      ]
+    },
+    "codex": {
+      "entries": [
+        "abyss_stalker",
+        "void_brute",
+        "rift_mage"
+      ]
+    },
+    "chest": {
+      "pity": 20,
+      "rewards": [
+        "Gold",
+        "Gem",
+        "EventRelic",
+        "PetFragment"
+      ]
+    },
+    "pet": {
+      "petId": "riftling"
     }
-  ]
+  }]
 }
