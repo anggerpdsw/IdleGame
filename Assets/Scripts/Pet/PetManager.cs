@@ -5,6 +5,7 @@ using UnityEngine;
 using PlayerClass = IdleDefenseSurvival.Player.Player;
 using IdleDefenseSurvival.Pet.Behavior;
 using IdleDefenseSurvival.Core;
+using IdleDefenseSurvival.UI;
 
 namespace IdleDefenseSurvival.Pet
 {
@@ -74,19 +75,18 @@ namespace IdleDefenseSurvival.Pet
         private void Start()
         {
             LoadPetDefinitions();
-            TryBindPlayer();
-
-            // DEBUG: Check setup
-            Debug.Log($"[PetManager] Prefab assigned: {_petPrefab != null}, Container assigned: {_petContainer != null}");
-            Debug.Log($"[PetManager] Equipped pets: {_equippedPets.Count}, Owned pets: {_ownedPets.Count}");
         }
 
         private void Update()
         {
+            // Skip if no pets equipped — idle di main menu
+            if (_equippedPets.Count == 0) return;
+
             // Late-bind Player if not available at Start (Bootstrap → Game transition)
             if (_player == null)
             {
                 TryBindPlayer();
+                if (_player == null) return; // Still in menu, player belum spawn
             }
 
             float deltaTime = Time.deltaTime;
@@ -96,12 +96,10 @@ namespace IdleDefenseSurvival.Pet
             {
                 if (pet == null) continue;
 
-                // Spawn visual if not yet instantiated (late equip after Player exists)
-                if (pet.GameObject == null && _petPrefab != null && _petContainer != null)
+                // Spawn visual if not yet ready (late equip after Player exists)
+                if (pet.GameObject == null)
                 {
-                    var petObj = Instantiate(_petPrefab, _petContainer);
-                    pet.GameObject = petObj;
-                    pet.Transform = petObj.transform;
+                    SpawnPetVisual(pet);
                     Debug.Log($"[PetManager] Late-spawned visual for {pet.PetId}");
                 }
 
@@ -138,17 +136,11 @@ namespace IdleDefenseSurvival.Pet
 
             // Auto-assign Player as container if not set in Inspector
             if (_petContainer == null)
-            {
                 _petContainer = _player.transform;
-                Debug.Log("[PetManager] Auto-assigned Player as pet container");
-            }
 
             // Auto-assign Prefab if not set in Inspector
             if (_petPrefab == null)
-            {
                 _petPrefab = Resources.Load<GameObject>("Art/Pet/Pet");
-                if (_petPrefab == null) Debug.LogError("[PetManager] Failed to load Pet prefab from Resources/Art/Pet/Pet");
-            }
         }
 
         /// <summary>
@@ -461,17 +453,12 @@ namespace IdleDefenseSurvival.Pet
             // Already equipped
             if (_equippedPets.Contains(pet)) return false;
             if (_equippedPets.Count >= _unlockedSlots) return false;
-            // Spawn visual GameObject
-            if (_petPrefab != null && _petContainer != null)
-            {
-                var petObj = Instantiate(_petPrefab, _petContainer);
-                pet.GameObject = petObj;
-                pet.Transform = petObj.transform;
-                pet.OrbitIndex = _equippedPets.Count; // Assign orbit position
-                Debug.Log($"[PetManager] Spawned visual for {pet.PetId} at {petObj.transform.position}");
-            }
+
+            SpawnPetVisual(pet);
+
             _equippedPets.Add(pet);
             pet.CurrentState = PetState.Follow;
+            RefreshOrbitIndices(); // Update all indices + snap to formation
             OnPetEquipped?.Invoke(pet);
             return true;
         }
@@ -488,8 +475,51 @@ namespace IdleDefenseSurvival.Pet
                 pet.GameObject = null;
                 pet.Transform = null;
             }
+            RefreshOrbitIndices(); // Update remaining pets' indices
             OnPetUnequipped?.Invoke(pet);
             return true;
+        }
+
+        /// <summary>
+        /// Reassign OrbitIndex untuk semua equipped pets (0, 1, 2, ...).
+        /// Call setelah equip/unequip agar formation konsisten.
+        /// </summary>
+        private void RefreshOrbitIndices()
+        {
+            for (int i = 0; i < _equippedPets.Count; i++)
+            {
+                _equippedPets[i].OrbitIndex = i;
+            }
+        }
+
+        /// <summary>
+        /// Spawn pet visual GameObject dan set sprite sesuai PetId.
+        /// </summary>
+        private void SpawnPetVisual(PetRuntime pet)
+        {
+            if (pet == null) return;
+            if (_petPrefab == null || _petContainer == null) return;
+
+            if (pet.GameObject != null)
+            {
+                ApplyPetSprite(pet.GameObject, pet.PetId);
+                return;
+            }
+
+            GameObject petObj = Instantiate(_petPrefab, _petContainer);
+            pet.GameObject = petObj;
+            pet.Transform = petObj.transform;
+
+            ApplyPetSprite(petObj, pet.PetId);
+        }
+
+        private void ApplyPetSprite(GameObject petObj, string petId)
+        {
+            if (petObj == null) return;
+            if (!petObj.TryGetComponent<PetUI>(out var petUI)) return;
+            Sprite petSprite = PetResources.GetPetIcon(petId);
+            if (petSprite == null) return;
+            petUI.SetSprite(petSprite);
         }
 
         public PetDefinition GetPetDefinition(string petId)

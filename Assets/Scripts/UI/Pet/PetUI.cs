@@ -28,28 +28,15 @@ namespace IdleDefenseSurvival.UI
         {
             // Subscribe to PetManager events
             if (PetManager.Instance != null)
-            {
-                PetManager.Instance.OnPetEquipped += HandlePetEquipped;
-                PetManager.Instance.OnPetUnequipped += HandlePetUnequipped;
                 PetManager.Instance.OnPetStateChanged += HandlePetStateChanged;
-            }
-
-            // Initialize hidden
-            SetVisible(false);
-
-            // Check if any pet already equipped
-            RefreshPetDisplay();
+            SetVisible(true);
         }
 
         private void OnDestroy()
         {
             // Unsubscribe from events
             if (PetManager.Instance != null)
-            {
-                PetManager.Instance.OnPetEquipped -= HandlePetEquipped;
-                PetManager.Instance.OnPetUnequipped -= HandlePetUnequipped;
                 PetManager.Instance.OnPetStateChanged -= HandlePetStateChanged;
-            }
         }
 
         private void Update()
@@ -73,48 +60,16 @@ namespace IdleDefenseSurvival.UI
             if (_petIcon.flipX != shouldFaceLeft) _petIcon.flipX = shouldFaceLeft;
         }
 
-        private void HandlePetEquipped(PetRuntime pet)
-        {
-            _currentPet = pet;
-            RefreshPetDisplay();
-            SetVisible(true);
-        }
-
-        private void HandlePetUnequipped(PetRuntime pet)
-        {
-            if (_currentPet == pet)
-            {
-                _currentPet = null;
-                SetVisible(false);
-            }
-        }
-
         private void HandlePetStateChanged(PetRuntime pet)
         {
             if (_currentPet == pet)
-            {
                 // Visual feedback for state changes
                 UpdateEmergencyIndicator();
-            }
         }
 
-        private void RefreshPetDisplay()
+        public void SetSprite(Sprite sprite)
         {
-            var activePets = PetManager.Instance?.GetActivePets();
-            if (activePets == null || activePets.Count == 0)
-            {
-                _currentPet = null;
-                SetVisible(false);
-                return;
-            }
-
-            // Display first equipped pet (can be extended for multiple pets)
-            _currentPet = activePets[0];
-
-            // Set pet icon based on pet ID
-            _petIcon.sprite = PetResources.GetPetIcon(_currentPet.PetId);
-
-            SetVisible(true);
+            if (_petIcon != null && sprite != null) _petIcon.sprite = sprite;
         }
 
         private void UpdateCooldownOverlay()

@@ -5,7 +5,7 @@
       "description": "Void creature that protects player in emergencies. Prioritizes enemies near player and provides shields when HP is critical.",
       "role": "Support",
       "element": "None",
-      "rarity": "Epic",
+      "rarity": "Common",
       "baseStats": {
         "attack": 8,
         "skillDamage": 1.5,

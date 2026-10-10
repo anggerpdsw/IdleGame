@@ -15,8 +15,7 @@ namespace IdleDefenseSurvival.Events.Infrastructure
 
         public void Initialize()
         {
-            var collider = GetComponent<Collider2D>();
-            if (collider != null)
+            if (TryGetComponent<Collider2D>(out var collider))
             {
                 collider.isTrigger = true;
             }

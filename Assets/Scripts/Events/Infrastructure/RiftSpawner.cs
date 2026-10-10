@@ -57,8 +57,7 @@ namespace IdleDefenseSurvival.Events.Infrastructure
             Vector3 spawnPos = _player.position + (Vector3)offset;
 
             GameObject rift = Instantiate(_riftPrefab, spawnPos, Quaternion.identity);
-            var behaviour = rift.GetComponent<RiftBehaviour>();
-            if (behaviour != null)
+            if (rift.TryGetComponent<RiftBehaviour>(out var behaviour))
             {
                 behaviour.Initialize();
             }

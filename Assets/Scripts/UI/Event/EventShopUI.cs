@@ -57,8 +57,7 @@ namespace IdleDefenseSurvival.UI.Event
                 if (_itemPrefab != null && _itemContainer != null)
                 {
                     var itemObj = Instantiate(_itemPrefab, _itemContainer);
-                    var slot = itemObj.GetComponent<EventShopItemUI>();
-                    if (slot != null)
+                    if (itemObj.TryGetComponent<EventShopItemUI>(out var slot))
                     {
                         slot.Initialize(item.itemId, item.price, this);
                     }
