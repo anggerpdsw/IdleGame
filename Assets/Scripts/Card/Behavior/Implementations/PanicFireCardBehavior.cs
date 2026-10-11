@@ -24,8 +24,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnEquip(state);
             _radiusFactor = GetParameter("Radius", 1.51f);
-            _enemiesPerStack = Mathf.RoundToInt(GetParameter("EnemiesPerStack", 3f));
-            _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 8f));
+            _enemiesPerStack = Mathf.RoundToInt(GetParameter("EnemiesPerStack", 2f));
+            _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 12f));
         }
 
         public override void OnPlayerAttack()
@@ -65,7 +65,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             // At max stacks, grant 1 extra pierce
             if (atMaxStacks)
             {
-                float _projectilePierce = GetParameter("ProjectilePierce", 1.1f);
+                float _projectilePierce = GetParameter("ProjectilesPierce", 1.1f);
                 var pierceMod = new StatModifier
                 {
                     Id = PierceModifierId,

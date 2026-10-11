@@ -14,7 +14,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         private const string ModifierId = "Card:EscapeVelocity";
         private float _buildTimeSeconds;
-        private float _damagePerStackPercent;
         private int _maximumStacks;
         private float _decayDelaySeconds;
         private float _decayIntervalSeconds;
@@ -29,7 +28,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnEquip(state);
             _buildTimeSeconds = GetParameter("BuildTimeSeconds", 0.5f);
-            _damagePerStackPercent = GetParameter("DamagePerStackPercent", 2f);
             _maximumStacks = Mathf.RoundToInt(GetParameter("MaximumStacks", 8f));
             _decayDelaySeconds = GetParameter("DecayDelaySeconds", 1.5f);
             _decayIntervalSeconds = GetParameter("DecayIntervalSeconds", 0.5f);
@@ -87,7 +85,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
             if (_currentStacks > 0)
             {
-                float bonusPercent = _currentStacks * _damagePerStackPercent;
+                float bonusPercent = _currentStacks * GetCurrentValue();
                 var modifier = new StatModifier
                 {
                     Id = ModifierId,

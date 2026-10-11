@@ -1,9 +1,4 @@
 using UnityEngine;
-using IdleDefenseSurvival.Data;
-using IdleDefenseSurvival.Manager;
-using IdleDefenseSurvival.Stats;
-using IdleDefenseSurvival.Enemy;
-using IdleDefenseSurvival.Player;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
@@ -12,7 +7,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override CardEffectType EffectType => CardEffectType.ReturningEcho;
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnPlayerAttack };
 
-        private float _triggerDistance;
         private float _returnDamagePercent;
         private float _returnChancePercent;
         private int _maximumReturnTargets;
@@ -23,7 +17,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            _triggerDistance = GetParameter("TriggerDistance", 8f);
             _returnDamagePercent = GetParameter("ReturnDamagePercent", 50f) / 100f;
             _returnChancePercent = GetParameter("ReturnChancePercent", 20f);
             _maximumReturnTargets = Mathf.RoundToInt(GetParameter("MaximumReturnTargets", 5f));
@@ -62,7 +55,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public int GetMaximumReturnTargets() => _maximumReturnTargets;
 
-        public float GetTriggerDistance() => _triggerDistance;
+        public float GetTriggerDistance() => GetCurrentValue();
 
         public CardHUDData GetHUDData()
         {

@@ -45,6 +45,10 @@ namespace IdleDefenseSurvival.Player
         [Tooltip("Target visual diameter in world units.")]
         [SerializeField] private float _visualSize = 0.67f;
 
+        [Header("Return Path")]
+        [Tooltip("Turn rate for curved return path (0-1, lower = wider curve).")]
+        [SerializeField] private float _returnTurnFactor = 0.2f;
+
         private Transform _target;
         private ProjectileOwner _owner;
         public ProjectileOwner Owner => _owner;
@@ -90,6 +94,8 @@ namespace IdleDefenseSurvival.Player
         // ReturningEcho tracking
         private bool _isReturning = false;
         private int _returnHitCount = 0;
+        private float _returnStartDistance;
+        private float _returnArcSign;
 
         // Reference to the pool for returning projectiles
         private ProjectilePool _pool;
@@ -267,8 +273,16 @@ namespace IdleDefenseSurvival.Player
             Vector2 direction;
             if (_isReturning && _player != null)
             {
-                // Return to player
-                direction = ((Vector2)_player.transform.position - _rb.position).normalized;
+                // Curved return to player
+                Vector2 toPlayer = (Vector2)_player.transform.position - _rb.position;
+                float distToPlayer = toPlayer.magnitude;
+                direction = toPlayer.normalized;
+
+                // Arc offset perpendicular to direction, fades as projectile approaches player
+                float arcStrength = Mathf.Clamp01(distToPlayer / _returnStartDistance);
+                Vector2 perpendicular = new Vector2(-direction.y, direction.x);
+                Vector2 arcOffset = perpendicular * _returnArcSign * _returnTurnFactor * arcStrength;
+                direction = (direction + arcOffset).normalized;
             }
             else if (_target != null)
             {
@@ -306,6 +320,10 @@ namespace IdleDefenseSurvival.Player
                         _returnHitCount = 0;
                         behavior.TriggerReturnCooldown();
                         _hitEnemies.Clear(); // Allow hitting same enemies on return
+
+                        // Capture return start for arc calculation
+                        _returnStartDistance = Vector2.Distance(_player.transform.position, transform.position);
+                        _returnArcSign = Random.value < 0.5f ? -1f : 1f;
 
                         // Visual feedback: swap to return sprite
                         if (_returnBulletSprite != null)

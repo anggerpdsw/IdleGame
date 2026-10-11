@@ -61,7 +61,7 @@
             "damageMultiplier": 1.0
           },
           "modifiers": [],
-          "cooldown": 1.34
+          "cooldown": 2.68
         },
         {
           "id": "voidling_aoe_pulse",
@@ -96,7 +96,7 @@
             "statusValue": 0.35
           },
           "modifiers": [],
-          "cooldown": 24
+          "cooldown": 48
         }
       ]
     },
@@ -163,7 +163,7 @@
           "type": "Leech",
           "value": 22.0
         }],
-        "cooldown": 0.8
+        "cooldown": 1.6
       }]
     },
     {
@@ -236,7 +236,7 @@
             "value": 2.0
           }
         ],
-        "cooldown": 1.1
+        "cooldown": 2.2
       }]
     },
     {
@@ -372,7 +372,7 @@
             "damageMultiplier": 8.0
           },
           "modifiers": [],
-          "cooldown": 50
+          "cooldown": 100
         },
         {
           "id": "basic_taunt",
@@ -394,7 +394,7 @@
             "damageMultiplier": 0.8
           },
           "modifiers": [],
-          "cooldown": 2.0
+          "cooldown": 4.0
         }
       ]
     },
@@ -459,7 +459,7 @@
             "damageMultiplier": 1.0
           },
           "modifiers": [],
-          "cooldown": 2.0
+          "cooldown": 4.0
         },
         {
           "id": "rocky_burrow_shield",
@@ -482,7 +482,7 @@
             "damageMultiplier": 5.0
           },
           "modifiers": [],
-          "cooldown": 40
+          "cooldown": 80
         }
       ]
     },
@@ -551,7 +551,7 @@
             "count": 2,
             "value": 0.6
           }],
-          "cooldown": 0.8
+          "cooldown": 1.6
         },
         {
           "id": "hawk_gale_burst",
@@ -578,7 +578,7 @@
             "type": "Splash",
             "value": 2.0
           }],
-          "cooldown": 24
+          "cooldown": 48
         }
       ]
     },
@@ -650,7 +650,7 @@
               "value": 1.15
             }
           ],
-          "cooldown": 2.0
+          "cooldown": 4.0
         },
         {
           "id": "wisp_crystal_prison",
@@ -677,7 +677,7 @@
             "statusValue": 0.5
           },
           "modifiers": [],
-          "cooldown": 36
+          "cooldown": 72
         }
       ]
     },
@@ -753,7 +753,7 @@
               "value": 15.0
             }
           ],
-          "cooldown": 0.9
+          "cooldown": 1.8
         },
         {
           "id": "phoenix_rebirth_heal",
@@ -776,7 +776,7 @@
             "damageMultiplier": 10.0
           },
           "modifiers": [],
-          "cooldown": 60
+          "cooldown": 120
         },
         {
           "id": "phoenix_flare_burst",
@@ -808,7 +808,7 @@
               "value": 0.25
             }
           ],
-          "cooldown": 40
+          "cooldown": 80
         }
       ]
     },
@@ -876,7 +876,7 @@
             "type": "DamageScaling",
             "value": 1.1
           }],
-          "cooldown": 2.0
+          "cooldown": 4.0
         },
         {
           "id": "golem_seismic_slam",
@@ -908,7 +908,7 @@
               "value": 1.5
             }
           ],
-          "cooldown": 50
+          "cooldown": 100
         },
         {
           "id": "golem_bedrock_barrier",
@@ -931,7 +931,7 @@
             "damageMultiplier": 8.0
           },
           "modifiers": [],
-          "cooldown": 60
+          "cooldown": 120
         }
       ]
     }

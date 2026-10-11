@@ -59,8 +59,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             ModifierManager.Instance.RemoveModifier(ModifierId);
             if (_currentStacks <= 0) return;
 
-            float conversionPercent = GetParameter("ConversionPercent", 18f);
-            float totalBonus = _currentStacks * conversionPercent;
+            float totalBonus = _currentStacks * GetCurrentValue();
 
             var modifier = new StatModifier
             {

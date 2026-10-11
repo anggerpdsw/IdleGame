@@ -2,7 +2,6 @@ using UnityEngine;
 using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
-using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
@@ -95,7 +94,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 Id = CritModifierId,
                 Source = ModifierSource.Card,
                 Stat = SkillType.CriticalChance,
-                Mode = ModifierMode.Flat,
+                Mode = ModifierMode.Percent,
                 Value = critBonus,
                 Permanent = false
             };

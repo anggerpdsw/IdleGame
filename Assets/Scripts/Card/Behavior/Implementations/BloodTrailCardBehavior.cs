@@ -15,7 +15,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override CardEffectType EffectType => CardEffectType.BloodTrail;
         public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
 
-        private float _trailDamagePercent;
         private float _trailRadius;
         private float _trailDurationSeconds;
         private float _slowPercent;
@@ -35,7 +34,6 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override void OnEquip(CardRuntimeState state)
         {
             base.OnEquip(state);
-            _trailDamagePercent = GetParameter("TrailDamagePercent", 18f);
             _trailRadius = GetParameter("TrailRadius", 1.5f);
             _trailDurationSeconds = GetParameter("TrailDurationSeconds", 3f);
             _slowPercent = GetParameter("SlowPercent", 20f) / 100f;
@@ -78,7 +76,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             }
 
             // Update and process trail segments
-            float damagePerSecond = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * _trailDamagePercent / 100f;
+            float damagePerSecond = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * GetCurrentValue() / 100f;
 
             for (int i = _trailSegments.Count - 1; i >= 0; i--)
             {

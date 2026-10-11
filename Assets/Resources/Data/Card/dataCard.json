@@ -500,7 +500,7 @@
         }, {
             "Id": "escape_velocity",
             "Name": "Escape Velocity",
-            "Description": "Moving continuously builds Momentum. Momentum increases Attack Damage and gradually decays when the player stops.",
+            "Description": "Moving continuously builds Momentum. Momentum increases {CurrentValue}% Attack Damage and gradually decays when the player stops.",
             "EffectType": "EscapeVelocity",
             "Mode": "Percent",
             "BaseValue": 2,
@@ -508,7 +508,6 @@
             "CardRarity": "Rare",
             "Parameters": {
                 "BuildTimeSeconds": 0.5,
-                "DamagePerStackPercent": 2,
                 "MaximumStacks": 8,
                 "DecayDelaySeconds": 1.5,
                 "DecayIntervalSeconds": 0.5
@@ -516,14 +515,13 @@
         }, {
             "Id": "blood_trail",
             "Name": "Blood Trail",
-            "Description": "Moving continuously leaves a Blood Trail behind. Enemies touching the trail take damage and are slowed.",
+            "Description": "Moving continuously leaves a Blood Trail behind. Enemies touching the trail take {CurrentValue}% damage and are slowed.",
             "EffectType": "BloodTrail",
             "Mode": "Percent",
             "BaseValue": 18,
             "ValuePerLevel": 2,
             "CardRarity": "Rare",
             "Parameters": {
-                "TrailDamagePercent": 18,
                 "TrailRadius": 1.5,
                 "TrailDurationSeconds": 3,
                 "SlowPercent": 20,
@@ -533,7 +531,7 @@
         }, {
             "Id": "death_momentum",
             "Name": "Death Momentum",
-            "Description": "Killing enemies grants Momentum, increasing Movement Speed, Attack Damage, and Attack Speed. Stacks persist briefly after stopping; refresh on kill.",
+            "Description": "Killing enemies grants Momentum, increasing Movement Speed, Attack Damage, and Attack Speed. Stackx{CurrentValue}% persist briefly after stopping; refresh on kill.",
             "EffectType": "DeathMomentum",
             "Mode": "Percent",
             "BaseValue": 4,
@@ -551,14 +549,13 @@
         }, {
             "Id": "returning_echo",
             "Name": "Returning Echo",
-            "Description": "After traveling beyond a distance, certain projectiles return toward the player and deal bonus damage to enemies they pass through.",
+            "Description": "After traveling {CurrentValue} distance, certain projectiles return toward the player and deal bonus damage to enemies they pass through.",
             "EffectType": "ReturningEcho",
             "Mode": "Percent",
-            "BaseValue": 8,
-            "ValuePerLevel": 1,
+            "BaseValue": 10,
+            "ValuePerLevel": -0.25,
             "CardRarity": "Rare",
             "Parameters": {
-                "TriggerDistance": 8.0,
                 "ReturnDamagePercent": 50,
                 "ReturnChancePercent": 20,
                 "MaximumReturnTargets": 5,
@@ -567,7 +564,7 @@
         }, {
             "Id": "overkill_conversion",
             "Name": "Overkill Conversion",
-            "Description": "Excess damage dealt beyond an enemy's remaining HP is converted into temporary attack range.",
+            "Description": "Excess damage dealt beyond an enemy's remaining HP is converted into temporary {CurrentValue}% attack range.",
             "EffectType": "OverkillConversion",
             "Mode": "Percent",
             "BaseValue": 1.7,
@@ -598,7 +595,7 @@
         }, {
             "Id": "time_fast",
             "Name": "Time Fast",
-            "Description": "Reduce wave and inter-wave durations by 28% at level 1. Duration reduction scales with card level.",
+            "Description": "Reduce wave and inter-wave durations by {CurrentValue}%. Duration reduction scales with card level.",
             "EffectType": "TimeFast",
             "Mode": "Percent",
             "BaseValue": 28,
@@ -607,7 +604,7 @@
         }, {
             "Id": "time_warp",
             "Name": "Time Warp",
-            "Description": "Reduce Ultimate cooldown by 3% at level 1. Cooldown reduction scales with card level.",
+            "Description": "Reduce Ultimate cooldown by {CurrentValue}%. Cooldown reduction scales with card level.",
             "SkillType": "CooldownReduction",
             "Mode": "Percent",
             "BaseValue": 3,
@@ -616,7 +613,7 @@
         }, {
             "Id": "berserker",
             "Name": "Berserker",
-            "Description": "Increase attack damage based on missing health",
+            "Description": "Increase {CurrentValue}% attack damage based on missing health",
             "EffectType": "Berserker",
             "Mode": "Percent",
             "BaseValue": 22,
@@ -634,7 +631,7 @@
         }, {
             "Id": "momentum_core",
             "Name": "Momentum Core",
-            "Description": "Each enemy killed within 3 seconds grants 2% Attack Speed, stacking up to 8 times. The stack duration refreshes whenever you kill an enemy.",
+            "Description": "Each enemy killed within 3 seconds grants {CurrentValue}% Attack Speed, stacking up to 8 times. The stack duration refreshes whenever you kill an enemy.",
             "EffectType": "MomentumCore",
             "Mode": "Percent",
             "BaseValue": 2,
@@ -647,7 +644,7 @@
         }, {
             "Id": "fracture_mark",
             "Name": "Fracture Mark",
-            "Description": "Attacks have a 20% chance to fracture an enemy for 4 seconds. Your next 3 hits against a Fractured enemy deal 25% bonus damage.",
+            "Description": "Attacks have a {CurrentValue}% chance to fracture an enemy for 4 seconds. Your next 3 hits against a Fractured enemy deal 25% bonus damage.",
             "EffectType": "FractureMark",
             "Mode": "Percent",
             "BaseValue": 20,
@@ -675,7 +672,7 @@
         }, {
             "Id": "blood_engine",
             "Name": "Blood Engine",
-            "Description": "Whenever Life Steal restores health while you are above 80% HP, convert 18% of the healing into Attack Damage for 4 seconds, stacking up to 5 times.",
+            "Description": "Whenever Life Steal restores health while you are above 80% HP, convert {CurrentValue}% of the healing into Attack Damage for 4 seconds, stacking up to 5 times.",
             "EffectType": "BloodEngine",
             "Mode": "Percent",
             "BaseValue": 18,
@@ -683,17 +680,16 @@
             "CardRarity": "Epic",
             "Parameters": {
                 "HealthThresholdPercent": 80,
-                "ConversionPercent": 18,
                 "DurationSeconds": 4,
                 "MaximumStacks": 5
             }
         }, {
             "Id": "gravity_well",
             "Name": "Gravity Well",
-            "Description": "Every 6 seconds create a Gravity Well around the player that pulls nearby enemies toward its center and reduces their movement speed by 25%.",
+            "Description": "Every {CurrentValue}s, create a Gravity Well around the player that pulls nearby enemies toward its center and reduces their movement speed by 25%.",
             "EffectType": "GravityWell",
             "Mode": "Flat",
-            "BaseValue": 6,
+            "BaseValue": 12,
             "ValuePerLevel": -0.2,
             "CardRarity": "Epic",
             "Parameters": {
@@ -705,7 +701,7 @@
         }, {
             "Id": "hunter_instinct",
             "Name": "Hunter Instinct",
-            "Description": "Deal 20% bonus damage to enemies below 35% HP. Bonus damage increases with card level.",
+            "Description": "Deal {CurrentValue}% bonus damage to enemies below 35% HP. Bonus damage increases with card level.",
             "EffectType": "HunterInstinct",
             "Mode": "Percent",
             "BaseValue": 20,
@@ -717,7 +713,7 @@
         }, {
             "Id": "echo_shot",
             "Name": "Echo Shot",
-            "Description": "Every 6th attack creates an Echo projectile that repeats the attack after a short delay with 65% damage.",
+            "Description": "Every {CurrentValue}th attack creates an Echo projectile that repeats the attack after a short delay with 65% damage.",
             "EffectType": "EchoShot",
             "Mode": "Flat",
             "BaseValue": 6,
@@ -730,7 +726,7 @@
         }, {
             "Id": "adrenaline_loop",
             "Name": "Adrenaline Loop",
-            "Description": "Below 40% HP, gain 20% Attack Speed. Killing an enemy while the effect is active restores 1.5% of max HP.",
+            "Description": "Below 40% HP, gain {CurrentValue}% Attack Speed. Killing an enemy while the effect is active restores 1.5% of max HP.",
             "EffectType": "AdrenalineLoop",
             "Mode": "Percent",
             "BaseValue": 20,
@@ -738,13 +734,12 @@
             "CardRarity": "Epic",
             "Parameters": {
                 "HealthThresholdPercent": 40,
-                "AttackSpeedBonusPercent": 20,
                 "HealOnKillPercent": 1.5
             }
         }, {
             "Id": "volatile_core",
             "Name": "Volatile Core",
-            "Description": "Every 12th enemy killed leaves a volatile core at its death location. Enemies entering the core take damage over time.",
+            "Description": "Every {CurrentValue}th enemy killed leaves a volatile core at its death location. Enemies entering the core take damage over time.",
             "EffectType": "VolatileCore",
             "Mode": "Flat",
             "BaseValue": 12,
@@ -758,7 +753,7 @@
         }, {
             "Id": "arcane_resonance",
             "Name": "Arcane Resonance",
-            "Description": "After using your Ultimate, your next 8 attacks gain 18% bonus damage and +8% Critical Chance for up to 6 seconds.",
+            "Description": "After using your Ultimate, your next 8 attacks gain {CurrentValue}% bonus damage and 8% Critical Chance for up to 6 seconds.",
             "EffectType": "ArcaneResonance",
             "Mode": "Percent",
             "BaseValue": 18,
@@ -766,14 +761,13 @@
             "CardRarity": "Epic",
             "Parameters": {
                 "AttackCount": 8,
-                "AttackDamageBonusPercent": 18,
                 "CriticalChanceBonusPercent": 8,
                 "DurationSeconds": 6
             }
         }, {
             "Id": "last_bullet",
             "Name": "Last Bullet",
-            "Description": "Every 7th attack becomes a Last Bullet that deals 2x damage, has +25% Critical Chance, and cannot miss.",
+            "Description": "Every {CurrentValue}th attack becomes a Last Bullet that deals 2x damage, has +25% Critical Chance, and cannot miss.",
             "EffectType": "LastBullet",
             "Mode": "Flat",
             "BaseValue": 7,
@@ -787,7 +781,7 @@
         }, {
             "Id": "death_chain",
             "Name": "Death Chain",
-            "Description": "Each enemy you kill adds 4% Attack Damage, up to 15 stacks. All stacks reset after 5 seconds without a kill.",
+            "Description": "Each enemy you kill adds {CurrentValue}% Attack Damage, up to 15 stacks. All stacks reset after 5 seconds without a kill.",
             "EffectType": "DeathChain",
             "Mode": "Percent",
             "BaseValue": 4,
@@ -815,7 +809,7 @@
         }, {
             "Id": "bullet_storm",
             "Name": "Bullet Storm",
-            "Description": "Every 8 attacks at level 1, fire 5 additional projectiles at nearby enemies. The attack interval scales with card level.",
+            "Description": "Every {CurrentValue} attacks, fire 5 additional projectiles at nearby enemies. The attack interval scales with card level.",
             "EffectType": "BulletStorm",
             "Mode": "Flat",
             "BaseValue": 8,
@@ -828,7 +822,7 @@
         }, {
             "Id": "execution_protocol",
             "Name": "Execution Protocol",
-            "Description": "Attacks have an 18% chance at level 1 to execute normal enemies below 15% HP, or Boss and Special enemies below 8% HP. Chance scales with card level.",
+            "Description": "Attacks have an {CurrentValue}% chance to execute normal enemies below 15% HP, or Boss and Special enemies below 8% HP. Chance scales with card level.",
             "EffectType": "ExecutionProtocol",
             "Mode": "Percent",
             "BaseValue": 18,
@@ -841,7 +835,7 @@
         }, {
             "Id": "overkill",
             "Name": "Overkill",
-            "Description": "Excess damage from killing an enemy is transferred to the nearest enemy, up to 300% of the original attack damage.",
+            "Description": "Excess damage from killing an enemy is transferred to the nearest enemy, up to {CurrentValue}% of the original attack damage.",
             "EffectType": "Overkill",
             "Mode": "Percent",
             "BaseValue": 100,
@@ -853,7 +847,7 @@
         }, {
             "Id": "vampiric_frenzy",
             "Name": "Vampiric Frenzy",
-            "Description": "Each 10% of max HP recovered through Life Steal grants 3% Attack Speed for 5 seconds, stacking up to 10 times. Bonus scales with card level.",
+            "Description": "Each 10% of max HP recovered through Life Steal grants {CurrentValue}% Attack Speed for 5 seconds, stacking up to 10 times. Bonus scales with card level.",
             "EffectType": "VampiricFrenzy",
             "Mode": "Percent",
             "BaseValue": 3,
@@ -882,7 +876,7 @@
         }, {
             "Id": "critical_cascade",
             "Name": "Critical Cascade",
-            "Description": "Critical hits have a 25% chance at level 1 to fire another projectile at the nearest enemy. This projectile can critically strike; chance scales with card level.",
+            "Description": "Critical hits have a {CurrentValue}% chance to fire another projectile at the nearest enemy. This projectile can critically strike; chance scales with card level.",
             "EffectType": "CriticalCascade",
             "Mode": "Percent",
             "BaseValue": 25,
@@ -934,16 +928,16 @@
         }, {
             "Id": "soul_harvester",
             "Name": "Soul Harvester",
-            "Description": "Each enemy you kill grants a Soul. Each Soul adds {CurrentValue}% Attack Damage. Every 666 kills, the Soul cap increases by 66.",
+            "Description": "Each enemy you kill grants a Soul. Each Soul adds {CurrentValue}% Attack Damage. Every 66 kills, the Soul cap increases by 6.",
             "EffectType": "SoulHarvester",
             "Mode": "Percent",
-            "BaseValue": 0.5,
-            "ValuePerLevel": 0.1,
+            "BaseValue": 0.05,
+            "ValuePerLevel": 0.011,
             "CardRarity": "Mythic",
             "Parameters": {
-                "InitialSoulCap": 666,
+                "InitialSoulCap": 66,
                 "SoulsPerCapIncrease": 666,
-                "SoulCapIncrease": 66
+                "SoulCapIncrease": 6
             }
         }, {
             "Id": "death_reversal",
