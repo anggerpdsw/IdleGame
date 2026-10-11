@@ -31,29 +31,32 @@ namespace IdleDefenseSurvival.Pet
 
         [Header("Target Scan Settings")]
         [SerializeField] private float _targetScanInterval = 0.2f; // Scan for targets every 0.2s
+        [Header("Pet Orbit Settings")]
+        [SerializeField, Min(0f)] private float _orbitAngularSpeed = 35f; // Degrees per second
+        [SerializeField, Range(0.1f, 1f)] private float _orbitRadiusRatio = 0.8f;
+        [SerializeField, Min(0f)] private float _orbitMovementSpeed = 8f; // Units per second for smooth following
+        private float _orbitStartAngle;
+        private float _orbitElapsedTime;
 
         [Header("Debug")]
         [SerializeField] private bool _debugBehaviors = false;
 
         // Pet database (loaded from JSON)
         private Dictionary<string, PetDefinition> _petDefinitions = new();
-
         // Owned pets (instance id -> runtime)
         private Dictionary<string, PetRuntime> _ownedPets = new();
-
         // Equipped pets (currently active in combat)
         private List<PetRuntime> _equippedPets = new();
-
         // Unlocked pet slots
         private int _unlockedSlots = GameConstants.PET_START_SLOT;
-
         // Player reference
         private PlayerClass _player;
-
         // Shared behavior context (reused across all pets per frame)
         private ActionModifierData _sharedModifierData = new();
         private float _battleTime = 0f;
-
+        // Start position initialization flag
+        private bool _startPositionsInitialized = false;
+        private float _initialSetupTimer = 0f; // delay before follow starts
         // Events
         public event Action<PetRuntime> OnPetStateChanged;
         public event Action<PetRuntime, string> OnPetSkillReady;
@@ -79,39 +82,48 @@ namespace IdleDefenseSurvival.Pet
 
         private void Update()
         {
-            // Skip if no pets equipped — idle di main menu
             if (_equippedPets.Count == 0) return;
 
-            // Late-bind Player if not available at Start (Bootstrap → Game transition)
             if (_player == null)
             {
                 TryBindPlayer();
-                if (_player == null) return; // Still in menu, player belum spawn
+                if (_player == null) return;
             }
 
             float deltaTime = Time.deltaTime;
             _battleTime += deltaTime;
 
+            // Spawn all visuals before assigning their initial orbit positions.
             foreach (var pet in _equippedPets)
             {
                 if (pet == null) continue;
-
-                // Spawn visual if not yet ready (late equip after Player exists)
                 if (pet.GameObject == null)
                 {
                     SpawnPetVisual(pet);
-                    Debug.Log($"[PetManager] Late-spawned visual for {pet.PetId}");
+                    if (pet.GameObject != null)
+                        Debug.Log($"[PetManager] Late-spawned visual for {pet.PetId}");
                 }
+            }
 
-                if (pet.GameObject == null) continue;
+            if (!_startPositionsInitialized &&
+                _equippedPets.All(p => p != null && p.GameObject != null))
+            {
+                InitializePetStartPositions();
+                _startPositionsInitialized = true;
+                _initialSetupTimer = 1.5f;
+            }
 
-                // Tick cooldowns (skills + behaviors)
+            if (_initialSetupTimer > 0f)
+                _initialSetupTimer = Mathf.Max(0f, _initialSetupTimer - deltaTime);
+            else
+                _orbitElapsedTime += deltaTime;
+
+            foreach (var pet in _equippedPets)
+            {
+                if (pet == null || pet.GameObject == null) continue;
+
                 pet.TickCooldowns(deltaTime);
-
-                // Tick stamina regeneration
                 pet.TickStaminaRegen(deltaTime);
-
-                // Update state machine and execute behaviors
                 UpdatePetStateMachine(pet, deltaTime);
             }
         }
@@ -128,16 +140,12 @@ namespace IdleDefenseSurvival.Pet
         private void TryBindPlayer()
         {
             if (_player != null) return;
-
             _player = PlayerClass.Instance;
             if (_player == null) return;
-
             _player.OnHealthChanged += CheckEmergencyMode;
-
             // Auto-assign Player as container if not set in Inspector
             if (_petContainer == null)
                 _petContainer = _player.transform;
-
             // Auto-assign Prefab if not set in Inspector
             if (_petPrefab == null)
                 _petPrefab = Resources.Load<GameObject>("Art/Pet/Pet");
@@ -167,18 +175,18 @@ namespace IdleDefenseSurvival.Pet
         {
             // Clear invalid target
             pet.ClearInvalidTarget();
-
             // Create behavior context (shared data for behavior evaluation)
             var context = BehaviorContext.Create(pet, _player, _battleTime);
-
             // Execute data-driven behaviors (NEW) - PRIMARY path
             bool behaviorExecuted = pet.ExecuteBehaviors(context, _sharedModifierData);
-
+            // Keep pets orbiting while following, regardless of whether a data-driven
+            // follow behavior executed. Attack/targeting states remain untouched.
+            if (pet.CurrentState == PetState.Follow)
+                UpdateOrbitPosition(pet, deltaTime);
             if (_debugBehaviors && behaviorExecuted)
             {
                 Debug.Log($"[PetManager] {pet.PetId} executed behavior, target: {pet.Target?.name ?? "none"}");
             }
-
             // Legacy state machine - FALLBACK only when no behavior executed
             if (!behaviorExecuted)
             {
@@ -187,9 +195,7 @@ namespace IdleDefenseSurvival.Pet
                     case PetState.Idle:
                         TransitionToFollow(pet);
                         break;
-
                     case PetState.Follow:
-                        UpdateFollowBehavior(pet, deltaTime);
                         // Check if should search for target
                         pet.TargetScanTimer += deltaTime;
                         if (pet.TargetScanTimer >= _targetScanInterval)
@@ -198,7 +204,6 @@ namespace IdleDefenseSurvival.Pet
                             TransitionToSearchTarget(pet);
                         }
                         break;
-
                     case PetState.SearchTarget:
                         SearchForTarget(pet);
                         if (pet.Target != null)
@@ -206,11 +211,9 @@ namespace IdleDefenseSurvival.Pet
                         else
                             TransitionToFollow(pet);
                         break;
-
                     case PetState.Attack:
                         UpdateAttackBehavior(pet, deltaTime);
                         break;
-
                     case PetState.Emergency:
                         UpdateEmergencyBehavior(pet, deltaTime);
                         break;
@@ -240,53 +243,37 @@ namespace IdleDefenseSurvival.Pet
         /// Update follow behavior - formation anchor relatif player.
         /// Pet tidak langsung menuju player, tapi ke formation slot.
         /// </summary>
-        private void UpdateFollowBehavior(PetRuntime pet, float deltaTime)
-        {
-            if (_player == null || pet.Transform == null) return;
-
-            // Calculate formation offset (cartesian, bukan polar)
-            Vector3 formationOffset = CalculateFormationOffset(pet.OrbitIndex, _equippedPets.Count, pet.Definition.orbitRadius);
-            Vector3 formationPos = _player.transform.position + formationOffset;
-
-            float distance = Vector3.Distance(pet.Transform.position, formationPos);
-            float moveSpeed = pet.Definition.baseStats.moveSpeed;
-
-            // Distance-based catch-up behavior - smooth movement, no teleport
-            float speedMultiplier = 1f;
-            if (distance > 8f) speedMultiplier = 2.5f;
-            else if (distance > 5f) speedMultiplier = 1.8f;
-            else if (distance > 2f) speedMultiplier = 1.2f;
-
-            pet.Transform.position = Vector3.MoveTowards(
-                pet.Transform.position,
-                formationPos,
-                moveSpeed * speedMultiplier * deltaTime
-            );
-
-            pet.Position = pet.Transform.position;
-        }
 
         /// <summary>
-        /// Calculate formation offset untuk pet index.
-        /// Formation pattern: spread horizontal di belakang player.
+        /// Moves a following pet around the player on a shared-radius orbit.
+        /// OrbitIndex and the randomized start angle keep pets evenly spaced.
         /// </summary>
-        private Vector3 CalculateFormationOffset(int index, int totalCount, float baseRadius)
+        private void UpdateOrbitPosition(PetRuntime pet, float deltaTime)
         {
-            if (totalCount == 1)
-            {
-                // Single pet: langsung di belakang player
-                return new Vector3(0f, -baseRadius, 0f);
-            }
+            if (_player == null || pet == null || pet.Transform == null)
+                return;
 
-            // Multi-pet: spread horizontal
-            float spacing = baseRadius * 0.8f;
-            float totalWidth = (totalCount - 1) * spacing;
-            float startX = -totalWidth / 2f;
+            if (_initialSetupTimer > 0f) return;
 
-            float x = startX + (index * spacing);
-            float y = -baseRadius; // Behind player
+            int count = _equippedPets.Count;
+            if (count == 0) return;
 
-            return new Vector3(x, y, 0f);
+            float radius = Mathf.Max(0f, _player.AttackRange) * _orbitRadiusRatio;
+            float angleStep = 360f / count;
+            float angle = (_orbitStartAngle + pet.OrbitIndex * angleStep +
+                           _orbitElapsedTime * _orbitAngularSpeed) * Mathf.Deg2Rad;
+
+            Vector3 offset = new Vector3(
+                Mathf.Cos(angle),
+                Mathf.Sin(angle),
+                0f) * radius;
+
+            Vector3 orbitPosition = _player.transform.position + offset;
+            pet.Transform.position = Vector3.Lerp(
+                pet.Transform.position,
+                orbitPosition,
+                _orbitMovementSpeed * deltaTime);
+            pet.Position = pet.Transform.position;
         }
 
         /// <summary>
@@ -295,7 +282,6 @@ namespace IdleDefenseSurvival.Pet
         private void SearchForTarget(PetRuntime pet)
         {
             if (_player == null) return;
-
             pet.Target = PetTargeting.FindBestTarget(
                 pet.Position,
                 _player.transform.position,
@@ -316,7 +302,6 @@ namespace IdleDefenseSurvival.Pet
                 TransitionToFollow(pet);
                 return;
             }
-
             // Behavior system handles attacks now
             // This legacy path is kept for backward compatibility
         }
@@ -333,14 +318,12 @@ namespace IdleDefenseSurvival.Pet
                 pet.TargetScanTimer = 0f;
                 SearchForTarget(pet); // Uses existing priority system
             }
-
             // Force active skill cast if available
             string activeSkillId = pet.Definition.skills.active;
             if (!string.IsNullOrEmpty(activeSkillId) && !pet.IsSkillOnCooldown(activeSkillId))
             {
                 OnPetSkillReady?.Invoke(pet, activeSkillId);
             }
-
             // Attack behavior same as normal
             UpdateAttackBehavior(pet, deltaTime);
         }
@@ -353,19 +336,15 @@ namespace IdleDefenseSurvival.Pet
         private void CheckEmergencyMode()
         {
             if (_player == null) return;
-
             float hpPercent = _player.CurrentHealth / _player.MaxHealth;
-
             foreach (var pet in _equippedPets)
             {
                 bool shouldBeEmergency = hpPercent <= pet.Definition.emergencyThreshold;
-
                 if (shouldBeEmergency && !pet.IsEmergencyMode)
                 {
                     // Enter emergency mode - set flag only
                     pet.IsEmergencyMode = true;
                     OnPetStateChanged?.Invoke(pet);
-
                     // Trigger passive emergency skill (LastHorizon for Voidling)
                     string passiveSkillId = pet.Definition.skills.passive;
                     if (!string.IsNullOrEmpty(passiveSkillId) && !pet.IsSkillOnCooldown(passiveSkillId))
@@ -383,31 +362,13 @@ namespace IdleDefenseSurvival.Pet
         }
 
         #region IPetService Implementation
-
-        public List<PetRuntime> GetActivePets()
-        {
-            return new List<PetRuntime>(_equippedPets);
-        }
-
-        public Dictionary<string, PetDefinition> GetAllDefinitions()
-        {
-            return _petDefinitions;
-        }
-
-        public bool HasPet(string petId)
-        {
-            return _ownedPets.Values.Any(p => p.PetId == petId);
-        }
-
-        public bool IsPetEquipped(string petId)
-        {
-            return _equippedPets.Any(p => p.PetId == petId);
-        }
-
+        public List<PetRuntime> GetActivePets() => new(_equippedPets);
+        public Dictionary<string, PetDefinition> GetAllDefinitions() => _petDefinitions;
+        public bool HasPet(string petId) => _ownedPets.Values.Any(p => p.PetId == petId);
+        public bool IsPetEquipped(string petId) => _equippedPets.Any(p => p.PetId == petId);
         public int UnlockedSlotCount => _unlockedSlots;
         public int MaxSlots => GameConstants.PET_MAX_SLOT;
         public int EquippedPetCount => _equippedPets.Count;
-
         public int NextSlotCostGem
         {
             get
@@ -416,7 +377,6 @@ namespace IdleDefenseSurvival.Pet
                 return GameConstants.PET_SLOT_EXPANSION_COSTS[_unlockedSlots];
             }
         }
-
         public bool ExpandSlot()
         {
             if (_unlockedSlots >= GameConstants.PET_MAX_SLOT)
@@ -424,7 +384,6 @@ namespace IdleDefenseSurvival.Pet
                 Debug.LogWarning("[PetManager] Cannot expand: already at max slots");
                 return false;
             }
-
             int cost = NextSlotCostGem;
             var economyService = ServiceLocator.EconomyService;
             if (economyService == null)
@@ -432,17 +391,14 @@ namespace IdleDefenseSurvival.Pet
                 Debug.LogError("[PetManager] EconomyService not available");
                 return false;
             }
-
             if (!economyService.HasEnoughCurrency(CurrencyType.Gem, cost))
             {
                 Debug.LogWarning($"[PetManager] Not enough gems. Need {cost}");
                 return false;
             }
-
             economyService.TrySpendCurrency(CurrencyType.Gem, cost, "PetSlotExpansion");
             _unlockedSlots++;
             OnSlotExpanded?.Invoke();
-
             Debug.Log($"[PetManager] Expanded pet slots to {_unlockedSlots}");
             return true;
         }
@@ -453,12 +409,10 @@ namespace IdleDefenseSurvival.Pet
             // Already equipped
             if (_equippedPets.Contains(pet)) return false;
             if (_equippedPets.Count >= _unlockedSlots) return false;
-
             SpawnPetVisual(pet);
-
             _equippedPets.Add(pet);
             pet.CurrentState = PetState.Follow;
-            RefreshOrbitIndices(); // Update all indices + snap to formation
+            RefreshOrbitIndices(); // Rebalance orbit spacing after equip
             OnPetEquipped?.Invoke(pet);
             return true;
         }
@@ -475,7 +429,7 @@ namespace IdleDefenseSurvival.Pet
                 pet.GameObject = null;
                 pet.Transform = null;
             }
-            RefreshOrbitIndices(); // Update remaining pets' indices
+            RefreshOrbitIndices(); // Rebalance remaining orbit spacing
             OnPetUnequipped?.Invoke(pet);
             return true;
         }
@@ -487,29 +441,70 @@ namespace IdleDefenseSurvival.Pet
         private void RefreshOrbitIndices()
         {
             for (int i = 0; i < _equippedPets.Count; i++)
-            {
                 _equippedPets[i].OrbitIndex = i;
+
+            // Randomize the phase when the equipped roster changes, then immediately
+            // place all available visuals on the new shared-radius orbit.
+            _orbitStartAngle = UnityEngine.Random.Range(0f, 360f);
+            _orbitElapsedTime = 0f;
+            _startPositionsInitialized = false;
+            _initialSetupTimer = 0f;
+
+            if (_player != null && _equippedPets.Count > 0 &&
+                _equippedPets.All(p => p != null && p.Transform != null))
+            {
+                InitializePetStartPositions();
+                _startPositionsInitialized = true;
+                _initialSetupTimer = 1.5f;
             }
         }
 
         /// <summary>
-        /// Spawn pet visual GameObject dan set sprite sesuai PetId.
+        /// Initializes a random orbit phase. Every pet starts at the same radius
+        /// from the player; multiple pets are evenly spaced around the circle.
+        /// A single pet receives a random angle on that same orbit.
         /// </summary>
+        private void InitializePetStartPositions()
+        {
+            if (_player == null || _equippedPets.Count == 0) return;
+
+            _orbitStartAngle = UnityEngine.Random.Range(0f, 360f);
+            _orbitElapsedTime = 0f;
+            int count = _equippedPets.Count;
+            float radius = Mathf.Max(0f, _player.AttackRange) * _orbitRadiusRatio;
+            float angleStep = 360f / count;
+            Vector3 playerPosition = _player.transform.position;
+
+            for (int i = 0; i < count; i++)
+            {
+                PetRuntime pet = _equippedPets[i];
+                if (pet == null || pet.Transform == null) continue;
+
+                pet.OrbitIndex = i;
+                float angle = (_orbitStartAngle + i * angleStep) * Mathf.Deg2Rad;
+                Vector3 offset = new Vector3(
+                    Mathf.Cos(angle),
+                    Mathf.Sin(angle),
+                    0f) * radius;
+
+                Vector3 startPosition = playerPosition + offset;
+                pet.Transform.position = startPosition;
+                pet.Position = startPosition;
+            }
+        }
+
         private void SpawnPetVisual(PetRuntime pet)
         {
             if (pet == null) return;
             if (_petPrefab == null || _petContainer == null) return;
-
             if (pet.GameObject != null)
             {
                 ApplyPetSprite(pet.GameObject, pet.PetId);
                 return;
             }
-
             GameObject petObj = Instantiate(_petPrefab, _petContainer);
             pet.GameObject = petObj;
             pet.Transform = petObj.transform;
-
             ApplyPetSprite(petObj, pet.PetId);
         }
 
@@ -534,15 +529,11 @@ namespace IdleDefenseSurvival.Pet
                 Debug.LogError($"[PetManager] Pet definition not found: {petId}");
                 return null;
             }
-
             string instanceId = Guid.NewGuid().ToString();
             var pet = new PetRuntime(instanceId, petId, definition, level);
-
             // NEW: Initialize behaviors from definition
             pet.InitializeBehaviors(definition);
-
             _ownedPets[instanceId] = pet;
-
             return instanceId;
         }
 
@@ -565,30 +556,25 @@ namespace IdleDefenseSurvival.Pet
                 6 => "Divine",
                 _ => null
             };
-
             if (string.IsNullOrEmpty(rarityStr))
             {
                 Debug.LogError($"[PetManager] Invalid rarity: {rarity}");
                 return null;
             }
-
             // Find all pets matching rarity
             var candidates = _petDefinitions.Values
                 .Where(p => p.rarity == rarityStr)
                 .ToList();
-
             if (candidates.Count == 0)
             {
                 Debug.LogError($"[PetManager] No pets found for rarity {rarityStr}");
                 return null;
             }
-
             // Deterministic random selection
             if (seed != 0)
             {
                 UnityEngine.Random.InitState(seed);
             }
-
             int index = UnityEngine.Random.Range(0, candidates.Count);
             return candidates[index].id;
         }
@@ -605,10 +591,8 @@ namespace IdleDefenseSurvival.Pet
                 isNewPet = false;
                 return null;
             }
-
             // Check if player already owns this pet
             var existingPet = _ownedPets.Values.FirstOrDefault(p => p.PetId == petId);
-
             if (existingPet == null)
             {
                 // New pet - grant level 1
@@ -623,7 +607,6 @@ namespace IdleDefenseSurvival.Pet
                 isNewPet = false;
                 long expGain = CalculateDuplicateExp();
                 existingPet.Experience += expGain;
-
                 // Check level up
                 int rarityTier = GetRarityTier(existingPet.Definition.rarity);
                 while (existingPet.Experience >= GetExpRequiredForLevel(existingPet.Level + 1, rarityTier))
@@ -632,7 +615,6 @@ namespace IdleDefenseSurvival.Pet
                     existingPet.Level++;
                     Debug.Log($"[PetManager] Pet {petId} leveled up to {existingPet.Level}");
                 }
-
                 Debug.Log($"[PetManager] Duplicate pet {petId}, added {expGain} exp (total={existingPet.Experience})");
                 return petId; // Return petId for duplicate path
             }
@@ -641,12 +623,9 @@ namespace IdleDefenseSurvival.Pet
         /// <summary>
         /// Calculate exp gained from duplicate pet.
         /// Each duplicate = 1 XP point (matches crafting duplicate pattern).
+        // ponytail: flat 1 XP per duplicate; scale with rarity if needed
         /// </summary>
-        private long CalculateDuplicateExp()
-        {
-            // ponytail: flat 1 XP per duplicate; scale with rarity if needed
-            return 1;
-        }
+        private long CalculateDuplicateExp() => 1;
 
         /// <summary>
         /// Get exp required to reach target level.
@@ -657,7 +636,7 @@ namespace IdleDefenseSurvival.Pet
         public long GetExpRequiredForLevel(int targetLevel, int rarityTier)
         {
             // ponytail: linear scaling ((BASE_LEVEL_PET + rarity) * (level - 1))
-            // Common Level 2 → (17+1)*1 = 18 XP, Epic Level 2 → (17+3)*1 = 20 XP
+            // Common Level 2 → (17+1)1 = 18 XP, Epic Level 2 → (17+3)1 = 20 XP
             return (long)(GameConstants.BASE_LEVEL_PET + rarityTier) * (targetLevel - 1);
         }
 
@@ -687,14 +666,11 @@ namespace IdleDefenseSurvival.Pet
         public PetRuntime GetPetWithLowestStaminaPercentage()
         {
             if (_equippedPets.Count == 0) return null;
-
             PetRuntime lowestPet = null;
             float lowestPercent = float.MaxValue;
-
             foreach (var pet in _equippedPets)
             {
                 float percent = pet.StaminaPercent;
-
                 // Lower percentage wins
                 if (percent < lowestPercent)
                 {
@@ -703,23 +679,19 @@ namespace IdleDefenseSurvival.Pet
                 }
                 // Tie-breaker: lowest OrbitIndex (deterministic)
                 else if (Mathf.Approximately(percent, lowestPercent) &&
-                         (lowestPet == null || pet.OrbitIndex < lowestPet.OrbitIndex))
+                        (lowestPet == null || pet.OrbitIndex < lowestPet.OrbitIndex))
                 {
                     lowestPet = pet;
                 }
             }
-
             return lowestPet;
         }
-
         #endregion
 
         #region Save/Load
-
         public List<PetSaveEntry> GetSaveData()
         {
             var saveData = new List<PetSaveEntry>();
-
             foreach (var pet in _ownedPets.Values)
             {
                 saveData.Add(new PetSaveEntry
@@ -733,23 +705,19 @@ namespace IdleDefenseSurvival.Pet
                     currentStamina = pet.CurrentStamina
                 });
             }
-
             return saveData;
         }
 
         public void LoadSaveData(List<PetSaveEntry> saveData, int unlockedSlots = -1)
         {
             if (saveData == null) return;
-
             _ownedPets.Clear();
             _equippedPets.Clear();
-
             // Restore unlocked slots from parameter (SaveManager pass from SaveData.petUnlockedSlots)
             if (unlockedSlots > 0)
                 _unlockedSlots = unlockedSlots;
             else
                 _unlockedSlots = GameConstants.PET_START_SLOT;
-
             foreach (var entry in saveData)
             {
                 if (!_petDefinitions.TryGetValue(entry.petId, out var definition))
@@ -757,26 +725,20 @@ namespace IdleDefenseSurvival.Pet
                     Debug.LogWarning($"[PetManager] Pet definition not found for saved pet: {entry.petId}");
                     continue;
                 }
-
                 var pet = new PetRuntime(entry.instanceId, entry.petId, definition, entry.level)
                 {
                     Experience = entry.experience,
                     EvolutionStage = entry.evolutionStage
                 };
-
                 // Restore stamina (backward compat: -1 = unset → use max)
                 if (entry.currentStamina >= 0f)
                     pet.RestoreStamina(entry.currentStamina - pet.CurrentStamina);
-
                 // NEW: Initialize behaviors from definition
                 pet.InitializeBehaviors(definition);
-
                 _ownedPets[entry.instanceId] = pet;
-
                 if (entry.isEquipped) EquipPet(entry.instanceId);
             }
         }
-
         #endregion
         
         #region UI Navigation
@@ -807,4 +769,5 @@ namespace IdleDefenseSurvival.Pet
         public bool isEquipped;
         public float currentStamina = -1f; // -1 = unset (v4 backward compat)
     }
+
 }

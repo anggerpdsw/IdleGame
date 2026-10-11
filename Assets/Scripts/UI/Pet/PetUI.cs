@@ -1,7 +1,6 @@
 using UnityEngine;
 using IdleDefenseSurvival.Pet;
 using TMPro;
-using IdleDefenseSurvival.Core;
 using IdleDefenseSurvival.Enemy;
 
 namespace IdleDefenseSurvival.UI
