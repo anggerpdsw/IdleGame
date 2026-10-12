@@ -753,7 +753,7 @@
         }, {
             "Id": "arcane_resonance",
             "Name": "Arcane Resonance",
-            "Description": "After using your Ultimate, your next 8 attacks gain {CurrentValue}% bonus damage and 8% Critical Chance for up to 6 seconds.",
+            "Description": "After using your Ultimate, your next 8 attacks gain {CurrentValue}% bonus damage and 22% Critical Chance for up to 6 seconds.",
             "EffectType": "ArcaneResonance",
             "Mode": "Percent",
             "BaseValue": 18,
@@ -761,7 +761,7 @@
             "CardRarity": "Epic",
             "Parameters": {
                 "AttackCount": 8,
-                "CriticalChanceBonusPercent": 8,
+                "CriticalChanceBonusPercent": 22,
                 "DurationSeconds": 6
             }
         }, {
@@ -928,21 +928,21 @@
         }, {
             "Id": "soul_harvester",
             "Name": "Soul Harvester",
-            "Description": "Each enemy you kill grants a Soul. Each Soul adds {CurrentValue}% Attack Damage. Every 66 kills, the Soul cap increases by 6.",
+            "Description": "Gain 1 Soul per 666 enemy kills. Each additional Soul requires 666 more kills. Each Soul adds {CurrentValue}% Attack Damage. Max 66 Souls.",
             "EffectType": "SoulHarvester",
             "Mode": "Percent",
-            "BaseValue": 0.05,
-            "ValuePerLevel": 0.011,
+            "BaseValue": 0.5,
+            "ValuePerLevel": 0.07,
             "CardRarity": "Mythic",
             "Parameters": {
-                "InitialSoulCap": 66,
-                "SoulsPerCapIncrease": 666,
-                "SoulCapIncrease": 6
+                "InitialKillThreshold": 666,
+                "KillIncrement": 666,
+                "MaxSouls": 66
             }
         }, {
             "Id": "death_reversal",
             "Name": "Death Reversal",
-            "Description": "Once per wave, prevent your first death and return to your position and HP from 5 seconds earlier, or 50% max HP if higher. Clear nearby enemy projectiles; restored HP scales with card level.",
+            "Description": "Once per wave, prevent your first death and return to your position and HP from 5 seconds earlier, or {CurrentValue}% max HP if higher. Clear nearby enemy projectiles; restored HP scales with card level.",
             "EffectType": "DeathReversal",
             "Mode": "Percent",
             "BaseValue": 50,
@@ -956,7 +956,7 @@
         }, {
             "Id": "void_overlord",
             "Name": "Void Overlord",
-            "Description": "Every 100 seconds, enter Void Overlord state for 15 seconds. During this state, player projectiles pierce enemies, deal 100% bonus damage, and prevent enemies from healing. Damage bonus scales with card level.",
+            "Description": "Every 100 seconds, enter Void Overlord state for 15 seconds. During this state, player projectiles pierce enemies, deal {CurrentValue}% bonus damage, and prevent enemies from healing. Damage bonus scales with card level.",
             "EffectType": "VoidOverlord",
             "Mode": "Percent",
             "BaseValue": 100,
@@ -969,7 +969,7 @@
         }, {
             "Id": "world_breaker",
             "Name": "World Breaker",
-            "Description": "Every 5A kills permanently grants 2% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
+            "Description": "Every 5A kills permanently grants {CurrentValue}% damage. Every 5 stacks ignores an additional 10% of enemy defense. Bonuses scale with card level.",
             "EffectType": "WorldBreaker",
             "Mode": "Percent",
             "BaseValue": 2,
@@ -984,7 +984,7 @@
         }, {
             "Id": "divine_retribution",
             "Name": "Divine Retribution",
-            "Description": "Losing 25% of max HP within 3 seconds triggers a blast against all enemies for 500% Attack Damage. Cooldown: 12 seconds. Damage scales with card level.",
+            "Description": "Losing 25% of max HP within 3 seconds triggers a blast against all enemies for {CurrentValue}% Attack Damage. Cooldown: 12 seconds. Damage scales with card level.",
             "EffectType": "DivineRetribution",
             "Mode": "Percent",
             "BaseValue": 500,
@@ -998,7 +998,7 @@
         }, {
             "Id": "celestial_arsenal",
             "Name": "Celestial Arsenal",
-            "Description": "Every 50 attacks summons a random piercing beam, orbital strike, or chain lightning. Each distinct weapon used permanently increases Celestial Weapon damage by 15%. Bonus scales with card level.",
+            "Description": "Every 50 attacks summons a random piercing beam, orbital strike, or chain lightning. Each distinct weapon used permanently increases Celestial Weapon damage by {CurrentValue}%. Bonus scales with card level.",
             "EffectType": "CelestialArsenal",
             "Mode": "Percent",
             "BaseValue": 15,
