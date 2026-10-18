@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "d8f74c9f0cf768f8fb70c241540bacaa25a64b12",
+    "indexed_at": "2026-10-18T13:44:45Z",
+    "project": "F-UNITY-IdleGame",
+    "nodes": 13371,
+    "edges": 52200,
+    "original_size": 43909120,
+    "compressed_size": 7710512,
+    "compression_level": 3
+}

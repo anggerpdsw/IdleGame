@@ -10,7 +10,7 @@ using IdleDefenseSurvival.Enemy.StatusEffects;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
-    public sealed class BloodTrailCardBehavior : CardBehaviorBase
+    public sealed class BloodTrailCardBehavior : CardBehaviorBase, ICardHUDProvider
     {
         public override CardEffectType EffectType => CardEffectType.BloodTrail;
         public override CardEventType[] SubscribedEvents => System.Array.Empty<CardEventType>();
@@ -48,6 +48,8 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             }
         }
 
+        private float _damageTickTimer;
+
         public override void Update(float deltaTime)
         {
             var player = PlayerClass.Instance;
@@ -75,8 +77,13 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                 _lastPosition = currentPos;
             }
 
+            // Damage tick rate: once per second
+            _damageTickTimer += deltaTime;
+            bool shouldTickDamage = _damageTickTimer >= 1f;
+            if (shouldTickDamage) _damageTickTimer -= 1f;
+
             // Update and process trail segments
-            float damagePerSecond = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * GetCurrentValue() / 100f;
+            float damagePerTick = PlayerStatsManager.Instance.GetStat(SkillType.AttackDamage) * GetCurrentValue() / 100f;
 
             for (int i = _trailSegments.Count - 1; i >= 0; i--)
             {
@@ -89,7 +96,7 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     continue;
                 }
 
-                // Damage and slow enemies in radius
+                // Damage and slow enemies in radius (damage once per second, slow continuously refreshed)
                 Collider2D[] hits = Physics2D.OverlapCircleAll(segment.Position, _trailRadius, LayerMask.GetMask("Enemy"));
                 foreach (var hit in hits)
                 {
@@ -97,15 +104,19 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
                     {
                         if (enemy.CurrentHealth <= 0) continue;
 
-                        // Apply damage
-                        var damageData = new DamageData(damagePerSecond * deltaTime, DamageType.Normal, CriticalType.None, "BloodTrail")
+                        // Apply damage once per second
+                        if (shouldTickDamage)
                         {
-                            Element = Element.None
-                        };
-                        enemy.TakeDamage(damageData);
+                            var damageData = new DamageData(damagePerTick, DamageType.Normal, CriticalType.None, "BloodTrail")
+                            {
+                                Element = Element.None
+                            };
+                            enemy.TakeDamage(damageData);
+                        }
 
-                        // Apply slow
-                        var slowEffect = new SlowStatus(_slowPercent, deltaTime * 2f);
+                        // Apply slow - refresh duration each frame while in trail
+                        // Slow lasts for 2 seconds (matching typical status effect duration)
+                        var slowEffect = new SlowStatus(_slowPercent, 2f);
                         enemy.EnemyStatusEffect?.AddEffect(slowEffect);
                     }
                 }
@@ -120,5 +131,14 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
             _trailSegments.Clear();
             _hasPosition = false;
         }
+
+        CardEffectType ICardHUDProvider.EffectType => CardEffectType.BloodTrail;
+        public CardHUDData GetHUDData()
+        {
+            int active = _trailSegments.Count;
+            return new CardHUDData(GetCardIcon(),
+                $"Trail: {active}/{_maximumTrailSegments}");
+        }
+
     }
 }

@@ -150,23 +150,6 @@ namespace IdleDefenseSurvival.Card
             return behavior?.GetNormalExecutionThreshold() ?? 0f;
         }
 
-        // Angel (Immortal) — query behavior state
-        public static float GetAngelMaxCooldown()
-        {
-            var mgr = CardRuntimeManager.Instance;
-            if (mgr == null) return 0f;
-            var behavior = mgr.GetBehavior("angel") as AngelCardBehavior;
-            return behavior?.GetCurrentValue() ?? 0f;
-        }
-
-        public static float GetAngelCooldownRemaining()
-        {
-            var mgr = CardRuntimeManager.Instance;
-            if (mgr == null) return 0f;
-            var behavior = mgr.GetBehavior("angel") as AngelCardBehavior;
-            return behavior?.GetCooldownRemaining() ?? 0f;
-        }
-
         public static bool TryTriggerAngel()
         {
             var behavior = CardRuntimeManager.Instance?.GetBehavior("angel") as AngelCardBehavior;
@@ -181,22 +164,6 @@ namespace IdleDefenseSurvival.Card
             return behavior?.HasImmunity() ?? false;
         }
 
-        public static float GetCrazyGamblerBonus()
-        {
-            var mgr = CardRuntimeManager.Instance;
-            if (mgr == null) return 0f;
-            var behavior = mgr.GetBehavior("crazy_gambler") as CrazyGamblerCardBehavior;
-            return behavior?.GetBonus() ?? 0f;
-        }
-
-        public static float GetDesperadosBonus()
-        {
-            var mgr = CardRuntimeManager.Instance;
-            if (mgr == null) return 0f;
-            var behavior = mgr.GetBehavior("desperados") as DesperadosCardBehavior;
-            return behavior?.GetBonus() ?? 0f;
-        }
-
         // DeathChain — query behavior's current stack count
         public static int GetDeathChainStack()
         {
@@ -204,18 +171,6 @@ namespace IdleDefenseSurvival.Card
             if (mgr == null) return 0;
             var behavior = mgr.GetBehavior("death_chain") as DeathChainCardBehavior;
             return behavior?.GetStackCount() ?? 0;
-        }
-
-        public static int GetSoulHarvesterSoulCount()
-        {
-            var behavior = CardRuntimeManager.Instance?.GetBehavior("soul_harvester") as SoulHarvesterCardBehavior;
-            return behavior?.GetSoulCount() ?? 0;
-        }
-
-        public static int GetSoulHarvesterMaxStack()
-        {
-            var behavior = CardRuntimeManager.Instance?.GetBehavior("soul_harvester") as SoulHarvesterCardBehavior;
-            return behavior?.GetMaxStack() ?? 0;
         }
 
         // Aura effect detection — used by AuraCollider

@@ -3,7 +3,6 @@ using IdleDefenseSurvival.Data;
 using IdleDefenseSurvival.Manager;
 using IdleDefenseSurvival.Stats;
 using IdleDefenseSurvival.Enemy;
-using IdleDefenseSurvival.Core;
 
 namespace IdleDefenseSurvival.Card.Behavior.Implementations
 {
@@ -13,10 +12,10 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         public override CardEventType[] SubscribedEvents => new[] { CardEventType.OnEnemyKilled };
 
         private int _soulCount;
-        private long _killCount;
         private int _maxSouls;
-        private int _threshold;
-        private int _increment;
+        private int _initialKillThreshold;
+        private int _killIncrement;
+        private int _remainingKills;
 
         private const string ModifierId = "Card:SoulHarvester";
 
@@ -24,39 +23,46 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
         {
             base.OnEquip(state);
             _soulCount = 0;
-            _killCount = 0;
-
             _maxSouls = Mathf.RoundToInt(GetParameter("MaxSouls", 66f));
-            _threshold = Mathf.RoundToInt(GetParameter("InitialKillThreshold", 666f));
-            _increment = Mathf.RoundToInt(GetParameter("KillIncrement", 66f));
+            _initialKillThreshold = Mathf.RoundToInt(GetParameter("InitialKillThreshold", 666f));
+            _killIncrement = Mathf.RoundToInt(GetParameter("KillIncrement", 66f));
+            _remainingKills = _initialKillThreshold;
+            RefreshModifier();
         }
 
         public override void OnUnequip(CardRuntimeState state)
         {
             _soulCount = 0;
-            _killCount = 0;
+            _remainingKills = 0;
             ModifierManager.Instance.RemoveModifier(ModifierId);
         }
 
         public override void OnEnemyKilled(int count, string enemyType, string damageSource)
         {
             if (damageSource != DamageSource.Player.ToString()) return;
+            if (_soulCount >= _maxSouls) return;
 
-            _killCount += count;
+            _remainingKills -= count;
 
-            int calculated = 0;
-            if (_killCount >= _threshold && _increment > 0)
+            while (_remainingKills <= 0 && _soulCount < _maxSouls)
             {
-                calculated = 1 + (int)((_killCount - _threshold) / _increment);
+                _soulCount++;
+                if (_soulCount < _maxSouls)
+                {
+                    _remainingKills += _killIncrement;
+                }
+                else
+                {
+                    _remainingKills = 0;
+                }
             }
 
-            _soulCount = Mathf.Min(calculated, _maxSouls);
             RefreshModifier();
         }
 
         public override void OnEnemyKilled(EnemyAi enemy, string damageSource)
         {
-            // Soul counting handled in count-based overload
+            // Handled in count-based overload
         }
 
         private void RefreshModifier()
@@ -81,14 +87,16 @@ namespace IdleDefenseSurvival.Card.Behavior.Implementations
 
         public int GetSoulCount() => _soulCount;
         public int GetMaxStack() => _maxSouls;
+        public int GetRemainingKills() => _remainingKills;
 
         CardEffectType ICardHUDProvider.EffectType => CardEffectType.SoulHarvester;
 
         public CardHUDData GetHUDData()
         {
-            float totalBonus = _soulCount * GetCurrentValue();
             int maxSouls = Mathf.RoundToInt(GetParameter("MaxSouls", 66f));
-            return new CardHUDData(GetCardIcon(), $"{_soulCount}/{maxSouls}\n{totalBonus:F1}%");
+            string countPart = $"{_soulCount}/{maxSouls}";
+            string remainingPart = _soulCount < maxSouls ? $"{GetRemainingKills()} kills left\n" : "MAX\n";
+            return new CardHUDData(GetCardIcon(), $"{remainingPart}{countPart}");
         }
     }
 }

@@ -928,7 +928,7 @@
         }, {
             "Id": "soul_harvester",
             "Name": "Soul Harvester",
-            "Description": "Gain 1 Soul per 666 enemy kills. Each additional Soul requires 666 more kills. Each Soul adds {CurrentValue}% Attack Damage. Max 66 Souls.",
+            "Description": "Gain 1 Soul per 666 enemy kills. Each additional Soul requires 66 more kills. Each Soul adds {CurrentValue}% Attack Damage. Max 66 Souls.",
             "EffectType": "SoulHarvester",
             "Mode": "Percent",
             "BaseValue": 0.5,
@@ -936,7 +936,7 @@
             "CardRarity": "Mythic",
             "Parameters": {
                 "InitialKillThreshold": 666,
-                "KillIncrement": 666,
+                "KillIncrement": 66,
                 "MaxSouls": 66
             }
         }, {
